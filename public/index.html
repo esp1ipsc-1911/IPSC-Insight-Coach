@@ -31,10 +31,8 @@
     <div class="field-group"><div class="field-label lang-email">E-post</div><input class="field-input" type="email" value="espen@dssn.no"></div>
     <div class="field-group"><div class="field-label lang-password">Passord</div><input class="field-input" type="password" value="password"></div>
     <button class="btn-primary lang-login" onclick="navigate('screen-home')">Logg inn</button>
-    <div class="divider"><div class="divider-line"></div><span class="divider-text">eller</span><div class="divider-line"></div></div>
-<button class="btn-secondary" onclick="navigate('screen-home')">
-  <span>Registrer bruker med autorisasjonskode</span>
-</button>
+    <div class="divider"><div class="divider-line"></div><span class="divider-text lang-or">eller</span><div class="divider-line"></div></div>
+    <button class="btn-secondary lang-register_with_code" onclick="navigate('screen-home')">Registrer bruker med autorisasjonskode</button>
   </div>
 </div>
 
@@ -456,7 +454,7 @@ const LANG = {
     login:'Logg inn',
     or:'eller',
     continue_github:'Fortsett med GitHub',
-    continue_apple:'Fortsett med Apple',
+    register_with_code:'Registrer bruker med autorisasjonskode',
     
     // Navigation
     home:'Hjem',
@@ -620,7 +618,7 @@ const LANG = {
     login:'Log in',
     or:'or',
     continue_github:'Continue with GitHub',
-    continue_apple:'Continue with Apple',
+    register_with_code:'Register user with authorization code',
     
     // Navigation
     home:'Home',
@@ -795,7 +793,7 @@ function setLanguage(lang){
   document.querySelectorAll('.lang-password').forEach(e=>e.textContent=t('password'));
   document.querySelectorAll('.lang-login').forEach(e=>e.textContent=t('login'));
   document.querySelectorAll('.lang-or').forEach(e=>e.textContent=t('or'));
-  document.querySelectorAll('.lang-continue_apple').forEach(e=>e.textContent=t('continue_apple'));
+  document.querySelectorAll('.lang-register_with_code').forEach(e=>e.textContent=t('register_with_code'));
   document.querySelectorAll('.lang-continue_github').forEach(e=>e.textContent=t('continue_github'));
   // Modal titles
   document.querySelectorAll('.lang-new_match').forEach(e=>e.textContent=t('new_match'));
@@ -2606,6 +2604,6 @@ calcPrognose();
 renderResults();
 </script>
 </div>
-<script type="module" src="../src/main.js"></script>
+<script type="module" src="/src/main.js"></script>
 </body>
 </html>

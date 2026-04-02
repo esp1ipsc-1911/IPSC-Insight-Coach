@@ -324,9 +324,39 @@ function errorStyle() {
   `;
 }
 
-export function initializeLoginUI() {
-  const loginScreen = document.getElementById('login-screen');
-  if (!loginScreen) return;
+export function attachLoginHandlers() {
+  window.setLanguage = function(lang) {
+    localStorage.setItem('ipsc_lang', lang);
+    window.location.reload();
+  };
+
+  window.switchAuthTab = function(tab) {
+    localStorage.setItem('ipsc_auth_tab', tab);
+
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+
+    const loginActive = tab === 'login';
+
+    if (loginForm) loginForm.style.display = loginActive ? 'block' : 'none';
+    if (registerForm) registerForm.style.display = loginActive ? 'none' : 'block';
+
+    if (tabLogin) {
+      tabLogin.style.background = loginActive
+        ? `linear-gradient(135deg, ${COLORS.gold} 0%, ${COLORS.goldDark} 100%)`
+        : 'rgba(255,255,255,0.04)';
+      tabLogin.style.color = loginActive ? COLORS.bg : '#d9dfed';
+    }
+
+    if (tabRegister) {
+      tabRegister.style.background = !loginActive
+        ? `linear-gradient(135deg, ${COLORS.gold} 0%, ${COLORS.goldDark} 100%)`
+        : 'rgba(255,255,255,0.04)';
+      tabRegister.style.color = !loginActive ? COLORS.bg : '#d9dfed';
+    }
+  };
 
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
@@ -358,12 +388,16 @@ async function handleLogin(e) {
 
   try {
     hideError(loginError);
-    setLoading(submitButton, true, 'logger inn');
+    setLoading(submitButton, true);
 
     const email = document.getElementById('login-email')?.value?.trim();
     const password = document.getElementById('login-password')?.value;
 
-    await login(email, password);
+    const result = await login(email, password);
+
+    if (result && result.success === false) {
+      showError(loginError, result.error || getErrorMessage(result));
+    }
   } catch (error) {
     showError(loginError, getErrorMessage(error));
   } finally {
@@ -379,53 +413,24 @@ async function handleRegister(e) {
 
   try {
     hideError(registerError);
-    setLoading(submitButton, true, 'oppretter konto');
+    setLoading(submitButton, true);
 
     const name = document.getElementById('register-name')?.value?.trim();
     const email = document.getElementById('register-email')?.value?.trim();
     const password = document.getElementById('register-password')?.value;
     const inviteCode = document.getElementById('register-invite')?.value?.trim().toUpperCase();
 
-    await register(email, password, name, inviteCode);
+    const result = await register(email, password, inviteCode, name);
+
+    if (result && result.success === false) {
+      showError(registerError, result.error || getErrorMessage(result));
+    }
   } catch (error) {
     showError(registerError, getErrorMessage(error));
   } finally {
     setLoading(submitButton, false);
   }
 }
-
-window.switchAuthTab = function(tab) {
-  localStorage.setItem('ipsc_auth_tab', tab);
-
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-  const tabLogin = document.getElementById('tab-login');
-  const tabRegister = document.getElementById('tab-register');
-
-  const loginActive = tab === 'login';
-
-  if (loginForm) loginForm.style.display = loginActive ? 'block' : 'none';
-  if (registerForm) registerForm.style.display = loginActive ? 'none' : 'block';
-
-  if (tabLogin) {
-    tabLogin.style.background = loginActive
-      ? `linear-gradient(135deg, ${COLORS.gold} 0%, ${COLORS.goldDark} 100%)`
-      : 'rgba(255,255,255,0.04)';
-    tabLogin.style.color = loginActive ? COLORS.bg : '#d9dfed';
-  }
-
-  if (tabRegister) {
-    tabRegister.style.background = !loginActive
-      ? `linear-gradient(135deg, ${COLORS.gold} 0%, ${COLORS.goldDark} 100%)`
-      : 'rgba(255,255,255,0.04)';
-    tabRegister.style.color = !loginActive ? COLORS.bg : '#d9dfed';
-  }
-};
-
-window.setLanguage = function(lang) {
-  localStorage.setItem('ipsc_lang', lang);
-  window.location.reload();
-};
 
 function showError(errorElement, message) {
   if (!errorElement) return;
@@ -439,7 +444,7 @@ function hideError(errorElement) {
   errorElement.textContent = '';
 }
 
-function setLoading(button, isLoading, action = 'laster') {
+function setLoading(button, isLoading) {
   if (!button) return;
   button.disabled = isLoading;
   button.style.opacity = isLoading ? '0.7' : '1';
@@ -459,29 +464,21 @@ function setLoading(button, isLoading, action = 'laster') {
 }
 
 function getErrorMessage(error) {
-  const code = error?.code || '';
+  const message = error?.message || error?.error || '';
   const lang = localStorage.getItem('ipsc_lang') || 'no';
   const isNo = lang === 'no';
 
-  switch (code) {
-    case 'auth/invalid-email':
-      return isNo ? 'Ugyldig e-postadresse.' : 'Invalid email address.';
-    case 'auth/user-not-found':
-    case 'auth/wrong-password':
-    case 'auth/invalid-credential':
-      return isNo ? 'Feil e-post eller passord.' : 'Incorrect email or password.';
-    case 'auth/email-already-in-use':
-      return isNo ? 'E-postadressen er allerede registrert.' : 'This email is already registered.';
-    case 'auth/weak-password':
-      return isNo ? 'Passordet må være minst 6 tegn.' : 'Password must be at least 6 characters.';
-    case 'auth/missing-password':
-      return isNo ? 'Passord mangler.' : 'Password is missing.';
-    case 'auth/too-many-requests':
-      return isNo ? 'For mange forsøk. Prøv igjen senere.' : 'Too many attempts. Please try again later.';
-    default:
-      if (error?.message?.includes('authorization code') || error?.message?.includes('autorisasjonskode')) {
-        return isNo ? 'Ugyldig autorisasjonskode.' : 'Invalid authorization code.';
-      }
-      return isNo ? 'Noe gikk galt. Prøv igjen.' : 'Something went wrong. Please try again.';
+  if (message.toLowerCase().includes('authorization code') || message.toLowerCase().includes('autorisasjonskode')) {
+    return isNo ? 'Ugyldig autorisasjonskode.' : 'Invalid authorization code.';
   }
+
+  if (message.toLowerCase().includes('email')) {
+    return isNo ? 'Feil med e-postadresse.' : 'Email error.';
+  }
+
+  if (message.toLowerCase().includes('password')) {
+    return isNo ? 'Feil passord eller ugyldig passord.' : 'Invalid password.';
+  }
+
+  return isNo ? 'Noe gikk galt. Prøv igjen.' : 'Something went wrong. Please try again.';
 }

@@ -2171,9 +2171,10 @@ if ('serviceWorker' in navigator) {
 }
 
 window.switchTab = switchTab;
+window.selectMatch = selectMatch;
 window.openModal = openModal;
 window.closeModal = closeModal;
-window.selectMatch = selectMatch;
-window.removeShooter = removeShooter;
+window.closeModalOutside = closeModalOutside;
 window.switchMode = switchMode;
+window.removeShooter = removeShooter;
 window.selectPF = selectPF;

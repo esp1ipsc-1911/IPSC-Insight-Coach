@@ -420,7 +420,7 @@ export async function renderApp(container) {
     <div class="nav-avatar" id="prof-avatar" onclick="switchTab('screen-home')">${initials()}</div>
   </div>
   <div class="scroll-content">
-    <div style="text-align:center;padding:32px 18px 24px">
+    <div style="text-align:center;padding:32px 0 24px">
       <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c97b2a);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:36px;color:var(--bg);margin:0 auto 16px">${initials()}</div>
       <div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px" id="prof-name">${profile.firstName || ''} ${profile.lastName || ''}</div>
       <div style="font-size:14px;color:var(--muted);margin-bottom:12px" id="prof-div">${profile.division || '—'} · ${profile.club || '—'}</div>
@@ -432,7 +432,7 @@ export async function renderApp(container) {
       <button class="btn-primary" style="margin-top:20px;max-width:280px" onclick="openEditProfile()">✏️ ${t('edit_profile')}</button>
     </div>
 
-    <div class="card" style="margin:0 18px 12px">
+    <div class="card">
       <div class="card-header"><div class="card-title">Personlig informasjon</div></div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="color:var(--muted)">Fornavn</span>
@@ -464,7 +464,7 @@ export async function renderApp(container) {
       </div>
     </div>
 
-    <div class="card" style="margin:0 18px 12px">
+    <div class="card">
       <div class="card-header"><div class="card-title">Sesongstatistikk</div></div>
       <div class="stats-grid">
         <div class="stat-block"><div class="stat-value" id="stat-matches">0</div><div class="stat-label">${t('matches_count')}</div></div>
@@ -474,7 +474,7 @@ export async function renderApp(container) {
       </div>
     </div>
 
-    <button class="btn-primary" style="margin:12px 18px;background:var(--red)" onclick="handleLogout()">🚪 ${t('logout')}</button>
+    <button class="btn-primary" style="margin-top:12px;background:var(--red)" onclick="handleLogout()">🚪 ${t('logout')}</button>
     <div style="height:20px"></div>
   </div>
   <div class="tab-bar">

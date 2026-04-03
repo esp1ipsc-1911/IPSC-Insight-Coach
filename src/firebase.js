@@ -3,7 +3,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-aut
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA110PapsS0fwLQzs-oEoF7papT9S3T5p7Q",
+  apiKey: "AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5pQ",
   authDomain: "ipsc-insight-coach.firebaseapp.com",
   projectId: "ipsc-insight-coach",
   storageBucket: "ipsc-insight-coach.firebasestorage.app",

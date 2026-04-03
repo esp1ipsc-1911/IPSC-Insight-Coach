@@ -1,60 +1,56 @@
-// ════════════════════════════════════════════════════════════════════════════
-// AUTHENTICATION MODULE - Email/Password with Invite Code System
-// ════════════════════════════════════════════════════════════════════════════
-
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
-  onAuthStateChanged 
+  onAuthStateChanged
 } from 'firebase/auth';
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  collection, 
-  query, 
-  where, 
-  getDocs,
+
+import {
+  doc,
+  setDoc,
+  getDoc,
   updateDoc,
-  increment 
+  increment
 } from 'firebase/firestore';
+
 import { auth, db } from './firebase.js';
 
-// Current user state
 let currentUser = null;
 let currentUserProfile = null;
 
-// ════════════════════════════════════════════════════════════════════════════
-// AUTH STATE LISTENER
-// ════════════════════════════════════════════════════════════════════════════
-
 export function initAuth(onUserChanged) {
-  console.log('initAuth: Setting up auth state listener');
   onAuthStateChanged(auth, async (user) => {
-    console.log('onAuthStateChanged fired! user:', user);
     if (user) {
       currentUser = user;
-      console.log('User authenticated, loading profile from Firestore...');
-      // Load user profile from Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      console.log('Firestore userDoc:', userDoc);
-      if (userDoc.exists()) {
-        currentUserProfile = { uid: user.uid, ...userDoc.data() };
-        console.log('User profile loaded:', currentUserProfile);
-      } else {
-        console.warn('User document does not exist in Firestore! Creating minimal profile...');
-        // Create minimal profile if document doesn't exist
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+        if (userDoc.exists()) {
+          currentUserProfile = { uid: user.uid, ...userDoc.data() };
+        } else {
+          currentUserProfile = {
+            uid: user.uid,
+            email: user.email,
+            name: user.email ? user.email.split('@')[0] : 'Bruker',
+            role: 'user'
+          };
+        }
+
+        onUserChanged(currentUserProfile);
+      } catch (error) {
+        console.error('Feil ved lasting av brukerprofil:', error);
+
         currentUserProfile = {
           uid: user.uid,
           email: user.email,
-          name: user.displayName || user.email.split('@')[0]
+          name: user.email ? user.email.split('@')[0] : 'Bruker',
+          role: 'user'
         };
+
+        onUserChanged(currentUserProfile);
       }
-      console.log('Calling onUserChanged callback with:', currentUserProfile);
-      onUserChanged(currentUserProfile);
     } else {
-      console.log('No user authenticated');
       currentUser = null;
       currentUserProfile = null;
       onUserChanged(null);
@@ -62,32 +58,36 @@ export function initAuth(onUserChanged) {
   });
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// INVITE CODE VALIDATION
-// ════════════════════════════════════════════════════════════════════════════
-
 async function validateInviteCode(code) {
   try {
-    const inviteDoc = await getDoc(doc(db, 'inviteCodes', code));
-    
+    if (!code || !code.trim()) {
+      return { valid: false, error: 'Du må skrive inn invitasjonskode' };
+    }
+
+    const inviteCode = code.trim();
+    const inviteDoc = await getDoc(doc(db, 'inviteCodes', inviteCode));
+
     if (!inviteDoc.exists()) {
       return { valid: false, error: 'Ugyldig invitasjonskode' };
     }
-    
+
     const data = inviteDoc.data();
-    
-    if (!data.active) {
+
+    if (data.active === false) {
       return { valid: false, error: 'Denne koden er deaktivert' };
     }
-    
-    if (data.usedCount >= data.maxUses) {
+
+    const usedCount = Number(data.usedCount || 0);
+    const maxUses = Number(data.maxUses || 0);
+
+    if (maxUses > 0 && usedCount >= maxUses) {
       return { valid: false, error: 'Denne koden har nådd maks antall brukere' };
     }
-    
-    return { valid: true, code: code };
+
+    return { valid: true, code: inviteCode };
   } catch (error) {
-    console.error('Invite code validation error:', error);
-    return { valid: false, error: 'Kunne ikke validere kode' };
+    console.error('Feil ved validering av invitasjonskode:', error);
+    return { valid: false, error: 'Kunne ikke validere invitasjonskode' };
   }
 }
 
@@ -97,32 +97,35 @@ async function incrementInviteCodeUsage(code) {
       usedCount: increment(1)
     });
   } catch (error) {
-    console.error('Failed to increment invite code usage:', error);
+    console.error('Kunne ikke oppdatere bruk av invitasjonskode:', error);
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// REGISTRATION
-// ════════════════════════════════════════════════════════════════════════════
-
 export async function register(email, password, inviteCode, name) {
   try {
-    // Validate invite code first
-    const codeValidation = await validateInviteCode(inviteCode);
+    const cleanEmail = (email || '').trim();
+    const cleanPassword = password || '';
+    const cleanInviteCode = (inviteCode || '').trim();
+    const cleanName = (name || '').trim();
+
+    const codeValidation = await validateInviteCode(cleanInviteCode);
     if (!codeValidation.valid) {
-      throw new Error(codeValidation.error);
+      return { success: false, error: codeValidation.error };
     }
-    
-    // Create Firebase Auth user
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      cleanEmail,
+      cleanPassword
+    );
+
     const user = userCredential.user;
-    
-    // Create user profile in Firestore
+
     await setDoc(doc(db, 'users', user.uid), {
-      email: email,
-      name: name || email.split('@')[0],
+      email: cleanEmail,
+      name: cleanName || cleanEmail.split('@')[0],
       role: 'user',
-      inviteCode: inviteCode,
+      inviteCode: cleanInviteCode,
       createdAt: new Date(),
       firstName: '',
       lastName: '',
@@ -132,15 +135,15 @@ export async function register(email, password, inviteCode, name) {
       draw: 1.42,
       reload: 2.5
     });
-    
-    // Increment invite code usage
-    await incrementInviteCodeUsage(inviteCode);
-    
-    return { success: true, user: user };
+
+    await incrementInviteCodeUsage(cleanInviteCode);
+
+    return { success: true, user };
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('Registrering feilet:', error);
+
     let errorMessage = 'Registrering feilet';
-    
+
     if (error.code === 'auth/email-already-in-use') {
       errorMessage = 'E-postadressen er allerede i bruk';
     } else if (error.code === 'auth/weak-password') {
@@ -150,52 +153,53 @@ export async function register(email, password, inviteCode, name) {
     } else if (error.message) {
       errorMessage = error.message;
     }
-    
+
     return { success: false, error: errorMessage };
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// LOGIN
-// ════════════════════════════════════════════════════════════════════════════
-
 export async function login(email, password) {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const cleanEmail = (email || '').trim();
+    const cleanPassword = password || '';
+
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      cleanEmail,
+      cleanPassword
+    );
+
     return { success: true, user: userCredential.user };
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Innlogging feilet:', error);
+
     let errorMessage = 'Innlogging feilet';
-    
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+
+    if (
+      error.code === 'auth/user-not-found' ||
+      error.code === 'auth/wrong-password' ||
+      error.code === 'auth/invalid-credential'
+    ) {
       errorMessage = 'Feil e-post eller passord';
     } else if (error.code === 'auth/invalid-email') {
       errorMessage = 'Ugyldig e-postadresse';
     } else if (error.code === 'auth/user-disabled') {
       errorMessage = 'Denne kontoen er deaktivert';
     }
-    
+
     return { success: false, error: errorMessage };
   }
 }
-
-// ════════════════════════════════════════════════════════════════════════════
-// LOGOUT
-// ════════════════════════════════════════════════════════════════════════════
 
 export async function logout() {
   try {
     await firebaseSignOut(auth);
     return { success: true };
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error('Utlogging feilet:', error);
     return { success: false, error: 'Kunne ikke logge ut' };
   }
 }
-
-// ════════════════════════════════════════════════════════════════════════════
-// USER GETTERS
-// ════════════════════════════════════════════════════════════════════════════
 
 export function getCurrentUser() {
   return currentUser;

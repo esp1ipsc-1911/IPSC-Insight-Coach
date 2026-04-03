@@ -1,7 +1,15 @@
-// Import Firebase (optional - uncomment when ready)
-// import './firebase.js';
+import { renderLogin } from "./loginUI.js";
+import { renderApp } from "./appUI.js";
 
-// Import main app logic
-import './app.js';
+const app = document.getElementById("app");
 
-console.log('IPSC Insight loaded');
+export function goToApp() {
+  renderApp(app);
+}
+
+export function goToLogin() {
+  renderLogin(app);
+}
+
+// START
+goToLogin();

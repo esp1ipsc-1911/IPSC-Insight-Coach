@@ -2170,11 +2170,21 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+
+window.setLanguage = setLanguage;
+window.navigate = navigate;
 window.switchTab = switchTab;
+window.setFilter = setFilter;
 window.selectMatch = selectMatch;
+window.createMatch = createMatch;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.closeModalOutside = closeModalOutside;
 window.switchMode = switchMode;
+window.addStage = addStage;
+window.addStageResult = addStageResult;
+window.calcPrognose = calcPrognose;
 window.removeShooter = removeShooter;
+window.openEditProfile = openEditProfile;
 window.selectPF = selectPF;
+window.saveProfile = saveProfile;

@@ -18,17 +18,7 @@ import {
 // GLOBAL STATE
 // ════════════════════════════════════════════════════════════════════════════
 
-let profile = {
-  firstName: 'Espen',
-  lastName: 'Fiskebeck',
-  division: 'Classic',
-  category: '—',
-  powerFactor: 'minor',
-  region: 'Norge',
-  club: 'NOP',
-  draw: 1.42,
-  reloadTime: 1.80
-};
+let profile;
 
 let activeMatchId = null;
 let matchFilterVal = 'all';
@@ -245,9 +235,9 @@ function gnvi(id, def) {
 }
 
 function initials() {
-  const f = profile.firstName || '';
-  const l = profile.lastName || '';
-  return (f.charAt(0) + l.charAt(0)).toUpperCase() || 'EF';
+  const f = profile?.firstName || '';
+  const l = profile?.lastName || '';
+  return (f.charAt(0) + l.charAt(0)).toUpperCase() || 'U';
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -260,11 +250,20 @@ export async function renderApp(container) {
   const currentUser = getCurrentUserProfile();
   
   if (userProfile) {
-    Object.assign(profile, userProfile);
+    profile = userProfile;
   } else {
-    // Initialize with current user data
-    profile.firstName = currentUser.name || currentUser.email?.split('@')[0] || 'Bruker';
-    profile.lastName = '';
+    // Initialize with empty profile for new user
+    profile = {
+      firstName: currentUser.name || currentUser.email?.split('@')[0] || '',
+      lastName: '',
+      division: '',
+      category: '',
+      powerFactor: '',
+      region: '',
+      club: '',
+      draw: null,
+      reloadTime: null
+    };
   }
 
   // Load matches from Firestore
@@ -352,8 +351,8 @@ export async function renderApp(container) {
       <div class="card-header"><div class="card-title">Skytterdata (snitt)</div><span class="badge badge-blue">Auto</span></div>
       <div class="stats-grid">
         <div class="stat-block"><div class="stat-value">0.18s</div><div class="stat-label">Split</div></div>
-        <div class="stat-block"><div class="stat-value">${profile.draw}s</div><div class="stat-label">Draw</div></div>
-        <div class="stat-block"><div class="stat-value">${profile.reloadTime}s</div><div class="stat-label">Reload</div></div>
+        <div class="stat-block"><div class="stat-value">${profile.draw || '—'}s</div><div class="stat-label">Draw</div></div>
+        <div class="stat-block"><div class="stat-value">${profile.reloadTime || '—'}s</div><div class="stat-label">Reload</div></div>
         <div class="stat-block"><div class="stat-value" id="prog-a-rate">—</div><div class="stat-label">A-andel</div></div>
       </div>
     </div>
@@ -369,10 +368,10 @@ export async function renderApp(container) {
       <div class="prognose-inputs">
         <div class="prog-field" style="opacity:0.7"><input type="number" id="prog-reloads" value="1" readonly style="color:var(--muted)"><div class="prog-field-lbl">Reloads (auto)</div></div>
         <div class="prog-field"><input type="number" id="prog-move" value="3" oninput="calcPrognose()"><div class="prog-field-lbl">${t('move_seconds')}</div></div>
-        <div class="prog-field"><input type="number" id="prog-draw" value="${profile.draw}" oninput="calcPrognose()" style="color:var(--accent)"><div class="prog-field-lbl">${t('draw_seconds')}</div></div>
+        <div class="prog-field"><input type="number" id="prog-draw" value="${profile.draw || 1.42}" oninput="calcPrognose()" style="color:var(--accent)"><div class="prog-field-lbl">${t('draw_seconds')}</div></div>
       </div>
       <div class="prognose-result">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:3px" id="prog-pf-note">${cap(profile.powerFactor)} · ${profile.division}</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px" id="prog-pf-note">${profile.powerFactor ? cap(profile.powerFactor) : 'Minor'} · ${profile.division || 'Classic'}</div>
         <div class="prog-hf-label">Estimert Hit Factor</div>
         <div class="prog-hf-value" id="prog-hf-out">—</div>
         <div id="prog-delta-wrap" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)">
@@ -423,12 +422,12 @@ export async function renderApp(container) {
   <div class="scroll-content">
     <div style="text-align:center;padding:32px 18px 24px">
       <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c97b2a);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:36px;color:var(--bg);margin:0 auto 16px">${initials()}</div>
-      <div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px" id="prof-name">${profile.firstName} ${profile.lastName}</div>
-      <div style="font-size:14px;color:var(--muted);margin-bottom:12px" id="prof-div">${profile.division} · ${profile.club}</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px" id="prof-name">${profile.firstName || ''} ${profile.lastName || ''}</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:12px" id="prof-div">${profile.division || '—'} · ${profile.club || '—'}</div>
       <div style="display:flex;justify-content:center;gap:8px">
-        <span class="badge badge-gold" id="prof-badge-pf">${cap(profile.powerFactor)}</span>
+        <span class="badge badge-gold" id="prof-badge-pf">${profile.powerFactor ? cap(profile.powerFactor) : '—'}</span>
         <span class="badge badge-green">Verified</span>
-        <span class="badge badge-blue" id="prof-badge-region">${profile.region}</span>
+        <span class="badge badge-blue" id="prof-badge-region">${profile.region || '—'}</span>
       </div>
       <button class="btn-primary" style="margin-top:20px;max-width:280px" onclick="openEditProfile()">✏️ ${t('edit_profile')}</button>
     </div>
@@ -437,31 +436,31 @@ export async function renderApp(container) {
       <div class="card-header"><div class="card-title">Personlig informasjon</div></div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="color:var(--muted)">Fornavn</span>
-        <span id="info-firstname">${profile.firstName}</span>
+        <span id="info-firstname">${profile.firstName || '—'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="color:var(--muted)">Etternavn</span>
-        <span id="info-lastname">${profile.lastName}</span>
+        <span id="info-lastname">${profile.lastName || '—'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="color:var(--muted)">Divisjon</span>
-        <span id="info-division">${profile.division}</span>
+        <span id="info-division">${profile.division || '—'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="color:var(--muted)">Kategori</span>
-        <span id="info-category">${profile.category}</span>
+        <span id="info-category">${profile.category || '—'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="color:var(--muted)">Power Factor</span>
-        <span id="info-pf">${cap(profile.powerFactor)}</span>
+        <span id="info-pf">${profile.powerFactor ? cap(profile.powerFactor) : '—'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="color:var(--muted)">Region</span>
-        <span id="info-region">${profile.region}</span>
+        <span id="info-region">${profile.region || '—'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:10px 0">
         <span style="color:var(--muted)">Klubb</span>
-        <span id="info-club">${profile.club}</span>
+        <span id="info-club">${profile.club || '—'}</span>
       </div>
     </div>
 
@@ -535,11 +534,11 @@ export async function renderApp(container) {
     <div class="modal-body">
       <div class="field-group">
         <div class="field-label">${t('first_name')}</div>
-        <input class="field-input" type="text" id="edit-firstname" value="${profile.firstName}">
+        <input class="field-input" type="text" id="edit-firstname" value="${profile.firstName || ''}">
       </div>
       <div class="field-group">
         <div class="field-label">${t('last_name')}</div>
-        <input class="field-input" type="text" id="edit-lastname" value="${profile.lastName}">
+        <input class="field-input" type="text" id="edit-lastname" value="${profile.lastName || ''}">
       </div>
       <div class="field-group">
         <div class="field-label">${t('division')}</div>
@@ -559,15 +558,15 @@ export async function renderApp(container) {
       </div>
       <div class="field-group">
         <div class="field-label">${t('club')}</div>
-        <input class="field-input" type="text" id="edit-club" value="${profile.club}">
+        <input class="field-input" type="text" id="edit-club" value="${profile.club || ''}">
       </div>
       <div class="field-group">
         <div class="field-label">${t('draw_seconds')}</div>
-        <input class="field-input" type="number" step="0.01" id="edit-draw" value="${profile.draw}">
+        <input class="field-input" type="number" step="0.01" id="edit-draw" value="${profile.draw || ''}">
       </div>
       <div class="field-group">
         <div class="field-label">${t('reload_seconds')}</div>
-        <input class="field-input" type="number" step="0.01" id="edit-reload" value="${profile.reloadTime}">
+        <input class="field-input" type="number" step="0.01" id="edit-reload" value="${profile.reloadTime || ''}">
       </div>
       <button class="btn-primary" id="save-profile-btn" onclick="saveProfileData()">${t('save_profile')}</button>
     </div>
@@ -914,26 +913,26 @@ function renderProfile() {
   });
   
   const profName = el('prof-name');
-  if (profName) profName.textContent = profile.firstName + ' ' + profile.lastName;
+  if (profName) profName.textContent = (profile.firstName || '') + ' ' + (profile.lastName || '');
   
   const profDiv = el('prof-div');
-  if (profDiv) profDiv.textContent = profile.division + ' · ' + profile.club;
+  if (profDiv) profDiv.textContent = (profile.division || '—') + ' · ' + (profile.club || '—');
   
   const profBadgePf = el('prof-badge-pf');
-  if (profBadgePf) profBadgePf.textContent = cap(profile.powerFactor);
+  if (profBadgePf) profBadgePf.textContent = profile.powerFactor ? cap(profile.powerFactor) : '—';
   
   const profBadgeRegion = el('prof-badge-region');
-  if (profBadgeRegion) profBadgeRegion.textContent = profile.region;
+  if (profBadgeRegion) profBadgeRegion.textContent = profile.region || '—';
   
   // Update info fields
   const infoFields = {
-    'info-firstname': profile.firstName,
-    'info-lastname': profile.lastName,
-    'info-division': profile.division,
-    'info-category': profile.category,
-    'info-pf': cap(profile.powerFactor),
-    'info-region': profile.region,
-    'info-club': profile.club
+    'info-firstname': profile.firstName || '—',
+    'info-lastname': profile.lastName || '—',
+    'info-division': profile.division || '—',
+    'info-category': profile.category || '—',
+    'info-pf': profile.powerFactor ? cap(profile.powerFactor) : '—',
+    'info-region': profile.region || '—',
+    'info-club': profile.club || '—'
   };
   
   Object.keys(infoFields).forEach(id => {
@@ -979,11 +978,11 @@ function updateProfileStats() {
 }
 
 function openEditProfile() {
-  el('edit-firstname').value = profile.firstName;
-  el('edit-lastname').value = profile.lastName;
-  el('edit-club').value = profile.club;
-  el('edit-draw').value = profile.draw || 1.42;
-  el('edit-reload').value = profile.reloadTime || 1.80;
+  el('edit-firstname').value = profile.firstName || '';
+  el('edit-lastname').value = profile.lastName || '';
+  el('edit-club').value = profile.club || '';
+  el('edit-draw').value = profile.draw || '';
+  el('edit-reload').value = profile.reloadTime || '';
   
   // Division dropdown
   let opts = '';
@@ -1038,14 +1037,14 @@ function selectPF(elem, pf) {
 }
 
 async function saveProfileData() {
-  profile.firstName = gv('edit-firstname').trim() || profile.firstName;
-  profile.lastName = gv('edit-lastname').trim() || profile.lastName;
-  profile.division = gv('edit-division');
-  profile.category = gv('edit-category');
-  profile.region = gv('edit-region');
-  profile.club = gv('edit-club').trim() || profile.club;
-  profile.draw = gnv('edit-draw', 1.42) || 1.42;
-  profile.reloadTime = gnv('edit-reload', 1.80) || 1.80;
+  profile.firstName = gv('edit-firstname').trim() || '';
+  profile.lastName = gv('edit-lastname').trim() || '';
+  profile.division = gv('edit-division') || '';
+  profile.category = gv('edit-category') || '';
+  profile.region = gv('edit-region') || '';
+  profile.club = gv('edit-club').trim() || '';
+  profile.draw = gnv('edit-draw') || null;
+  profile.reloadTime = gnv('edit-reload') || null;
   
   // Save to Firestore
   const result = await saveUserProfile(profile);
@@ -1080,8 +1079,8 @@ function calcPrognose() {
   const move = gnv('prog-move', 3);
   const draw = gnv('prog-draw', profile.draw || 1.42);
   
-  const div = profile.division;
-  const pf = profile.powerFactor;
+  const div = profile.division || 'Classic';
+  const pf = profile.powerFactor || 'minor';
   
   const reloads = calcReloads(shots, div, pf);
   el('prog-reloads').value = reloads;
@@ -1155,7 +1154,7 @@ async function addStageResultHandler() {
     hf: hf,
     time: time,
     pts: pts,
-    pf: profile.powerFactor
+    pf: profile.powerFactor || 'minor'
   };
   
   if (!match.stages) match.stages = [];

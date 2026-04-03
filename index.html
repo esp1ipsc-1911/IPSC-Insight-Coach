@@ -4,162 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="theme-color" content="#e8b84b">
+  <meta name="description" content="IPSC match performance tracker - Analyse, Prognose, Resultat">
   <title>IPSC Insight</title>
-  <style>
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
-:root{--bg:#0a0c10;--bg2:#111318;--bg3:#181c24;--card:#1a1e28;--border:rgba(255,255,255,0.07);--accent:#e8b84b;--accent2:#f0d080;--red:#e05252;--green:#4caf7d;--blue:#4a9eff;--text:#f0f2f5;--muted:#6b7280;--sub:#9ca3af;--radius:14px;--radius-sm:8px;}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;display:flex;justify-content:center;}
-.phone{width:100%;max-width:430px;min-height:100vh;background:var(--bg);}
-.screen{display:none;flex-direction:column;min-height:100vh;}
-.screen.active{display:flex;}
-.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 60% 0%,rgba(232,184,75,.15) 0%,transparent 60%),radial-gradient(ellipse at 10% 80%,rgba(74,158,255,.08) 0%,transparent 50%);}
-.login-content{position:relative;z-index:1;display:flex;flex-direction:column;padding:60px 32px 40px;min-height:100vh;}
-.logo-mark{width:56px;height:56px;background:var(--accent);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:48px;box-shadow:0 0 40px rgba(232,184,75,.3);}
-.login-title{font-family:'Rajdhani',sans-serif;font-size:44px;font-weight:700;line-height:1;margin-bottom:8px;letter-spacing:-.5px;}
-.login-title span{color:var(--accent);}
-.login-sub{color:var(--muted);font-size:15px;margin-bottom:48px;}
-.field-group{margin-bottom:16px;}
-.field-label{font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;}
-.field-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;color:var(--text);font-size:16px;font-family:'Inter',sans-serif;outline:none;}
-.btn-primary{width:100%;background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius-sm);padding:16px;font-size:16px;font-weight:600;font-family:'Rajdhani',sans-serif;cursor:pointer;margin-top:8px;}
-.navbar{padding:52px 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.nav-title{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;flex-shrink:0;}
-.nav-title span{color:var(--accent);}
-.scroll-content{flex:1;overflow-y:auto;padding:0 18px 110px;}
-.tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding:10px 0 26px;z-index:100;}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:var(--muted);font-size:10px;}
-.tab-item.active{color:var(--accent);}
-.tab-icon{font-size:20px;line-height:1;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
-  </style>
+
+  <link rel="manifest" href="./public/manifest.json">
+  <link rel="apple-touch-icon" href="./public/assets/icon-192.png">
+  <link rel="stylesheet" href="./public/styles.css">
 </head>
+
 <body>
   <div id="app"></div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5p7Q",
-      authDomain: "ipsc-insight-coach.firebaseapp.com",
-      projectId: "ipsc-insight-coach",
-      storageBucket: "ipsc-insight-coach.firebasestorage.app",
-      messagingSenderId: "864793320312",
-      appId: "1:864793320312:web:c586e384bbe365444bc68d"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const appContainer = document.getElementById('app');
-
-    function showLogin() {
-      appContainer.innerHTML = `
-        <div class="phone">
-          <div class="screen active">
-            <div class="login-bg"></div>
-            <div class="login-content">
-              <div class="logo-mark">
-                <svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:var(--bg)">
-                  <path d="M12 2L3 7v10l9 5 9-5V7L12 2zm0 2.5l6.5 3.6v7.8L12 19.5l-6.5-3.6V8.1L12 4.5z"/>
-                </svg>
-              </div>
-              <div class="login-title">IPSC<br><span>INSIGHT</span></div>
-              <div class="login-sub">Analyse. Prognose. Resultat.</div>
-              <div class="field-group">
-                <div class="field-label">E-post</div>
-                <input class="field-input" type="email" id="email" value="espen@dssn.no">
-              </div>
-              <div class="field-group">
-                <div class="field-label">Passord</div>
-                <input class="field-input" type="password" id="password" value="">
-              </div>
-              <button class="btn-primary" onclick="handleLogin()">Logg inn</button>
-              <div id="error" style="color:var(--red);margin-top:10px;font-size:14px;text-align:center"></div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function showApp(user) {
-      appContainer.innerHTML = `
-        <div class="phone">
-          <div class="screen active">
-            <div class="navbar">
-              <div class="nav-title">IPSC <span>INSIGHT</span></div>
-            </div>
-            <div class="scroll-content">
-              <div class="card">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:24px;margin-bottom:12px">✅ Appen fungerer!</h2>
-                <p style="color:var(--muted);margin-bottom:8px">Du er logget inn som:</p>
-                <p style="color:var(--accent);font-weight:600">${user.email}</p>
-                <button class="btn-primary" style="margin-top:20px;background:var(--red)" onclick="handleLogout()">Logg ut</button>
-              </div>
-              <div class="card">
-                <h3 style="margin-bottom:12px">Status:</h3>
-                <p style="color:var(--green)">✓ Firebase Authentication fungerer</p>
-                <p style="color:var(--green)">✓ Firestore tilkobling OK</p>
-                <p style="color:var(--green)">✓ UI rendrer riktig</p>
-              </div>
-            </div>
-            <div class="tab-bar">
-              <div class="tab-item active">
-                <div class="tab-icon">🏠</div>
-                <span>Hjem</span>
-              </div>
-              <div class="tab-item">
-                <div class="tab-icon">🏆</div>
-                <span>Matcher</span>
-              </div>
-              <div class="tab-item">
-                <div class="tab-icon">📊</div>
-                <span>Prognose</span>
-              </div>
-              <div class="tab-item">
-                <div class="tab-icon">📡</div>
-                <span>Live</span>
-              </div>
-              <div class="tab-item">
-                <div class="tab-icon">👤</div>
-                <span>Profil</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    window.handleLogin = async () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const errorEl = document.getElementById('error');
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        errorEl.textContent = '';
-      } catch (error) {
-        errorEl.textContent = 'Feil e-post eller passord';
-        console.error(error);
-      }
-    };
-
-    window.handleLogout = async () => {
-      await signOut(auth);
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        showApp(user);
-      } else {
-        showLogin();
-      }
-    });
-  </script>
+  <script type="module" src="./src/main.js"></script>
 </body>
 </html>

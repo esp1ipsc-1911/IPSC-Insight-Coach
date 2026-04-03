@@ -2169,3 +2169,11 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('SW registration failed:', err));
   });
 }
+
+window.switchTab = switchTab;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.selectMatch = selectMatch;
+window.removeShooter = removeShooter;
+window.switchMode = switchMode;
+window.selectPF = selectPF;

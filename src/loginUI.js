@@ -33,12 +33,32 @@ export function renderLogin(container, onSuccess) {
         position: relative;
       }
 
-      .ipsc-topbar {
+      .ipsc-header {
         width: 100%;
         display: flex;
-        justify-content: flex-end;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+
+      .brand-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(224, 182, 73, 0.14);
+        flex-shrink: 0;
+      }
+
+      .brand-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .lang-flags {
+        display: flex;
         gap: 8px;
-        margin-bottom: 14px;
       }
 
       .lang-btn {
@@ -60,25 +80,6 @@ export function renderLogin(container, onSuccess) {
         opacity: 1;
         border: 2px solid #e0b649;
         box-shadow: 0 0 0 1px rgba(224, 182, 73, 0.15);
-      }
-
-      .brand-icon {
-        width: 58px;
-        height: 58px;
-        border-radius: 16px;
-        background: #e0b649;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 24px rgba(224, 182, 73, 0.14);
-        margin-bottom: 18px;
-      }
-
-      .brand-hex {
-        width: 22px;
-        height: 22px;
-        border: 3px solid #0b1220;
-        clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0% 50%);
       }
 
       .brand-title {
@@ -248,13 +249,14 @@ export function renderLogin(container, onSuccess) {
 
     <div class="ipsc-login-page">
       <div class="ipsc-login-shell">
-        <div class="ipsc-topbar">
-          <button id="langNo" class="lang-btn active" type="button" aria-label="Norsk">🇳🇴</button>
-          <button id="langEn" class="lang-btn" type="button" aria-label="English">🇺🇸</button>
-        </div>
-
-        <div class="brand-icon">
-          <div class="brand-hex"></div>
+        <div class="ipsc-header">
+          <div class="brand-icon">
+            <img src="Logo_IPSC-insight.png" alt="IPSC Insight">
+          </div>
+          <div class="lang-flags">
+            <button id="langNo" class="lang-btn active" type="button" aria-label="Norsk">🇳🇴</button>
+            <button id="langEn" class="lang-btn" type="button" aria-label="English">🇺🇸</button>
+          </div>
         </div>
 
         <div class="brand-title">

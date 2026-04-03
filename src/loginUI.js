@@ -191,8 +191,12 @@ export function renderLogin(container, onSuccess) {
         margin-top: 12px;
       }
 
-      .register-wrap {
+      .section {
         display: none;
+      }
+
+      .section.active {
+        display: block;
       }
 
       .error-text {
@@ -230,26 +234,37 @@ export function renderLogin(container, onSuccess) {
           <span class="bottom">INSIGHT</span>
         </div>
 
-        <div class="brand-subtitle">Analyse. Prognose. Resultat.</div>
+        <div id="brandSubtitle" class="brand-subtitle">Analyse. Prognose. Resultat.</div>
 
-        <div id="labelEmail" class="field-label">E-post</div>
-        <input id="email" class="field" type="email" placeholder="navn@epost.no" />
+        <div id="loginSection" class="section active">
+          <div id="loginEmailLabel" class="field-label">E-post</div>
+          <input id="loginEmail" class="field" type="email" placeholder="navn@epost.no" />
 
-        <div id="labelPassword" class="field-label">Passord</div>
-        <input id="password" class="field" type="password" placeholder="Passord" />
+          <div id="loginPasswordLabel" class="field-label">Passord</div>
+          <input id="loginPassword" class="field" type="password" placeholder="Passord" />
 
-        <button id="loginBtn" class="primary-btn">Logg inn</button>
+          <button id="loginBtn" class="primary-btn">Logg inn</button>
 
-        <div id="separatorText" class="separator">eller</div>
+          <div id="separatorText" class="separator">eller</div>
 
-        <button id="showRegisterBtn" class="secondary-btn">Registrer ny bruker</button>
+          <button id="showRegisterBtn" class="secondary-btn">Registrer ny bruker</button>
+        </div>
 
-        <div id="registerWrap" class="register-wrap">
-          <div id="labelName" class="field-label" style="margin-top: 22px;">Navn</div>
-          <input id="name" class="field" type="text" placeholder="Ditt navn" />
+        <div id="registerSection" class="section">
+          <div id="registerNameLabel" class="field-label">Navn</div>
+          <input id="registerName" class="field" type="text" placeholder="Ditt navn" />
 
-          <div id="labelCode" class="field-label">Invitasjonskode</div>
-          <input id="code" class="field" type="text" placeholder="Invitasjonskode" />
+          <div id="registerEmailLabel" class="field-label">E-post</div>
+          <input id="registerEmail" class="field" type="email" placeholder="navn@epost.no" />
+
+          <div id="registerEmailConfirmLabel" class="field-label">Bekreft e-post</div>
+          <input id="registerEmailConfirm" class="field" type="email" placeholder="Gjenta e-post" />
+
+          <div id="registerPasswordLabel" class="field-label">Passord</div>
+          <input id="registerPassword" class="field" type="password" placeholder="Passord" />
+
+          <div id="registerCodeLabel" class="field-label">Invitasjonskode</div>
+          <input id="registerCode" class="field" type="text" placeholder="Invitasjonskode" />
 
           <button id="registerBtn" class="primary-btn">Opprett bruker</button>
           <button id="cancelRegisterBtn" class="ghost-btn">Avbryt</button>
@@ -262,39 +277,62 @@ export function renderLogin(container, onSuccess) {
 
   const texts = {
     no: {
-      emailLabel: 'E-post',
-      emailPlaceholder: 'navn@epost.no',
-      passwordLabel: 'Passord',
-      passwordPlaceholder: 'Passord',
+      subtitle: 'Analyse. Prognose. Resultat.',
+      loginEmailLabel: 'E-post',
+      loginEmailPlaceholder: 'navn@epost.no',
+      loginPasswordLabel: 'Passord',
+      loginPasswordPlaceholder: 'Passord',
       login: 'Logg inn',
       or: 'eller',
       showRegister: 'Registrer ny bruker',
-      nameLabel: 'Navn',
-      namePlaceholder: 'Ditt navn',
-      codeLabel: 'Invitasjonskode',
-      codePlaceholder: 'Invitasjonskode',
+      registerNameLabel: 'Navn',
+      registerNamePlaceholder: 'Ditt navn',
+      registerEmailLabel: 'E-post',
+      registerEmailPlaceholder: 'navn@epost.no',
+      registerEmailConfirmLabel: 'Bekreft e-post',
+      registerEmailConfirmPlaceholder: 'Gjenta e-post',
+      registerPasswordLabel: 'Passord',
+      registerPasswordPlaceholder: 'Passord',
+      registerCodeLabel: 'Invitasjonskode',
+      registerCodePlaceholder: 'Invitasjonskode',
       register: 'Opprett bruker',
-      cancel: 'Avbryt'
+      cancel: 'Avbryt',
+      emailMismatch: 'E-postadressene er ikke like',
+      missingFields: 'Fyll ut alle feltene',
+      missingName: 'Du må skrive inn navn'
     },
     en: {
-      emailLabel: 'Email',
-      emailPlaceholder: 'name@email.com',
-      passwordLabel: 'Password',
-      passwordPlaceholder: 'Password',
+      subtitle: 'Analyze. Predict. Perform.',
+      loginEmailLabel: 'Email',
+      loginEmailPlaceholder: 'name@email.com',
+      loginPasswordLabel: 'Password',
+      loginPasswordPlaceholder: 'Password',
       login: 'Log in',
       or: 'or',
       showRegister: 'Create new user',
-      nameLabel: 'Name',
-      namePlaceholder: 'Your name',
-      codeLabel: 'Invite code',
-      codePlaceholder: 'Invite code',
+      registerNameLabel: 'Name',
+      registerNamePlaceholder: 'Your name',
+      registerEmailLabel: 'Email',
+      registerEmailPlaceholder: 'name@email.com',
+      registerEmailConfirmLabel: 'Confirm email',
+      registerEmailConfirmPlaceholder: 'Repeat email',
+      registerPasswordLabel: 'Password',
+      registerPasswordPlaceholder: 'Password',
+      registerCodeLabel: 'Invite code',
+      registerCodePlaceholder: 'Invite code',
       register: 'Create account',
-      cancel: 'Cancel'
+      cancel: 'Cancel',
+      emailMismatch: 'The email addresses do not match',
+      missingFields: 'Please fill in all fields',
+      missingName: 'Please enter your name'
     }
   };
 
+  let currentLang = 'no';
+
   const errorEl = document.getElementById('error');
-  const registerWrap = document.getElementById('registerWrap');
+  const loginSection = document.getElementById('loginSection');
+  const registerSection = document.getElementById('registerSection');
   const showRegisterBtn = document.getElementById('showRegisterBtn');
   const cancelRegisterBtn = document.getElementById('cancelRegisterBtn');
   const loginBtn = document.getElementById('loginBtn');
@@ -303,19 +341,29 @@ export function renderLogin(container, onSuccess) {
   const langEn = document.getElementById('langEn');
 
   function applyLanguage(lang) {
+    currentLang = lang;
     const t = texts[lang];
 
-    document.getElementById('labelEmail').innerText = t.emailLabel;
-    document.getElementById('email').placeholder = t.emailPlaceholder;
-    document.getElementById('labelPassword').innerText = t.passwordLabel;
-    document.getElementById('password').placeholder = t.passwordPlaceholder;
+    document.getElementById('brandSubtitle').innerText = t.subtitle;
+
+    document.getElementById('loginEmailLabel').innerText = t.loginEmailLabel;
+    document.getElementById('loginEmail').placeholder = t.loginEmailPlaceholder;
+    document.getElementById('loginPasswordLabel').innerText = t.loginPasswordLabel;
+    document.getElementById('loginPassword').placeholder = t.loginPasswordPlaceholder;
     document.getElementById('loginBtn').innerText = t.login;
     document.getElementById('separatorText').innerText = t.or;
     document.getElementById('showRegisterBtn').innerText = t.showRegister;
-    document.getElementById('labelName').innerText = t.nameLabel;
-    document.getElementById('name').placeholder = t.namePlaceholder;
-    document.getElementById('labelCode').innerText = t.codeLabel;
-    document.getElementById('code').placeholder = t.codePlaceholder;
+
+    document.getElementById('registerNameLabel').innerText = t.registerNameLabel;
+    document.getElementById('registerName').placeholder = t.registerNamePlaceholder;
+    document.getElementById('registerEmailLabel').innerText = t.registerEmailLabel;
+    document.getElementById('registerEmail').placeholder = t.registerEmailPlaceholder;
+    document.getElementById('registerEmailConfirmLabel').innerText = t.registerEmailConfirmLabel;
+    document.getElementById('registerEmailConfirm').placeholder = t.registerEmailConfirmPlaceholder;
+    document.getElementById('registerPasswordLabel').innerText = t.registerPasswordLabel;
+    document.getElementById('registerPassword').placeholder = t.registerPasswordPlaceholder;
+    document.getElementById('registerCodeLabel').innerText = t.registerCodeLabel;
+    document.getElementById('registerCode').placeholder = t.registerCodePlaceholder;
     document.getElementById('registerBtn').innerText = t.register;
     document.getElementById('cancelRegisterBtn').innerText = t.cancel;
 
@@ -324,14 +372,14 @@ export function renderLogin(container, onSuccess) {
   }
 
   function showRegisterMode() {
-    registerWrap.style.display = 'block';
-    showRegisterBtn.style.display = 'none';
+    loginSection.classList.remove('active');
+    registerSection.classList.add('active');
     errorEl.innerText = '';
   }
 
   function showLoginMode() {
-    registerWrap.style.display = 'none';
-    showRegisterBtn.style.display = 'block';
+    registerSection.classList.remove('active');
+    loginSection.classList.add('active');
     errorEl.innerText = '';
   }
 
@@ -344,8 +392,8 @@ export function renderLogin(container, onSuccess) {
   loginBtn.onclick = async () => {
     errorEl.innerText = '';
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
 
     const result = await login(email, password);
 
@@ -358,11 +406,28 @@ export function renderLogin(container, onSuccess) {
 
   registerBtn.onclick = async () => {
     errorEl.innerText = '';
+    const t = texts[currentLang];
 
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const code = document.getElementById('code').value.trim();
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const confirmEmail = document.getElementById('registerEmailConfirm').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const code = document.getElementById('registerCode').value.trim();
+
+    if (!name) {
+      errorEl.innerText = t.missingName;
+      return;
+    }
+
+    if (!email || !confirmEmail || !password || !code) {
+      errorEl.innerText = t.missingFields;
+      return;
+    }
+
+    if (email !== confirmEmail) {
+      errorEl.innerText = t.emailMismatch;
+      return;
+    }
 
     const result = await register(email, password, code, name);
 

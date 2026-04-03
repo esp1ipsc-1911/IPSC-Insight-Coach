@@ -1,14 +1,16 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+// Firebase via CDN (funksjonerer i GitHub Pages)
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyA110PapsS0fwLQzs-oEoF7papT9S3T5p7Q',
-  authDomain: 'ipsc-insight-coach.firebaseapp.com',
-  projectId: 'ipsc-insight-coach',
-  storageBucket: 'ipsc-insight-coach.firebasestorage.app',
-  messagingSenderId: '864793320312',
-  appId: '1:864793320312:web:c586e384bbe365444bc68d'
+  apiKey: "AIzaSyA110PapsS0fwLQzs-oEoF7papT9S3T5p7Q",
+  authDomain: "ipsc-insight-coach.firebaseapp.com",
+  projectId: "ipsc-insight-coach",
+  storageBucket: "ipsc-insight-coach.firebasestorage.app",
+  messagingSenderId: "864793320312",
+  appId: "1:864793320312:web:c586e384bbe365444bc68d"
 };
 
 const app = initializeApp(firebaseConfig);

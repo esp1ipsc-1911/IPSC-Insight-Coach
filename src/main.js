@@ -1,15 +1,21 @@
-import { renderLogin } from "./loginUI.js";
-import { renderApp } from "./appUI.js";
+import { renderLogin } from './loginUI.js';
+import { renderApp } from './appUI.js';
+import { initAuth } from './auth.js';
 
-const app = document.getElementById("app");
+const app = document.getElementById('app');
 
-export function goToApp() {
+function showLogin() {
+  renderLogin(app, showApp);
+}
+
+function showApp() {
   renderApp(app);
 }
 
-export function goToLogin() {
-  renderLogin(app);
-}
-
-// START
-goToLogin();
+initAuth((user) => {
+  if (user) {
+    showApp();
+  } else {
+    showLogin();
+  }
+});

@@ -199,6 +199,34 @@ export function renderLogin(container, onSuccess) {
         display: block;
       }
 
+      .strength-wrap {
+        margin-top: -6px;
+        margin-bottom: 12px;
+      }
+
+      .strength-bar-bg {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        overflow: hidden;
+      }
+
+      .strength-bar-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        transition: width 0.2s ease;
+        background: #ff6b6b;
+      }
+
+      .strength-text {
+        font-size: 13px;
+        color: #9aa3b2;
+        margin-top: 6px;
+        min-height: 18px;
+      }
+
       .error-text {
         color: #ff8a8a;
         font-size: 14px;
@@ -263,6 +291,13 @@ export function renderLogin(container, onSuccess) {
           <div id="registerPasswordLabel" class="field-label">Passord</div>
           <input id="registerPassword" class="field" type="password" placeholder="Passord" />
 
+          <div class="strength-wrap">
+            <div class="strength-bar-bg">
+              <div id="passwordStrengthBar" class="strength-bar-fill"></div>
+            </div>
+            <div id="passwordStrengthText" class="strength-text"></div>
+          </div>
+
           <div id="registerPasswordConfirmLabel" class="field-label">Bekreft passord</div>
           <input id="registerPasswordConfirm" class="field" type="password" placeholder="Gjenta passord" />
 
@@ -305,7 +340,14 @@ export function renderLogin(container, onSuccess) {
       emailMismatch: 'E-postadressene er ikke like',
       passwordMismatch: 'Passordene er ikke like',
       missingFields: 'Fyll ut alle feltene',
-      missingName: 'Du må skrive inn navn'
+      missingName: 'Du må skrive inn navn',
+      weakPassword: 'Passordet er for svakt',
+      strengthEmpty: '',
+      strengthVeryWeak: 'Passordstyrke: Svært svak',
+      strengthWeak: 'Passordstyrke: Svak',
+      strengthMedium: 'Passordstyrke: Middels',
+      strengthStrong: 'Passordstyrke: Sterk',
+      strengthVeryStrong: 'Passordstyrke: Svært sterk'
     },
     en: {
       subtitle: 'Analyze. Predict. Perform.',
@@ -333,7 +375,14 @@ export function renderLogin(container, onSuccess) {
       emailMismatch: 'The email addresses do not match',
       passwordMismatch: 'Passwords do not match',
       missingFields: 'Please fill in all fields',
-      missingName: 'Please enter your name'
+      missingName: 'Please enter your name',
+      weakPassword: 'The password is too weak',
+      strengthEmpty: '',
+      strengthVeryWeak: 'Password strength: Very weak',
+      strengthWeak: 'Password strength: Weak',
+      strengthMedium: 'Password strength: Medium',
+      strengthStrong: 'Password strength: Strong',
+      strengthVeryStrong: 'Password strength: Very strong'
     }
   };
 
@@ -348,6 +397,48 @@ export function renderLogin(container, onSuccess) {
   const registerBtn = document.getElementById('registerBtn');
   const langNo = document.getElementById('langNo');
   const langEn = document.getElementById('langEn');
+  const registerPasswordInput = document.getElementById('registerPassword');
+  const strengthBar = document.getElementById('passwordStrengthBar');
+  const strengthText = document.getElementById('passwordStrengthText');
+
+  function getPasswordStrength(password) {
+    let score = 0;
+
+    if (!password) {
+      return { score: 0, width: '0%', labelKey: 'strengthEmpty', color: '#ff6b6b' };
+    }
+
+    if (password.length >= 8) score += 1;
+    if (password.length >= 12) score += 1;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    if (score <= 1) {
+      return { score, width: '20%', labelKey: 'strengthVeryWeak', color: '#ff6b6b' };
+    }
+    if (score === 2) {
+      return { score, width: '40%', labelKey: 'strengthWeak', color: '#ff9f43' };
+    }
+    if (score === 3) {
+      return { score, width: '60%', labelKey: 'strengthMedium', color: '#feca57' };
+    }
+    if (score === 4) {
+      return { score, width: '80%', labelKey: 'strengthStrong', color: '#1dd1a1' };
+    }
+
+    return { score, width: '100%', labelKey: 'strengthVeryStrong', color: '#10ac84' };
+  }
+
+  function updatePasswordStrength() {
+    const t = texts[currentLang];
+    const password = registerPasswordInput.value;
+    const strength = getPasswordStrength(password);
+
+    strengthBar.style.width = strength.width;
+    strengthBar.style.background = strength.color;
+    strengthText.innerText = t[strength.labelKey];
+  }
 
   function applyLanguage(lang) {
     currentLang = lang;
@@ -380,6 +471,8 @@ export function renderLogin(container, onSuccess) {
 
     langNo.classList.toggle('active', lang === 'no');
     langEn.classList.toggle('active', lang === 'en');
+
+    updatePasswordStrength();
   }
 
   function showRegisterMode() {
@@ -399,6 +492,7 @@ export function renderLogin(container, onSuccess) {
 
   showRegisterBtn.onclick = showRegisterMode;
   cancelRegisterBtn.onclick = showLoginMode;
+  registerPasswordInput.oninput = updatePasswordStrength;
 
   loginBtn.onclick = async () => {
     errorEl.innerText = '';
@@ -446,6 +540,11 @@ export function renderLogin(container, onSuccess) {
       return;
     }
 
+    if (getPasswordStrength(password).score <= 1) {
+      errorEl.innerText = t.weakPassword;
+      return;
+    }
+
     const result = await register(email, password, code, name);
 
     if (result.success) {
@@ -456,4 +555,5 @@ export function renderLogin(container, onSuccess) {
   };
 
   applyLanguage('no');
+  updatePasswordStrength();
 }

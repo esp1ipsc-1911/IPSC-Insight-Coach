@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite'
-import path from 'path'
+import { defineConfig } from 'vite';
+import path from 'path';
 
 export default defineConfig({
+  base: '/IPSC-Insight-Coach/',
   root: 'public',
   publicDir: 'assets',
   build: {
@@ -16,4 +17,4 @@ export default defineConfig({
   server: {
     port: 3000
   }
-})
+});

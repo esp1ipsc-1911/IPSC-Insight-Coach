@@ -1,5 +1,3 @@
-// Firebase via CDN (funksjonerer i GitHub Pages)
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -10,7 +8,8 @@ const firebaseConfig = {
   projectId: "ipsc-insight-coach",
   storageBucket: "ipsc-insight-coach.firebasestorage.app",
   messagingSenderId: "864793320312",
-  appId: "1:864793320312:web:c586e384bbe365444bc68d"
+  appId: "1:864793320312:web:c586e384bbe365444bc68d",
+  measurementId: "G-3Y4NZTBBS2"
 };
 
 const app = initializeApp(firebaseConfig);

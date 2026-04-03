@@ -16,20 +16,20 @@ export function renderLogin(container, onSuccess) {
         min-height: 100vh;
         width: 100%;
         background:
-          radial-gradient(circle at top right, rgba(224, 182, 73, 0.12), transparent 34%),
-          radial-gradient(circle at bottom left, rgba(9, 35, 89, 0.18), transparent 34%),
+          radial-gradient(circle at top right, rgba(224, 182, 73, 0.10), transparent 34%),
+          radial-gradient(circle at bottom left, rgba(9, 35, 89, 0.16), transparent 34%),
           linear-gradient(135deg, #04070d 0%, #101010 56%, #16120e 100%);
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        padding: 18px 16px 28px;
+        padding: 14px 14px 24px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
         color: #f5f7fb;
       }
 
       .ipsc-login-shell {
         width: 100%;
-        max-width: 380px;
+        max-width: 360px;
         position: relative;
       }
 
@@ -37,20 +37,20 @@ export function renderLogin(container, onSuccess) {
         width: 100%;
         display: flex;
         justify-content: flex-end;
-        gap: 10px;
-        margin-bottom: 18px;
+        gap: 8px;
+        margin-bottom: 14px;
       }
 
       .lang-btn {
-        width: 50px;
-        height: 40px;
-        border-radius: 12px;
+        width: 46px;
+        height: 36px;
+        border-radius: 10px;
         border: 1px solid rgba(255,255,255,0.08);
         background: rgba(19, 25, 40, 0.72);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 20px;
         line-height: 1;
         cursor: pointer;
         opacity: 0.72;
@@ -63,34 +63,34 @@ export function renderLogin(container, onSuccess) {
       }
 
       .brand-icon {
-        width: 78px;
-        height: 78px;
-        border-radius: 20px;
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
         background: #e0b649;
         display: flex;
         align-items: center;
         justify-content: center;
         box-shadow: 0 8px 24px rgba(224, 182, 73, 0.14);
-        margin-bottom: 26px;
+        margin-bottom: 18px;
       }
 
       .brand-hex {
-        width: 28px;
-        height: 28px;
-        border: 4px solid #0b1220;
+        width: 22px;
+        height: 22px;
+        border: 3px solid #0b1220;
         clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0% 50%);
       }
 
       .brand-title {
         line-height: 0.92;
         letter-spacing: -1px;
-        margin-bottom: 18px;
+        margin-bottom: 12px;
       }
 
       .brand-title .top,
       .brand-title .bottom {
         display: block;
-        font-size: clamp(46px, 10vw, 60px);
+        font-size: clamp(34px, 8.2vw, 42px);
         font-weight: 900;
       }
 
@@ -103,31 +103,31 @@ export function renderLogin(container, onSuccess) {
       }
 
       .brand-subtitle {
-        font-size: clamp(14px, 4vw, 18px);
+        font-size: clamp(13px, 3.7vw, 16px);
         color: #7d8598;
         font-weight: 500;
-        margin-bottom: 34px;
+        margin-bottom: 26px;
       }
 
       .field-label {
-        font-size: clamp(14px, 3.7vw, 17px);
+        font-size: clamp(12px, 3.5vw, 15px);
         color: #7d8598;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
+        letter-spacing: 0.7px;
       }
 
       .field {
         width: 100%;
-        height: 62px;
-        border-radius: 16px;
+        height: 50px;
+        border-radius: 14px;
         border: 1px solid #27314a;
         background: rgba(18, 26, 50, 0.88);
         color: #f5f7fb;
-        font-size: clamp(18px, 4.7vw, 21px);
-        padding: 0 20px;
+        font-size: clamp(15px, 4vw, 17px);
+        padding: 0 16px;
         outline: none;
-        margin-bottom: 18px;
+        margin-bottom: 14px;
         box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
       }
 
@@ -137,25 +137,25 @@ export function renderLogin(container, onSuccess) {
 
       .primary-btn {
         width: 100%;
-        height: 66px;
+        height: 54px;
         border: none;
-        border-radius: 18px;
+        border-radius: 16px;
         background: #e0b649;
         color: #111111;
-        font-size: clamp(21px, 4.8vw, 25px);
+        font-size: clamp(17px, 4vw, 20px);
         font-weight: 800;
         cursor: pointer;
-        margin-top: 6px;
+        margin-top: 4px;
         box-shadow: 0 10px 24px rgba(224, 182, 73, 0.14);
       }
 
       .separator {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
         color: #7d8598;
-        font-size: 16px;
-        margin: 20px 0;
+        font-size: 14px;
+        margin: 16px 0;
       }
 
       .separator::before,
@@ -168,27 +168,27 @@ export function renderLogin(container, onSuccess) {
 
       .secondary-btn {
         width: 100%;
-        height: 62px;
-        border-radius: 16px;
+        height: 50px;
+        border-radius: 14px;
         border: 1px solid #2c3446;
         background: rgba(19, 25, 40, 0.74);
         color: #f3f5fb;
-        font-size: clamp(18px, 4.3vw, 21px);
+        font-size: clamp(15px, 4vw, 17px);
         font-weight: 700;
         cursor: pointer;
       }
 
       .ghost-btn {
         width: 100%;
-        height: 56px;
+        height: 48px;
         border-radius: 14px;
         border: 1px solid #2c3446;
         background: transparent;
         color: #d7dbe4;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 700;
         cursor: pointer;
-        margin-top: 12px;
+        margin-top: 10px;
       }
 
       .section {
@@ -201,8 +201,8 @@ export function renderLogin(container, onSuccess) {
 
       .error-text {
         color: #ff8a8a;
-        font-size: 15px;
-        margin-top: 14px;
+        font-size: 14px;
+        margin-top: 12px;
         min-height: 20px;
       }
 
@@ -213,7 +213,7 @@ export function renderLogin(container, onSuccess) {
         }
 
         .ipsc-login-shell {
-          max-width: 400px;
+          max-width: 380px;
         }
       }
     </style>
@@ -263,6 +263,9 @@ export function renderLogin(container, onSuccess) {
           <div id="registerPasswordLabel" class="field-label">Passord</div>
           <input id="registerPassword" class="field" type="password" placeholder="Passord" />
 
+          <div id="registerPasswordConfirmLabel" class="field-label">Bekreft passord</div>
+          <input id="registerPasswordConfirm" class="field" type="password" placeholder="Gjenta passord" />
+
           <div id="registerCodeLabel" class="field-label">Invitasjonskode</div>
           <input id="registerCode" class="field" type="text" placeholder="Invitasjonskode" />
 
@@ -293,11 +296,14 @@ export function renderLogin(container, onSuccess) {
       registerEmailConfirmPlaceholder: 'Gjenta e-post',
       registerPasswordLabel: 'Passord',
       registerPasswordPlaceholder: 'Passord',
+      registerPasswordConfirmLabel: 'Bekreft passord',
+      registerPasswordConfirmPlaceholder: 'Gjenta passord',
       registerCodeLabel: 'Invitasjonskode',
       registerCodePlaceholder: 'Invitasjonskode',
       register: 'Opprett bruker',
       cancel: 'Avbryt',
       emailMismatch: 'E-postadressene er ikke like',
+      passwordMismatch: 'Passordene er ikke like',
       missingFields: 'Fyll ut alle feltene',
       missingName: 'Du må skrive inn navn'
     },
@@ -318,11 +324,14 @@ export function renderLogin(container, onSuccess) {
       registerEmailConfirmPlaceholder: 'Repeat email',
       registerPasswordLabel: 'Password',
       registerPasswordPlaceholder: 'Password',
+      registerPasswordConfirmLabel: 'Confirm password',
+      registerPasswordConfirmPlaceholder: 'Repeat password',
       registerCodeLabel: 'Invite code',
       registerCodePlaceholder: 'Invite code',
       register: 'Create account',
       cancel: 'Cancel',
       emailMismatch: 'The email addresses do not match',
+      passwordMismatch: 'Passwords do not match',
       missingFields: 'Please fill in all fields',
       missingName: 'Please enter your name'
     }
@@ -362,6 +371,8 @@ export function renderLogin(container, onSuccess) {
     document.getElementById('registerEmailConfirm').placeholder = t.registerEmailConfirmPlaceholder;
     document.getElementById('registerPasswordLabel').innerText = t.registerPasswordLabel;
     document.getElementById('registerPassword').placeholder = t.registerPasswordPlaceholder;
+    document.getElementById('registerPasswordConfirmLabel').innerText = t.registerPasswordConfirmLabel;
+    document.getElementById('registerPasswordConfirm').placeholder = t.registerPasswordConfirmPlaceholder;
     document.getElementById('registerCodeLabel').innerText = t.registerCodeLabel;
     document.getElementById('registerCode').placeholder = t.registerCodePlaceholder;
     document.getElementById('registerBtn').innerText = t.register;
@@ -412,6 +423,7 @@ export function renderLogin(container, onSuccess) {
     const email = document.getElementById('registerEmail').value.trim();
     const confirmEmail = document.getElementById('registerEmailConfirm').value.trim();
     const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerPasswordConfirm').value;
     const code = document.getElementById('registerCode').value.trim();
 
     if (!name) {
@@ -419,13 +431,18 @@ export function renderLogin(container, onSuccess) {
       return;
     }
 
-    if (!email || !confirmEmail || !password || !code) {
+    if (!email || !confirmEmail || !password || !confirmPassword || !code) {
       errorEl.innerText = t.missingFields;
       return;
     }
 
     if (email !== confirmEmail) {
       errorEl.innerText = t.emailMismatch;
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      errorEl.innerText = t.passwordMismatch;
       return;
     }
 

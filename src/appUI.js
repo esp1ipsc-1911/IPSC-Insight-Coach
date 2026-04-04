@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// IPSC INSIGHT - MAIN APP UI
+// IPSC INSIGHT - MAIN APP UI (CLEAN VERSION - CONSISTENT CARD STYLING)
 // ════════════════════════════════════════════════════════════════════════════
 
 import { logout, getCurrentUserProfile } from './auth.js';
@@ -366,17 +366,17 @@ export async function renderApp(container) {
       </div>
       <div class="section-label">Tidsjustering</div>
       <div class="prognose-inputs">
-        <div class="prog-field" style="opacity:0.7"><input type="number" id="prog-reloads" value="1" readonly style="color:var(--muted)"><div class="prog-field-lbl">Reloads (auto)</div></div>
+        <div class="prog-field" class="prog-readonly"><input type="number" id="prog-reloads" value="1" readonly class="prog-readonly-input"><div class="prog-field-lbl">Reloads (auto)</div></div>
         <div class="prog-field"><input type="number" id="prog-move" value="3" oninput="calcPrognose()"><div class="prog-field-lbl">${t('move_seconds')}</div></div>
-        <div class="prog-field"><input type="number" id="prog-draw" value="${profile.draw || 1.42}" oninput="calcPrognose()" style="color:var(--accent)"><div class="prog-field-lbl">${t('draw_seconds')}</div></div>
+        <div class="prog-field"><input type="number" id="prog-draw" value="${profile.draw || 1.42}" oninput="calcPrognose()" class="prog-accent-input"><div class="prog-field-lbl">${t('draw_seconds')}</div></div>
       </div>
       <div class="prognose-result">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:3px" id="prog-pf-note">${profile.powerFactor ? cap(profile.powerFactor) : 'Minor'} · ${profile.division || 'Classic'}</div>
+        <div class="prog-pf-note" id="prog-pf-note">${profile.powerFactor ? cap(profile.powerFactor) : 'Minor'} · ${profile.division || 'Classic'}</div>
         <div class="prog-hf-label">Estimert Hit Factor</div>
         <div class="prog-hf-value" id="prog-hf-out">—</div>
-        <div id="prog-delta-wrap" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">vs. match-snitt</div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700" id="prog-delta">—</div>
+        <div id="prog-delta-wrap" class="prog-delta-wrap">
+          <div class="prog-delta-label">vs. match-snitt</div>
+          <div class="prog-delta-value" id="prog-delta">—</div>
         </div>
         <div class="prog-breakdown" id="prog-breakdown"></div>
       </div>
@@ -420,51 +420,51 @@ export async function renderApp(container) {
     <div class="nav-avatar" id="prof-avatar" onclick="switchTab('screen-home')">${initials()}</div>
   </div>
   <div class="scroll-content">
-    <div style="text-align:center;padding:32px 0 24px">
-      <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c97b2a);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:36px;color:var(--bg);margin:0 auto 16px">${initials()}</div>
-      <div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px" id="prof-name">${profile.firstName || ''} ${profile.lastName || ''}</div>
-      <div style="font-size:14px;color:var(--muted);margin-bottom:12px" id="prof-div">${profile.division || '—'} · ${profile.club || '—'}</div>
-      <div style="display:flex;justify-content:center;gap:8px">
+    <div class="profile-header">
+      <div class="profile-avatar">${initials()}</div>
+      <div class="profile-name" id="prof-name">${profile.firstName || ''} ${profile.lastName || ''}</div>
+      <div class="profile-div" id="prof-div">${profile.division || '—'} · ${profile.club || '—'}</div>
+      <div class="profile-badges">
         <span class="badge badge-gold" id="prof-badge-pf">${profile.powerFactor ? cap(profile.powerFactor) : '—'}</span>
         <span class="badge badge-green">Verified</span>
         <span class="badge badge-blue" id="prof-badge-region">${profile.region || '—'}</span>
       </div>
-      <button class="btn-primary" style="margin-top:20px" onclick="openEditProfile()">✏️ ${t('edit_profile')}</button>
+      <button class="btn-primary" onclick="openEditProfile()">✏️ ${t('edit_profile')}</button>
     </div>
 
-    <div class="card" style="margin:0 0 12px 0">
+    <div class="card">
       <div class="card-header"><div class="card-title">Personlig informasjon</div></div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--muted)">Fornavn</span>
+      <div class="info-row">
+        <span class="info-key">Fornavn</span>
         <span id="info-firstname">${profile.firstName || '—'}</span>
       </div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--muted)">Etternavn</span>
+      <div class="info-row">
+        <span class="info-key">Etternavn</span>
         <span id="info-lastname">${profile.lastName || '—'}</span>
       </div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--muted)">Divisjon</span>
+      <div class="info-row">
+        <span class="info-key">Divisjon</span>
         <span id="info-division">${profile.division || '—'}</span>
       </div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--muted)">Kategori</span>
+      <div class="info-row">
+        <span class="info-key">Kategori</span>
         <span id="info-category">${profile.category || '—'}</span>
       </div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--muted)">Power Factor</span>
+      <div class="info-row">
+        <span class="info-key">Power Factor</span>
         <span id="info-pf">${profile.powerFactor ? cap(profile.powerFactor) : '—'}</span>
       </div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--muted)">Region</span>
+      <div class="info-row">
+        <span class="info-key">Region</span>
         <span id="info-region">${profile.region || '—'}</span>
       </div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0">
-        <span style="color:var(--muted)">Klubb</span>
+      <div class="info-row">
+        <span class="info-key">Klubb</span>
         <span id="info-club">${profile.club || '—'}</span>
       </div>
     </div>
 
-    <div class="card" style="margin:0 0 12px 0">
+    <div class="card">
       <div class="card-header"><div class="card-title">Sesongstatistikk</div></div>
       <div class="stats-grid">
         <div class="stat-block"><div class="stat-value" id="stat-matches">0</div><div class="stat-label">${t('matches_count')}</div></div>
@@ -474,8 +474,8 @@ export async function renderApp(container) {
       </div>
     </div>
 
-    <button class="btn-primary" style="margin:12px 0;background:var(--red)" onclick="handleLogout()">🚪 ${t('logout')}</button>
-    <div style="height:20px"></div>
+    <button class="btn-primary btn-logout" onclick="handleLogout()">🚪 ${t('logout')}</button>
+    <div class="profile-spacer"></div>
   </div>
   <div class="tab-bar">
     <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${t('home')}</span></div>
@@ -550,7 +550,7 @@ export async function renderApp(container) {
       </div>
       <div class="field-group">
         <div class="field-label">${t('select_power_factor')}</div>
-        <div id="pf-options" style="display:flex;gap:10px;margin-top:8px"></div>
+        <div id="pf-options" class="pf-options"></div>
       </div>
       <div class="field-group">
         <div class="field-label">${t('region')}</div>
@@ -759,11 +759,11 @@ function renderHome() {
   
   if (!match) {
     container.innerHTML = `
-      <div style="padding:60px 20px;text-align:center">
-        <div style="font-size:48px;margin-bottom:12px">🏆</div>
-        <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:600;margin-bottom:6px">Velg en match</div>
-        <div style="color:var(--muted);font-size:14px;margin-bottom:20px">Trykk på match-chip over eller gå til Matcher-fanen</div>
-        <button class="btn-primary" style="max-width:200px" onclick="switchTab('screen-matches')">Se matcher</button>
+      <div class="empty-state">
+        <div class="empty-icon">🏆</div>
+        <div class="empty-title">Velg en match</div>
+        <div class="empty-sub">Trykk på match-chip over eller gå til Matcher-fanen</div>
+        <button class="btn-primary btn-home-action" onclick="switchTab('screen-matches')">Se matcher</button>
       </div>
     `;
     return;
@@ -827,7 +827,7 @@ function renderMatchList() {
   });
   
   if (filtered.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted)">Ingen matcher funnet</div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-sub">Ingen matcher funnet</div></div>';
     return;
   }
   
@@ -857,23 +857,23 @@ function renderResults() {
   const match = matches.find(m => m.id === activeMatchId);
   
   if (!match) {
-    container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--muted)">Velg en match først</div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-sub">Velg en match først</div></div>';
     return;
   }
   
   if (!match.shooters || match.shooters.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">👥</div><div style="font-weight:600;margin-bottom:6px">Ingen skyttere</div><div style="color:var(--muted);font-size:14px">Trykk + for å legge til skyttere</div></div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Ingen skyttere</div><div class="empty-sub">Trykk + for å legge til skyttere</div></div>';
     return;
   }
   
-  let html = '<div class="card" style="margin:0 0 12px 0">';
+  let html = '<div class="card">';
   html += '<div class="card-header"><div class="card-title">Standings</div></div>';
-  html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">';
-  html += '<thead><tr style="border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)">';
-  html += '<th style="text-align:left;padding:8px">#</th>';
-  html += '<th style="text-align:left;padding:8px">Skytter</th>';
-  html += '<th style="text-align:right;padding:8px">Pts</th>';
-  html += '<th style="text-align:right;padding:8px">%</th>';
+  html += '<div class="standings-table-wrap"><table class="standings-table">';
+  html += '<thead><tr class="standings-header-row">';
+  html += '<th class="standings-th standings-th-rank">#</th>';
+  html += '<th class="standings-th standings-th-shooter">Skytter</th>';
+  html += '<th class="standings-th standings-th-pts">Pts</th>';
+  html += '<th class="standings-th standings-th-pct">%</th>';
   html += '</tr></thead>';
   html += '<tbody>';
   
@@ -887,14 +887,14 @@ function renderResults() {
   
   standings.forEach((shooter, idx) => {
     const pct = winnerPts > 0 ? ((shooter.totalPts / winnerPts) * 100).toFixed(2) : '0.00';
-    html += '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">';
-    html += '<td style="padding:10px;font-weight:600">' + (idx + 1) + '</td>';
-    html += '<td style="padding:10px">';
-    html += '<div style="font-weight:600">' + shooter.firstName + ' ' + shooter.lastName + '</div>';
-    html += '<div style="font-size:11px;color:var(--muted)">' + shooter.division + ' · ' + cap(shooter.pf || 'minor') + '</div>';
+    html += '<tr class="standings-row">';
+    html += '<td class="standings-td standings-td-rank">' + (idx + 1) + '</td>';
+    html += '<td class="standings-td standings-td-shooter">';
+    html += '<div class="standings-shooter-name">' + shooter.firstName + ' ' + shooter.lastName + '</div>';
+    html += '<div class="standings-shooter-meta">' + shooter.division + ' · ' + cap(shooter.pf || 'minor') + '</div>';
     html += '</td>';
-    html += '<td style="padding:10px;text-align:right;font-weight:600">' + shooter.totalPts.toFixed(2) + '</td>';
-    html += '<td style="padding:10px;text-align:right;color:var(--accent);font-family:Rajdhani,sans-serif;font-weight:700">' + pct + '%</td>';
+    html += '<td class="standings-td standings-td-pts">' + shooter.totalPts.toFixed(2) + '</td>';
+    html += '<td class="standings-td standings-td-pct">' + pct + '%</td>';
     html += '</tr>';
   });
   
@@ -1016,10 +1016,10 @@ function updatePFOptions() {
   let html = '';
   allowed.forEach(pf => {
     const isActive = profile.powerFactor === pf;
-    html += '<label class="pf-option' + (isActive ? ' active' : '') + '" onclick="selectPF(this,\'' + pf + '\')" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer">';
-    html += '<input type="radio" name="pf" value="' + pf + '" style="display:none">';
-    html += '<div style="font-weight:600;margin-bottom:2px">' + pf.toUpperCase() + '</div>';
-    html += '<div style="font-size:11px;color:var(--muted)">' + (pf === 'major' ? '≥170 PF' : '<170 PF') + '</div>';
+    html += '<label class="pf-option' + (isActive ? ' active' : '') + '" onclick="selectPF(this,\'' + pf + '\')">';
+    html += '<input type="radio" name="pf" value="' + pf + '">';
+    html += '<div class="pf-label">' + pf.toUpperCase() + '</div>';
+    html += '<div class="pf-sub">' + (pf === 'major' ? '≥170 PF' : '<170 PF') + '</div>';
     html += '</label>';
   });
   
@@ -1095,7 +1095,7 @@ function calcPrognose() {
   el('prog-hf-out').textContent = estimatedHF.toFixed(2);
   
   let breakdown = '';
-  breakdown += '<div style="font-size:11px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05)">';
+  breakdown += '<div class="prog-breakdown-detail">';
   breakdown += 'Trekk: ' + draw.toFixed(2) + 's · ';
   breakdown += 'Skudd: ' + (shots * splitTime).toFixed(2) + 's · ';
   breakdown += 'Reload: ' + (reloads * reloadTime).toFixed(2) + 's · ';

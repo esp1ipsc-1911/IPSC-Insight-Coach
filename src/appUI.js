@@ -432,7 +432,7 @@ export async function renderApp(container) {
       <button class="btn-primary" style="margin-top:20px" onclick="openEditProfile()">✏️ ${t('edit_profile')}</button>
     </div>
 
-    <div class="card" style="margin:0 18px 12px">
+    <div class="card" style="margin:0 0 12px 0">
       <div class="card-header"><div class="card-title">Personlig informasjon</div></div>
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="color:var(--muted)">Fornavn</span>
@@ -464,7 +464,7 @@ export async function renderApp(container) {
       </div>
     </div>
 
-    <div class="card" style="margin:0 18px 12px">
+    <div class="card" style="margin:0 0 12px 0">
       <div class="card-header"><div class="card-title">Sesongstatistikk</div></div>
       <div class="stats-grid">
         <div class="stat-block"><div class="stat-value" id="stat-matches">0</div><div class="stat-label">${t('matches_count')}</div></div>
@@ -474,7 +474,7 @@ export async function renderApp(container) {
       </div>
     </div>
 
-    <button class="btn-primary" style="margin:12px 18px;background:var(--red)" onclick="handleLogout()">🚪 ${t('logout')}</button>
+    <button class="btn-primary" style="margin:12px 0;background:var(--red)" onclick="handleLogout()">🚪 ${t('logout')}</button>
     <div style="height:20px"></div>
   </div>
   <div class="tab-bar">
@@ -866,7 +866,7 @@ function renderResults() {
     return;
   }
   
-  let html = '<div class="card" style="margin:18px 18px 12px">';
+  let html = '<div class="card" style="margin:0 0 12px 0">';
   html += '<div class="card-header"><div class="card-title">Standings</div></div>';
   html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">';
   html += '<thead><tr style="border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)">';

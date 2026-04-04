@@ -85,15 +85,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .match-row-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
 .match-stg-count{font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;color:var(--accent);}
 .match-stg-lbl{font-size:10px;color:var(--muted);}
-.search-wrap{position:relative;margin-bottom:12px;}
+.search-wrap{position:relative;margin:0 18px 12px 18px;}
 .search-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px 12px 40px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;outline:none;}
 .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;}
-.filter-row{display:flex;gap:7px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.filter-row{display:flex;gap:7px;margin:0 18px 12px 18px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
 .filter-row::-webkit-scrollbar{display:none;}
 .filter-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:500;white-space:nowrap;cursor:pointer;color:var(--muted);}
 .filter-chip.active{background:rgba(232,184,75,.15);border-color:rgba(232,184,75,.4);color:var(--accent);}
-.section-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;margin:14px 0 10px;}
-.section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px;}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;margin:14px 18px 10px 18px;}
+.section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:16px 18px 8px 18px;}
 .fab{position:fixed;bottom:84px;right:calc(50% - 195px + 14px);width:50px;height:50px;border-radius:15px;background:var(--accent);color:var(--bg);border:none;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(232,184,75,.4);z-index:99;}
 @media(max-width:390px){.fab{right:14px;}}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center;}

@@ -105,12 +105,18 @@ export async function login(email, password) {
 // REGISTER (for loginUI.js) - WITH CLOUD FUNCTION VALIDATION
 // ════════════════════════════════════════════════════════════════════════════
 
-export async function register(email, password, inviteCode, name) {
+export async function register(email, password, inviteCode, firstName, lastName, division, category, powerFactor, region, club) {
   try {
     const cleanEmail = (email || '').trim();
     const cleanPassword = password || '';
     const cleanInviteCode = (inviteCode || '').trim();
-    const cleanName = (name || '').trim();
+    const cleanFirstName = (firstName || '').trim();
+    const cleanLastName = (lastName || '').trim();
+    const cleanDivision = (division || '').trim();
+    const cleanCategory = (category || '').trim();
+    const cleanPowerFactor = (powerFactor || 'minor').trim();
+    const cleanRegion = (region || '').trim();
+    const cleanClub = (club || '').trim();
 
     // Step 1: Create user account first
     const userCredential = await createUserWithEmailAndPassword(
@@ -149,20 +155,21 @@ export async function register(email, password, inviteCode, name) {
       return { success: false, error: errorMessage };
     }
 
-    // Step 3: Create user profile in Firestore
+    // Step 3: Create user profile in Firestore with all profile data
     await setDoc(doc(db, 'users', user.uid), {
       email: cleanEmail,
-      name: cleanName || cleanEmail.split('@')[0],
+      firstName: cleanFirstName,
+      lastName: cleanLastName,
+      division: cleanDivision,
+      category: cleanCategory,
+      powerFactor: cleanPowerFactor,
+      region: cleanRegion,
+      club: cleanClub,
       role: 'user',
       inviteCode: cleanInviteCode,
       createdAt: new Date(),
-      firstName: '',
-      lastName: '',
-      club: '',
-      region: '',
-      category: 'Standard',
-      draw: 1.42,
-      reload: 2.5
+      draw: null,
+      reloadTime: null
     });
 
     return { success: true, user };

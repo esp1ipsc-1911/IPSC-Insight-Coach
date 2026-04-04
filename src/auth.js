@@ -1,214 +1,131 @@
+import { auth, db } from './firebase.js';
 import {
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
+  createUserWithEmailAndPassword,
+  signOut,
   onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import {
   doc,
-  setDoc,
   getDoc,
-  updateDoc,
-  increment
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  setDoc
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
 
-import { auth, db } from "./firebase.js";
+const functions = getFunctions();
 
-let currentUser = null;
-let currentUserProfile = null;
-
-export function initAuth(onUserChanged) {
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      currentUser = user;
-
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-
-        if (userDoc.exists()) {
-          currentUserProfile = { uid: user.uid, ...userDoc.data() };
-        } else {
-          currentUserProfile = {
-            uid: user.uid,
-            email: user.email,
-            name: user.email ? user.email.split("@")[0] : "Bruker",
-            role: "user"
-          };
-        }
-
-        onUserChanged(currentUserProfile);
-      } catch (error) {
-        console.error("Feil ved lasting av brukerprofil:", error);
-
-        currentUserProfile = {
-          uid: user.uid,
-          email: user.email,
-          name: user.email ? user.email.split("@")[0] : "Bruker",
-          role: "user"
-        };
-
-        onUserChanged(currentUserProfile);
-      }
-    } else {
-      currentUser = null;
-      currentUserProfile = null;
-      onUserChanged(null);
-    }
-  });
-}
-
-async function validateInviteCode(code) {
+export async function login(email, password) {
   try {
-    if (!code || !code.trim()) {
-      return { valid: false, error: "Du må skrive inn invitasjonskode" };
-    }
-
-    const inviteCode = code.trim();
-    const inviteDoc = await getDoc(doc(db, "inviteCodes", inviteCode));
-
-    if (!inviteDoc.exists()) {
-      return { valid: false, error: "Ugyldig invitasjonskode" };
-    }
-
-    const data = inviteDoc.data();
-
-    if (data.active === false) {
-      return { valid: false, error: "Denne koden er deaktivert" };
-    }
-
-    const usedCount = Number(data.usedCount || 0);
-    const maxUses = Number(data.maxUses || 0);
-
-    if (maxUses > 0 && usedCount >= maxUses) {
-      return { valid: false, error: "Denne koden har nådd maks antall brukere" };
-    }
-
-    return { valid: true, code: inviteCode };
+    await signInWithEmailAndPassword(auth, email, password);
+    return { success: true };
   } catch (error) {
-    console.error("Feil ved validering av invitasjonskode:", error);
-    return { valid: false, error: "Kunne ikke validere invitasjonskode" };
-  }
-}
-
-async function incrementInviteCodeUsage(code) {
-  try {
-    await updateDoc(doc(db, "inviteCodes", code), {
-      usedCount: increment(1)
-    });
-  } catch (error) {
-    console.error("Kunne ikke oppdatere bruk av invitasjonskode:", error);
+    console.error('Login error:', error);
+    let errorMessage = 'Innlogging feilet';
+    
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'Bruker ikke funnet';
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage = 'Feil passord';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Ugyldig e-postadresse';
+    } else if (error.code === 'auth/invalid-credential') {
+      errorMessage = 'Ugyldig e-post eller passord';
+    }
+    
+    return { success: false, error: errorMessage };
   }
 }
 
 export async function register(email, password, inviteCode, name) {
   try {
-    const cleanEmail = (email || "").trim();
-    const cleanPassword = password || "";
-    const cleanInviteCode = (inviteCode || "").trim();
-    const cleanName = (name || "").trim();
-
-    const codeValidation = await validateInviteCode(cleanInviteCode);
-    if (!codeValidation.valid) {
-      return { success: false, error: codeValidation.error };
-    }
-
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      cleanEmail,
-      cleanPassword
-    );
-
+    // Create user account first
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    await setDoc(doc(db, "users", user.uid), {
-      email: cleanEmail,
-      name: cleanName || cleanEmail.split("@")[0],
-      role: "user",
-      inviteCode: cleanInviteCode,
+    // Validate invite code via Cloud Function
+    const validateCode = httpsCallable(functions, 'validateInviteCode');
+    
+    try {
+      await validateCode({
+        code: inviteCode,
+        userId: user.uid,
+        userEmail: email
+      });
+    } catch (codeError) {
+      // If code validation fails, delete the user account
+      await user.delete();
+      
+      let errorMessage = 'Ugyldig invitasjonskode';
+      if (codeError.code === 'functions/not-found') {
+        errorMessage = 'Ugyldig invitasjonskode';
+      } else if (codeError.code === 'functions/permission-denied') {
+        errorMessage = 'Denne koden er deaktivert';
+      } else if (codeError.code === 'functions/resource-exhausted') {
+        errorMessage = 'Denne koden har nådd maksimalt antall bruk';
+      } else if (codeError.code === 'functions/already-exists') {
+        errorMessage = 'Du har allerede brukt denne koden';
+      } else if (codeError.message) {
+        errorMessage = codeError.message;
+      }
+      
+      return { success: false, error: errorMessage };
+    }
+
+    // Create user profile in Firestore
+    await setDoc(doc(db, 'users', user.uid), {
+      email: email,
+      name: name,
       createdAt: new Date(),
-      firstName: "",
-      lastName: "",
-      club: "",
-      region: "",
-      category: "Standard",
-      draw: 1.42,
-      reload: 2.5
+      inviteCode: inviteCode
     });
 
-    await incrementInviteCodeUsage(cleanInviteCode);
-
-    return { success: true, user };
+    return { success: true };
   } catch (error) {
-    console.error("Registrering feilet:", error);
-
-    let errorMessage = "Registrering feilet";
-
-    if (error.code === "auth/email-already-in-use") {
-      errorMessage = "E-postadressen er allerede i bruk";
-    } else if (error.code === "auth/weak-password") {
-      errorMessage = "Passordet må være minst 6 tegn";
-    } else if (error.code === "auth/invalid-email") {
-      errorMessage = "Ugyldig e-postadresse";
-    } else if (error.message) {
-      errorMessage = error.message;
+    console.error('Registration error:', error);
+    let errorMessage = 'Registrering feilet';
+    
+    if (error.code === 'auth/email-already-in-use') {
+      errorMessage = 'E-postadressen er allerede i bruk';
+    } else if (error.code === 'auth/weak-password') {
+      errorMessage = 'Passordet er for svakt';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Ugyldig e-postadresse';
     }
-
-    return { success: false, error: errorMessage };
-  }
-}
-
-export async function login(email, password) {
-  try {
-    const cleanEmail = (email || "").trim();
-    const cleanPassword = password || "";
-
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      cleanEmail,
-      cleanPassword
-    );
-
-    return { success: true, user: userCredential.user };
-  } catch (error) {
-    console.error("Innlogging feilet:", error);
-
-    let errorMessage = "Innlogging feilet";
-
-    if (
-      error.code === "auth/user-not-found" ||
-      error.code === "auth/wrong-password" ||
-      error.code === "auth/invalid-credential"
-    ) {
-      errorMessage = "Feil e-post eller passord";
-    } else if (error.code === "auth/invalid-email") {
-      errorMessage = "Ugyldig e-postadresse";
-    } else if (error.code === "auth/user-disabled") {
-      errorMessage = "Denne kontoen er deaktivert";
-    }
-
+    
     return { success: false, error: errorMessage };
   }
 }
 
 export async function logout() {
   try {
-    await firebaseSignOut(auth);
+    await signOut(auth);
     return { success: true };
   } catch (error) {
-    console.error("Utlogging feilet:", error);
-    return { success: false, error: "Kunne ikke logge ut" };
+    console.error('Logout error:', error);
+    return { success: false, error: 'Utlogging feilet' };
   }
 }
 
+export function onAuthChange(callback) {
+  return onAuthStateChanged(auth, callback);
+}
+
 export function getCurrentUser() {
-  return currentUser;
+  return auth.currentUser;
 }
 
-export function getCurrentUserProfile() {
-  return currentUserProfile;
-}
+export async function getCurrentUserProfile() {
+  const user = auth.currentUser;
+  if (!user) return null;
 
-export function isAdmin() {
-  return currentUserProfile && currentUserProfile.role === "admin";
+  try {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) {
+      return { uid: user.uid, email: user.email, ...userDoc.data() };
+    }
+    return { uid: user.uid, email: user.email };
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    return { uid: user.uid, email: user.email };
+  }
 }

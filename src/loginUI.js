@@ -136,6 +136,53 @@ export function renderLogin(container, onSuccess) {
         color: #8b91a1;
       }
 
+      .field-select {
+        width: 100%;
+        height: 50px;
+        border-radius: 14px;
+        border: 1px solid #27314a;
+        background: rgba(18, 26, 50, 0.88);
+        color: #f5f7fb;
+        font-size: clamp(15px, 4vw, 17px);
+        padding: 0 16px;
+        outline: none;
+        margin-bottom: 14px;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238b91a1' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+      }
+
+      .pf-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .pf-option {
+        flex: 1;
+        height: 50px;
+        border-radius: 14px;
+        border: 1px solid #27314a;
+        background: rgba(18, 26, 50, 0.88);
+        color: #8b91a1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+
+      .pf-option.selected {
+        border-color: #e0b649;
+        background: rgba(224, 182, 73, 0.1);
+        color: #e0b649;
+      }
+
       .primary-btn {
         width: 100%;
         height: 54px;
@@ -281,8 +328,11 @@ export function renderLogin(container, onSuccess) {
         </div>
 
         <div id="registerSection" class="section">
-          <div id="registerNameLabel" class="field-label">Navn</div>
-          <input id="registerName" class="field" type="text" placeholder="Ditt navn" />
+          <div id="registerFirstNameLabel" class="field-label">Fornavn</div>
+          <input id="registerFirstName" class="field" type="text" placeholder="Fornavn" />
+
+          <div id="registerLastNameLabel" class="field-label">Etternavn</div>
+          <input id="registerLastName" class="field" type="text" placeholder="Etternavn" />
 
           <div id="registerEmailLabel" class="field-label">E-post</div>
           <input id="registerEmail" class="field" type="email" placeholder="navn@epost.no" />
@@ -302,6 +352,50 @@ export function renderLogin(container, onSuccess) {
 
           <div id="registerPasswordConfirmLabel" class="field-label">Bekreft passord</div>
           <input id="registerPasswordConfirm" class="field" type="password" placeholder="Gjenta passord" />
+
+          <div id="registerDivisionLabel" class="field-label">Divisjon</div>
+          <select id="registerDivision" class="field-select">
+            <option value="">Velg divisjon</option>
+            <option value="Standard">Standard</option>
+            <option value="Open">Open</option>
+            <option value="Production">Production</option>
+            <option value="Production Optics">Production Optics</option>
+            <option value="Classic">Classic</option>
+            <option value="Revolver">Revolver</option>
+          </select>
+
+          <div id="registerCategoryLabel" class="field-label">Kategori</div>
+          <select id="registerCategory" class="field-select">
+            <option value="">Velg kategori (valgfri)</option>
+            <option value="Junior">Junior</option>
+            <option value="Senior">Senior</option>
+            <option value="Super Senior">Super Senior</option>
+            <option value="Lady">Lady</option>
+            <option value="Lady Junior">Lady Junior</option>
+            <option value="Lady Senior">Lady Senior</option>
+          </select>
+
+          <div id="registerPowerFactorLabel" class="field-label">Power Factor</div>
+          <div class="pf-selector">
+            <div class="pf-option selected" data-pf="minor" id="pfMinor">Minor</div>
+            <div class="pf-option" data-pf="major" id="pfMajor">Major</div>
+          </div>
+
+          <div id="registerRegionLabel" class="field-label">Region</div>
+          <select id="registerRegion" class="field-select">
+            <option value="">Velg region (valgfri)</option>
+            <option value="Norge">Norge</option>
+            <option value="Sverige">Sverige</option>
+            <option value="Danmark">Danmark</option>
+            <option value="Finland">Finland</option>
+            <option value="Tyskland">Tyskland</option>
+            <option value="Storbritannia">Storbritannia</option>
+            <option value="USA">USA</option>
+            <option value="Annet">Annet</option>
+          </select>
+
+          <div id="registerClubLabel" class="field-label">Klubb</div>
+          <input id="registerClub" class="field" type="text" placeholder="Klubbnavn (valgfri)" />
 
           <div id="registerCodeLabel" class="field-label">Invitasjonskode</div>
           <input id="registerCode" class="field" type="text" placeholder="Invitasjonskode" />
@@ -325,8 +419,10 @@ export function renderLogin(container, onSuccess) {
       login: 'Logg inn',
       or: 'eller',
       showRegister: 'Registrer ny bruker',
-      registerNameLabel: 'Navn',
-      registerNamePlaceholder: 'Ditt navn',
+      registerFirstNameLabel: 'Fornavn',
+      registerFirstNamePlaceholder: 'Fornavn',
+      registerLastNameLabel: 'Etternavn',
+      registerLastNamePlaceholder: 'Etternavn',
       registerEmailLabel: 'E-post',
       registerEmailPlaceholder: 'navn@epost.no',
       registerEmailConfirmLabel: 'Bekreft e-post',
@@ -335,14 +431,20 @@ export function renderLogin(container, onSuccess) {
       registerPasswordPlaceholder: 'Passord',
       registerPasswordConfirmLabel: 'Bekreft passord',
       registerPasswordConfirmPlaceholder: 'Gjenta passord',
+      registerDivisionLabel: 'Divisjon',
+      registerCategoryLabel: 'Kategori',
+      registerPowerFactorLabel: 'Power Factor',
+      registerRegionLabel: 'Region',
+      registerClubLabel: 'Klubb',
       registerCodeLabel: 'Invitasjonskode',
       registerCodePlaceholder: 'Invitasjonskode',
       register: 'Opprett bruker',
       cancel: 'Avbryt',
       emailMismatch: 'E-postadressene er ikke like',
       passwordMismatch: 'Passordene er ikke like',
-      missingFields: 'Fyll ut alle feltene',
-      missingName: 'Du må skrive inn navn',
+      missingFields: 'Fyll ut alle påkrevde feltene',
+      missingName: 'Du må skrive inn fornavn og etternavn',
+      missingDivision: 'Du må velge divisjon',
       weakPassword: 'Passordet er for svakt',
       strengthEmpty: '',
       strengthVeryWeak: 'Passordstyrke: Svært svak',
@@ -360,8 +462,10 @@ export function renderLogin(container, onSuccess) {
       login: 'Log in',
       or: 'or',
       showRegister: 'Create new user',
-      registerNameLabel: 'Name',
-      registerNamePlaceholder: 'Your name',
+      registerFirstNameLabel: 'First Name',
+      registerFirstNamePlaceholder: 'First name',
+      registerLastNameLabel: 'Last Name',
+      registerLastNamePlaceholder: 'Last name',
       registerEmailLabel: 'Email',
       registerEmailPlaceholder: 'name@email.com',
       registerEmailConfirmLabel: 'Confirm email',
@@ -370,14 +474,20 @@ export function renderLogin(container, onSuccess) {
       registerPasswordPlaceholder: 'Password',
       registerPasswordConfirmLabel: 'Confirm password',
       registerPasswordConfirmPlaceholder: 'Repeat password',
+      registerDivisionLabel: 'Division',
+      registerCategoryLabel: 'Category',
+      registerPowerFactorLabel: 'Power Factor',
+      registerRegionLabel: 'Region',
+      registerClubLabel: 'Club',
       registerCodeLabel: 'Invite code',
       registerCodePlaceholder: 'Invite code',
       register: 'Create account',
       cancel: 'Cancel',
       emailMismatch: 'The email addresses do not match',
       passwordMismatch: 'Passwords do not match',
-      missingFields: 'Please fill in all fields',
-      missingName: 'Please enter your name',
+      missingFields: 'Please fill in all required fields',
+      missingName: 'Please enter your first and last name',
+      missingDivision: 'Please select a division',
       weakPassword: 'The password is too weak',
       strengthEmpty: '',
       strengthVeryWeak: 'Password strength: Very weak',
@@ -389,6 +499,7 @@ export function renderLogin(container, onSuccess) {
   };
 
   let currentLang = 'no';
+  let selectedPowerFactor = 'minor';
 
   const errorEl = document.getElementById('error');
   const loginSection = document.getElementById('loginSection');
@@ -402,6 +513,21 @@ export function renderLogin(container, onSuccess) {
   const registerPasswordInput = document.getElementById('registerPassword');
   const strengthBar = document.getElementById('passwordStrengthBar');
   const strengthText = document.getElementById('passwordStrengthText');
+  const pfMinor = document.getElementById('pfMinor');
+  const pfMajor = document.getElementById('pfMajor');
+
+  // Power Factor selection
+  pfMinor.onclick = () => {
+    selectedPowerFactor = 'minor';
+    pfMinor.classList.add('selected');
+    pfMajor.classList.remove('selected');
+  };
+
+  pfMajor.onclick = () => {
+    selectedPowerFactor = 'major';
+    pfMajor.classList.add('selected');
+    pfMinor.classList.remove('selected');
+  };
 
   function getPasswordStrength(password) {
     let score = 0;
@@ -456,8 +582,10 @@ export function renderLogin(container, onSuccess) {
     document.getElementById('separatorText').innerText = t.or;
     document.getElementById('showRegisterBtn').innerText = t.showRegister;
 
-    document.getElementById('registerNameLabel').innerText = t.registerNameLabel;
-    document.getElementById('registerName').placeholder = t.registerNamePlaceholder;
+    document.getElementById('registerFirstNameLabel').innerText = t.registerFirstNameLabel;
+    document.getElementById('registerFirstName').placeholder = t.registerFirstNamePlaceholder;
+    document.getElementById('registerLastNameLabel').innerText = t.registerLastNameLabel;
+    document.getElementById('registerLastName').placeholder = t.registerLastNamePlaceholder;
     document.getElementById('registerEmailLabel').innerText = t.registerEmailLabel;
     document.getElementById('registerEmail').placeholder = t.registerEmailPlaceholder;
     document.getElementById('registerEmailConfirmLabel').innerText = t.registerEmailConfirmLabel;
@@ -466,6 +594,11 @@ export function renderLogin(container, onSuccess) {
     document.getElementById('registerPassword').placeholder = t.registerPasswordPlaceholder;
     document.getElementById('registerPasswordConfirmLabel').innerText = t.registerPasswordConfirmLabel;
     document.getElementById('registerPasswordConfirm').placeholder = t.registerPasswordConfirmPlaceholder;
+    document.getElementById('registerDivisionLabel').innerText = t.registerDivisionLabel;
+    document.getElementById('registerCategoryLabel').innerText = t.registerCategoryLabel;
+    document.getElementById('registerPowerFactorLabel').innerText = t.registerPowerFactorLabel;
+    document.getElementById('registerRegionLabel').innerText = t.registerRegionLabel;
+    document.getElementById('registerClubLabel').innerText = t.registerClubLabel;
     document.getElementById('registerCodeLabel').innerText = t.registerCodeLabel;
     document.getElementById('registerCode').placeholder = t.registerCodePlaceholder;
     document.getElementById('registerBtn').innerText = t.register;
@@ -515,20 +648,30 @@ export function renderLogin(container, onSuccess) {
     errorEl.innerText = '';
     const t = texts[currentLang];
 
-    const name = document.getElementById('registerName').value.trim();
+    const firstName = document.getElementById('registerFirstName').value.trim();
+    const lastName = document.getElementById('registerLastName').value.trim();
     const email = document.getElementById('registerEmail').value.trim();
     const confirmEmail = document.getElementById('registerEmailConfirm').value.trim();
     const password = document.getElementById('registerPassword').value;
     const confirmPassword = document.getElementById('registerPasswordConfirm').value;
+    const division = document.getElementById('registerDivision').value;
+    const category = document.getElementById('registerCategory').value;
+    const region = document.getElementById('registerRegion').value;
+    const club = document.getElementById('registerClub').value.trim();
     const code = document.getElementById('registerCode').value.trim();
 
-    if (!name) {
+    if (!firstName || !lastName) {
       errorEl.innerText = t.missingName;
       return;
     }
 
     if (!email || !confirmEmail || !password || !confirmPassword || !code) {
       errorEl.innerText = t.missingFields;
+      return;
+    }
+
+    if (!division) {
+      errorEl.innerText = t.missingDivision;
       return;
     }
 
@@ -547,7 +690,8 @@ export function renderLogin(container, onSuccess) {
       return;
     }
 
-    const result = await register(email, password, code, name);
+    // Call register with profile data
+    const result = await register(email, password, code, firstName, lastName, division, category, selectedPowerFactor, region, club);
 
     if (result.success) {
       onSuccess();

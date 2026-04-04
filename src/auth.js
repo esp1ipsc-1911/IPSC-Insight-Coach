@@ -1,8 +1,13 @@
+// ════════════════════════════════════════════════════════════════════════════
+// IPSC INSIGHT - AUTHENTICATION MODULE
+// Cloud Functions Integration (Server-side invite code validation)
+// ════════════════════════════════════════════════════════════════════════════
+
 import { auth, db } from './firebase.js';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
+  signOut as firebaseSignOut,
   onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import {
@@ -14,42 +19,115 @@ import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/
 
 const functions = getFunctions();
 
+// ════════════════════════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ════════════════════════════════════════════════════════════════════════════
+
+let currentUser = null;
+let currentUserProfile = null;
+
+// ════════════════════════════════════════════════════════════════════════════
+// INIT AUTH (for main.js compatibility)
+// ════════════════════════════════════════════════════════════════════════════
+
+export function initAuth(onUserChanged) {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          currentUserProfile = { uid: user.uid, ...userDoc.data() };
+        } else {
+          currentUserProfile = {
+            uid: user.uid,
+            email: user.email,
+            name: user.email ? user.email.split('@')[0] : 'Bruker',
+            role: 'user'
+          };
+        }
+        onUserChanged(currentUserProfile);
+      } catch (error) {
+        console.error('Feil ved lasting av brukerprofil:', error);
+        currentUserProfile = {
+          uid: user.uid,
+          email: user.email,
+          name: user.email ? user.email.split('@')[0] : 'Bruker',
+          role: 'user'
+        };
+        onUserChanged(currentUserProfile);
+      }
+    } else {
+      currentUser = null;
+      currentUserProfile = null;
+      onUserChanged(null);
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// LOGIN (for loginUI.js)
+// ════════════════════════════════════════════════════════════════════════════
+
 export async function login(email, password) {
   try {
-    await signInWithEmailAndPassword(auth, email, password);
-    return { success: true };
+    const cleanEmail = (email || '').trim();
+    const cleanPassword = password || '';
+    
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      cleanEmail,
+      cleanPassword
+    );
+    
+    return { success: true, user: userCredential.user };
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Innlogging feilet:', error);
     let errorMessage = 'Innlogging feilet';
     
-    if (error.code === 'auth/user-not-found') {
-      errorMessage = 'Bruker ikke funnet';
-    } else if (error.code === 'auth/wrong-password') {
-      errorMessage = 'Feil passord';
+    if (
+      error.code === 'auth/user-not-found' ||
+      error.code === 'auth/wrong-password' ||
+      error.code === 'auth/invalid-credential'
+    ) {
+      errorMessage = 'Feil e-post eller passord';
     } else if (error.code === 'auth/invalid-email') {
       errorMessage = 'Ugyldig e-postadresse';
-    } else if (error.code === 'auth/invalid-credential') {
-      errorMessage = 'Ugyldig e-post eller passord';
+    } else if (error.code === 'auth/user-disabled') {
+      errorMessage = 'Denne kontoen er deaktivert';
     }
     
     return { success: false, error: errorMessage };
   }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// REGISTER (for loginUI.js) - WITH CLOUD FUNCTION VALIDATION
+// ════════════════════════════════════════════════════════════════════════════
+
 export async function register(email, password, inviteCode, name) {
   try {
-    // Create user account first
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const cleanEmail = (email || '').trim();
+    const cleanPassword = password || '';
+    const cleanInviteCode = (inviteCode || '').trim();
+    const cleanName = (name || '').trim();
+
+    // Step 1: Create user account first
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      cleanEmail,
+      cleanPassword
+    );
     const user = userCredential.user;
 
-    // Validate invite code via Cloud Function
+    // Step 2: Validate invite code via Cloud Function
     const validateCode = httpsCallable(functions, 'validateInviteCode');
     
     try {
       await validateCode({
-        code: inviteCode,
+        code: cleanInviteCode,
         userId: user.uid,
-        userEmail: email
+        userEmail: cleanEmail
       });
     } catch (codeError) {
       // If code validation fails, delete the user account
@@ -71,61 +149,71 @@ export async function register(email, password, inviteCode, name) {
       return { success: false, error: errorMessage };
     }
 
-    // Create user profile in Firestore
+    // Step 3: Create user profile in Firestore
     await setDoc(doc(db, 'users', user.uid), {
-      email: email,
-      name: name,
+      email: cleanEmail,
+      name: cleanName || cleanEmail.split('@')[0],
+      role: 'user',
+      inviteCode: cleanInviteCode,
       createdAt: new Date(),
-      inviteCode: inviteCode
+      firstName: '',
+      lastName: '',
+      club: '',
+      region: '',
+      category: 'Standard',
+      draw: 1.42,
+      reload: 2.5
     });
 
-    return { success: true };
+    return { success: true, user };
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('Registrering feilet:', error);
     let errorMessage = 'Registrering feilet';
     
     if (error.code === 'auth/email-already-in-use') {
       errorMessage = 'E-postadressen er allerede i bruk';
     } else if (error.code === 'auth/weak-password') {
-      errorMessage = 'Passordet er for svakt';
+      errorMessage = 'Passordet må være minst 6 tegn';
     } else if (error.code === 'auth/invalid-email') {
       errorMessage = 'Ugyldig e-postadresse';
+    } else if (error.message) {
+      errorMessage = error.message;
     }
     
     return { success: false, error: errorMessage };
   }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// LOGOUT (for appUI.js)
+// ════════════════════════════════════════════════════════════════════════════
+
 export async function logout() {
   try {
-    await signOut(auth);
+    await firebaseSignOut(auth);
     return { success: true };
   } catch (error) {
-    console.error('Logout error:', error);
-    return { success: false, error: 'Utlogging feilet' };
+    console.error('Utlogging feilet:', error);
+    return { success: false, error: 'Kunne ikke logge ut' };
   }
 }
 
-export function onAuthChange(callback) {
-  return onAuthStateChanged(auth, callback);
-}
+// ════════════════════════════════════════════════════════════════════════════
+// GET CURRENT USER (for appUI.js)
+// ════════════════════════════════════════════════════════════════════════════
 
 export function getCurrentUser() {
-  return auth.currentUser;
+  return currentUser;
 }
 
-export async function getCurrentUserProfile() {
-  const user = auth.currentUser;
-  if (!user) return null;
+export function getCurrentUserProfile() {
+  return currentUserProfile;
+}
 
-  try {
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    if (userDoc.exists()) {
-      return { uid: user.uid, email: user.email, ...userDoc.data() };
-    }
-    return { uid: user.uid, email: user.email };
-  } catch (error) {
-    console.error('Error getting user profile:', error);
-    return { uid: user.uid, email: user.email };
-  }
+// ════════════════════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ════════════════════════════════════════════════════════════════════════════
+
+export function isAdmin() {
+  return currentUserProfile && currentUserProfile.role === 'admin';
 }

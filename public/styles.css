@@ -42,7 +42,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:var(--muted);font-size:10px;}
 .tab-item.active{color:var(--accent);}
 .tab-icon{font-size:20px;line-height:1;}
-.scroll-content{flex:1;overflow-y:auto;padding:0 18px 110px;width:100%;}
+.scroll-content{flex:1;overflow-y:auto;padding:0 0 110px;width:100%;}
+.scroll-content > *:not(.card):not(.btn-primary){padding-left:18px;padding-right:18px;}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:0 0 12px 0;width:100%;}
 .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .card-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;}

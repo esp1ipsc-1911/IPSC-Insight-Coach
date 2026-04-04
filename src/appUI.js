@@ -420,7 +420,7 @@ export async function renderApp(container) {
     <div class="nav-avatar" id="prof-avatar" onclick="switchTab('screen-home')">${initials()}</div>
   </div>
   <div class="scroll-content">
-    <div style="text-align:center;padding:32px 18px 24px">
+    <div style="text-align:center;padding:32px 0 24px">
       <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c97b2a);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:36px;color:var(--bg);margin:0 auto 16px">${initials()}</div>
       <div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px" id="prof-name">${profile.firstName || ''} ${profile.lastName || ''}</div>
       <div style="font-size:14px;color:var(--muted);margin-bottom:12px" id="prof-div">${profile.division || '—'} · ${profile.club || '—'}</div>

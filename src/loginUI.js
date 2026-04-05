@@ -1,4 +1,5 @@
 import { login, register } from './auth.js';
+import { createGDPRCheckbox, validateGDPRConsent } from './gdpr.js';
 
 export function renderLogin(container, onSuccess) {
   container.innerHTML = `
@@ -400,6 +401,8 @@ export function renderLogin(container, onSuccess) {
           <div id="registerCodeLabel" class="field-label">Invitasjonskode</div>
           <input id="registerCode" class="field" type="text" placeholder="Invitasjonskode" />
 
+          <div id="gdprCheckboxContainer"></div>
+
           <button id="registerBtn" class="primary-btn">Opprett bruker</button>
           <button id="cancelRegisterBtn" class="ghost-btn">Avbryt</button>
         </div>
@@ -451,7 +454,8 @@ export function renderLogin(container, onSuccess) {
       strengthWeak: 'Passordstyrke: Svak',
       strengthMedium: 'Passordstyrke: Middels',
       strengthStrong: 'Passordstyrke: Sterk',
-      strengthVeryStrong: 'Passordstyrke: Svært sterk'
+      strengthVeryStrong: 'Passordstyrke: Svært sterk',
+      gdprRequired: 'Du må godta personvernerklæringen for å registrere deg'
     },
     en: {
       subtitle: 'Analyze. Predict. Perform.',
@@ -494,7 +498,8 @@ export function renderLogin(container, onSuccess) {
       strengthWeak: 'Password strength: Weak',
       strengthMedium: 'Password strength: Medium',
       strengthStrong: 'Password strength: Strong',
-      strengthVeryStrong: 'Password strength: Very strong'
+      strengthVeryStrong: 'Password strength: Very strong',
+      gdprRequired: 'You must accept the privacy policy to register'
     }
   };
 
@@ -614,6 +619,13 @@ export function renderLogin(container, onSuccess) {
     loginSection.classList.remove('active');
     registerSection.classList.add('active');
     errorEl.innerText = '';
+    
+    // Add GDPR checkbox when showing register section
+    const gdprContainer = document.getElementById('gdprCheckboxContainer');
+    if (gdprContainer && !gdprContainer.hasChildNodes()) {
+      const checkbox = createGDPRCheckbox();
+      gdprContainer.appendChild(checkbox);
+    }
   }
 
   function showLoginMode() {
@@ -687,6 +699,13 @@ export function renderLogin(container, onSuccess) {
 
     if (getPasswordStrength(password).score <= 1) {
       errorEl.innerText = t.weakPassword;
+      return;
+    }
+
+    // Validate GDPR consent
+    const gdprValidation = validateGDPRConsent();
+    if (!gdprValidation.valid) {
+      errorEl.innerText = t.gdprRequired;
       return;
     }
 

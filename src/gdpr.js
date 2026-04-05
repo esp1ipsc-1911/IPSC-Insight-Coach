@@ -92,7 +92,7 @@ export const GDPR_CONSENT_TEXT = `
   <h3>9. Kontaktinformasjon</h3>
   <p>
     Har du spørsmål om personvern eller ønsker å utøve dine rettigheter, kan du kontakte oss på:<br>
-    <strong>E-post:</strong> [mailto: esp1.ipsc@gmail.com
+    <strong>E-post:</strong> [DIN KONTAKT E-POST HER]
   </p>
 
   <h3>10. Endringer i personvernerklæringen</h3>

@@ -169,7 +169,11 @@ export async function register(email, password, inviteCode, firstName, lastName,
       inviteCode: cleanInviteCode,
       createdAt: new Date(),
       draw: null,
-      reloadTime: null
+      reloadTime: null,
+      // GDPR consent
+      gdprConsent: true,
+      gdprConsentDate: new Date(),
+      gdprVersion: '1.0'
     });
 
     return { success: true, user };

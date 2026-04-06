@@ -82,29 +82,31 @@ export async function saveUserProfile(profile) {
   }
 }
 
-export async function getUserProfile() {
-  const user = getCurrentUser();
-  if (!user) return null;
-
+export async function getUserProfile(userId) {
   try {
-    const docSnap = await getDoc(doc(db, 'users', user.uid));
-    if (docSnap.exists()) {
-      return { uid: user.uid, ...docSnap.data() };
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      return { uid: userId, ...userDoc.data() };
     }
     return null;
   } catch (error) {
-    console.error('Get profile error:', error);
+    console.error('Get user profile error:', error);
     return null;
   }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// MATCHES - CRUD Operations
+// MATCH CRUD
 // ════════════════════════════════════════════════════════════════════════════
 
 export async function createMatch(matchData) {
   const user = getCurrentUser();
-  if (!user) return { success: false, error: 'Not authenticated' };
+  console.log('🔍 [CREATE MATCH] User:', user?.uid);
+  
+  if (!user) {
+    console.error('❌ [CREATE MATCH] Not authenticated');
+    return { success: false, error: 'Not authenticated' };
+  }
 
   try {
     const matchDoc = normalizeMatch({
@@ -115,10 +117,23 @@ export async function createMatch(matchData) {
       updatedAt: serverTimestamp()
     });
 
+    console.log('📝 [CREATE MATCH] Match document to save:', {
+      name: matchDoc.name,
+      ownerId: matchDoc.ownerId,
+      participants: matchDoc.participants,
+      date: matchDoc.date,
+      type: matchDoc.type
+    });
+
     const docRef = await addDoc(collection(db, 'matches'), matchDoc);
+    
+    console.log('✅ [CREATE MATCH] Success! Match ID:', docRef.id);
+    
     return { success: true, matchId: docRef.id };
   } catch (error) {
-    console.error('Create match error:', error);
+    console.error('❌ [CREATE MATCH] Error:', error);
+    console.error('   Error code:', error.code);
+    console.error('   Error message:', error.message);
     return { success: false, error: error.message };
   }
 }
@@ -182,7 +197,12 @@ export async function getMatch(matchId) {
 
 export async function getUserMatches() {
   const user = getCurrentUser();
-  if (!user) return [];
+  console.log('📊 [GET USER MATCHES] User:', user?.uid);
+  
+  if (!user) {
+    console.warn('⚠️ [GET USER MATCHES] Not authenticated');
+    return [];
+  }
 
   try {
     const participantQuery = query(
@@ -195,6 +215,8 @@ export async function getUserMatches() {
       where('ownerId', '==', user.uid)
     );
 
+    console.log('🔍 [GET USER MATCHES] Running queries...');
+
     const [participantSnapshot, ownerSnapshot] = await Promise.all([
       getDocs(participantQuery),
       getDocs(ownerQuery)
@@ -202,17 +224,26 @@ export async function getUserMatches() {
 
     const participantMatches = [];
     participantSnapshot.forEach((docSnap) => {
-      participantMatches.push({ id: docSnap.id, ...docSnap.data() });
+      const match = { id: docSnap.id, ...docSnap.data() };
+      console.log('  📌 Participant match:', docSnap.id, '-', match.name);
+      participantMatches.push(match);
     });
 
     const ownerMatches = [];
     ownerSnapshot.forEach((docSnap) => {
-      ownerMatches.push({ id: docSnap.id, ...docSnap.data() });
+      const match = { id: docSnap.id, ...docSnap.data() };
+      console.log('  👑 Owner match:', docSnap.id, '-', match.name);
+      ownerMatches.push(match);
     });
 
-    return mergeMatchArrays(participantMatches, ownerMatches);
+    const merged = mergeMatchArrays(participantMatches, ownerMatches);
+    console.log('✅ [GET USER MATCHES] Total matches:', merged.length);
+
+    return merged;
   } catch (error) {
-    console.error('Get user matches error:', error);
+    console.error('❌ [GET USER MATCHES] Error:', error);
+    console.error('   Error code:', error.code);
+    console.error('   Error message:', error.message);
     return [];
   }
 }
@@ -223,7 +254,12 @@ export async function getUserMatches() {
 
 export function listenToUserMatches(callback) {
   const user = getCurrentUser();
-  if (!user) return () => {};
+  console.log('👂 [LISTEN USER MATCHES] Setting up listeners for user:', user?.uid);
+  
+  if (!user) {
+    console.warn('⚠️ [LISTEN USER MATCHES] No user, skipping listeners');
+    return () => {};
+  }
 
   const participantQuery = query(
     collection(db, 'matches'),
@@ -239,38 +275,51 @@ export function listenToUserMatches(callback) {
   let ownerMatches = [];
 
   const emit = () => {
-    callback(mergeMatchArrays(participantMatches, ownerMatches));
+    const merged = mergeMatchArrays(participantMatches, ownerMatches);
+    console.log('🔄 [LISTEN USER MATCHES] Emitting', merged.length, 'matches');
+    callback(merged);
   };
 
   const unsubscribeParticipants = onSnapshot(
     participantQuery,
     (snapshot) => {
+      console.log('📊 [LISTEN USER MATCHES] Participant snapshot:', snapshot.size, 'docs');
       participantMatches = [];
       snapshot.forEach((docSnap) => {
-        participantMatches.push({ id: docSnap.id, ...docSnap.data() });
+        const match = { id: docSnap.id, ...docSnap.data() };
+        console.log('  📌 Participant match:', docSnap.id, '-', match.name);
+        participantMatches.push(match);
       });
       emit();
     },
     (error) => {
-      console.error('Listen to participant matches error:', error);
+      console.error('❌ [LISTEN USER MATCHES] Participant query error:', error);
+      console.error('   Error code:', error.code);
+      console.error('   Error message:', error.message);
     }
   );
 
   const unsubscribeOwners = onSnapshot(
     ownerQuery,
     (snapshot) => {
+      console.log('👑 [LISTEN USER MATCHES] Owner snapshot:', snapshot.size, 'docs');
       ownerMatches = [];
       snapshot.forEach((docSnap) => {
-        ownerMatches.push({ id: docSnap.id, ...docSnap.data() });
+        const match = { id: docSnap.id, ...docSnap.data() };
+        console.log('  👑 Owner match:', docSnap.id, '-', match.name);
+        ownerMatches.push(match);
       });
       emit();
     },
     (error) => {
-      console.error('Listen to owner matches error:', error);
+      console.error('❌ [LISTEN USER MATCHES] Owner query error:', error);
+      console.error('   Error code:', error.code);
+      console.error('   Error message:', error.message);
     }
   );
 
   return () => {
+    console.log('🔌 [LISTEN USER MATCHES] Unsubscribing from listeners');
     unsubscribeParticipants();
     unsubscribeOwners();
   };
@@ -295,60 +344,45 @@ export function listenToMatch(matchId, callback) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// MATCH SHARING - Invite others to collaborate
+// MATCH SHARING
 // ════════════════════════════════════════════════════════════════════════════
 
-export async function inviteUserToMatch(matchId, inviteeEmail) {
+export async function inviteUserToMatch(matchId, email) {
   const user = getCurrentUser();
   if (!user) return { success: false, error: 'Not authenticated' };
 
   try {
-    const normalizedEmail = (inviteeEmail || '').trim().toLowerCase();
-    if (!normalizedEmail) {
-      return { success: false, error: 'Du må skrive inn en e-postadresse' };
-    }
-
-    const matchRef = doc(db, 'matches', matchId);
-    const matchDoc = await getDoc(matchRef);
-
+    const matchDoc = await getDoc(doc(db, 'matches', matchId));
     if (!matchDoc.exists()) {
       return { success: false, error: 'Match ikke funnet' };
     }
 
-    const matchData = normalizeMatch(matchDoc.data());
-
-    if (!matchData.ownerId) {
-      return { success: false, error: 'Matchen mangler eierinformasjon' };
-    }
-
+    const matchData = matchDoc.data();
     if (matchData.ownerId !== user.uid) {
-      return { success: false, error: 'Kun den som opprettet matchen kan invitere deltakere' };
+      return { success: false, error: 'Kun matchens eier kan invitere' };
     }
 
-    const q = query(collection(db, 'users'), where('email', '==', normalizedEmail));
-    const querySnapshot = await getDocs(q);
+    const usersSnapshot = await getDocs(
+      query(collection(db, 'users'), where('email', '==', email))
+    );
 
-    if (querySnapshot.empty) {
+    if (usersSnapshot.empty) {
       return { success: false, error: 'Bruker ikke funnet' };
     }
 
-    const inviteeDoc = querySnapshot.docs[0];
-    const inviteeId = inviteeDoc.id;
+    const invitedUser = usersSnapshot.docs[0];
+    const invitedUserId = invitedUser.id;
 
-    if (inviteeId === user.uid) {
-      return { success: false, error: 'Du er allerede eier av matchen' };
-    }
-
-    if (matchData.participants.includes(inviteeId)) {
+    if (matchData.participants?.includes(invitedUserId)) {
       return { success: false, error: 'Bruker er allerede deltaker' };
     }
 
-    await updateDoc(matchRef, {
-      participants: arrayUnion(inviteeId),
+    await updateDoc(doc(db, 'matches', matchId), {
+      participants: arrayUnion(invitedUserId),
       updatedAt: serverTimestamp()
     });
 
-    return { success: true, message: 'Bruker lagt til' };
+    return { success: true, message: 'Bruker lagt til!' };
   } catch (error) {
     console.error('Invite user error:', error);
     return { success: false, error: error.message };
@@ -360,32 +394,21 @@ export async function removeUserFromMatch(matchId, userId) {
   if (!user) return { success: false, error: 'Not authenticated' };
 
   try {
-    const matchRef = doc(db, 'matches', matchId);
-    const matchDoc = await getDoc(matchRef);
-
+    const matchDoc = await getDoc(doc(db, 'matches', matchId));
     if (!matchDoc.exists()) {
       return { success: false, error: 'Match ikke funnet' };
     }
 
-    const matchData = normalizeMatch(matchDoc.data());
-
-    if (!matchData.ownerId) {
-      return { success: false, error: 'Matchen mangler eierinformasjon' };
-    }
-
+    const matchData = matchDoc.data();
     if (matchData.ownerId !== user.uid) {
-      return { success: false, error: 'Kun eier kan fjerne deltakere' };
+      return { success: false, error: 'Kun matchens eier kan fjerne deltakere' };
     }
 
     if (userId === matchData.ownerId) {
-      return { success: false, error: 'Kan ikke fjerne eier' };
+      return { success: false, error: 'Kan ikke fjerne matchens eier' };
     }
 
-    if (!matchData.participants.includes(userId)) {
-      return { success: false, error: 'Bruker er ikke deltaker i matchen' };
-    }
-
-    await updateDoc(matchRef, {
+    await updateDoc(doc(db, 'matches', matchId), {
       participants: arrayRemove(userId),
       updatedAt: serverTimestamp()
     });
@@ -402,28 +425,17 @@ export async function leaveMatch(matchId) {
   if (!user) return { success: false, error: 'Not authenticated' };
 
   try {
-    const matchRef = doc(db, 'matches', matchId);
-    const matchDoc = await getDoc(matchRef);
-
+    const matchDoc = await getDoc(doc(db, 'matches', matchId));
     if (!matchDoc.exists()) {
       return { success: false, error: 'Match ikke funnet' };
     }
 
-    const matchData = normalizeMatch(matchDoc.data());
-
-    if (!matchData.ownerId) {
-      return { success: false, error: 'Matchen mangler eierinformasjon' };
-    }
-
+    const matchData = matchDoc.data();
     if (matchData.ownerId === user.uid) {
-      return { success: false, error: 'Eier kan ikke forlate match. Slett matchen i stedet.' };
+      return { success: false, error: 'Eieren kan ikke forlate matchen' };
     }
 
-    if (!matchData.participants.includes(user.uid)) {
-      return { success: false, error: 'Du er ikke deltaker i denne matchen' };
-    }
-
-    await updateDoc(matchRef, {
+    await updateDoc(doc(db, 'matches', matchId), {
       participants: arrayRemove(user.uid),
       updatedAt: serverTimestamp()
     });
@@ -435,10 +447,6 @@ export async function leaveMatch(matchId) {
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// GET MATCH PARTICIPANTS
-// ════════════════════════════════════════════════════════════════════════════
-
 export async function getMatchParticipants(matchId) {
   try {
     const matchDoc = await getDoc(doc(db, 'matches', matchId));
@@ -446,24 +454,30 @@ export async function getMatchParticipants(matchId) {
       return [];
     }
 
-    const matchData = normalizeMatch(matchDoc.data());
+    const matchData = matchDoc.data();
     const participantIds = matchData.participants || [];
 
-    const participants = [];
-    for (const userId of participantIds) {
-      const userDoc = await getDoc(doc(db, 'users', userId));
-      if (userDoc.exists()) {
-        participants.push({
-          uid: userId,
-          ...userDoc.data(),
-          isOwner: userId === matchData.ownerId
-        });
-      }
-    }
+    const participants = await Promise.all(
+      participantIds.map(async (uid) => {
+        const userDoc = await getDoc(doc(db, 'users', uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          return {
+            uid,
+            name: userData.firstName && userData.lastName
+              ? `${userData.firstName} ${userData.lastName}`
+              : userData.email,
+            email: userData.email,
+            isOwner: uid === matchData.ownerId
+          };
+        }
+        return null;
+      })
+    );
 
-    return participants;
+    return participants.filter(Boolean);
   } catch (error) {
-    console.error('Get participants error:', error);
+    console.error('Get match participants error:', error);
     return [];
   }
 }

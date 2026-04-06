@@ -845,8 +845,9 @@ body {
   inset: 0;
   background: rgba(0, 0, 0, .75);
   z-index: 200;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
+  padding-top: 20px;
 }
 
 .modal-overlay.open {

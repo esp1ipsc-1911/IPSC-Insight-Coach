@@ -2,11 +2,11 @@
 // MATCH SHARING UI
 // ════════════════════════════════════════════════════════════════════════════
 
-import { 
-  inviteUserToMatch, 
-  getMatchParticipants, 
-  removeUserFromMatch, 
-  leaveMatch 
+import {
+  inviteUserToMatch,
+  getMatchParticipants,
+  removeUserFromMatch,
+  leaveMatch
 } from './dataLayer.js';
 import { getCurrentUser } from './auth.js';
 
@@ -25,7 +25,7 @@ export async function showMatchSharingModal(matchId, matchName) {
     justify-content: center;
     z-index: 10000;
   `;
-  
+
   const content = document.createElement('div');
   content.style.cssText = `
     background: #1a1d25;
@@ -36,18 +36,18 @@ export async function showMatchSharingModal(matchId, matchName) {
     max-height: 80vh;
     overflow-y: auto;
   `;
-  
+
   content.innerHTML = `
     <h2 style="color: #e8b84b; margin: 0 0 8px 0;">Del match</h2>
     <p style="color: #8b92a7; margin: 0 0 24px 0; font-size: 14px;">${matchName}</p>
-    
-    <div style="margin-bottom: 24px;">
+
+    <div id="invite-section" style="margin-bottom: 24px; display: none;">
       <label style="display: block; color: #8b92a7; font-size: 14px; margin-bottom: 8px;">
         Inviter bruker (e-post)
       </label>
       <div style="display: flex; gap: 8px;">
-        <input 
-          type="email" 
+        <input
+          type="email"
           id="invite-email-input"
           placeholder="henrik@example.com"
           style="
@@ -60,7 +60,7 @@ export async function showMatchSharingModal(matchId, matchName) {
             font-size: 14px;
           "
         />
-        <button 
+        <button
           id="invite-btn"
           style="
             padding: 12px 20px;
@@ -81,7 +81,19 @@ export async function showMatchSharingModal(matchId, matchName) {
         display: none;
       "></div>
     </div>
-    
+
+    <div id="non-owner-info" style="
+      margin-bottom: 24px;
+      padding: 12px;
+      background: #2a2f3a;
+      border-radius: 8px;
+      color: #8b92a7;
+      font-size: 13px;
+      display: none;
+    ">
+      Kun den som opprettet matchen kan invitere eller fjerne deltakere.
+    </div>
+
     <div>
       <h3 style="color: #fff; font-size: 16px; margin: 0 0 12px 0;">Deltakere</h3>
       <div id="participants-list" style="
@@ -94,9 +106,9 @@ export async function showMatchSharingModal(matchId, matchName) {
         </div>
       </div>
     </div>
-    
+
     <div style="display: flex; gap: 8px; margin-top: 24px;">
-      <button 
+      <button
         id="close-share-modal"
         style="
           flex: 1;
@@ -111,50 +123,50 @@ export async function showMatchSharingModal(matchId, matchName) {
       >Lukk</button>
     </div>
   `;
-  
+
   modal.appendChild(content);
   document.body.appendChild(modal);
-  
-  // Load participants
-  loadParticipants(matchId);
-  
-  // Event handlers
+
+  await loadParticipants(matchId);
+
   document.getElementById('invite-btn').addEventListener('click', async () => {
     const email = document.getElementById('invite-email-input').value.trim();
     if (!email) return;
-    
+
     const btn = document.getElementById('invite-btn');
     btn.disabled = true;
     btn.textContent = 'Sender...';
-    
+
     const result = await inviteUserToMatch(matchId, email);
     const msg = document.getElementById('invite-message');
-    
+
     if (result.success) {
       msg.style.background = '#1a4a1a';
       msg.style.color = '#4ade80';
       msg.textContent = result.message || 'Bruker lagt til!';
       document.getElementById('invite-email-input').value = '';
-      loadParticipants(matchId); // Refresh list
+      await loadParticipants(matchId);
     } else {
       msg.style.background = '#4a1a1a';
       msg.style.color = '#ff6b6b';
-      msg.textContent = result.error;
+      msg.textContent = result.error || 'Kunne ikke invitere bruker';
     }
-    
+
     msg.style.display = 'block';
     btn.disabled = false;
     btn.textContent = 'Inviter';
-    
+
     setTimeout(() => {
-      msg.style.display = 'none';
+      if (msg) {
+        msg.style.display = 'none';
+      }
     }, 3000);
   });
-  
+
   document.getElementById('close-share-modal').addEventListener('click', () => {
     modal.remove();
   });
-  
+
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.remove();
@@ -165,10 +177,23 @@ export async function showMatchSharingModal(matchId, matchName) {
 async function loadParticipants(matchId) {
   const container = document.getElementById('participants-list');
   if (!container) return;
-  
+
   const participants = await getMatchParticipants(matchId);
   const currentUser = getCurrentUser();
-  
+  const currentUserParticipant = participants.find(p => currentUser && p.uid === currentUser.uid);
+  const isOwner = !!currentUserParticipant?.isOwner;
+
+  const inviteSection = document.getElementById('invite-section');
+  const nonOwnerInfo = document.getElementById('non-owner-info');
+
+  if (inviteSection) {
+    inviteSection.style.display = isOwner ? 'block' : 'none';
+  }
+
+  if (nonOwnerInfo) {
+    nonOwnerInfo.style.display = isOwner ? 'none' : 'block';
+  }
+
   if (participants.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; color: #8b92a7; padding: 20px;">
@@ -177,39 +202,15 @@ async function loadParticipants(matchId) {
     `;
     return;
   }
-  
-  container.innerHTML = participants.map(p => `
-    <div style="
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      background: #2a2f3a;
-      border-radius: 8px;
-    ">
-      <div style="
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: ${p.isOwner ? '#e8b84b' : '#3a3f4a'};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: ${p.isOwner ? '#0a0c10' : '#fff'};
-        font-weight: 700;
-        font-size: 16px;
-      ">
-        ${(p.name || p.email).charAt(0).toUpperCase()}
-      </div>
-      <div style="flex: 1;">
-        <div style="color: #fff; font-weight: 600;">
-          ${p.name || p.email}
-          ${p.isOwner ? '<span style="color: #e8b84b; font-size: 12px; margin-left: 8px;">EIER</span>' : ''}
-        </div>
-        <div style="color: #8b92a7; font-size: 13px;">${p.email}</div>
-      </div>
-      ${!p.isOwner && currentUser && (p.uid === currentUser.uid || p.isOwner) ? `
-        <button 
+
+  container.innerHTML = participants.map(p => {
+    const canRemoveOther = isOwner && !p.isOwner;
+    const canLeaveSelf = !isOwner && currentUser && p.uid === currentUser.uid;
+
+    let actionButton = '';
+    if (canRemoveOther || canLeaveSelf) {
+      actionButton = `
+        <button
           onclick="removeParticipant('${matchId}', '${p.uid}')"
           style="
             padding: 6px 12px;
@@ -220,40 +221,72 @@ async function loadParticipants(matchId) {
             font-size: 12px;
             cursor: pointer;
           "
-        >${p.uid === currentUser.uid ? 'Forlat' : 'Fjern'}</button>
-      ` : ''}
-    </div>
-  `).join('');
+        >${canLeaveSelf ? 'Forlat' : 'Fjern'}</button>
+      `;
+    }
+
+    return `
+      <div style="
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #2a2f3a;
+        border-radius: 8px;
+      ">
+        <div style="
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: ${p.isOwner ? '#e8b84b' : '#3a3f4a'};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${p.isOwner ? '#0a0c10' : '#fff'};
+          font-weight: 700;
+          font-size: 16px;
+        ">
+          ${(p.name || p.email || '?').charAt(0).toUpperCase()}
+        </div>
+        <div style="flex: 1;">
+          <div style="color: #fff; font-weight: 600;">
+            ${p.name || p.email}
+            ${p.isOwner ? '<span style="color: #e8b84b; font-size: 12px; margin-left: 8px;">EIER</span>' : ''}
+          </div>
+          <div style="color: #8b92a7; font-size: 13px;">${p.email || ''}</div>
+        </div>
+        ${actionButton}
+      </div>
+    `;
+  }).join('');
 }
 
 window.removeParticipant = async function(matchId, userId) {
   const currentUser = getCurrentUser();
   if (!currentUser) return;
-  
+
   const confirmed = confirm(
-    userId === currentUser.uid 
-      ? 'Vil du forlate denne matchen?' 
+    userId === currentUser.uid
+      ? 'Vil du forlate denne matchen?'
       : 'Vil du fjerne denne brukeren?'
   );
-  
+
   if (!confirmed) return;
-  
+
   let result;
   if (userId === currentUser.uid) {
     result = await leaveMatch(matchId);
   } else {
     result = await removeUserFromMatch(matchId, userId);
   }
-  
+
   if (result.success) {
     if (userId === currentUser.uid) {
-      // User left the match, close modal
       document.getElementById('share-match-modal')?.remove();
     } else {
-      // Refresh participants list
-      loadParticipants(matchId);
+      await loadParticipants(matchId);
     }
   } else {
-    alert(result.error);
+    alert(result.error || 'Handlingen kunne ikke gjennomføres');
   }
 };

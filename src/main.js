@@ -1,7 +1,6 @@
 import { renderLogin } from './loginUI.js';
 import { renderApp } from './appUI.js';
 import { initAuth } from './auth.js';
-import '../public/gdpr-styles.css';
 
 const app = document.getElementById('app');
 

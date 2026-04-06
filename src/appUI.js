@@ -529,6 +529,8 @@ export async function renderApp(container) {
         <div class="field-label">${t('planned_stages')}</div>
         <input class="field-input" type="number" id="new-match-stages" value="6">
       </div>
+    </div>
+    <div class="modal-footer">
       <button class="btn-primary" onclick="createMatch()">${t('save')}</button>
     </div>
   </div>
@@ -577,6 +579,8 @@ export async function renderApp(container) {
         <div class="field-label">${t('reload_seconds')}</div>
         <input class="field-input" type="number" step="0.01" id="edit-reload" value="${profile.reloadTime || ''}">
       </div>
+    </div>
+    <div class="modal-footer">
       <button class="btn-primary" id="save-profile-btn" onclick="saveProfileData()">${t('save_profile')}</button>
     </div>
   </div>
@@ -601,6 +605,8 @@ export async function renderApp(container) {
         <div class="field-label">${t('division')}</div>
         <select class="field-select" id="new-shooter-division"></select>
       </div>
+    </div>
+    <div class="modal-footer">
       <button class="btn-primary" onclick="addShooter()">${t('save_shooter')}</button>
     </div>
   </div>
@@ -625,7 +631,77 @@ export async function renderApp(container) {
         <div class="field-label">Points</div>
         <input class="field-input" type="number" id="new-result-points">
       </div>
+    </div>
+    <div class="modal-footer">
       <button class="btn-primary" onclick="addStageResult()">${t('save_result')}</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDIT MATCH -->
+<div class="modal-overlay" id="modal-edit-match" onclick="closeModalOutside(event,'modal-edit-match')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Rediger match</div>
+      <div class="modal-close" onclick="closeModal('modal-edit-match')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <div class="field-label">MATCHNAVN</div>
+        <input class="field-input" type="text" id="edit-match-name">
+      </div>
+      <div class="field-group">
+        <div class="field-label">DATO</div>
+        <input class="field-input" type="date" id="edit-match-date">
+      </div>
+      <div class="field-group">
+        <div class="field-label">STED</div>
+        <input class="field-input" type="text" id="edit-match-location">
+      </div>
+      <div class="field-group">
+        <div class="field-label">TYPE</div>
+        <select class="field-select" id="edit-match-type">
+          <option value="Trening">Trening</option>
+          <option value="Stevne">Stevne</option>
+          <option value="Landsmesterskap">Landsmesterskap</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">ANTALL STAGES</div>
+        <input class="field-input" type="number" id="edit-match-stages" min="1">
+      </div>
+      <div class="field-group" style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+        <input type="checkbox" id="edit-match-searchable" style="width:18px;height:18px;">
+        <label for="edit-match-searchable" style="font-size:14px;">Tillat at andre kan finne denne matchen</label>
+      </div>
+      <div class="field-group" style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+        <input type="checkbox" id="edit-match-finished" style="width:18px;height:18px;">
+        <label for="edit-match-finished" style="font-size:14px;">Marker som ferdig</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="saveEditMatch()">Lagre</button>
+      <button id="delete-match-btn" onclick="confirmDeleteMatch()" style="width:100%;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Slett match</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRM DELETE MATCH -->
+<div class="modal-overlay" id="modal-confirm-delete" onclick="closeModalOutside(event,'modal-confirm-delete')">
+  <div class="modal-sheet" onclick="event.stopPropagation()" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">Slett match</div>
+      <div class="modal-close" onclick="closeModal('modal-confirm-delete')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:20px;">Er du sikker på at du vil slette <strong id="delete-match-name"></strong>?</p>
+      <p style="color:var(--muted);font-size:13px;">Denne handlingen kan ikke angres.</p>
+    </div>
+    <div class="modal-footer">
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeModal('modal-confirm-delete')" style="flex:1;padding:12px;background:#374151;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Avbryt</button>
+        <button onclick="deleteMatchConfirmed()" style="flex:1;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Slett match</button>
+      </div>
     </div>
   </div>
 </div>
@@ -667,6 +743,25 @@ function setupApp() {
   window.addShooter = addShooterHandler;
   window.addStageResult = addStageResultHandler;
   window.handleLogout = handleLogoutHandler;
+  window.openEditMatch = openEditMatchHandler;
+  window.saveEditMatch = saveEditMatchHandler;
+  window.confirmDeleteMatch = confirmDeleteMatchHandler;
+  window.deleteMatchConfirmed = deleteMatchConfirmedHandler;
+  
+  // Close dropdown when clicking outside - MUST be after HTML is rendered
+  document.addEventListener('click', function(event) {
+    const isChip = event.target.closest('.match-chip');
+    const isDropdown = event.target.closest('.match-dropdown');
+    
+    if (!isChip && !isDropdown) {
+      document.querySelectorAll('.match-dropdown').forEach(dd => {
+        dd.classList.remove('open');
+      });
+      document.querySelectorAll('.match-chip').forEach(ch => {
+        ch.classList.remove('open');
+      });
+    }
+  });
 }
 
 function switchTab(screenId) {
@@ -785,7 +880,10 @@ function renderHome() {
   
   // Match info card
   html += '<div class="card">';
+  html += '<div class="card-header">';
   html += '<div class="mhc-name">' + match.name + '</div>';
+  html += '<button class="btn-sm accent" onclick="openEditMatch()">⚙ Rediger</button>';
+  html += '</div>';
   html += '<div class="mhc-meta">' + fmtDate(match.date) + ' · ' + match.type + '</div>';
   html += '<div class="mhc-stats">';
   html += '<div><div class="mhc-val">' + (match.stages?.length || 0) + '</div><div class="mhc-lbl">Stages</div></div>';
@@ -1251,17 +1349,105 @@ function renderMatchDropdown(dropdownId) {
   dropdown.innerHTML = html;
 }
 
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-  const isChip = event.target.closest('.match-chip');
-  const isDropdown = event.target.closest('.match-dropdown');
-  
-  if (!isChip && !isDropdown) {
-    document.querySelectorAll('.match-dropdown').forEach(dd => {
-      dd.classList.remove('open');
-    });
-    document.querySelectorAll('.match-chip').forEach(ch => {
-      ch.classList.remove('open');
-    });
+// ════════════════════════════════════════════════════════════════════════════
+// EDIT/DELETE MATCH FUNCTIONS
+// ════════════════════════════════════════════════════════════════════════════
+
+function openEditMatchHandler() {
+  const match = matches.find(m => m.id === activeMatchId);
+  if (!match) {
+    alert('Ingen match valgt');
+    return;
   }
-});
+  
+  el('edit-match-name').value = match.name || '';
+  el('edit-match-date').value = match.date || '';
+  el('edit-match-location').value = match.location || '';
+  el('edit-match-type').value = match.type || 'Trening';
+  el('edit-match-stages').value = match.plannedStages || 0;
+  
+  const searchableCheckbox = el('edit-match-searchable');
+  if (searchableCheckbox) {
+    searchableCheckbox.checked = match.searchable !== false;
+  }
+  
+  const finishedCheckbox = el('edit-match-finished');
+  if (finishedCheckbox) {
+    finishedCheckbox.checked = match.status === 'finished';
+  }
+  
+  // SLETT-KNAPP ER ALLTID SYNLIG
+  const deleteBtn = el('delete-match-btn');
+  if (deleteBtn) {
+    deleteBtn.style.display = 'block';
+  }
+  
+  openModal('modal-edit-match');
+}
+
+async function saveEditMatchHandler() {
+  const match = matches.find(m => m.id === activeMatchId);
+  if (!match) {
+    alert('Ingen match valgt');
+    return;
+  }
+  
+  const searchableCheckbox = el('edit-match-searchable');
+  const finishedCheckbox = el('edit-match-finished');
+  
+  const updates = {
+    name: gnv('edit-match-name') || match.name,
+    type: gnv('edit-match-type') || match.type,
+    date: gnv('edit-match-date') || match.date,
+    location: gnv('edit-match-location') || match.location,
+    plannedStages: gnvi('edit-match-stages', match.plannedStages),
+    searchable: searchableCheckbox ? searchableCheckbox.checked : true,
+    status: finishedCheckbox && finishedCheckbox.checked ? 'finished' : 'active'
+  };
+  
+  const result = await updateMatchDB(match.id, updates);
+  
+  if (result.success) {
+    closeModal('modal-edit-match');
+    // Refresh displays
+    renderHome();
+    renderMatchList();
+  } else {
+    alert('Kunne ikke oppdatere match: ' + result.error);
+  }
+}
+
+function confirmDeleteMatchHandler() {
+  const match = matches.find(m => m.id === activeMatchId);
+  if (!match) {
+    alert('Ingen match valgt');
+    return;
+  }
+  
+  const matchName = match.id ? 'Match ID ' + match.id + ' ' + match.name : match.name;
+  el('delete-match-name').textContent = matchName;
+  
+  openModal('modal-confirm-delete');
+}
+
+async function deleteMatchConfirmedHandler() {
+  const match = matches.find(m => m.id === activeMatchId);
+  if (!match) {
+    alert('Ingen match valgt');
+    return;
+  }
+  
+  const result = await deleteMatchDB(match.id);
+  
+  if (result.success) {
+    closeModal('modal-confirm-delete');
+    closeModal('modal-edit-match');
+    activeMatchId = null;
+    renderHome();
+    renderMatchList();
+    alert('Match slettet');
+  } else {
+    alert('Kunne ikke slette match: ' + result.error);
+  }
+}
+

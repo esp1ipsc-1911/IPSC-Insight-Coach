@@ -287,10 +287,13 @@ export async function renderApp(container) {
 <div class="screen active" id="screen-home">
   <div class="navbar">
     <div class="nav-title">IPSC <span>INSIGHT</span></div>
-    <div class="match-chip" onclick="switchTab('screen-matches')">
-      <div class="match-chip-dot"></div>
-      <div class="match-chip-name" id="home-chip-name">${t('no_match_selected')}</div>
-      <div class="match-chip-arrow">&#9660;</div>
+    <div class="match-chip-wrapper">
+      <div class="match-chip" onclick="toggleMatchDropdown('match-dropdown-home')">
+        <div class="match-chip-dot"></div>
+        <div class="match-chip-name" id="home-chip-name">${t('no_match_selected')}</div>
+        <div class="match-chip-arrow">&#9660;</div>
+      </div>
+      <div class="match-dropdown" id="match-dropdown-home"></div>
     </div>
     <div class="nav-avatar" id="nav-av-home" onclick="switchTab('screen-profile')">${initials()}</div>
   </div>
@@ -337,10 +340,13 @@ export async function renderApp(container) {
 <div class="screen" id="screen-prognose">
   <div class="navbar">
     <div class="nav-title">PROG<span>NOSE</span></div>
-    <div class="match-chip" onclick="switchTab('screen-matches')">
-      <div class="match-chip-dot"></div>
-      <div class="match-chip-name" id="prog-chip-name">${t('no_match_selected')}</div>
-      <div class="match-chip-arrow">&#9660;</div>
+    <div class="match-chip-wrapper">
+      <div class="match-chip" onclick="toggleMatchDropdown('match-dropdown-prog')">
+        <div class="match-chip-dot"></div>
+        <div class="match-chip-name" id="prog-chip-name">${t('no_match_selected')}</div>
+        <div class="match-chip-arrow">&#9660;</div>
+      </div>
+      <div class="match-dropdown" id="match-dropdown-prog"></div>
     </div>
     <div class="nav-avatar" id="nav-av-prog" onclick="switchTab('screen-profile')">${initials()}</div>
   </div>
@@ -395,10 +401,13 @@ export async function renderApp(container) {
 <div class="screen" id="screen-results">
   <div class="navbar">
     <div class="nav-title">LIVE<span></span></div>
-    <div class="match-chip" onclick="switchTab('screen-matches')">
-      <div class="match-chip-dot"></div>
-      <div class="match-chip-name" id="results-chip-name">${t('no_match_selected')}</div>
-      <div class="match-chip-arrow">&#9660;</div>
+    <div class="match-chip-wrapper">
+      <div class="match-chip" onclick="toggleMatchDropdown('match-dropdown-results')">
+        <div class="match-chip-dot"></div>
+        <div class="match-chip-name" id="results-chip-name">${t('no_match_selected')}</div>
+        <div class="match-chip-arrow">&#9660;</div>
+      </div>
+      <div class="match-dropdown" id="match-dropdown-results"></div>
     </div>
     <div class="nav-avatar" id="nav-av-results" onclick="switchTab('screen-profile')">${initials()}</div>
   </div>
@@ -645,6 +654,9 @@ function setupApp() {
   window.closeModal = closeModal;
   window.closeModalOutside = closeModalOutside;
   window.createMatch = createMatchHandler;
+  window.toggleMatchDropdown = toggleMatchDropdown;
+  window.selectMatchFromDropdown = selectMatchFromDropdown;
+  window.renderMatchDropdown = renderMatchDropdown;
   window.openEditProfile = openEditProfile;
   window.saveProfileData = saveProfileData;
   window.selectPF = selectPF;
@@ -1173,3 +1185,83 @@ async function handleLogoutHandler() {
   await logout();
   window.location.reload();
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// MATCH DROPDOWN FUNCTIONS
+// ════════════════════════════════════════════════════════════════════════════
+
+function toggleMatchDropdown(dropdownId) {
+  const dropdown = el(dropdownId);
+  if (!dropdown) return;
+  
+  const chip = dropdown.previousElementSibling;
+  const isOpen = dropdown.classList.contains('open');
+  
+  // Close all dropdowns first
+  document.querySelectorAll('.match-dropdown').forEach(dd => {
+    dd.classList.remove('open');
+  });
+  document.querySelectorAll('.match-chip').forEach(ch => {
+    ch.classList.remove('open');
+  });
+  
+  // Toggle current dropdown
+  if (!isOpen) {
+    dropdown.classList.add('open');
+    chip.classList.add('open');
+    renderMatchDropdown(dropdownId);
+  }
+}
+
+function selectMatchFromDropdown(matchId) {
+  selectMatch(matchId);
+  
+  // Close all dropdowns
+  document.querySelectorAll('.match-dropdown').forEach(dd => {
+    dd.classList.remove('open');
+  });
+  document.querySelectorAll('.match-chip').forEach(ch => {
+    ch.classList.remove('open');
+  });
+}
+
+function renderMatchDropdown(dropdownId) {
+  const dropdown = el(dropdownId);
+  if (!dropdown) return;
+  
+  if (matches.length === 0) {
+    dropdown.innerHTML = '<div class="match-dropdown-item" style="text-align:center;color:var(--muted);padding:20px;">Ingen matcher</div>';
+    return;
+  }
+  
+  let html = '';
+  matches.forEach((match, index) => {
+    const isActive = match.id === activeMatchId;
+    html += '<div class="match-dropdown-item' + (isActive ? ' active' : '') + '" onclick="selectMatchFromDropdown(\'' + match.id + '\')">';
+    html += '<div class="match-dropdown-name">';
+    html += 'Match ID ' + (index + 1) + ' ' + match.name;
+    if (isActive) {
+      html += '<span class="match-dropdown-active-indicator"></span>';
+    }
+    html += '</div>';
+    html += '<div class="match-dropdown-meta">' + fmtDate(match.date) + ' · ' + (match.location || match.type) + '</div>';
+    html += '</div>';
+  });
+  
+  dropdown.innerHTML = html;
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+  const isChip = event.target.closest('.match-chip');
+  const isDropdown = event.target.closest('.match-dropdown');
+  
+  if (!isChip && !isDropdown) {
+    document.querySelectorAll('.match-dropdown').forEach(dd => {
+      dd.classList.remove('open');
+    });
+    document.querySelectorAll('.match-chip').forEach(ch => {
+      ch.classList.remove('open');
+    });
+  }
+});

@@ -863,6 +863,7 @@ body {
   max-height: 92vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   animation: slideUp .28s ease;
 }
 
@@ -903,6 +904,7 @@ body {
 
 .modal-body {
   padding: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   flex: 1;
   min-height: 0;

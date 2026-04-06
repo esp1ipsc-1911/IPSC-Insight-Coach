@@ -21,6 +21,48 @@ import { db } from './firebase.js';
 import { getCurrentUser } from './auth.js';
 
 // ════════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════════════════════
+
+function normalizeMatch(match) {
+  if (!match) return match;
+
+  const ownerId = match.ownerId || null;
+  const rawParticipants = Array.isArray(match.participants) ? match.participants : [];
+  const uniqueParticipants = [...new Set(rawParticipants.filter(Boolean))];
+
+  if (ownerId && !uniqueParticipants.includes(ownerId)) {
+    uniqueParticipants.unshift(ownerId);
+  }
+
+  return {
+    ...match,
+    ownerId,
+    participants: uniqueParticipants
+  };
+}
+
+function sortMatchesByNewest(matches) {
+  matches.sort((a, b) => {
+    const dateA = a.date || a.createdAt?.toDate?.() || new Date(0);
+    const dateB = b.date || b.createdAt?.toDate?.() || new Date(0);
+    return dateB - dateA;
+  });
+  return matches;
+}
+
+function mergeMatchArrays(...arrays) {
+  const map = new Map();
+
+  arrays.flat().forEach((match) => {
+    if (!match?.id) return;
+    map.set(match.id, normalizeMatch(match));
+  });
+
+  return sortMatchesByNewest([...map.values()]);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // USER PROFILE
 // ════════════════════════════════════════════════════════════════════════════
 
@@ -65,13 +107,13 @@ export async function createMatch(matchData) {
   if (!user) return { success: false, error: 'Not authenticated' };
 
   try {
-    const matchDoc = {
+    const matchDoc = normalizeMatch({
       ...matchData,
       ownerId: user.uid,
       participants: [user.uid],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
-    };
+    });
 
     const docRef = await addDoc(collection(db, 'matches'), matchDoc);
     return { success: true, matchId: docRef.id };
@@ -86,10 +128,25 @@ export async function updateMatch(matchId, matchData) {
   if (!user) return { success: false, error: 'Not authenticated' };
 
   try {
-    await updateDoc(doc(db, 'matches', matchId), {
+    const existing = await getDoc(doc(db, 'matches', matchId));
+    if (!existing.exists()) {
+      return { success: false, error: 'Match ikke funnet' };
+    }
+
+    const existingData = normalizeMatch(existing.data());
+    const payload = {
       ...matchData,
+      ownerId: existingData.ownerId,
+      participants: Array.isArray(matchData.participants)
+        ? normalizeMatch({
+            ownerId: existingData.ownerId,
+            participants: matchData.participants
+          }).participants
+        : existingData.participants,
       updatedAt: serverTimestamp()
-    });
+    };
+
+    await updateDoc(doc(db, 'matches', matchId), payload);
     return { success: true };
   } catch (error) {
     console.error('Update match error:', error);
@@ -114,7 +171,7 @@ export async function getMatch(matchId) {
   try {
     const docSnap = await getDoc(doc(db, 'matches', matchId));
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+      return normalizeMatch({ id: docSnap.id, ...docSnap.data() });
     }
     return null;
   } catch (error) {
@@ -128,24 +185,32 @@ export async function getUserMatches() {
   if (!user) return [];
 
   try {
-    const q = query(
+    const participantQuery = query(
       collection(db, 'matches'),
       where('participants', 'array-contains', user.uid)
     );
 
-    const querySnapshot = await getDocs(q);
-    const matches = [];
-    querySnapshot.forEach((docSnap) => {
-      matches.push({ id: docSnap.id, ...docSnap.data() });
+    const ownerQuery = query(
+      collection(db, 'matches'),
+      where('ownerId', '==', user.uid)
+    );
+
+    const [participantSnapshot, ownerSnapshot] = await Promise.all([
+      getDocs(participantQuery),
+      getDocs(ownerQuery)
+    ]);
+
+    const participantMatches = [];
+    participantSnapshot.forEach((docSnap) => {
+      participantMatches.push({ id: docSnap.id, ...docSnap.data() });
     });
 
-    matches.sort((a, b) => {
-      const dateA = a.date || a.createdAt?.toDate?.() || new Date(0);
-      const dateB = b.date || b.createdAt?.toDate?.() || new Date(0);
-      return dateB - dateA;
+    const ownerMatches = [];
+    ownerSnapshot.forEach((docSnap) => {
+      ownerMatches.push({ id: docSnap.id, ...docSnap.data() });
     });
 
-    return matches;
+    return mergeMatchArrays(participantMatches, ownerMatches);
   } catch (error) {
     console.error('Get user matches error:', error);
     return [];
@@ -160,41 +225,71 @@ export function listenToUserMatches(callback) {
   const user = getCurrentUser();
   if (!user) return () => {};
 
-  const q = query(
+  const participantQuery = query(
     collection(db, 'matches'),
     where('participants', 'array-contains', user.uid)
   );
 
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const matches = [];
-    snapshot.forEach((docSnap) => {
-      matches.push({ id: docSnap.id, ...docSnap.data() });
-    });
+  const ownerQuery = query(
+    collection(db, 'matches'),
+    where('ownerId', '==', user.uid)
+  );
 
-    matches.sort((a, b) => {
-      const dateA = a.date || a.createdAt?.toDate?.() || new Date(0);
-      const dateB = b.date || b.createdAt?.toDate?.() || new Date(0);
-      return dateB - dateA;
-    });
+  let participantMatches = [];
+  let ownerMatches = [];
 
-    callback(matches);
-  }, (error) => {
-    console.error('Listen to matches error:', error);
-  });
+  const emit = () => {
+    callback(mergeMatchArrays(participantMatches, ownerMatches));
+  };
 
-  return unsubscribe;
+  const unsubscribeParticipants = onSnapshot(
+    participantQuery,
+    (snapshot) => {
+      participantMatches = [];
+      snapshot.forEach((docSnap) => {
+        participantMatches.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      emit();
+    },
+    (error) => {
+      console.error('Listen to participant matches error:', error);
+    }
+  );
+
+  const unsubscribeOwners = onSnapshot(
+    ownerQuery,
+    (snapshot) => {
+      ownerMatches = [];
+      snapshot.forEach((docSnap) => {
+        ownerMatches.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      emit();
+    },
+    (error) => {
+      console.error('Listen to owner matches error:', error);
+    }
+  );
+
+  return () => {
+    unsubscribeParticipants();
+    unsubscribeOwners();
+  };
 }
 
 export function listenToMatch(matchId, callback) {
-  const unsubscribe = onSnapshot(doc(db, 'matches', matchId), (docSnap) => {
-    if (docSnap.exists()) {
-      callback({ id: docSnap.id, ...docSnap.data() });
-    } else {
-      callback(null);
+  const unsubscribe = onSnapshot(
+    doc(db, 'matches', matchId),
+    (docSnap) => {
+      if (docSnap.exists()) {
+        callback(normalizeMatch({ id: docSnap.id, ...docSnap.data() }));
+      } else {
+        callback(null);
+      }
+    },
+    (error) => {
+      console.error('Listen to match error:', error);
     }
-  }, (error) => {
-    console.error('Listen to match error:', error);
-  });
+  );
 
   return unsubscribe;
 }
@@ -220,7 +315,7 @@ export async function inviteUserToMatch(matchId, inviteeEmail) {
       return { success: false, error: 'Match ikke funnet' };
     }
 
-    const matchData = matchDoc.data();
+    const matchData = normalizeMatch(matchDoc.data());
 
     if (!matchData.ownerId) {
       return { success: false, error: 'Matchen mangler eierinformasjon' };
@@ -228,10 +323,6 @@ export async function inviteUserToMatch(matchId, inviteeEmail) {
 
     if (matchData.ownerId !== user.uid) {
       return { success: false, error: 'Kun den som opprettet matchen kan invitere deltakere' };
-    }
-
-    if (!Array.isArray(matchData.participants)) {
-      return { success: false, error: 'Matchdata er ugyldig' };
     }
 
     const q = query(collection(db, 'users'), where('email', '==', normalizedEmail));
@@ -276,14 +367,10 @@ export async function removeUserFromMatch(matchId, userId) {
       return { success: false, error: 'Match ikke funnet' };
     }
 
-    const matchData = matchDoc.data();
+    const matchData = normalizeMatch(matchDoc.data());
 
     if (!matchData.ownerId) {
       return { success: false, error: 'Matchen mangler eierinformasjon' };
-    }
-
-    if (!Array.isArray(matchData.participants)) {
-      return { success: false, error: 'Matchdata er ugyldig' };
     }
 
     if (matchData.ownerId !== user.uid) {
@@ -322,14 +409,10 @@ export async function leaveMatch(matchId) {
       return { success: false, error: 'Match ikke funnet' };
     }
 
-    const matchData = matchDoc.data();
+    const matchData = normalizeMatch(matchDoc.data());
 
     if (!matchData.ownerId) {
       return { success: false, error: 'Matchen mangler eierinformasjon' };
-    }
-
-    if (!Array.isArray(matchData.participants)) {
-      return { success: false, error: 'Matchdata er ugyldig' };
     }
 
     if (matchData.ownerId === user.uid) {
@@ -363,8 +446,8 @@ export async function getMatchParticipants(matchId) {
       return [];
     }
 
-    const matchData = matchDoc.data();
-    const participantIds = Array.isArray(matchData.participants) ? matchData.participants : [];
+    const matchData = normalizeMatch(matchDoc.data());
+    const participantIds = matchData.participants || [];
 
     const participants = [];
     for (const userId of participantIds) {

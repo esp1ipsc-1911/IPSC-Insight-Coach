@@ -2,16 +2,15 @@
 // FIRESTORE DATA LAYER - Cloud sync for matches and user data
 // ════════════════════════════════════════════════════════════════════════════
 
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
+import {
+  collection,
+  doc,
+  getDoc,
   getDocs,
   addDoc,
-  updateDoc, 
+  updateDoc,
   deleteDoc,
-  query, 
+  query,
   where,
   onSnapshot,
   arrayUnion,
@@ -28,7 +27,7 @@ import { getCurrentUser } from './auth.js';
 export async function saveUserProfile(profile) {
   const user = getCurrentUser();
   if (!user) return { success: false, error: 'Not authenticated' };
-  
+
   try {
     await updateDoc(doc(db, 'users', user.uid), {
       ...profile,
@@ -44,7 +43,7 @@ export async function saveUserProfile(profile) {
 export async function getUserProfile() {
   const user = getCurrentUser();
   if (!user) return null;
-  
+
   try {
     const docSnap = await getDoc(doc(db, 'users', user.uid));
     if (docSnap.exists()) {
@@ -64,7 +63,7 @@ export async function getUserProfile() {
 export async function createMatch(matchData) {
   const user = getCurrentUser();
   if (!user) return { success: false, error: 'Not authenticated' };
-  
+
   try {
     const matchDoc = {
       ...matchData,
@@ -73,7 +72,7 @@ export async function createMatch(matchData) {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
-    
+
     const docRef = await addDoc(collection(db, 'matches'), matchDoc);
     return { success: true, matchId: docRef.id };
   } catch (error) {
@@ -85,7 +84,7 @@ export async function createMatch(matchData) {
 export async function updateMatch(matchId, matchData) {
   const user = getCurrentUser();
   if (!user) return { success: false, error: 'Not authenticated' };
-  
+
   try {
     await updateDoc(doc(db, 'matches', matchId), {
       ...matchData,
@@ -101,7 +100,7 @@ export async function updateMatch(matchId, matchData) {
 export async function deleteMatch(matchId) {
   const user = getCurrentUser();
   if (!user) return { success: false, error: 'Not authenticated' };
-  
+
   try {
     await deleteDoc(doc(db, 'matches', matchId));
     return { success: true };
@@ -127,26 +126,25 @@ export async function getMatch(matchId) {
 export async function getUserMatches() {
   const user = getCurrentUser();
   if (!user) return [];
-  
+
   try {
     const q = query(
       collection(db, 'matches'),
       where('participants', 'array-contains', user.uid)
     );
-    
+
     const querySnapshot = await getDocs(q);
     const matches = [];
-    querySnapshot.forEach((doc) => {
-      matches.push({ id: doc.id, ...doc.data() });
+    querySnapshot.forEach((docSnap) => {
+      matches.push({ id: docSnap.id, ...docSnap.data() });
     });
-    
-    // Sort by date (newest first)
+
     matches.sort((a, b) => {
-      const dateA = a.date || a.createdAt?.toDate() || new Date(0);
-      const dateB = b.date || b.createdAt?.toDate() || new Date(0);
+      const dateA = a.date || a.createdAt?.toDate?.() || new Date(0);
+      const dateB = b.date || b.createdAt?.toDate?.() || new Date(0);
       return dateB - dateA;
     });
-    
+
     return matches;
   } catch (error) {
     console.error('Get user matches error:', error);
@@ -161,44 +159,43 @@ export async function getUserMatches() {
 export function listenToUserMatches(callback) {
   const user = getCurrentUser();
   if (!user) return () => {};
-  
+
   const q = query(
     collection(db, 'matches'),
     where('participants', 'array-contains', user.uid)
   );
-  
+
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const matches = [];
-    snapshot.forEach((doc) => {
-      matches.push({ id: doc.id, ...doc.data() });
+    snapshot.forEach((docSnap) => {
+      matches.push({ id: docSnap.id, ...docSnap.data() });
     });
-    
-    // Sort by date
+
     matches.sort((a, b) => {
-      const dateA = a.date || a.createdAt?.toDate() || new Date(0);
-      const dateB = b.date || b.createdAt?.toDate() || new Date(0);
+      const dateA = a.date || a.createdAt?.toDate?.() || new Date(0);
+      const dateB = b.date || b.createdAt?.toDate?.() || new Date(0);
       return dateB - dateA;
     });
-    
+
     callback(matches);
   }, (error) => {
     console.error('Listen to matches error:', error);
   });
-  
+
   return unsubscribe;
 }
 
 export function listenToMatch(matchId, callback) {
-  const unsubscribe = onSnapshot(doc(db, 'matches', matchId), (doc) => {
-    if (doc.exists()) {
-      callback({ id: doc.id, ...doc.data() });
+  const unsubscribe = onSnapshot(doc(db, 'matches', matchId), (docSnap) => {
+    if (docSnap.exists()) {
+      callback({ id: docSnap.id, ...docSnap.data() });
     } else {
       callback(null);
     }
   }, (error) => {
     console.error('Listen to match error:', error);
   });
-  
+
   return unsubscribe;
 }
 
@@ -209,41 +206,57 @@ export function listenToMatch(matchId, callback) {
 export async function inviteUserToMatch(matchId, inviteeEmail) {
   const user = getCurrentUser();
   if (!user) return { success: false, error: 'Not authenticated' };
-  
+
   try {
-    // Find user by email
-    const q = query(collection(db, 'users'), where('email', '==', inviteeEmail));
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-      return { success: false, error: 'Bruker ikke funnet' };
+    const normalizedEmail = (inviteeEmail || '').trim().toLowerCase();
+    if (!normalizedEmail) {
+      return { success: false, error: 'Du må skrive inn en e-postadresse' };
     }
-    
-    const inviteeDoc = querySnapshot.docs[0];
-    const inviteeId = inviteeDoc.id;
-    
-    // Check if match exists and user has access
-    const matchDoc = await getDoc(doc(db, 'matches', matchId));
+
+    const matchRef = doc(db, 'matches', matchId);
+    const matchDoc = await getDoc(matchRef);
+
     if (!matchDoc.exists()) {
       return { success: false, error: 'Match ikke funnet' };
     }
-    
+
     const matchData = matchDoc.data();
-    if (!matchData.participants.includes(user.uid)) {
-      return { success: false, error: 'Ingen tilgang til denne matchen' };
+
+    if (!matchData.ownerId) {
+      return { success: false, error: 'Matchen mangler eierinformasjon' };
     }
-    
-    // Check if user is already a participant
+
+    if (matchData.ownerId !== user.uid) {
+      return { success: false, error: 'Kun den som opprettet matchen kan invitere deltakere' };
+    }
+
+    if (!Array.isArray(matchData.participants)) {
+      return { success: false, error: 'Matchdata er ugyldig' };
+    }
+
+    const q = query(collection(db, 'users'), where('email', '==', normalizedEmail));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return { success: false, error: 'Bruker ikke funnet' };
+    }
+
+    const inviteeDoc = querySnapshot.docs[0];
+    const inviteeId = inviteeDoc.id;
+
+    if (inviteeId === user.uid) {
+      return { success: false, error: 'Du er allerede eier av matchen' };
+    }
+
     if (matchData.participants.includes(inviteeId)) {
       return { success: false, error: 'Bruker er allerede deltaker' };
     }
-    
-    // Add user to participants
-    await updateDoc(doc(db, 'matches', matchId), {
+
+    await updateDoc(matchRef, {
       participants: arrayUnion(inviteeId),
       updatedAt: serverTimestamp()
     });
-    
+
     return { success: true, message: 'Bruker lagt til' };
   } catch (error) {
     console.error('Invite user error:', error);
@@ -254,30 +267,42 @@ export async function inviteUserToMatch(matchId, inviteeEmail) {
 export async function removeUserFromMatch(matchId, userId) {
   const user = getCurrentUser();
   if (!user) return { success: false, error: 'Not authenticated' };
-  
+
   try {
-    // Check if current user is owner
-    const matchDoc = await getDoc(doc(db, 'matches', matchId));
+    const matchRef = doc(db, 'matches', matchId);
+    const matchDoc = await getDoc(matchRef);
+
     if (!matchDoc.exists()) {
       return { success: false, error: 'Match ikke funnet' };
     }
-    
+
     const matchData = matchDoc.data();
+
+    if (!matchData.ownerId) {
+      return { success: false, error: 'Matchen mangler eierinformasjon' };
+    }
+
+    if (!Array.isArray(matchData.participants)) {
+      return { success: false, error: 'Matchdata er ugyldig' };
+    }
+
     if (matchData.ownerId !== user.uid) {
       return { success: false, error: 'Kun eier kan fjerne deltakere' };
     }
-    
-    // Can't remove owner
+
     if (userId === matchData.ownerId) {
       return { success: false, error: 'Kan ikke fjerne eier' };
     }
-    
-    // Remove user from participants
-    await updateDoc(doc(db, 'matches', matchId), {
+
+    if (!matchData.participants.includes(userId)) {
+      return { success: false, error: 'Bruker er ikke deltaker i matchen' };
+    }
+
+    await updateDoc(matchRef, {
       participants: arrayRemove(userId),
       updatedAt: serverTimestamp()
     });
-    
+
     return { success: true };
   } catch (error) {
     console.error('Remove user error:', error);
@@ -288,26 +313,38 @@ export async function removeUserFromMatch(matchId, userId) {
 export async function leaveMatch(matchId) {
   const user = getCurrentUser();
   if (!user) return { success: false, error: 'Not authenticated' };
-  
+
   try {
-    const matchDoc = await getDoc(doc(db, 'matches', matchId));
+    const matchRef = doc(db, 'matches', matchId);
+    const matchDoc = await getDoc(matchRef);
+
     if (!matchDoc.exists()) {
       return { success: false, error: 'Match ikke funnet' };
     }
-    
+
     const matchData = matchDoc.data();
-    
-    // Owner can't leave
+
+    if (!matchData.ownerId) {
+      return { success: false, error: 'Matchen mangler eierinformasjon' };
+    }
+
+    if (!Array.isArray(matchData.participants)) {
+      return { success: false, error: 'Matchdata er ugyldig' };
+    }
+
     if (matchData.ownerId === user.uid) {
       return { success: false, error: 'Eier kan ikke forlate match. Slett matchen i stedet.' };
     }
-    
-    // Remove self from participants
-    await updateDoc(doc(db, 'matches', matchId), {
+
+    if (!matchData.participants.includes(user.uid)) {
+      return { success: false, error: 'Du er ikke deltaker i denne matchen' };
+    }
+
+    await updateDoc(matchRef, {
       participants: arrayRemove(user.uid),
       updatedAt: serverTimestamp()
     });
-    
+
     return { success: true };
   } catch (error) {
     console.error('Leave match error:', error);
@@ -325,11 +362,10 @@ export async function getMatchParticipants(matchId) {
     if (!matchDoc.exists()) {
       return [];
     }
-    
+
     const matchData = matchDoc.data();
-    const participantIds = matchData.participants || [];
-    
-    // Fetch user profiles for all participants
+    const participantIds = Array.isArray(matchData.participants) ? matchData.participants : [];
+
     const participants = [];
     for (const userId of participantIds) {
       const userDoc = await getDoc(doc(db, 'users', userId));
@@ -341,7 +377,7 @@ export async function getMatchParticipants(matchId) {
         });
       }
     }
-    
+
     return participants;
   } catch (error) {
     console.error('Get participants error:', error);

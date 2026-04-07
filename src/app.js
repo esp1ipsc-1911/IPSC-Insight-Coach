@@ -534,7 +534,114 @@ function shooterMatchPct(shooter,shooters){
 }
 function shooterAvgHF(shooter){var stgs=shooter.stages;if(!stgs.length)return 0;var sum=0;for(var i=0;i<stgs.length;i++)sum+=stgs[i].hf;return sum/stgs.length;}
 function shooterEstNextHF(shooter){var stgs=shooter.stages;if(!stgs.length)return 0;var recent=stgs.slice(-3);var rs=0;for(var i=0;i<recent.length;i++)rs+=recent[i].hf;var as=0;for(var i=0;i<stgs.length;i++)as+=stgs[i].hf;return(rs/recent.length)*0.6+(as/stgs.length)*0.4;}
-function findStage(stages,num){for(var i=0;i<stages.length;i++){if(stages[i].num===num)return stages[i];}return null;}
+function findStage(stages,num){
+  if(!stages||!stages.length)return null;
+  for(var i=0;i<stages.length;i++){
+    var n=stages[i].num!==undefined?stages[i].num:stages[i].number;
+    if(n===num)return stages[i];
+  }
+  return null;
+}
+function stageNumber(stage){
+  if(!stage)return null;
+  return stage.num!==undefined?stage.num:stage.number;
+}
+function stageDisplayName(stage,num){
+  if(!stage)return 'Stage '+num;
+  return stage.name||('Stage '+num);
+}
+function isStageDefinition(stage){
+  if(!stage)return false;
+  return stage.number!==undefined
+    || stage.rounds!==undefined
+    || stage.maxPts!==undefined
+    || stage.paperTargets!==undefined
+    || stage.poppers!==undefined
+    || stage.plates!==undefined
+    || stage.noShoots!==undefined
+    || stage.bonusPaperTargets!==undefined;
+}
+function getStageDefinitions(match){
+  if(!match)return [];
+  var defs=(match.stageDefs&&match.stageDefs.length)?match.stageDefs:[];
+  if(defs.length)return defs.slice().sort(function(a,b){return stageNumber(a)-stageNumber(b);});
+  if(match.stages&&match.stages.length){
+    var onlyDefs=match.stages.filter(function(s){return isStageDefinition(s);});
+    if(onlyDefs.length){
+      return onlyDefs.slice().sort(function(a,b){return stageNumber(a)-stageNumber(b);});
+    }
+  }
+  return [];
+}
+function getAllStageNumbers(match){
+  var nums={};
+  var defs=getStageDefinitions(match);
+  for(var i=0;i<defs.length;i++){
+    var n=stageNumber(defs[i]);
+    if(n!==null&&n!==undefined)nums[n]=1;
+  }
+  var shooters=match&&match.shooters?match.shooters:[];
+  for(var s=0;s<shooters.length;s++){
+    var stages=shooters[s].stages||[];
+    for(var j=0;j<stages.length;j++){
+      var sn=stageNumber(stages[j]);
+      if(sn!==null&&sn!==undefined)nums[sn]=1;
+    }
+  }
+  return Object.keys(nums).map(function(n){return parseInt(n,10);}).sort(function(a,b){return a-b;});
+}
+function getStageDefinition(match,num){
+  var defs=getStageDefinitions(match);
+  for(var i=0;i<defs.length;i++){
+    if(stageNumber(defs[i])===num)return defs[i];
+  }
+  return null;
+}
+function stageShotsFromDef(def){
+  if(!def)return 0;
+  if(def.rounds!==undefined)return def.rounds||0;
+  return ((def.paperTargets||0)*2)+((def.poppers||0))+((def.plates||0))+((def.bonusPaperTargets||0)*2);
+}
+function stageMaxPtsFromDef(def){
+  if(!def)return 0;
+  if(def.maxPts!==undefined)return def.maxPts||0;
+  return ((def.paperTargets||0)*10)+((def.poppers||0)*10)+((def.plates||0)*10)+((def.bonusPaperTargets||0)*10);
+}
+function ensureMeShooter(match){
+  if(!match.shooters)match.shooters=[];
+  var me=null;
+  for(var i=0;i<match.shooters.length;i++){
+    if(match.shooters[i].isMe){me=match.shooters[i];break;}
+  }
+  if(!me){
+    me={id:'s_me',isMe:true,firstName:profile.firstName,lastName:profile.lastName,division:profile.division,pf:profile.powerFactor,club:profile.club,stages:[]};
+    match.shooters.unshift(me);
+  }
+  if(!me.stages)me.stages=[];
+  return me;
+}
+function upsertShooterStageResult(shooter,result){
+  if(!shooter.stages)shooter.stages=[];
+  var idx=-1;
+  for(var i=0;i<shooter.stages.length;i++){
+    if(stageNumber(shooter.stages[i])===result.num){idx=i;break;}
+  }
+  if(idx>=0)shooter.stages[idx]=Object.assign({}, shooter.stages[idx], result);
+  else shooter.stages.push(result);
+  shooter.stages.sort(function(a,b){return stageNumber(a)-stageNumber(b);});
+}
+function ensureStageDefinition(match,num,patch){
+  var def=getStageDefinition(match,num);
+  if(def){
+    Object.assign(def, patch||{});
+    return def;
+  }
+  if(!match.stageDefs)match.stageDefs=[];
+  def=Object.assign({num:num,number:num,name:'Stage '+num}, patch||{});
+  match.stageDefs.push(def);
+  match.stageDefs.sort(function(a,b){return stageNumber(a)-stageNumber(b);});
+  return def;
+}
 
 // ── NAVIGATION ──
 function navigate(id){
@@ -763,25 +870,21 @@ function saveManual(){
   var mid=gv('result-match-select')||activeMatchId;
   var m=null;for(var i=0;i<matches.length;i++){if(matches[i].id===mid){m=matches[i];break;}}
   if(!m)return;
-  var stageNum=gnvi('m-stage',m.stages.length+1);
+  var stageNum=gnvi('m-stage',getAllStageNumbers(m).length+1);
   var time=gnv('m-time'),a=gnvi('m-a'),c=gnvi('m-c'),d=gnvi('m-d'),miss=gnvi('m-miss'),ns=gnvi('m-ns'),proc=gnvi('m-proc');
   var pts=calcPoints(a,c,d,miss,ns,proc,profile.powerFactor);
   var hf=time>0?pts/time:0;
-  m.stages.push({num:stageNum,name:'Stage '+stageNum,hf:hf,time:time,pts:pts,a:a,c:c,d:d,miss:miss,ns:ns,proc:proc,pf:profile.powerFactor});
-  m.stages.sort(function(x,y){return x.num-y.num;});
-  // Sync me-shooter
-  if(!m.shooters)m.shooters=[];
-  var me=null;for(var i=0;i<m.shooters.length;i++){if(m.shooters[i].isMe){me=m.shooters[i];break;}}
-  if(!me){me={id:'s_me',isMe:true,firstName:profile.firstName,lastName:profile.lastName,division:profile.division,pf:profile.powerFactor,club:profile.club,stages:[]};m.shooters.unshift(me);}
-  if(!findStage(me.stages,stageNum))me.stages.push({num:stageNum,hf:hf,pts:pts,pf:profile.powerFactor});
-  me.stages.sort(function(a,b){return a.num-b.num;});
+  ensureStageDefinition(m,stageNum,{name:'Stage '+stageNum});
+  var me=ensureMeShooter(m);
+  upsertShooterStageResult(me,{num:stageNum,name:'Stage '+stageNum,hf:hf,time:time,pts:pts,a:a,c:c,d:d,miss:miss,ns:ns,proc:proc,pf:profile.powerFactor});
   activeMatchId=mid;
   ['m-stage','m-time','m-a','m-c','m-d','m-miss','m-ns','m-proc'].forEach(function(id){el(id).value='';});
   el('manual-preview').style.display='none';
-  closeModal('modal-add');renderHome();updateProfileStats();saveState();
+  closeModal('modal-add');renderHome();renderResults();renderSnapshots();renderPrognoseContext();updateProfileStats();saveState();
 }
 
 // ── EMAIL PARSER ──
+
 function parseEmail(){
   var text=gv('email-paste');
   var nameM=text.match(/^\d+\s+(.+)/m);
@@ -808,12 +911,15 @@ function saveEmail(){
   var mid=gv('result-match-select')||activeMatchId;
   var m=null;for(var i=0;i<matches.length;i++){if(matches[i].id===mid){m=matches[i];break;}}
   if(!m)return;
-  var stg=m.stages.length+1;
+  var allNums=getAllStageNumbers(m);
+  var stg=allNums.length?Math.max.apply(null,allNums)+1:1;
   var pts=aM?parseInt(aM[1])*5+parseInt(aM[2])*3+parseInt(aM[3]):0;
-  m.stages.push({num:stg,name:'Stage '+stg,hf:parseFloat(hfM[1]),time:timeM?parseFloat(timeM[1]):0,pts:pts,a:aM?parseInt(aM[1]):0,c:aM?parseInt(aM[2]):0,d:aM?parseInt(aM[3]):0,miss:aM?parseInt(aM[4]):0,ns:aM?parseInt(aM[5]):0,proc:0,pf:profile.powerFactor});
+  ensureStageDefinition(m,stg,{name:'Stage '+stg});
+  var me=ensureMeShooter(m);
+  upsertShooterStageResult(me,{num:stg,name:'Stage '+stg,hf:parseFloat(hfM[1]),time:timeM?parseFloat(timeM[1]):0,pts:pts,a:aM?parseInt(aM[1]):0,c:aM?parseInt(aM[2]):0,d:aM?parseInt(aM[3]):0,miss:aM?parseInt(aM[4]):0,ns:aM?parseInt(aM[5]):0,proc:0,pf:profile.powerFactor});
   activeMatchId=mid;
   closeModal('modal-add');el('email-paste').value='';el('parse-preview').classList.remove('show');
-  renderHome();updateProfileStats();saveState();
+  renderHome();renderResults();renderSnapshots();renderPrognoseContext();updateProfileStats();saveState();
 }
 
 // ── PROGNOSE ──
@@ -876,488 +982,163 @@ function renderPrognoseContext(){
   var ctx=el('prog-match-context');
   if(!ctx)return;
   if(!m){ctx.innerHTML='';return;}
-  var stg=m.stages;
-  var avgHF=stg.length?(stg.reduce(function(s,r){return s+r.hf;},0)/stg.length):null;
-  var bestHF=stg.length?Math.max.apply(null,stg.map(function(s){return s.hf;})):null;
-  var nextStageNum=stg.length+1;
-  var planned=m.plannedStages>0?m.plannedStages:null;
+  var defs=getStageDefinitions(m);
+  var stageNums=getAllStageNumbers(m);
+  var completed=0;
+  var shooters=m.shooters||[];
+  for(var i=0;i<stageNums.length;i++){
+    var hasAny=false;
+    for(var j=0;j<shooters.length;j++){
+      if(findStage(shooters[j].stages||[],stageNums[i])){hasAny=true;break;}
+    }
+    if(hasAny)completed++;
+  }
   var html='<div class="card" style="margin-bottom:12px;border-color:rgba(232,184,75,.2);background:linear-gradient(135deg,var(--card),var(--bg3))">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
     +'<div><div style="font-family:\'Rajdhani\',sans-serif;font-size:16px;font-weight:700">'+m.name+'</div>'
     +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+m.type+' · '+fmtDate(m.date)+(m.location?' · '+m.location:'')+'</div></div>'
-    +'<span class="badge badge-gold">Stage '+nextStageNum+(planned?' av '+planned:'')+'</span></div>';
-  if(stg.length){
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'
-      +'<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:var(--accent)">'+avgHF.toFixed(4)+'</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:2px">Snitt HF</div></div>'
-      +'<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:var(--green)">'+bestHF.toFixed(4)+'</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:2px">Best HF</div></div>'
-      +'<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:var(--blue)">'+stg.length+(planned?'/'+planned:'')+'</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:2px">Stages</div></div>'
-      +'</div>';
-  } else {
-    html+='<div style="font-size:12px;color:var(--muted);text-align:center;padding:4px 0">Ingen stages registrert ennå</div>';
-  }
-  html+='</div>';
+    +'<span class="badge badge-gold">'+(defs.length?defs.length:stageNums.length)+' stages</span></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'
+    +'<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:var(--accent)">'+(defs.length?defs.length:stageNums.length)+'</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:2px">Stages</div></div>'
+    +'<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:var(--green)">'+completed+'</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:2px">Med resultater</div></div>'
+    +'<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:var(--blue)">'+(m.shooters&&m.shooters.length?m.shooters.length:0)+'</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:2px">Skyttere</div></div>'
+    +'</div></div>';
   ctx.innerHTML=html;
 }
 function renderSnapshots(){
   var container=el('snapshot-container');
   if(!container)return;
   var m=activeMatch();
-  if(!m||!m.shooters||m.shooters.length<2){container.innerHTML='';return;}
-  var shooters=m.shooters;
-  var me=null;
-  for(var i=0;i<shooters.length;i++){if(shooters[i].isMe){me=shooters[i];break;}}
-  if(!me||!me.stages.length){container.innerHTML='';return;}
-  var rivals=[];
-  for(var i=0;i<shooters.length;i++){if(!shooters[i].isMe&&shooters[i].stages.length)rivals.push(shooters[i]);}
-  if(!rivals.length){container.innerHTML='';return;}
-  var bestRival=rivals[0];
-  var MINOR={A:5,C:3,D:1};
+  if(!m){container.innerHTML='';return;}
+  var shooters=m.shooters||[];
+  var defs=getStageDefinitions(m);
+  var stageNums=defs.length?defs.map(function(d){return stageNumber(d);}):getAllStageNumbers(m);
 
-  function stgMaxPts(n){if(m.stageDefs){var d=findStage(m.stageDefs,n);if(d)return d.maxPts||0;}return 0;}
-  function stgRounds(n){if(m.stageDefs){var d=findStage(m.stageDefs,n);if(d)return d.rounds||12;}return 12;}
-  function stgName(n){if(m.stageDefs){var d=findStage(m.stageDefs,n);if(d)return d.name||'';}return '';}
-  function winHF(n){var max=0;for(var i=0;i<shooters.length;i++){var s=findStage(shooters[i].stages,n);if(s&&s.hf>max)max=s.hf;}return max||1;}
-  function mPtsAt(sh,upTo){
+  if(!stageNums.length){
+    container.innerHTML='<div class="card" style="text-align:center;padding:20px;color:var(--muted)">Ingen stages på valgt match ennå.</div>';
+    return;
+  }
+
+  function stageTitle(num){
+    var def=getStageDefinition(m,num);
+    return 'Stage '+num+'. '+(def?stageDisplayName(def,num):('Stage '+num));
+  }
+
+  function stageStatus(num){
+    for(var i=0;i<shooters.length;i++){
+      if(findStage(shooters[i].stages||[],num))return true;
+    }
+    return false;
+  }
+
+  function rowsForStage(num){
+    var rows=[];
+    for(var i=0;i<shooters.length;i++){
+      var shooter=shooters[i];
+      var result=findStage(shooter.stages||[],num);
+      if(!result)continue;
+      rows.push({
+        shooter: shooter,
+        result: result,
+        pts: result.pts||0,
+        hf: result.hf||0,
+        isMe: !!shooter.isMe
+      });
+    }
+    rows.sort(function(a,b){
+      if((b.pts||0)!==(a.pts||0))return (b.pts||0)-(a.pts||0);
+      return (b.hf||0)-(a.hf||0);
+    });
+    return rows;
+  }
+
+  function estimateNextHF(meShooter, nextNum){
+    if(!meShooter)return null;
+    var played=(meShooter.stages||[]).filter(function(s){return !!s.hf;});
+    if(!played.length)return null;
     var sum=0;
-    for(var n=1;n<=upTo;n++){
-      var stg=findStage(sh.stages,n);if(!stg||!stg.hf)continue;
-      var mp=stgMaxPts(n);
-      if(!mp){for(var j=0;j<shooters.length;j++){var s2=findStage(shooters[j].stages,n);if(s2&&s2.hf>=winHF(n)){mp=s2.pts||0;break;}}}
-      sum+=(stg.hf/winHF(n))*(mp||stg.pts||1);
-    }
-    return sum;
-  }
-  function calcRel(shots,div,pf){return Math.max(0,Math.ceil(shots/getMagCap(div||'Standard',pf||'minor'))-1);}
-  function shotTimeOf(totalT,shots,div,pf){
-    var dr=profile.draw||1.42;var rl=profile.reloadTime||1.80;
-    var r=calcRel(shots,div,pf);
-    return shots>0?(totalT-dr-r*rl)/shots:0;
-  }
-  function dagsform(upTo){
-    // KORREKT MODELL:
-    // 1. Tid/skudd = (total − trekk − reloads×reload) / skudd  — per stage, så snitt
-    // 2. Treffprofil = A%/C%/D% av TREFF (uten bom/proc — de er stage-spesifikke)
-    // 3. Projeksjon: trekk + neste_skudd×tid_per_skudd + reloads×reload → HF
-    var dr=profile.draw||1.42;
-    var rl=profile.reloadTime||1.80;
-    var div=profile.division||'Standard';
-    var pf=profile.powerFactor||'minor';
-    var ta=0,tc=0,td=0,tm=0,tns=0,th=0,ts=0;
-    var stArr=[];
-    for(var n=1;n<=upTo;n++){
-      var ms=m.stages?findStage(m.stages,n):null;
-      var sh=findStage(me.stages,n);
-      if(!sh||!sh.hf)continue;
-      var a=ms?ms.a||0:0;
-      var c=ms?ms.c||0:0;
-      var d=ms?ms.d||0:0;
-      var miss=ms?ms.miss||0:0;
-      var ns2=ms?ms.ns||0:0;
-      var time=ms?ms.time||0:0;
-      var shots=a+c+d+miss+ns2;
-      // Accumulate HITS only (no miss/ns) for treff-profil
-      ta+=a; tc+=c; td+=d;
-      th+=a+c+d;
-      tm+=miss; tns+=ns2; ts+=shots;
-      // Shot time per stage
-      if(shots>0&&time>0){
-        var r2=calcRel(shots,div,pf);
-        var st=(time-dr-r2*rl)/shots;
-        if(st>0)stArr.push(st);
-      }
-    }
-    // Treff-profil (A/C/D%) — eksluderer bom og prosedyrer
-    var ar=th>0?ta/th:0.85;
-    var cr=th>0?tc/th:0.12;
-    var dr2=th>0?td/th:0.03;
-    // Snitt tid per skudd
-    var avgST=stArr.length>0?stArr.reduce(function(s,v){return s+v;},0)/stArr.length:0.20;
-    var missR=ts>0?(tm+tns)/ts:0;
-    return{
-      ar:ar, cr:cr, dr:dr2,
-      avgST:avgST,
-      missR:missR,
-      ta:ta, tc:tc, td:td, th:th,
-      tm:tm, tns:tns, ts:ts,
-      myDraw:dr, myReload:rl
-    };
+    for(var i=0;i<played.length;i++)sum+=played[i].hf||0;
+    return sum/played.length;
   }
 
-  function detectTrend(upTo){
-    // Compare first half vs second half of stages played
-    if(upTo<2)return null;
-    var DR=profile.draw||1.42;
-    var RL=profile.reloadTime||1.80;
-    var div=profile.division||'Standard';
-    var pf=profile.powerFactor||'minor';
-    var mid=Math.max(1,Math.floor(upTo/2));
-    function halfProfile(from,to){
-      var ta=0,tc=0,td=0,th=0,sts=[];
-      for(var n=from;n<=to;n++){
-        var ms=m.stages?findStage(m.stages,n):null;
-        var sh=findStage(me.stages,n);
-        if(!sh||!sh.hf)continue;
-        var a=ms?ms.a||0:0;var c=ms?ms.c||0:0;var d=ms?ms.d||0:0;
-        var miss=ms?ms.miss||0:0;var ns2=ms?ms.ns||0:0;var time=ms?ms.time||0:0;
-        var shots=a+c+d+miss+ns2;
-        ta+=a;tc+=c;td+=d;th+=a+c+d;
-        if(shots>0&&time>0){
-          var r2=calcRel(shots,div,pf);
-          var st=(time-DR-r2*RL)/shots;
-          if(st>0)sts.push(st);
-        }
-      }
-      var ar=th>0?ta/th:0;
-      var avgST=sts.length>0?sts.reduce(function(s,v){return s+v;},0)/sts.length:0;
-      return{ar:ar,avgST:avgST,stages:to-from+1};
-    }
-    var first=halfProfile(1,mid);
-    var second=halfProfile(mid+1,upTo);
-    if(!first.avgST||!second.avgST)return null;
-    var tempoChange=second.avgST-first.avgST;  // positive = slower
-    var treffChange=second.ar-first.ar;        // positive = more A
-    var TEMPO_T=0.05;var TREFF_T=0.05;
-    return{
-      first:first,second:second,
-      tempoChange:tempoChange,treffChange:treffChange,
-      tempoFell:tempoChange>TEMPO_T,
-      tempoRose:tempoChange<-TEMPO_T,
-      treffFell:treffChange<-TREFF_T,
-      treffRose:treffChange>TREFF_T
-    };
-  }
+  var html='';
+  for(var x=0;x<stageNums.length;x++){
+    var num=stageNums[x];
+    var def=getStageDefinition(m,num);
+    var rows=rowsForStage(num);
+    var isShot=rows.length>0;
+    var nextNum=(x+1<stageNums.length)?stageNums[x+1]:null;
+    var nextDef=nextNum?getStageDefinition(m,nextNum):null;
+    var me=null;
+    for(var si=0;si<shooters.length;si++){if(shooters[si].isMe){me=shooters[si];break;}}
+    var myResult=me?findStage(me.stages||[],num):null;
+    var accent=isShot?'var(--green)':'var(--border)';
+    html+='<div class="card" style="margin-bottom:14px;border-left:4px solid '+accent+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px">';
+    html+='<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700">'+stageTitle(num)+'</div>';
+    html+='<span class="badge '+(isShot?'badge-green':'badge-muted')+'">'+(isShot?'✅ SKUTT':'⏳ IKKE SKUTT')+'</span>';
+    html+='</div>';
 
-  function buildTrendMsg(t,df){
-    if(!t)return null;
-    var f=t.first;var s=t.second;
-    if(t.tempoFell&&!t.treffFell){
-      return'Tempoet falt ('+f.avgST.toFixed(3)+'s → '+s.avgST.toFixed(3)+'s/skudd), men treffbildet holder på '+Math.round(df.ar*100)+'%A. Teknisk stage? Mye bevegelse? Reflekter over hva som tok tid.';
-    } else if(t.tempoFell&&t.treffFell){
-      return'Både tempo og treff har falt. Sliten? Press deg på neste stage — du har mer i deg.';
-    } else if(!t.tempoFell&&t.treffFell){
-      return'Du holder tempoet bra, men A-raten har falt litt. Jager du for hardt? Ta ett ekstra øyeblikk på siktingen.';
-    } else if(t.tempoRose&&t.treffRose){
-      return'Du finner flyten — raskere og bedre treff. Hold det gående.';
-    } else if(t.tempoRose){
-      return'Tempoet øker, treffbildet stabilt. Du er i god rytme.';
+    if(isShot){
+      var leaderPts=rows[0].pts||0;
+      html+='<div style="overflow-x:auto;margin-top:12px;">';
+      html+='<table style="width:100%;font-size:13px;border-collapse:collapse;">';
+      html+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);">';
+      html+='<th style="padding:8px;text-align:left;">#</th>';
+      html+='<th style="padding:8px;text-align:left;">NAVN</th>';
+      html+='<th style="padding:8px;text-align:right;">PTS</th>';
+      html+='<th style="padding:8px;text-align:right;">%</th>';
+      html+='<th style="padding:8px;text-align:right;">HF</th>';
+      html+='</tr>';
+      for(var r=0;r<rows.length;r++){
+        var row=rows[r];
+        var pct=leaderPts>0?(row.pts/leaderPts*100):0;
+        var rowBg=row.isMe?'background:var(--accent-fade);font-weight:600;':'';
+        html+='<tr style="'+rowBg+'border-bottom:1px solid var(--border);">';
+        html+='<td style="padding:8px;">'+(r+1)+'</td>';
+        html+='<td style="padding:8px;">'+row.shooter.firstName+' '+row.shooter.lastName+'</td>';
+        html+='<td style="padding:8px;text-align:right;color:var(--accent);">'+(row.pts||0).toFixed(1)+'</td>';
+        html+='<td style="padding:8px;text-align:right;">'+pct.toFixed(2)+'%</td>';
+        html+='<td style="padding:8px;text-align:right;">'+(row.hf||0).toFixed(2)+'</td>';
+        html+='</tr>';
+      }
+      html+='</table></div>';
+
+      if(myResult){
+        var shots = stageShotsFromDef(def);
+        if(!shots)shots=(myResult.a||0)+(myResult.c||0)+(myResult.d||0)+(myResult.miss||0)+(myResult.ns||0);
+        var draw=profile.draw||1.42;
+        var reload=profile.reloadTime||1.80;
+        var rel=shots>0?Math.max(0,Math.ceil(shots/getMagCap(profile.division||'Standard',profile.powerFactor||'minor'))-1):0;
+        var shotTime = shots>0 && myResult.time ? Math.max(0,(myResult.time-draw-(rel*reload))/shots) : 0;
+        var hits=(myResult.a||0)+(myResult.c||0)+(myResult.d||0);
+        var aPct=hits>0?Math.round((myResult.a||0)/hits*100):0;
+        var estNext=nextNum?estimateNextHF(me,nextNum):null;
+        html+='<div style="margin-top:15px;padding:12px;background:var(--bg);border-radius:8px;">';
+        html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:13px;">';
+        html+='<div><div style="color:var(--muted);margin-bottom:4px;">t/skudd</div><div style="font-weight:600;">'+(shotTime?shotTime.toFixed(3)+'s':'—')+'</div></div>';
+        html+='<div><div style="color:var(--muted);margin-bottom:4px;">Treff</div><div style="font-weight:600;color:var(--green);">'+aPct+'%A</div></div>';
+        html+='<div><div style="color:var(--muted);margin-bottom:4px;">Est. HF neste</div><div style="font-weight:600;color:var(--accent);">'+(estNext?estNext.toFixed(2):'—')+'</div></div>';
+        html+='</div></div>';
+      }
+
+      if(nextNum){
+        var nextShots=stageShotsFromDef(nextDef);
+        var nextMax=stageMaxPtsFromDef(nextDef);
+        html+='<div style="margin-top:15px;padding:12px;background:var(--accent-fade);border-radius:8px;border-left:3px solid var(--accent);">';
+        html+='<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">NESTE: '+stageDisplayName(nextDef,nextNum).toUpperCase();
+        if(nextShots||nextMax)html+=' ('+(nextShots||0)+' SKUDD, MAX '+(nextMax||0)+' PTS)';
+        html+='</div>';
+        html+='<div style="font-size:14px;line-height:1.5;">Hold fokus på siktet. Skytt som vanlig.</div>';
+        html+='</div>';
+      }
     } else {
-      return'Konsistent gjennom matchen — '+Math.round(df.ar*100)+'%A og '+df.avgST.toFixed(3)+'s/skudd. Hold rytmen.';
+      html+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Ingen resultater ennå. Last opp resultat eller legg til manuelt.</div>';
     }
-  }
-
-  function projectNextStage(df, nextShots, div, pf){
-    // Project: trekk + skudd×tid/skudd + reloads×reload = forventet tid
-    var dr=df.myDraw; var rl=df.myReload;
-    var r=calcRel(nextShots,div||'Standard',pf||'minor');
-    var expTime=dr+(nextShots*df.avgST)+(r*rl);
-    // Forventede treff: skudd×A%, ×C%, ×D%
-    var expA=nextShots*df.ar;
-    var expC=nextShots*df.cr;
-    var expD=nextShots*df.dr;
-    var expPts=expA*5+expC*3+expD*1;
-    var estHF=expTime>0?expPts/expTime:0;
-    return{expTime:expTime, expA:expA, expC:expC, expD:expD,
-           expPts:expPts, estHF:estHF, reloads:r};
-  }
-  function rivalEst(rival,upTo){
-    var hfs=[];
-    for(var n=1;n<=upTo;n++){var s=findStage(rival.stages,n);if(s&&s.hf)hfs.push(s.hf);}
-    if(!hfs.length)return 0;
-    var recent=hfs.slice(-3);
-    return recent.reduce(function(s,v){return s+v;},0)/recent.length*0.65
-          +hfs.reduce(function(s,v){return s+v;},0)/hfs.length*0.35;
-  }
-  function solveHF(ePts,rPts,rEst,rem){
-    var lo=0.1,hi=25;
-    for(var i=0;i<60;i++){
-      var mid=(lo+hi)/2;var ef=0,rf=0;
-      for(var j=0;j<rem.length;j++){
-        var mp=stgMaxPts(rem[j]);var wHF=Math.max(mid,rEst);
-        ef+=(mid/wHF)*mp;rf+=(rEst/wHF)*mp;
-      }
-      if((ePts+ef)>(rPts+rf))hi=mid;else lo=mid;
-    }
-    return(lo+hi)/2+0.001;
-  }
-
-  var maxN=0;
-  for(var i=0;i<me.stages.length;i++){if(me.stages[i].num>maxN)maxN=me.stages[i].num;}
-
-  var html='<div style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;margin:16px 0 4px">&#9889; Prognose underveis</div>';
-  html+='<div style="font-size:12px;color:var(--muted);margin-bottom:12px">Hva ville appen sagt — basert på dagsform etter hver stage</div>';
-
-  for(var after=1;after<=maxN;after++){
-    if(!findStage(me.stages,after)||!findStage(bestRival.stages,after))continue;
-    var remaining=[];
-    for(var n=after+1;n<=m.plannedStages;n++){if(stgMaxPts(n)>0)remaining.push(n);}
-    if(!remaining.length&&after<maxN)continue;
-
-    var ePts=mPtsAt(me,after);
-    var rPts=mPtsAt(bestRival,after);
-    var top=Math.max(ePts,rPts);
-    var iLead=ePts>=rPts;
-    var gapPts=Math.abs(ePts-rPts);
-    var df=dagsform(after);
-    var rEst=rivalEst(bestRival,after);
-
-    // Next stage specifics
-    var nextN=remaining.length>0?remaining[0]:0;
-    var nextShots=nextN>0?stgRounds(nextN):0;
-    var nextName=nextN>0?stgName(nextN):'';
-    var nextDiv=profile.division||'Standard';
-    var nextPF=profile.powerFactor||'minor';
-    var nextMaxPts=nextN>0?stgMaxPts(nextN):0;
-
-    // Target HF (solve for all remaining)
-    var targetHF=remaining.length>0?solveHF(ePts,rPts,rEst,remaining):0;
-
-    // ── PROJECT NEXT STAGE using correct model ──
-    // Estimated HF based on today's treff-profil and avg tid/skudd
-    var proj=nextShots>0?projectNextStage(df,nextShots,nextDiv,nextPF):null;
-    var estNextHF=proj?proj.estHF:0;
-
-    // What shot time do I need to hit targetHF, keeping today's A/C/D%?
-    var nextTimeNeeded=0,nextSTNeeded=0,maxCsameTime=0;
-    var nextReloads=nextShots>0?calcRel(nextShots,nextDiv,nextPF):0;
-    var dr=df.myDraw;var rl=df.myReload;
-    if(nextShots>0&&targetHF>0){
-      var expPtsAtProfile=nextShots*df.ar*5+nextShots*df.cr*3+nextShots*df.dr*1;
-      nextTimeNeeded=expPtsAtProfile/targetHF;
-      nextSTNeeded=(nextTimeNeeded-dr-nextReloads*rl)/nextShots;
-      // Max C at current shot time — keeping same avg tid/skudd
-      var currTotalT=dr+nextReloads*rl+nextShots*df.avgST;
-      for(var nc=0;nc<=nextShots;nc++){
-        var pts2=(nextShots-nc)*MINOR.A+nc*MINOR.C;
-        if(currTotalT>0&&pts2/currTotalT>=targetHF)maxCsameTime=nc;else break;
-      }
-    }
-    var missCost=targetHF>0?10/targetHF:0;
-    var stDiff=df.avgST-nextSTNeeded;
-    var needsFaster=nextSTNeeded>0&&stDiff>0.05;
-    var missCost=targetHF>0?10/targetHF:0;
-    var estNextHF=proj?proj.estHF:0;
-    var hfGap=targetHF-estNextHF;
-
-    // ── WHAT MUST CHANGE FROM DAGSFORM? ──
-    // Opt 1: same A/C%, solve for shot time needed
-    var ptsAtProfile=nextShots*df.ar*5+nextShots*df.cr*3+nextShots*df.dr*1;
-    var timeNeededOpt1=targetHF>0?ptsAtProfile/targetHF:0;
-    var stNeededOpt1=nextShots>0?(timeNeededOpt1-dr-nextReloads*rl)/nextShots:0;
-    var stDiff1=df.avgST-stNeededOpt1;
-
-    // Opt 2: same shot time, solve for A count needed
-    var currTotalTime=dr+nextShots*df.avgST+nextReloads*rl;
-    var ptsNeededOpt2=targetHF*currTotalTime;
-    var aNeededOpt2=Math.min(nextShots,Math.max(0,(ptsNeededOpt2-3*nextShots)/2));
-    var aNeededDiff=aNeededOpt2-(df.ar*nextShots);
-    var aCurrRound=Math.round(df.ar*nextShots);
-
-    // Realism checks
-    var opt1Ok=stNeededOpt1>0&&stDiff1>=0&&stDiff1<df.avgST*0.30;
-    var opt2Ok=aNeededOpt2<=nextShots&&aNeededDiff>0.5;
-    var aCRoom=Math.max(0,Math.floor((df.ar*nextShots)-aNeededOpt2));
-
-    // ── ADVICE — realistic, motivating, anchored to dagsform ──
-    var advice='';
-    var adviceColor='var(--text)';
-    var aRatePct=Math.round(df.ar*100);
-    var cRoom=aCRoom; // how many extra C you can take at same tempo
-    var gapPct=top>0?(gapPts/top)*100:0; // Gap as percentage of leader's score
-
-    if(remaining.length===0){
-      advice=iLead?'🏆 Du vant matchen!':'Match ferdig.';
-
-    } else if(gapPct<1){
-      // Ekstremt jevnt (under 1%)
-      advice='Ekstremt jevnt! Hold hodet kaldt, skyt din normale rytme. Det avgjøres på detaljer — fokus på hvert skudd.';
-      adviceColor='var(--accent)';
-    } else if(gapPct<2){
-      // Svært jevnt (1-2%)
-      advice='Svært jevnt! Hold rytmen, unngå stress. Skyt ditt normale treffbilde — små marginer avgjør.';
-      adviceColor='var(--accent)';
-    } else if(gapPct<4){
-      // Meget jevnt (2-4%)
-      advice='Meget jevnt! Hold fokus på prosessen. Skyt '+aRatePct+'%A som vanlig, unngå miss. Du har det du trenger.';
-      adviceColor='var(--accent)';
-    } else if(gapPct<6){
-      // Veldig jevnt (4-6%)
-      if(iLead){
-        advice='Veldig jevnt. Hold samme rytme — du tåler '+(cRoom>0?cRoom+' C til':'små feil')+'. Ikke press unødvendig.';
-      } else {
-        advice='Veldig jevnt. Press litt på tempoet, hold '+aRatePct+'%A. Du kan ta dette tilbake.';
-      }
-      adviceColor=iLead?'var(--green)':'var(--accent)';
-    } else if(gapPct<8){
-      // Jevnt (6-8%)
-      if(iLead){
-        advice='Jevnt. Hold rytmen og treffbildet. Du har litt rom — ikke stress.';
-      } else {
-        advice='Jevnt. Du trenger å presse på — hold '+aRatePct+'%A, øk tempoet litt. 0 miss.';
-      }
-      adviceColor=iLead?'var(--green)':'var(--accent)';
-    } else if(iLead){
-      if(estNextHF>=targetHF){
-        // Dagsform is enough — motivating hold message
-        if(cRoom>0){
-          advice='Du er i rute. Hold samme rytme — du tåler '+cRoom+' C til på denne stagen. Skyt A der det er naturlig.';
-        } else {
-          advice='Du er i rute. Hold samme rytme og treffbilde. Ikke press — du har det du trenger.';
-        }
-        adviceColor='var(--green)';
-      } else {
-        // Need small improvement — one thing to focus on
-        var smallGap=hfGap<0.3;
-        if(smallGap&&opt1Ok){
-          advice='Nesten der. Press litt på tempoet — hold '+aRatePct+'%A som du har gjort. Ikke jag etter perfeksjon. 0 miss.';
-        } else if(opt2Ok&&Math.round(aNeededDiff)<=3){
-          advice='Hold tempoet. Prøv å bytte '+Math.round(aNeededDiff)+' C til A — det holder. 0 miss.';
-        } else {
-          advice='Press litt på — hold ditt treffbilde på '+aRatePct+'%A. Du er nærme. 0 miss.';
-        }
-        adviceColor='var(--accent)';
-      }
-
-    } else {
-      // Behind
-      var bigGap2=hfGap>0.8;
-      if(bigGap2){
-        // Large gap — honest but motivating
-        advice='Du kan ta dette tilbake. Alt du har nå — høyeste tempo du klarer, hold '+aRatePct+'%A. Null miss, det koster '+missCost.toFixed(1)+'s.';
-      } else if(opt1Ok&&opt2Ok&&Math.round(aNeededDiff)<=3){
-        // Both adjustments are small
-        advice='Du kan ta dette. Press tempoet litt og bytt '+Math.round(aNeededDiff)+' C til A. Hold '+aRatePct+'%A som base. 0 miss — det koster '+missCost.toFixed(1)+'s.';
-      } else if(opt1Ok){
-        // Just need more tempo
-        advice='Du kan ta dette tilbake. Press tempoet — hold ditt treffbilde på '+aRatePct+'%A. 0 miss — det koster '+missCost.toFixed(1)+'s.';
-      } else {
-        advice='Alt du har. Høyeste tempo du klarer, hold ditt treffbilde. 0 miss — det koster '+missCost.toFixed(1)+'s.';
-      }
-      adviceColor='var(--red)';
-    }
-
-    var stageStageName=after+'';
-    if(m.stageDefs){var def3=findStage(m.stageDefs,after);if(def3)stageStageName=after+'. '+def3.name;}
-    var borderCol=iLead?'var(--green)':'var(--red)';
-
-    html+='<div class="card" style="margin-bottom:10px;border-left:4px solid '+borderCol+'">';
-
-    // Header + score
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
-    html+='<div style="font-family:Rajdhani,sans-serif;font-size:14px;font-weight:700">Etter '+stageStageName+'</div>';
-    html+='<div style="font-size:12px;font-weight:700;color:'+borderCol+'">'+(iLead?'LEDER':'BAK')+' '+gapPts.toFixed(1)+' pts</div>';
-    html+='</div>';
-
-    // Score bar
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">';
-    html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:8px;text-align:center">';
-    html+='<div style="font-size:10px;color:var(--muted)">'+me.firstName+' <span style="font-size:9px;opacity:0.6">(poeng totalt)</span></div>';
-    html+='<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:var(--accent)">'+ePts.toFixed(1)+'</div>';
-    html+='<div style="font-size:10px;color:var(--muted)">'+(top>0?ePts/top*100:0).toFixed(2)+'%</div></div>';
-    html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:8px;text-align:center">';
-    html+='<div style="font-size:10px;color:var(--muted)">'+bestRival.firstName+' <span style="font-size:9px;opacity:0.6">(poeng totalt)</span></div>';
-    html+='<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:'+(iLead?'var(--muted)':'var(--red)')+'">'+rPts.toFixed(1)+'</div>';
-    html+='<div style="font-size:10px;color:var(--muted)">'+(top>0?rPts/top*100:0).toFixed(2)+'%</div></div>';
-    html+='</div>';
-
-    // Dagsform — compact — shows the three key variables
-    var projDisp=nextShots>0?projectNextStage(df,nextShots,nextDiv,nextPF):null;
-    html+='<div style="display:flex;gap:6px;margin-bottom:10px">';
-    // Tid per skudd
-    html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:8px;flex:1;text-align:center">';
-    html+='<div style="font-size:10px;color:var(--muted)">t/skudd</div>';
-    html+='<div style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700">'+df.avgST.toFixed(3)+'s</div></div>';
-    // Treff-profil
-    html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:8px;flex:1;text-align:center">';
-    html+='<div style="font-size:10px;color:var(--muted)">Treff</div>';
-    html+='<div style="font-size:12px;font-weight:600;line-height:1.6">';
-    html+='<span style="color:var(--green)">'+Math.round(df.ar*100)+'%A</span> ';
-    html+='<span style="color:var(--accent)">'+Math.round(df.cr*100)+'%C</span>';
-    html+=(df.dr>0.01?'<br><span style="color:#f59e0b">'+Math.round(df.dr*100)+'%D</span>':'');
-    html+='</div></div>';
-    // Estimert HF på neste stage
-    html+='<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:8px;flex:1;text-align:center">';
-    html+='<div style="font-size:10px;color:var(--muted)">Est. HF neste</div>';
-    html+='<div style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:var(--accent)">'+(projDisp?projDisp.estHF.toFixed(3):'—')+'</div>';
-    if(projDisp)html+='<div style="font-size:9px;color:var(--muted)">'+projDisp.expTime.toFixed(1)+'s · '+Math.round(projDisp.expPts)+'pts</div>';
-    html+='</div>';
-    html+='</div>';
-
-    // ── THE ONE SENTENCE ──
-    html+='<div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px;border-left:3px solid '+adviceColor+'">';
-    if(nextN>0){
-      // Stage info with reloads
-      var stageInfo='Neste: '+nextName+' ('+nextShots+' skudd';
-      if(nextReloads>0)stageInfo+=', '+nextReloads+' reload'+(nextReloads>1?'s':'');
-      stageInfo+=', max '+nextMaxPts+' pts)';
-      html+='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:4px">'+stageInfo+'</div>';
-    }
-    html+='<div style="font-size:15px;font-weight:600;color:'+adviceColor+';line-height:1.5">'+advice+'</div>';
-    
-    // ── SCENARIO & CONTEXT ──
-    if(remaining.length>0&&nextN>0){
-      var scenarioText='';
-      var hfGap=Math.abs(targetHF-estNextHF);
-      
-      // Realistisk vurdering av target HF
-      if(targetHF>0&&estNextHF>0){
-        if(hfGap>1.5){
-          var difficulty=targetHF>estNextHF?'MYE høyere':'MYE lavere';
-          scenarioText='Target HF '+targetHF.toFixed(2)+' er '+difficulty+' enn ditt estimat '+estNextHF.toFixed(2)+'. ';
-          if(targetHF>estNextHF){
-            scenarioText+='Dette krever perfekt gjennomføring.';
-          }
-        } else if(hfGap>0.5){
-          scenarioText='Target HF '+targetHF.toFixed(2)+' vs estimat '+estNextHF.toFixed(2)+'. ';
-          scenarioText+=targetHF>estNextHF?'Du må presse litt over vanlig nivå.':'Du har god margin.';
-        }
-      }
-      
-      // Scenario for gjenværende stages
-      if(remaining.length>1){
-        var avgNeeded=0;
-        var totalMaxRemaining=0;
-        for(var ri=0;ri<remaining.length;ri++){
-          totalMaxRemaining+=stgMaxPts(remaining[ri]);
-        }
-        if(totalMaxRemaining>0){
-          var ptsNeeded=iLead?(rPts+0.1-ePts):(ePts+0.1-rPts);
-          if(!iLead)ptsNeeded=Math.abs(ptsNeeded)+0.1;
-          avgNeeded=(ptsNeeded/remaining.length)*100/totalMaxRemaining*remaining.length;
-          if(avgNeeded>0&&remaining.length>1){
-            if(scenarioText)scenarioText+=' ';
-            scenarioText+='Over '+remaining.length+' stages: gjennomsnittlig '+(iLead?'hold':'oppnå')+' ~'+avgNeeded.toFixed(0)+'% av max for å '+(iLead?'holde':'ta')+'.';
-          }
-        }
-      }
-      
-      if(scenarioText){
-        html+='<div style="font-size:11px;color:var(--sub);margin-top:8px;line-height:1.5;padding-top:8px;border-top:1px solid var(--border)">'+scenarioText+'</div>';
-      }
-    }
-    
-    html+='</div>';
-
-    // ── TREND REFLECTION ──
-    var trend=detectTrend(after);
-    var trendMsg=buildTrendMsg(trend,df);
-    if(trendMsg&&remaining.length>0){
-      var trendIcon='&#128200;';
-      var trendColor='var(--muted)';
-      if(trend&&trend.tempoFell&&!trend.treffFell){trendIcon='&#9200;';trendColor='var(--accent)';}
-      else if(trend&&trend.tempoFell&&trend.treffFell){trendIcon='&#9888;';trendColor='var(--red)';}
-      else if(trend&&!trend.tempoFell&&trend.treffFell){trendIcon='&#127919;';trendColor='var(--accent)';}
-      else if(trend&&trend.tempoRose&&trend.treffRose){trendIcon='&#9889;';trendColor='var(--green)';}
-      html+='<div style="margin-top:8px;background:rgba(255,255,255,.03);border-radius:var(--radius-sm);padding:10px;border-left:2px solid '+trendColor+'">';
-      html+='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:4px">'+trendIcon+' Refleksjon</div>';
-      html+='<div style="font-size:13px;color:var(--sub);line-height:1.6">'+trendMsg+'</div>';
-      html+='</div>';
-    }
-
     html+='</div>';
   }
   container.innerHTML=html;
 }
-
 
 function renderPrognoseHistory(){
   var card=el('prog-history-card');

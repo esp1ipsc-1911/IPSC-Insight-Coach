@@ -617,30 +617,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
         ℹ️ Ingen skutte stages ennå. Data vil vises etter at du har lagt til resultater.
       </div>
     </div>
-    <div class="section-title">Stage-parametre</div>
-    <div class="card">
-      <div class="section-label">Stageinnhold</div>
-      <div class="prognose-inputs">
-        <div class="prog-field"><input type="number" id="prog-shots" value="12" oninput="calcPrognose()"><div class="prog-field-lbl">${d("shots")}</div></div>
-        <div class="prog-field"><input type="number" id="prog-targets" value="6" oninput="calcPrognose()"><div class="prog-field-lbl">${d("targets")}</div></div>
-        <div class="prog-field"><input type="number" id="prog-steel" value="2" oninput="calcPrognose()"><div class="prog-field-lbl">${d("steel")}</div></div>
-      </div>
-      <div class="section-label">Tidsjustering</div>
-      <div class="prognose-inputs">
-        <div class="prog-field" class="prog-readonly"><input type="number" id="prog-reloads" value="1" readonly class="prog-readonly-input"><div class="prog-field-lbl">Reloads (auto)</div></div>
-        <div class="prog-field"><input type="number" id="prog-move" value="3" oninput="calcPrognose()"><div class="prog-field-lbl">${d("move_seconds")}</div></div>
-        <div class="prog-field"><input type="number" id="prog-draw" value="${g.draw||1.42}" oninput="calcPrognose()" class="prog-accent-input"><div class="prog-field-lbl">${d("draw_seconds")}</div></div>
-      </div>
-      <div class="prognose-result">
-        <div class="prog-pf-note" id="prog-pf-note">${g.powerFactor?ge(g.powerFactor):"Minor"} · ${g.division||"Classic"}</div>
-        <div class="prog-hf-label">Estimert Hit Factor</div>
-        <div class="prog-hf-value" id="prog-hf-out">—</div>
-        <div id="prog-delta-wrap" class="prog-delta-wrap">
-          <div class="prog-delta-label">vs. match-snitt</div>
-          <div class="prog-delta-value" id="prog-delta">—</div>
-        </div>
-        <div id="prog-coaching" style="margin-top:15px;"></div>
-        <div class="prog-breakdown" id="prog-breakdown"></div>
+    
       </div>
     </div>
     <div id="prog-stages-container"></div>

@@ -38,7 +38,9 @@ function normalizeMatch(match) {
   return {
     ...match,
     ownerId,
-    participants: uniqueParticipants
+    participants: uniqueParticipants,
+    stages: Array.isArray(match.stages) ? match.stages : [],
+    shooters: Array.isArray(match.shooters) ? match.shooters : []
   };
 }
 
@@ -73,6 +75,8 @@ export async function saveUserProfile(profile) {
   try {
     await updateDoc(doc(db, 'users', user.uid), {
       ...profile,
+      stages: Array.isArray(matchData.stages) ? matchData.stages : [],
+      shooters: Array.isArray(matchData.shooters) ? matchData.shooters : [],
       updatedAt: serverTimestamp()
     });
     return { success: true };
@@ -84,9 +88,11 @@ export async function saveUserProfile(profile) {
 
 export async function getUserProfile(userId) {
   try {
-    const userDoc = await getDoc(doc(db, 'users', userId));
+    const effectiveUserId = userId || getCurrentUser()?.uid;
+    if (!effectiveUserId) return null;
+    const userDoc = await getDoc(doc(db, 'users', effectiveUserId));
     if (userDoc.exists()) {
-      return { uid: userId, ...userDoc.data() };
+      return { uid: effectiveUserId, ...userDoc.data() };
     }
     return null;
   } catch (error) {
@@ -114,6 +120,8 @@ export async function createMatch(matchData) {
       ownerId: user.uid,
       participants: [user.uid],
       createdAt: serverTimestamp(),
+      stages: Array.isArray(matchData.stages) ? matchData.stages : [],
+      shooters: Array.isArray(matchData.shooters) ? matchData.shooters : [],
       updatedAt: serverTimestamp()
     });
 
@@ -379,6 +387,8 @@ export async function inviteUserToMatch(matchId, email) {
 
     await updateDoc(doc(db, 'matches', matchId), {
       participants: arrayUnion(invitedUserId),
+      stages: Array.isArray(matchData.stages) ? matchData.stages : [],
+      shooters: Array.isArray(matchData.shooters) ? matchData.shooters : [],
       updatedAt: serverTimestamp()
     });
 
@@ -410,6 +420,8 @@ export async function removeUserFromMatch(matchId, userId) {
 
     await updateDoc(doc(db, 'matches', matchId), {
       participants: arrayRemove(userId),
+      stages: Array.isArray(matchData.stages) ? matchData.stages : [],
+      shooters: Array.isArray(matchData.shooters) ? matchData.shooters : [],
       updatedAt: serverTimestamp()
     });
 
@@ -437,6 +449,8 @@ export async function leaveMatch(matchId) {
 
     await updateDoc(doc(db, 'matches', matchId), {
       participants: arrayRemove(user.uid),
+      stages: Array.isArray(matchData.stages) ? matchData.stages : [],
+      shooters: Array.isArray(matchData.shooters) ? matchData.shooters : [],
       updatedAt: serverTimestamp()
     });
 

@@ -550,7 +550,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="nav-avatar" id="nav-av-home" onclick="switchTab('screen-profile')">${le()}</div>
  </div>
  <div class="scroll-content" id="home-content"></div>
- <button class="fab" onclick="openModal('modal-add')">+</button>
+ <button class="fab" onclick="openModal('modal-upload-result')">+</button>
  <div class="tab-bar">
  <div class="tab-item active" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${d("home")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>

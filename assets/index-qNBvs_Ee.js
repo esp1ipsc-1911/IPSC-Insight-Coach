@@ -737,7 +737,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title">${d("new_match")}</div>
- <div class="modal-close" onclick="closeModal('modal-new-match')"></div>
+ <div class="modal-close" onclick="closeModal('modal-new-match')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div class="field-group">
@@ -793,7 +793,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title">${d("edit_match")}</div>
- <div class="modal-close" onclick="closeModal('modal-edit-match')"></div>
+ <div class="modal-close" onclick="closeModal('modal-edit-match')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div class="field-group">
@@ -869,7 +869,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title">${d("edit_profile")}</div>
- <div class="modal-close" onclick="closeModal('modal-edit-profile')"></div>
+ <div class="modal-close" onclick="closeModal('modal-edit-profile')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div class="field-group">
@@ -917,7 +917,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title">${d("add_shooter")}</div>
- <div class="modal-close" onclick="closeModal('modal-add-shooter')"></div>
+ <div class="modal-close" onclick="closeModal('modal-add-shooter')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div class="field-group">
@@ -941,7 +941,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title">Last opp resultat</div>
- <div class="modal-close" onclick="closeModal('modal-upload-result')"></div>
+ <div class="modal-close" onclick="closeModal('modal-upload-result')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div style="margin-bottom:15px;padding:10px;background:var(--bg);border-radius:8px;">
@@ -970,7 +970,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title" id="ocr-confirm-title">Bekreft resultat</div>
- <div class="modal-close" onclick="closeModal('modal-ocr-confirm')"></div>
+ <div class="modal-close" onclick="closeModal('modal-ocr-confirm')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div id="ocr-confirm-desc" style="margin-bottom:15px;color:var(--muted);font-size:13px;">Kontroller og rediger verdiene. Poeng beregnes automatisk fra Minor/Major og treffbildet.</div>
@@ -1021,7 +1021,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title">${d("add_result")}</div>
- <div class="modal-close" onclick="closeModal('modal-add')"></div>
+ <div class="modal-close" onclick="closeModal('modal-add')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div class="field-group">
@@ -1075,7 +1075,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title" id="stage-modal-title">${d("create_stage")}</div>
- <div class="modal-close" onclick="closeModal('modal-create-stage')"></div>
+ <div class="modal-close" onclick="closeModal('modal-create-stage')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div class="field-group">
@@ -1145,7 +1145,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title">${d("invite_user")}</div>
- <div class="modal-close" onclick="closeModal('modal-invite-user')"></div>
+ <div class="modal-close" onclick="closeModal('modal-invite-user')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <div class="field-group">
@@ -1167,7 +1167,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()">
  <div class="modal-header">
  <div class="modal-title">${d("invitations")}</div>
- <div class="modal-close" onclick="closeModal('modal-invitations')"></div>
+ <div class="modal-close" onclick="closeModal('modal-invitations')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body" id="invitations-list">
  <!-- Populated by JavaScript -->
@@ -1179,7 +1179,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="modal-sheet" onclick="event.stopPropagation()" style="max-width:400px;">
  <div class="modal-header">
  <div class="modal-title">Slett match</div>
- <div class="modal-close" onclick="closeModal('modal-confirm-delete')"></div>
+ <div class="modal-close" onclick="closeModal('modal-confirm-delete')" aria-label="Lukk">×</div>
  </div>
  <div class="modal-body">
  <p style="margin-bottom:15px;">Er du sikker på at du vil slette denne matchen?</p>

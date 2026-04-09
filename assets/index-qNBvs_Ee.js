@@ -989,46 +989,44 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </div>
  <div class="section-label" style="margin-top:15px;">Treffbilde <span style="font-size:12px;color:var(--muted);font-weight:400;">(låst til <span id="ocr-total-display">0</span> treff)</span></div>
  <input type="hidden" id="ocr-a" value="0">
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
- <div class="field-group">
+ <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:end;">
+ <div class="field-group" style="min-width:0;">
  <div class="field-label">A</div>
- <div class="field-input" style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);">
- <span id="ocr-a-display" style="font-size:32px;font-weight:700;">0</span>
- <span style="font-size:12px;color:var(--muted);text-transform:uppercase;">Auto</span>
+ <div class="field-input" style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bg);min-width:0;">
+ <span id="ocr-a-display" style="font-size:32px;font-weight:700;line-height:1;">0</span>
+ <span style="font-size:12px;color:var(--muted);text-transform:uppercase;white-space:nowrap;">Auto</span>
  </div>
  </div>
- <div class="field-group">
+ <div class="field-group" style="min-width:0;">
  <div class="field-label">Steel</div>
- <div style="display:flex;align-items:center;gap:8px;">
- <button type="button" onclick="adjustOcrHits('steel',-1)" style="width:44px;height:44px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:24px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-steel" value="0" readonly style="text-align:center;flex:1;background:var(--bg);">
- <button type="button" onclick="adjustOcrHits('steel',1)" style="width:44px;height:44px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:24px;cursor:pointer;">+</button>
+ <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:6px;align-items:center;min-width:0;">
+ <button type="button" onclick="adjustOcrHits('steel',-1)" style="width:36px;height:36px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;line-height:1;">−</button>
+ <input class="field-input" type="number" id="ocr-steel" value="0" readonly style="text-align:center;min-width:0;padding:10px 8px;background:var(--bg);">
+ <button type="button" onclick="adjustOcrHits('steel',1)" style="width:36px;height:36px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;line-height:1;">+</button>
  </div>
  </div>
- </div>
- <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
- <div class="field-group">
+ <div class="field-group" style="min-width:0;">
  <div class="field-label">C</div>
- <div style="display:flex;align-items:center;gap:8px;">
- <button type="button" onclick="adjustOcrHits('c',-1)" style="width:44px;height:44px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:24px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-c" value="0" readonly style="text-align:center;flex:1;background:var(--bg);">
- <button type="button" onclick="adjustOcrHits('c',1)" style="width:44px;height:44px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:24px;cursor:pointer;">+</button>
+ <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:6px;align-items:center;min-width:0;">
+ <button type="button" onclick="adjustOcrHits('c',-1)" style="width:36px;height:36px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;line-height:1;">−</button>
+ <input class="field-input" type="number" id="ocr-c" value="0" readonly style="text-align:center;min-width:0;padding:10px 8px;background:var(--bg);">
+ <button type="button" onclick="adjustOcrHits('c',1)" style="width:36px;height:36px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;line-height:1;">+</button>
  </div>
  </div>
- <div class="field-group">
+ <div class="field-group" style="min-width:0;">
  <div class="field-label">D</div>
- <div style="display:flex;align-items:center;gap:8px;">
- <button type="button" onclick="adjustOcrHits('d',-1)" style="width:44px;height:44px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:24px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-d" value="0" readonly style="text-align:center;flex:1;background:var(--bg);">
- <button type="button" onclick="adjustOcrHits('d',1)" style="width:44px;height:44px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:24px;cursor:pointer;">+</button>
+ <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:6px;align-items:center;min-width:0;">
+ <button type="button" onclick="adjustOcrHits('d',-1)" style="width:36px;height:36px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;line-height:1;">−</button>
+ <input class="field-input" type="number" id="ocr-d" value="0" readonly style="text-align:center;min-width:0;padding:10px 8px;background:var(--bg);">
+ <button type="button" onclick="adjustOcrHits('d',1)" style="width:36px;height:36px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;line-height:1;">+</button>
  </div>
  </div>
- <div class="field-group">
+ <div class="field-group" style="grid-column:1 / -1;min-width:0;">
  <div class="field-label">Miss</div>
- <div style="display:flex;align-items:center;gap:8px;">
- <button type="button" onclick="adjustOcrHits('miss',-1)" style="width:44px;height:44px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:24px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-miss" value="0" readonly style="text-align:center;flex:1;background:var(--bg);">
- <button type="button" onclick="adjustOcrHits('miss',1)" style="width:44px;height:44px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:24px;cursor:pointer;">+</button>
+ <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:6px;align-items:center;min-width:0;">
+ <button type="button" onclick="adjustOcrHits('miss',-1)" style="width:36px;height:36px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;line-height:1;">−</button>
+ <input class="field-input" type="number" id="ocr-miss" value="0" readonly style="text-align:center;min-width:0;padding:10px 8px;background:var(--bg);">
+ <button type="button" onclick="adjustOcrHits('miss',1)" style="width:36px;height:36px;border:none;border-radius:10px;background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;line-height:1;">+</button>
  </div>
  </div>
  </div>

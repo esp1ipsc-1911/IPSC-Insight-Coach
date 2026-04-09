@@ -5,12 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IPSC Insight - Admin</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --bg: #0a0c10;
       --bg2: #111318;
@@ -28,7 +23,6 @@
       --radius: 14px;
       --radius-sm: 8px;
     }
-
     body {
       background: var(--bg);
       color: var(--text);
@@ -36,66 +30,68 @@
       padding: 20px;
       min-height: 100vh;
     }
+    .container { max-width: 1320px; margin: 0 auto; }
+    .header { margin-bottom: 32px; }
+    .header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .header h1 span { color: var(--accent); }
+    .header p { color: var(--muted); font-size: 14px; }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
     }
-
-    .header {
-      margin-bottom: 40px;
+    .tab-btn {
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
     }
-
-    .header h1 {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .header h1 span {
+    .tab-btn.active {
+      background: rgba(232,184,75,.14);
+      border-color: rgba(232,184,75,.35);
       color: var(--accent);
     }
 
-    .header p {
-      color: var(--muted);
-      font-size: 14px;
-    }
+    .panel { display: none; }
+    .panel.active { display: block; }
 
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
-
     .stat-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 20px;
     }
-
     .stat-value {
       font-size: 36px;
       font-weight: 700;
       color: var(--accent);
       margin-bottom: 8px;
     }
-
     .stat-label {
       font-size: 12px;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-
     .actions {
       display: flex;
       gap: 12px;
       margin-bottom: 24px;
       flex-wrap: wrap;
+      align-items: center;
     }
-
     .btn {
       padding: 12px 20px;
       border-radius: var(--radius-sm);
@@ -105,30 +101,16 @@
       border: none;
       transition: all 0.2s;
     }
-
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    .btn-primary:hover {
-      background: var(--accent2);
-    }
-
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-primary:hover { background: var(--accent2); }
     .btn-secondary {
       background: var(--bg3);
       color: var(--text);
       border: 1px solid var(--border);
     }
-
-    .btn-secondary:hover {
-      background: var(--card);
-    }
-
-    .btn-danger {
-      background: var(--red);
-      color: white;
-    }
+    .btn-secondary:hover { background: var(--card); }
+    .btn-danger { background: var(--red); color: white; }
+    .btn-danger:hover { filter: brightness(1.05); }
 
     .table-container {
       background: var(--card);
@@ -136,16 +118,8 @@
       border-radius: var(--radius);
       overflow: hidden;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    thead {
-      background: var(--bg3);
-    }
-
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--bg3); }
     th {
       padding: 16px;
       text-align: left;
@@ -154,38 +128,38 @@
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
-
     td {
       padding: 16px;
       border-top: 1px solid var(--border);
       font-size: 14px;
+      vertical-align: top;
     }
-
-    tr:hover {
-      background: var(--bg3);
-    }
-
+    tr:hover { background: var(--bg3); }
     .badge {
       display: inline-block;
       padding: 4px 12px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 600;
+      white-space: nowrap;
     }
-
     .badge-active {
       background: rgba(76,175,125,.15);
       color: var(--green);
       border: 1px solid rgba(76,175,125,.3);
     }
-
     .badge-inactive {
       background: rgba(224,82,82,.1);
       color: var(--red);
       border: 1px solid rgba(224,82,82,.2);
     }
-
+    .badge-benchmark {
+      background: rgba(74,158,255,.12);
+      color: var(--blue);
+      border: 1px solid rgba(74,158,255,.25);
+    }
     .modal {
       display: none;
       position: fixed;
@@ -194,31 +168,30 @@
       align-items: center;
       justify-content: center;
       z-index: 1000;
+      padding: 24px;
     }
-
-    .modal.open {
-      display: flex;
-    }
-
+    .modal.open { display: flex; }
     .modal-content {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 32px;
-      max-width: 500px;
-      width: 90%;
+      max-width: 760px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
     }
-
     .modal-title {
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 24px;
     }
-
-    .form-group {
-      margin-bottom: 20px;
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
     }
-
+    .form-group { margin-bottom: 20px; }
     .form-label {
       display: block;
       font-size: 12px;
@@ -227,8 +200,7 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-
-    .form-input {
+    .form-input, .form-select {
       width: 100%;
       background: var(--bg3);
       border: 1px solid var(--border);
@@ -237,35 +209,23 @@
       color: var(--text);
       font-size: 14px;
     }
-
-    .form-input:focus {
+    .form-input:focus, .form-select:focus {
       outline: none;
       border-color: var(--accent);
     }
-
     .form-actions {
       display: flex;
       gap: 12px;
       margin-top: 24px;
+      flex-wrap: wrap;
     }
-
-    .action-btns {
-      display: flex;
-      gap: 8px;
-    }
-
+    .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-sm {
       padding: 6px 12px;
       font-size: 12px;
       border-radius: 6px;
     }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: var(--muted);
-    }
-
+    .loading { text-align: center; padding: 40px; color: var(--muted); }
     .error {
       background: rgba(224,82,82,.1);
       border: 1px solid rgba(224,82,82,.2);
@@ -274,21 +234,16 @@
       border-radius: var(--radius-sm);
       margin-bottom: 20px;
     }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state h3 { font-size: 18px; margin-bottom: 8px; color: var(--sub); }
+    .muted { color: var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .nowrap { white-space: nowrap; }
+    #logoutBtn { margin-left: auto; }
 
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-    }
-
-    .empty-state h3 {
-      font-size: 18px;
-      margin-bottom: 8px;
-      color: var(--sub);
-    }
-
-    #logoutBtn {
-      margin-left: auto;
+    @media (max-width: 900px) {
+      .form-grid { grid-template-columns: 1fr; }
+      table, thead, tbody, tr, th, td { font-size: 13px; }
     }
   </style>
 </head>
@@ -296,7 +251,7 @@
   <div class="container">
     <div class="header">
       <h1>IPSC <span>INSIGHT</span> Admin</h1>
-      <p>Administrer invitasjonskoder</p>
+      <p>Administrer invitasjonskoder og referanseskyttere</p>
     </div>
 
     <div id="loginSection">
@@ -316,55 +271,108 @@
     </div>
 
     <div id="adminContent" style="display: none;">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="statTotal">0</div>
-          <div class="stat-label">Totalt koder</div>
+      <div class="tabs">
+        <button id="tabCodesBtn" class="tab-btn active" type="button">Invitasjonskoder</button>
+        <button id="tabShootersBtn" class="tab-btn" type="button">Referanseskyttere</button>
+      </div>
+
+      <div id="codesPanel" class="panel active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-label">Totalt koder</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statActive">0</div>
+            <div class="stat-label">Aktive koder</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statUsed">0</div>
+            <div class="stat-label">Totalt brukt</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statUsers">0</div>
+            <div class="stat-label">Totalt brukere</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="statActive">0</div>
-          <div class="stat-label">Aktive koder</div>
+
+        <div class="actions">
+          <button id="createCodeBtn" class="btn btn-primary">+ Ny kode</button>
+          <button id="refreshBtn" class="btn btn-secondary">↻ Oppdater</button>
+          <button id="logoutBtn" class="btn btn-secondary">Logg ut</button>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="statUsed">0</div>
-          <div class="stat-label">Totalt brukt</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="statUsers">0</div>
-          <div class="stat-label">Totalt brukere</div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Status</th>
+                <th>Maks bruk</th>
+                <th>Brukt</th>
+                <th>Beskrivelse</th>
+                <th>Opprettet</th>
+                <th>Handlinger</th>
+              </tr>
+            </thead>
+            <tbody id="codesTable">
+              <tr><td colspan="7" class="loading">Laster...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div class="actions">
-        <button id="createCodeBtn" class="btn btn-primary">+ Ny kode</button>
-        <button id="refreshBtn" class="btn btn-secondary">↻ Oppdater</button>
-        <button id="logoutBtn" class="btn btn-secondary">Logg ut</button>
-      </div>
+      <div id="shootersPanel" class="panel">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statShootersTotal">0</div>
+            <div class="stat-label">Referanseskyttere</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statShootersClassic">0</div>
+            <div class="stat-label">Classic</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statShootersMinor">0</div>
+            <div class="stat-label">Minor</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statBenchmarks">0</div>
+            <div class="stat-label">Benchmark-profiler</div>
+          </div>
+        </div>
 
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Kode</th>
-              <th>Status</th>
-              <th>Maks bruk</th>
-              <th>Brukt</th>
-              <th>Beskrivelse</th>
-              <th>Opprettet</th>
-              <th>Handlinger</th>
-            </tr>
-          </thead>
-          <tbody id="codesTable">
-            <tr>
-              <td colspan="7" class="loading">Laster...</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="actions">
+          <button id="createShooterBtn" class="btn btn-primary">+ Ny referanseskytter</button>
+          <button id="refreshShootersBtn" class="btn btn-secondary">↻ Oppdater</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Navn</th>
+                <th>Divisjon</th>
+                <th>PF</th>
+                <th>Draw</th>
+                <th>Reload</th>
+                <th>Short HF</th>
+                <th>Medium HF</th>
+                <th>Long HF</th>
+                <th>Status</th>
+                <th>Handlinger</th>
+              </tr>
+            </thead>
+            <tbody id="shootersTable">
+              <tr><td colspan="11" class="loading">Laster...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Create Code Modal -->
   <div id="createModal" class="modal">
     <div class="modal-content">
       <div class="modal-title">Opprett ny kode</div>
@@ -388,26 +396,99 @@
     </div>
   </div>
 
+  <div id="shooterModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="shooterModalTitle">Opprett referanseskytter</div>
+      <div id="shooterError" class="error" style="display: none;"></div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Dokument-ID</label>
+          <input id="shooterId" class="form-input mono" type="text" placeholder="shooter_003">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Navn</label>
+          <input id="shooterName" class="form-input" type="text" placeholder="Robert Cernigoj">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Divisjon</label>
+          <select id="shooterDivision" class="form-select">
+            <option value="Classic">Classic</option>
+            <option value="Standard">Standard</option>
+            <option value="Open">Open</option>
+            <option value="Production">Production</option>
+            <option value="Production Optics">Production Optics</option>
+            <option value="Revolver">Revolver</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Power Factor</label>
+          <select id="shooterPowerFactor" class="form-select">
+            <option value="Minor">Minor</option>
+            <option value="Major">Major</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Draw time</label>
+          <input id="shooterDrawTime" class="form-input" type="number" step="0.01" placeholder="0.95">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reload time</label>
+          <input id="shooterReloadTime" class="form-input" type="number" step="0.01" placeholder="0.90">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short HF</label>
+          <input id="shooterShortHF" class="form-input" type="number" step="0.0001" placeholder="5.6062">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Medium HF</label>
+          <input id="shooterMediumHF" class="form-input" type="number" step="0.0001" placeholder="6.8997">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Long HF</label>
+          <input id="shooterLongHF" class="form-input" type="number" step="0.0001" placeholder="7.1971">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Benchmark-profil</label>
+          <select id="shooterBenchmark" class="form-select">
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button id="saveShooterBtn" class="btn btn-primary">Lagre</button>
+        <button id="cancelShooterBtn" class="btn btn-secondary">Avbryt</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, db } from './src/firebase.js';
-    import { 
+    import {
       signInWithEmailAndPassword,
       signOut,
-      onAuthStateChanged 
+      onAuthStateChanged
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    import { 
+    import {
       doc,
-      getDoc 
+      getDoc,
+      collection,
+      getDocs,
+      setDoc,
+      deleteDoc
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-    import { 
+    import {
       getFunctions,
-      httpsCallable 
+      httpsCallable
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
 
     const functions = getFunctions();
     let currentUser = null;
+    let currentTab = 'codes';
+    let editingShooterId = null;
 
-    // DOM elements
     const loginSection = document.getElementById('loginSection');
     const adminContent = document.getElementById('adminContent');
     const loginEmail = document.getElementById('loginEmail');
@@ -415,6 +496,12 @@
     const loginBtn = document.getElementById('loginBtn');
     const loginError = document.getElementById('loginError');
     const logoutBtn = document.getElementById('logoutBtn');
+
+    const tabCodesBtn = document.getElementById('tabCodesBtn');
+    const tabShootersBtn = document.getElementById('tabShootersBtn');
+    const codesPanel = document.getElementById('codesPanel');
+    const shootersPanel = document.getElementById('shootersPanel');
+
     const createCodeBtn = document.getElementById('createCodeBtn');
     const refreshBtn = document.getElementById('refreshBtn');
     const createModal = document.getElementById('createModal');
@@ -423,18 +510,41 @@
     const cancelCreateBtn = document.getElementById('cancelCreateBtn');
     const codesTable = document.getElementById('codesTable');
 
-    // Auth state
+    const createShooterBtn = document.getElementById('createShooterBtn');
+    const refreshShootersBtn = document.getElementById('refreshShootersBtn');
+    const shootersTable = document.getElementById('shootersTable');
+    const shooterModal = document.getElementById('shooterModal');
+    const shooterModalTitle = document.getElementById('shooterModalTitle');
+    const shooterError = document.getElementById('shooterError');
+    const saveShooterBtn = document.getElementById('saveShooterBtn');
+    const cancelShooterBtn = document.getElementById('cancelShooterBtn');
+
+    const shooterIdInput = document.getElementById('shooterId');
+    const shooterNameInput = document.getElementById('shooterName');
+    const shooterDivisionInput = document.getElementById('shooterDivision');
+    const shooterPowerFactorInput = document.getElementById('shooterPowerFactor');
+    const shooterDrawTimeInput = document.getElementById('shooterDrawTime');
+    const shooterReloadTimeInput = document.getElementById('shooterReloadTime');
+    const shooterShortHFInput = document.getElementById('shooterShortHF');
+    const shooterMediumHFInput = document.getElementById('shooterMediumHF');
+    const shooterLongHFInput = document.getElementById('shooterLongHF');
+    const shooterBenchmarkInput = document.getElementById('shooterBenchmark');
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Check if user is admin
-        const adminDoc = await getDoc(doc(db, 'adminUsers', user.email));
-        if (adminDoc.exists()) {
-          currentUser = user;
-          loginSection.style.display = 'none';
-          adminContent.style.display = 'block';
-          loadCodes();
-        } else {
-          alert('Du har ikke admin-tilgang');
+        try {
+          const adminDoc = await getDoc(doc(db, 'adminUsers', user.email));
+          if (adminDoc.exists()) {
+            currentUser = user;
+            loginSection.style.display = 'none';
+            adminContent.style.display = 'block';
+            await Promise.all([loadCodes(), loadReferenceShooters()]);
+          } else {
+            alert('Du har ikke admin-tilgang');
+            await signOut(auth);
+          }
+        } catch (error) {
+          alert('Feil ved sjekk av admin-tilgang: ' + error.message);
           await signOut(auth);
         }
       } else {
@@ -444,16 +554,13 @@
       }
     });
 
-    // Login
     loginBtn.onclick = async () => {
       const email = loginEmail.value.trim();
       const password = loginPassword.value;
-
       if (!email || !password) {
         showError(loginError, 'Fyll ut alle feltene');
         return;
       }
-
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (error) {
@@ -461,27 +568,32 @@
       }
     };
 
-    // Logout
-    logoutBtn.onclick = async () => {
-      await signOut(auth);
-    };
+    logoutBtn.onclick = async () => { await signOut(auth); };
 
-    // Load codes
+    tabCodesBtn.onclick = () => setTab('codes');
+    tabShootersBtn.onclick = () => setTab('shooters');
+
+    function setTab(tab) {
+      currentTab = tab;
+      const codesActive = tab === 'codes';
+      tabCodesBtn.classList.toggle('active', codesActive);
+      tabShootersBtn.classList.toggle('active', !codesActive);
+      codesPanel.classList.toggle('active', codesActive);
+      shootersPanel.classList.toggle('active', !codesActive);
+    }
+
     async function loadCodes() {
       try {
         const listCodes = httpsCallable(functions, 'listInviteCodes');
         const result = await listCodes();
-        const codes = result.data.codes;
+        const codes = result.data.codes || [];
 
-        // Update stats
         const totalCodes = codes.length;
         const activeCodes = codes.filter(c => c.active).length;
-        const totalUsed = codes.reduce((sum, c) => sum + c.usedCount, 0);
+        const totalUsed = codes.reduce((sum, c) => sum + (c.usedCount || 0), 0);
         const uniqueUsers = new Set();
         codes.forEach(c => {
-          if (c.usedBy) {
-            c.usedBy.forEach(u => uniqueUsers.add(u));
-          }
+          if (Array.isArray(c.usedBy)) c.usedBy.forEach(u => uniqueUsers.add(u));
         });
 
         document.getElementById('statTotal').textContent = totalCodes;
@@ -489,7 +601,6 @@
         document.getElementById('statUsed').textContent = totalUsed;
         document.getElementById('statUsers').textContent = uniqueUsers.size;
 
-        // Render table
         if (codes.length === 0) {
           codesTable.innerHTML = `
             <tr>
@@ -499,43 +610,43 @@
               </td>
             </tr>
           `;
-        } else {
-          codesTable.innerHTML = codes.map(code => `
-            <tr>
-              <td><strong>${code.code}</strong></td>
-              <td>
-                <span class="badge ${code.active ? 'badge-active' : 'badge-inactive'}">
-                  ${code.active ? 'Aktiv' : 'Inaktiv'}
-                </span>
-              </td>
-              <td>${code.maxUses || '∞'}</td>
-              <td>${code.usedCount}</td>
-              <td>${code.description || '—'}</td>
-              <td>${formatDate(code.createdAt)}</td>
-              <td>
-                <div class="action-btns">
-                  <button class="btn btn-sm btn-secondary" onclick="toggleCode('${code.code}', ${!code.active})">
-                    ${code.active ? 'Deaktiver' : 'Aktiver'}
-                  </button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteCode('${code.code}')">
-                    Slett
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `).join('');
+          return;
         }
+
+        codesTable.innerHTML = codes.map(code => `
+          <tr>
+            <td><strong>${escapeHtml(code.code)}</strong></td>
+            <td>
+              <span class="badge ${code.active ? 'badge-active' : 'badge-inactive'}">
+                ${code.active ? 'Aktiv' : 'Inaktiv'}
+              </span>
+            </td>
+            <td>${code.maxUses || '∞'}</td>
+            <td>${code.usedCount || 0}</td>
+            <td>${escapeHtml(code.description || '—')}</td>
+            <td>${formatDate(code.createdAt)}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-sm btn-secondary" onclick="toggleCode('${escapeAttr(code.code)}', ${!code.active})">
+                  ${code.active ? 'Deaktiver' : 'Aktiver'}
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCode('${escapeAttr(code.code)}')">
+                  Slett
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
       } catch (error) {
         console.error('Error loading codes:', error);
         codesTable.innerHTML = `
           <tr>
-            <td colspan="7" class="error">Feil ved lasting av koder: ${error.message}</td>
+            <td colspan="7" class="error">Feil ved lasting av koder: ${escapeHtml(error.message)}</td>
           </tr>
         `;
       }
     }
 
-    // Create code
     createCodeBtn.onclick = () => {
       createModal.classList.add('open');
       createError.style.display = 'none';
@@ -544,9 +655,7 @@
       document.getElementById('newDescription').value = '';
     };
 
-    cancelCreateBtn.onclick = () => {
-      createModal.classList.remove('open');
-    };
+    cancelCreateBtn.onclick = () => createModal.classList.remove('open');
 
     confirmCreateBtn.onclick = async () => {
       const code = document.getElementById('newCode').value.trim().toUpperCase();
@@ -561,67 +670,252 @@
       try {
         const createCode = httpsCallable(functions, 'createInviteCode');
         await createCode({
-          code: code,
-          maxUses: maxUses ? parseInt(maxUses) : null,
-          description: description
+          code,
+          maxUses: maxUses ? parseInt(maxUses, 10) : null,
+          description
         });
-
         createModal.classList.remove('open');
-        loadCodes();
+        await loadCodes();
       } catch (error) {
         showError(createError, error.message);
       }
     };
 
-    // Toggle code
     window.toggleCode = async (code, active) => {
       try {
         const toggleCode = httpsCallable(functions, 'toggleInviteCode');
         await toggleCode({ code, active });
-        loadCodes();
+        await loadCodes();
       } catch (error) {
         alert('Feil: ' + error.message);
       }
     };
 
-    // Delete code
     window.deleteCode = async (code) => {
-      if (!confirm(`Er du sikker på at du vil slette koden "${code}"?`)) {
+      if (!confirm(`Er du sikker på at du vil slette koden "${code}"?`)) return;
+      try {
+        const deleteCode = httpsCallable(functions, 'deleteInviteCode');
+        await deleteCode({ code });
+        await loadCodes();
+      } catch (error) {
+        alert('Feil: ' + error.message);
+      }
+    };
+
+    refreshBtn.onclick = loadCodes;
+
+    async function loadReferenceShooters() {
+      try {
+        const snap = await getDocs(collection(db, 'referenceShooters'));
+        const shooters = [];
+        snap.forEach(docSnap => shooters.push({ id: docSnap.id, ...docSnap.data() }));
+        shooters.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'no'));
+
+        document.getElementById('statShootersTotal').textContent = shooters.length;
+        document.getElementById('statShootersClassic').textContent = shooters.filter(s => (s.division || '') === 'Classic').length;
+        document.getElementById('statShootersMinor').textContent = shooters.filter(s => String(s.powerFactor || '').toLowerCase() === 'minor').length;
+        document.getElementById('statBenchmarks').textContent = shooters.filter(s => !!s.isBenchmark).length;
+
+        if (shooters.length === 0) {
+          shootersTable.innerHTML = `
+            <tr>
+              <td colspan="11" class="empty-state">
+                <h3>Ingen referanseskyttere ennå</h3>
+                <p>Klikk "Ny referanseskytter" for å opprette første profil</p>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        shootersTable.innerHTML = shooters.map(shooter => `
+          <tr>
+            <td class="mono nowrap">${escapeHtml(shooter.id)}</td>
+            <td><strong>${escapeHtml(shooter.name || '—')}</strong></td>
+            <td>${escapeHtml(shooter.division || '—')}</td>
+            <td>${escapeHtml(shooter.powerFactor || '—')}</td>
+            <td>${formatNumber(shooter.drawTime, 2)}</td>
+            <td>${formatNumber(shooter.reloadTime, 2)}</td>
+            <td>${formatNumber(shooter.shortHF, 4)}</td>
+            <td>${formatNumber(shooter.mediumHF, 4)}</td>
+            <td>${formatNumber(shooter.longHF, 4)}</td>
+            <td><span class="badge badge-benchmark">${shooter.isBenchmark ? 'Benchmark' : 'Profil'}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-sm btn-secondary" onclick="editReferenceShooter('${escapeAttr(shooter.id)}')">Rediger</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteReferenceShooter('${escapeAttr(shooter.id)}')">Slett</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        window.__referenceShooters = shooters;
+      } catch (error) {
+        console.error('Error loading reference shooters:', error);
+        shootersTable.innerHTML = `
+          <tr>
+            <td colspan="11" class="error">Feil ved lasting av referanseskyttere: ${escapeHtml(error.message)}</td>
+          </tr>
+        `;
+      }
+    }
+
+    function openShooterModal(mode, shooter = null) {
+      shooterError.style.display = 'none';
+      if (mode === 'create') {
+        editingShooterId = null;
+        shooterModalTitle.textContent = 'Opprett referanseskytter';
+        shooterIdInput.disabled = false;
+        shooterIdInput.value = suggestNextShooterId();
+        shooterNameInput.value = '';
+        shooterDivisionInput.value = 'Classic';
+        shooterPowerFactorInput.value = 'Minor';
+        shooterDrawTimeInput.value = '';
+        shooterReloadTimeInput.value = '';
+        shooterShortHFInput.value = '';
+        shooterMediumHFInput.value = '';
+        shooterLongHFInput.value = '';
+        shooterBenchmarkInput.value = 'true';
+      } else {
+        editingShooterId = shooter.id;
+        shooterModalTitle.textContent = 'Rediger referanseskytter';
+        shooterIdInput.disabled = true;
+        shooterIdInput.value = shooter.id || '';
+        shooterNameInput.value = shooter.name || '';
+        shooterDivisionInput.value = shooter.division || 'Classic';
+        shooterPowerFactorInput.value = shooter.powerFactor || 'Minor';
+        shooterDrawTimeInput.value = shooter.drawTime ?? '';
+        shooterReloadTimeInput.value = shooter.reloadTime ?? '';
+        shooterShortHFInput.value = shooter.shortHF ?? '';
+        shooterMediumHFInput.value = shooter.mediumHF ?? '';
+        shooterLongHFInput.value = shooter.longHF ?? '';
+        shooterBenchmarkInput.value = String(!!shooter.isBenchmark);
+      }
+      shooterModal.classList.add('open');
+    }
+
+    createShooterBtn.onclick = () => openShooterModal('create');
+    cancelShooterBtn.onclick = () => shooterModal.classList.remove('open');
+    refreshShootersBtn.onclick = loadReferenceShooters;
+
+    saveShooterBtn.onclick = async () => {
+      const shooterId = shooterIdInput.value.trim();
+      const payload = {
+        name: shooterNameInput.value.trim(),
+        division: shooterDivisionInput.value.trim(),
+        powerFactor: shooterPowerFactorInput.value.trim(),
+        drawTime: parseOptionalNumber(shooterDrawTimeInput.value),
+        reloadTime: parseOptionalNumber(shooterReloadTimeInput.value),
+        shortHF: parseOptionalNumber(shooterShortHFInput.value),
+        mediumHF: parseOptionalNumber(shooterMediumHFInput.value),
+        longHF: parseOptionalNumber(shooterLongHFInput.value),
+        isBenchmark: shooterBenchmarkInput.value === 'true'
+      };
+
+      if (!shooterId) {
+        showError(shooterError, 'Dokument-ID er påkrevd');
+        return;
+      }
+      if (!payload.name) {
+        showError(shooterError, 'Navn er påkrevd');
+        return;
+      }
+      if (payload.shortHF == null || payload.mediumHF == null || payload.longHF == null) {
+        showError(shooterError, 'Short HF, Medium HF og Long HF må fylles ut');
+        return;
+      }
+      if (payload.drawTime == null || payload.reloadTime == null) {
+        showError(shooterError, 'Draw time og Reload time må fylles ut');
         return;
       }
 
       try {
-        const deleteCode = httpsCallable(functions, 'deleteInviteCode');
-        await deleteCode({ code });
-        loadCodes();
+        await setDoc(doc(db, 'referenceShooters', shooterId), payload, { merge: true });
+        shooterModal.classList.remove('open');
+        await loadReferenceShooters();
       } catch (error) {
-        alert('Feil: ' + error.message);
+        showError(shooterError, 'Kunne ikke lagre referanseskytter: ' + error.message);
       }
     };
 
-    // Refresh
-    refreshBtn.onclick = loadCodes;
+    window.editReferenceShooter = (id) => {
+      const shooters = Array.isArray(window.__referenceShooters) ? window.__referenceShooters : [];
+      const shooter = shooters.find(s => s.id === id);
+      if (!shooter) {
+        alert('Fant ikke referanseskytter');
+        return;
+      }
+      openShooterModal('edit', shooter);
+    };
 
-    // Helper functions
+    window.deleteReferenceShooter = async (id) => {
+      if (!confirm(`Er du sikker på at du vil slette referanseskytter "${id}"?`)) return;
+      try {
+        await deleteDoc(doc(db, 'referenceShooters', id));
+        await loadReferenceShooters();
+      } catch (error) {
+        alert('Feil ved sletting: ' + error.message);
+      }
+    };
+
+    function suggestNextShooterId() {
+      const shooters = Array.isArray(window.__referenceShooters) ? window.__referenceShooters : [];
+      let max = 0;
+      for (const shooter of shooters) {
+        const match = String(shooter.id || '').match(/^shooter_(\d+)$/i);
+        if (match) max = Math.max(max, parseInt(match[1], 10));
+      }
+      return `shooter_${String(max + 1).padStart(3, '0')}`;
+    }
+
+    function parseOptionalNumber(value) {
+      const trimmed = String(value ?? '').trim();
+      if (!trimmed) return null;
+      const num = Number(trimmed.replace(',', '.'));
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function formatNumber(value, decimals = 2) {
+      return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(decimals) : '—';
+    }
+
     function showError(element, message) {
       element.textContent = message;
       element.style.display = 'block';
-      setTimeout(() => {
-        element.style.display = 'none';
-      }, 5000);
+      setTimeout(() => { element.style.display = 'none'; }, 5000);
     }
 
     function formatDate(dateString) {
       if (!dateString) return '—';
       const date = new Date(dateString);
-      return date.toLocaleDateString('no-NO', { 
-        year: 'numeric', 
-        month: 'short', 
+      return date.toLocaleDateString('no-NO', {
+        year: 'numeric',
+        month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
       });
     }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function escapeAttr(value) {
+      return String(value ?? '').replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+    }
+
+    createModal.addEventListener('click', (e) => {
+      if (e.target === createModal) createModal.classList.remove('open');
+    });
+    shooterModal.addEventListener('click', (e) => {
+      if (e.target === shooterModal) shooterModal.classList.remove('open');
+    });
   </script>
 </body>
 </html>

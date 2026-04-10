@@ -1,131 +1,1222 @@
-<!DOCTYPE html>
-<html lang="no">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IPSC Admin</title>
+M
+      font-size: 14px;
+      vertical-align: top;
+    }
+    tr:hover { background: var(--bg3); }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-active {
+      background: rgba(76,175,125,.15);
+      color: var(--green);
+      border: 1px solid rgba(76,175,125,.3);
+    }
+    .badge-inactive {
+      background: rgba(224,82,82,.1);
+      color: var(--red);
+      border: 1px solid rgba(224,82,82,.2);
+    }
+    .badge-benchmark {
+      background: rgba(74,158,255,.12);
+      color: var(--blue);
+      border: 1px solid rgba(74,158,255,.25);
+    }
+    .badge-owner {
+      background: rgba(232,184,75,.12);
+      color: var(--accent);
+      border: 1px solid rgba(232,184,75,.25);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+    }
+    .modal.open { display: flex; }
+    .modal-content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      max-width: 980px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+    .loading { text-align: center; padding: 40px; color: var(--muted); }
+    .error {
+      background: rgba(224,82,82,.1);
+      border: 1px solid rgba(224,82,82,.2);
+      color: var(--red);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+    }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state h3 { font-size: 18px; margin-bottom: 8px; color: var(--sub); }
+    .muted { color: var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .nowrap { white-space: nowrap; }
+    #logoutBtn { margin-left: auto; }
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+    }
+    .subcard {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .subcard h3 {
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+    .participant-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .participant-item,
+    .search-result-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.02);
+    }
+    .participant-meta,
+    .search-result-meta {
+      min-width: 0;
+    }
+    .participant-name,
+    .search-result-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .participant-email,
+    .search-result-email {
+      color: var(--muted);
+      font-size: 13px;
+      word-break: break-all;
+    }
+    .toolbar-inline {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .toolbar-inline .form-input {
+      flex: 1;
+      min-width: 240px;
+    }
+    .helper {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
 
-<style>
-body {
-  font-family: Arial;
-  background:#111;
-  color:#fff;
-  padding:10px;
-}
+    @media (max-width: 1100px) {
+      .split-grid { grid-template-columns: 1fr; }
+    }
 
-h1 {color:gold;}
+    @media (max-width: 900px) {
+      .form-grid { grid-template-columns: 1fr; }
+      table, thead, tbody, tr, th, td { font-size: 13px; }
+      .toolbar-inline .form-input { min-width: 100%; }
+    }
 
-button {
-  padding:10px;
-  margin:5px;
-}
-
-.card {
-  background:#222;
-  padding:10px;
-  margin:10px 0;
-  border-radius:8px;
-}
-
-input {
-  padding:8px;
-  width:100%;
-  margin:5px 0;
-}
-</style>
+    .login-wrap { min-height: calc(100vh - 120px); display:flex; align-items:flex-start; justify-content:center; padding-top: 30px; }
+    .login-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; width: 100%; max-width: 360px; }
+    .login-card .modal-title { margin-bottom: 16px; }
+    @media (max-width: 900px) { .login-wrap { padding-top: 12px; } .login-card { max-width: 100%; padding: 18px; } }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <div class="header">
+      <h1>IPSC <span>INSIGHT</span> Admin</h1>
+      <p>Administrer invitasjonskoder, referanseskyttere og matchdeltakere</p>
+    </div>
 
-<h1>IPSC Admin</h1>
+    <div id="loginSection" class="login-wrap">
+      <div class="login-card">
+        <div class="modal-title">Admin Login</div>
+        <div id="loginError" class="error" style="display: none;"></div>
+        <div class="form-group">
+          <label class="form-label">E-post</label>
+          <input id="loginEmail" class="form-input" type="email" placeholder="admin@ipsc.no">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passord</label>
+          <input id="loginPassword" class="form-input" type="password" placeholder="Passord">
+        </div>
+        <button id="loginBtn" class="btn btn-primary" style="width: 100%;">Logg inn</button>
+      </div>
+    </div>
 
-<div id="login">
-  <input id="email" placeholder="E-post">
-  <input id="password" type="password" placeholder="Passord">
-  <button onclick="login()">Login</button>
-</div>
+    <div id="adminContent" style="display: none;">
+      <div class="tabs">
+        <button id="tabCodesBtn" class="tab-btn active" type="button">Invitasjonskoder</button>
+        <button id="tabShootersBtn" class="tab-btn" type="button">Referanseskyttere</button>
+        <button id="tabMatchesBtn" class="tab-btn" type="button">Matcher</button>
+      </div>
 
-<div id="app" style="display:none">
+      <div id="codesPanel" class="panel active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-label">Totalt koder</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statActive">0</div>
+            <div class="stat-label">Aktive koder</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statUsed">0</div>
+            <div class="stat-label">Totalt brukt</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statUsers">0</div>
+            <div class="stat-label">Totalt brukere</div>
+          </div>
+        </div>
 
-<h2>Brukere</h2>
-<div id="users"></div>
+        <div class="actions">
+          <button id="createCodeBtn" class="btn btn-primary">+ Ny kode</button>
+          <button id="refreshBtn" class="btn btn-secondary">↻ Oppdater</button>
+          <button id="logoutBtn" class="btn btn-secondary">Logg ut</button>
+        </div>
 
-<h2>Referanseskyttere</h2>
-<div id="shooters"></div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Status</th>
+                <th>Maks bruk</th>
+                <th>Brukt</th>
+                <th>Beskrivelse</th>
+                <th>Opprettet</th>
+                <th>Handlinger</th>
+              </tr>
+            </thead>
+            <tbody id="codesTable">
+              <tr><td colspan="7" class="loading">Laster...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-<h2>Matcher</h2>
-<div id="matches"></div>
+      <div id="shootersPanel" class="panel">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statShootersTotal">0</div>
+            <div class="stat-label">Referanseskyttere</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statShootersClassic">0</div>
+            <div class="stat-label">Classic</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statShootersMinor">0</div>
+            <div class="stat-label">Minor</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statBenchmarks">0</div>
+            <div class="stat-label">Benchmark-profiler</div>
+          </div>
+        </div>
 
-</div>
+        <div class="actions">
+          <button id="createShooterBtn" class="btn btn-primary">+ Ny referanseskytter</button>
+          <button id="refreshShootersBtn" class="btn btn-secondary">↻ Oppdater</button>
+        </div>
 
-<script type="module">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Navn</th>
+                <th>Divisjon</th>
+                <th>PF</th>
+                <th>Draw</th>
+                <th>Reload</th>
+                <th>Short HF</th>
+                <th>Medium HF</th>
+                <th>Long HF</th>
+                <th>Status</th>
+                <th>Handlinger</th>
+              </tr>
+            </thead>
+            <tbody id="shootersTable">
+              <tr><td colspan="11" class="loading">Laster...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      <div id="matchesPanel" class="panel">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statMatchesTotal">0</div>
+            <div class="stat-label">Matcher</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statMatchesParticipants">0</div>
+            <div class="stat-label">Deltakere totalt</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statMatchesUniqueUsers">0</div>
+            <div class="stat-label">Unike skyttere</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statMatchesOwners">0</div>
+            <div class="stat-label">Unike eiere</div>
+          </div>
+        </div>
 
-const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_ID"
-};
+        <div class="actions">
+          <button id="refreshMatchesBtn" class="btn btn-secondary">↻ Oppdater matcher</button>
+        </div>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th>Dato</th>
+                <th>Eier</th>
+                <th>Deltakere</th>
+                <th>Stager</th>
+                <th>Handlinger</th>
+              </tr>
+            </thead>
+            <tbody id="matchesTable">
+              <tr><td colspan="6" class="loading">Laster...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
-window.login = async () => {
-  await signInWithEmailAndPassword(
-    auth,
-    document.getElementById("email").value,
-    document.getElementById("password").value
-  );
+  <div id="createModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title">Opprett ny kode</div>
+      <div id="createError" class="error" style="display: none;"></div>
+      <div class="form-group">
+        <label class="form-label">Kode</label>
+        <input id="newCode" class="form-input" type="text" placeholder="IPSC2026" style="text-transform: uppercase;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Maks bruk (la stå tom for ubegrenset)</label>
+        <input id="newMaxUses" class="form-input" type="number" placeholder="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Beskrivelse (valgfri)</label>
+        <input id="newDescription" class="form-input" type="text" placeholder="For NOP medlemmer">
+      </div>
+      <div class="form-actions">
+        <button id="confirmCreateBtn" class="btn btn-primary">Opprett</button>
+        <button id="cancelCreateBtn" class="btn btn-secondary">Avbryt</button>
+      </div>
+    </div>
+  </div>
 
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
+  <div id="shooterModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="shooterModalTitle">Opprett referanseskytter</div>
+      <div id="shooterError" class="error" style="display: none;"></div>
 
-  loadUsers();
-  loadShooters();
-  loadMatches();
-};
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Dokument-ID</label>
+          <input id="shooterId" class="form-input mono" type="text" placeholder="shooter_003">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Navn</label>
+          <input id="shooterName" class="form-input" type="text" placeholder="Robert Cernigoj">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Divisjon</label>
+          <select id="shooterDivision" class="form-select">
+            <option value="Classic">Classic</option>
+            <option value="Standard">Standard</option>
+            <option value="Open">Open</option>
+            <option value="Production">Production</option>
+            <option value="Production Optics">Production Optics</option>
+            <option value="Revolver">Revolver</option>
+            <option value="Optics">Optics</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Power Factor</label>
+          <select id="shooterPowerFactor" class="form-select">
+            <option value="Minor">Minor</option>
+            <option value="Major">Major</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Draw time</label>
+          <input id="shooterDrawTime" class="form-input" type="number" step="0.01" placeholder="0.95">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reload time</label>
+          <input id="shooterReloadTime" class="form-input" type="number" step="0.01" placeholder="0.90">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short HF</label>
+          <input id="shooterShortHF" class="form-input" type="number" step="0.0001" placeholder="5.6062">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Medium HF</label>
+          <input id="shooterMediumHF" class="form-input" type="number" step="0.0001" placeholder="6.8997">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Long HF</label>
+          <input id="shooterLongHF" class="form-input" type="number" step="0.0001" placeholder="7.1971">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Benchmark-profil</label>
+          <select id="shooterBenchmark" class="form-select">
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </select>
+        </div>
+      </div>
 
-async function loadUsers() {
-  const snap = await getDocs(collection(db,"users"));
-  let html = "";
+      <div class="form-actions">
+        <button id="saveShooterBtn" class="btn btn-primary">Lagre</button>
+        <button id="cancelShooterBtn" class="btn btn-secondary">Avbryt</button>
+      </div>
+    </div>
+  </div>
 
-  snap.forEach(doc=>{
-    const u = doc.data();
-    html += `<div class="card">${u.email || doc.id}</div>`;
-  });
+  <div id="matchModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="matchModalTitle">Administrer match</div>
+      <div id="matchError" class="error" style="display: none;"></div>
+      <div class="split-grid">
+        <div>
+          <div class="subcard">
+            <h3>Matchinformasjon</h3>
+            <div id="matchInfoContent" class="muted">Laster...</div>
+          </div>
+          <div class="subcard">
+            <h3>Deltakere</h3>
+            <div id="participantList" class="participant-list"></div>
+            <div id="participantListEmpty" class="helper" style="display:none;">Ingen deltakere funnet.</div>
+          </div>
+        </div>
 
-  document.getElementById("users").innerHTML = html;
-}
+        <div>
+          <div class="subcard">
+            <h3>Legg til skytter</h3>
+            <div class="toolbar-inline">
+              <input id="matchUserSearch" class="form-input" type="text" placeholder="Søk etter navn eller e-post">
+              <button id="matchUserSearchBtn" class="btn btn-primary" type="button">Søk</button>
+            </div>
+            <div id="matchSearchResults"></div>
+            <div class="helper">Bare brukere som ikke allerede er i matchen vises som aktive valg.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="closeMatchModalBtn" class="btn btn-secondary">Lukk</button>
+      </div>
+    </div>
+  </div>
 
-async function loadShooters() {
-  const snap = await getDocs(collection(db,"referenceShooters"));
-  let html = "";
+  <script type="module">
+    import { auth, db } from './src/firebase.js';
+    import {
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import {
+      doc,
+      getDoc,
+      collection,
+      getDocs,
+      setDoc,
+      deleteDoc,
+      updateDoc
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import {
+      getFunctions,
+      httpsCallable
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
 
-  snap.forEach(doc=>{
-    const s = doc.data();
-    html += `<div class="card">${s.name}</div>`;
-  });
+    const functions = getFunctions();
+    let currentUser = null;
+    let currentTab = 'codes';
+    let editingShooterId = null;
+    let allUsers = [];
+    let allMatches = [];
+    let currentManagedMatchId = null;
 
-  document.getElementById("shooters").innerHTML = html;
-}
+    const loginSection = document.getElementById('loginSection');
+    const adminContent = document.getElementById('adminContent');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-async function loadMatches() {
-  const snap = await getDocs(collection(db,"matches"));
-  let html = "";
+    const tabCodesBtn = document.getElementById('tabCodesBtn');
+    const tabShootersBtn = document.getElementById('tabShootersBtn');
+    const tabMatchesBtn = document.getElementById('tabMatchesBtn');
+    const codesPanel = document.getElementById('codesPanel');
+    const shootersPanel = document.getElementById('shootersPanel');
+    const matchesPanel = document.getElementById('matchesPanel');
 
-  snap.forEach(doc=>{
-    const m = doc.data();
-    html += `<div class="card">${m.name}</div>`;
-  });
+    const createCodeBtn = document.getElementById('createCodeBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const createModal = document.getElementById('createModal');
+    const createError = document.getElementById('createError');
+    const confirmCreateBtn = document.getElementById('confirmCreateBtn');
+    const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+    const codesTable = document.getElementById('codesTable');
 
-  document.getElementById("matches").innerHTML = html;
-}
+    const createShooterBtn = document.getElementById('createShooterBtn');
+    const refreshShootersBtn = document.getElementById('refreshShootersBtn');
+    const shootersTable = document.getElementById('shootersTable');
+    const shooterModal = document.getElementById('shooterModal');
+    const shooterModalTitle = document.getElementById('shooterModalTitle');
+    const shooterError = document.getElementById('shooterError');
+    const saveShooterBtn = document.getElementById('saveShooterBtn');
+    const cancelShooterBtn = document.getElementById('cancelShooterBtn');
 
-</script>
+    const shooterIdInput = document.getElementById('shooterId');
+    const shooterNameInput = document.getElementById('shooterName');
+    const shooterDivisionInput = document.getElementById('shooterDivision');
+    const shooterPowerFactorInput = document.getElementById('shooterPowerFactor');
+    const shooterDrawTimeInput = document.getElementById('shooterDrawTime');
+    const shooterReloadTimeInput = document.getElementById('shooterReloadTime');
+    const shooterShortHFInput = document.getElementById('shooterShortHF');
+    const shooterMediumHFInput = document.getElementById('shooterMediumHF');
+    const shooterLongHFInput = document.getElementById('shooterLongHF');
+    const shooterBenchmarkInput = document.getElementById('shooterBenchmark');
 
+    const refreshMatchesBtn = document.getElementById('refreshMatchesBtn');
+    const matchesTable = document.getElementById('matchesTable');
+    const matchModal = document.getElementById('matchModal');
+    const matchModalTitle = document.getElementById('matchModalTitle');
+    const matchError = document.getElementById('matchError');
+    const matchInfoContent = document.getElementById('matchInfoContent');
+    const participantList = document.getElementById('participantList');
+    const participantListEmpty = document.getElementById('participantListEmpty');
+    const matchUserSearch = document.getElementById('matchUserSearch');
+    const matchUserSearchBtn = document.getElementById('matchUserSearchBtn');
+    const matchSearchResults = document.getElementById('matchSearchResults');
+    const closeMatchModalBtn = document.getElementById('closeMatchModalBtn');
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const adminDoc = await getDoc(doc(db, 'adminUsers', user.email));
+          if (adminDoc.exists()) {
+            currentUser = user;
+            loginSection.style.display = 'none';
+            adminContent.style.display = 'block';
+            await bootstrapAdmin();
+          } else {
+            alert('Du har ikke admin-tilgang');
+            await signOut(auth);
+          }
+        } catch (error) {
+          alert('Feil ved sjekk av admin-tilgang: ' + error.message);
+          await signOut(auth);
+        }
+      } else {
+        currentUser = null;
+        loginSection.style.display = 'flex';
+        adminContent.style.display = 'none';
+      }
+    });
+
+    async function bootstrapAdmin() {
+      await loadUsers();
+      await Promise.all([loadCodes(), loadReferenceShooters(), loadMatches()]);
+    }
+
+    async function loadUsers() {
+      const snap = await getDocs(collection(db, 'users'));
+      const users = [];
+      snap.forEach(docSnap => users.push({ id: docSnap.id, ...docSnap.data() }));
+      allUsers = users;
+      window.__userMap = new Map(users.map(user => [user.id, user]));
+    }
+
+    loginBtn.onclick = async () => {
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
+      if (!email || !password) {
+        showError(loginError, 'Fyll ut alle feltene');
+        return;
+      }
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        showError(loginError, 'Innlogging feilet: ' + error.message);
+      }
+    };
+
+    logoutBtn.onclick = async () => { await signOut(auth); };
+
+    tabCodesBtn.onclick = () => setTab('codes');
+    tabShootersBtn.onclick = () => setTab('shooters');
+    tabMatchesBtn.onclick = () => setTab('matches');
+
+    function setTab(tab) {
+      currentTab = tab;
+      tabCodesBtn.classList.toggle('active', tab === 'codes');
+      tabShootersBtn.classList.toggle('active', tab === 'shooters');
+      tabMatchesBtn.classList.toggle('active', tab === 'matches');
+      codesPanel.classList.toggle('active', tab === 'codes');
+      shootersPanel.classList.toggle('active', tab === 'shooters');
+      matchesPanel.classList.toggle('active', tab === 'matches');
+    }
+
+    async function loadCodes() {
+      try {
+        const listCodes = httpsCallable(functions, 'listInviteCodes');
+        const result = await listCodes();
+        const codes = result.data.codes || [];
+
+        const totalCodes = codes.length;
+        const activeCodes = codes.filter(c => c.active).length;
+        const totalUsed = codes.reduce((sum, c) => sum + (c.usedCount || 0), 0);
+        const uniqueUsers = new Set();
+        codes.forEach(c => {
+          if (Array.isArray(c.usedBy)) c.usedBy.forEach(u => uniqueUsers.add(u));
+        });
+
+        document.getElementById('statTotal').textContent = totalCodes;
+        document.getElementById('statActive').textContent = activeCodes;
+        document.getElementById('statUsed').textContent = totalUsed;
+        document.getElementById('statUsers').textContent = uniqueUsers.size;
+
+        if (codes.length === 0) {
+          codesTable.innerHTML = `
+            <tr>
+              <td colspan="7" class="empty-state">
+                <h3>Ingen koder ennå</h3>
+                <p>Klikk "Ny kode" for å opprette din første invitasjonskode</p>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        codesTable.innerHTML = codes.map(code => `
+          <tr>
+            <td><strong>${escapeHtml(code.code)}</strong></td>
+            <td>
+              <span class="badge ${code.active ? 'badge-active' : 'badge-inactive'}">
+                ${code.active ? 'Aktiv' : 'Inaktiv'}
+              </span>
+            </td>
+            <td>${code.maxUses || '∞'}</td>
+            <td>${code.usedCount || 0}</td>
+            <td>${escapeHtml(code.description || '—')}</td>
+            <td>${formatDate(code.createdAt)}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-sm btn-secondary" onclick="toggleCode('${escapeAttr(code.code)}', ${!code.active})">
+                  ${code.active ? 'Deaktiver' : 'Aktiver'}
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCode('${escapeAttr(code.code)}')">
+                  Slett
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading codes:', error);
+        codesTable.innerHTML = `
+          <tr>
+            <td colspan="7" class="error">Feil ved lasting av koder: ${escapeHtml(error.message)}</td>
+          </tr>
+        `;
+      }
+    }
+
+    createCodeBtn.onclick = () => {
+      createModal.classList.add('open');
+      createError.style.display = 'none';
+      document.getElementById('newCode').value = '';
+      document.getElementById('newMaxUses').value = '';
+      document.getElementById('newDescription').value = '';
+    };
+
+    cancelCreateBtn.onclick = () => createModal.classList.remove('open');
+
+    confirmCreateBtn.onclick = async () => {
+      const code = document.getElementById('newCode').value.trim().toUpperCase();
+      const maxUses = document.getElementById('newMaxUses').value;
+      const description = document.getElementById('newDescription').value.trim();
+
+      if (!code) {
+        showError(createError, 'Kode er påkrevd');
+        return;
+      }
+
+      try {
+        const createCode = httpsCallable(functions, 'createInviteCode');
+        await createCode({
+          code,
+          maxUses: maxUses ? parseInt(maxUses, 10) : null,
+          description
+        });
+        createModal.classList.remove('open');
+        await loadCodes();
+      } catch (error) {
+        showError(createError, error.message);
+      }
+    };
+
+    window.toggleCode = async (code, active) => {
+      try {
+        const toggleCode = httpsCallable(functions, 'toggleInviteCode');
+        await toggleCode({ code, active });
+        await loadCodes();
+      } catch (error) {
+        alert('Feil: ' + error.message);
+      }
+    };
+
+    window.deleteCode = async (code) => {
+      if (!confirm(`Er du sikker på at du vil slette koden "${code}"?`)) return;
+      try {
+        const deleteCode = httpsCallable(functions, 'deleteInviteCode');
+        await deleteCode({ code });
+        await loadCodes();
+      } catch (error) {
+        alert('Feil: ' + error.message);
+      }
+    };
+
+    refreshBtn.onclick = loadCodes;
+
+    async function loadReferenceShooters() {
+      try {
+        const snap = await getDocs(collection(db, 'referenceShooters'));
+        const shooters = [];
+        snap.forEach(docSnap => shooters.push({ id: docSnap.id, ...docSnap.data() }));
+        shooters.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'no'));
+
+        document.getElementById('statShootersTotal').textContent = shooters.length;
+        document.getElementById('statShootersClassic').textContent = shooters.filter(s => (s.division || '') === 'Classic').length;
+        document.getElementById('statShootersMinor').textContent = shooters.filter(s => String(s.powerFactor || '').toLowerCase() === 'minor').length;
+        document.getElementById('statBenchmarks').textContent = shooters.filter(s => !!s.isBenchmark).length;
+
+        if (shooters.length === 0) {
+          shootersTable.innerHTML = `
+            <tr>
+              <td colspan="11" class="empty-state">
+                <h3>Ingen referanseskyttere ennå</h3>
+                <p>Klikk "Ny referanseskytter" for å opprette første profil</p>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        shootersTable.innerHTML = shooters.map(shooter => `
+          <tr>
+            <td class="mono nowrap">${escapeHtml(shooter.id)}</td>
+            <td><strong>${escapeHtml(shooter.name || '—')}</strong></td>
+            <td>${escapeHtml(shooter.division || '—')}</td>
+            <td>${escapeHtml(shooter.powerFactor || '—')}</td>
+            <td>${formatNumber(shooter.drawTime, 2)}</td>
+            <td>${formatNumber(shooter.reloadTime, 2)}</td>
+            <td>${formatNumber(shooter.shortHF, 4)}</td>
+            <td>${formatNumber(shooter.mediumHF, 4)}</td>
+            <td>${formatNumber(shooter.longHF, 4)}</td>
+            <td><span class="badge badge-benchmark">${shooter.isBenchmark ? 'Benchmark' : 'Profil'}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-sm btn-secondary" onclick="editReferenceShooter('${escapeAttr(shooter.id)}')">Rediger</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteReferenceShooter('${escapeAttr(shooter.id)}')">Slett</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        window.__referenceShooters = shooters;
+      } catch (error) {
+        console.error('Error loading reference shooters:', error);
+        shootersTable.innerHTML = `
+          <tr>
+            <td colspan="11" class="error">Feil ved lasting av referanseskyttere: ${escapeHtml(error.message)}</td>
+          </tr>
+        `;
+      }
+    }
+
+    function openShooterModal(mode, shooter = null) {
+      shooterError.style.display = 'none';
+      if (mode === 'create') {
+        editingShooterId = null;
+        shooterModalTitle.textContent = 'Opprett referanseskytter';
+        shooterIdInput.disabled = false;
+        shooterIdInput.value = suggestNextShooterId();
+        shooterNameInput.value = '';
+        shooterDivisionInput.value = 'Classic';
+        shooterPowerFactorInput.value = 'Minor';
+        shooterDrawTimeInput.value = '';
+        shooterReloadTimeInput.value = '';
+        shooterShortHFInput.value = '';
+        shooterMediumHFInput.value = '';
+        shooterLongHFInput.value = '';
+        shooterBenchmarkInput.value = 'true';
+      } else {
+        editingShooterId = shooter.id;
+        shooterModalTitle.textContent = 'Rediger referanseskytter';
+        shooterIdInput.disabled = true;
+        shooterIdInput.value = shooter.id || '';
+        shooterNameInput.value = shooter.name || '';
+        shooterDivisionInput.value = shooter.division || 'Classic';
+        shooterPowerFactorInput.value = shooter.powerFactor || 'Minor';
+        shooterDrawTimeInput.value = shooter.drawTime ?? '';
+        shooterReloadTimeInput.value = shooter.reloadTime ?? '';
+        shooterShortHFInput.value = shooter.shortHF ?? '';
+        shooterMediumHFInput.value = shooter.mediumHF ?? '';
+        shooterLongHFInput.value = shooter.longHF ?? '';
+        shooterBenchmarkInput.value = String(!!shooter.isBenchmark);
+      }
+      shooterModal.classList.add('open');
+    }
+
+    createShooterBtn.onclick = () => openShooterModal('create');
+    cancelShooterBtn.onclick = () => shooterModal.classList.remove('open');
+    refreshShootersBtn.onclick = loadReferenceShooters;
+
+    saveShooterBtn.onclick = async () => {
+      const shooterId = shooterIdInput.value.trim();
+      const payload = {
+        name: shooterNameInput.value.trim(),
+        division: shooterDivisionInput.value.trim(),
+        powerFactor: shooterPowerFactorInput.value.trim(),
+        drawTime: parseOptionalNumber(shooterDrawTimeInput.value),
+        reloadTime: parseOptionalNumber(shooterReloadTimeInput.value),
+        shortHF: parseOptionalNumber(shooterShortHFInput.value),
+        mediumHF: parseOptionalNumber(shooterMediumHFInput.value),
+        longHF: parseOptionalNumber(shooterLongHFInput.value),
+        isBenchmark: shooterBenchmarkInput.value === 'true'
+      };
+
+      if (!shooterId) {
+        showError(shooterError, 'Dokument-ID er påkrevd');
+        return;
+      }
+      if (!payload.name) {
+        showError(shooterError, 'Navn er påkrevd');
+        return;
+      }
+      if (payload.shortHF == null || payload.mediumHF == null || payload.longHF == null) {
+        showError(shooterError, 'Short HF, Medium HF og Long HF må fylles ut');
+        return;
+      }
+      if (payload.drawTime == null || payload.reloadTime == null) {
+        showError(shooterError, 'Draw time og Reload time må fylles ut');
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, 'referenceShooters', shooterId), payload, { merge: true });
+        shooterModal.classList.remove('open');
+        await loadReferenceShooters();
+      } catch (error) {
+        showError(shooterError, 'Kunne ikke lagre referanseskytter: ' + error.message);
+      }
+    };
+
+    window.editReferenceShooter = (id) => {
+      const shooters = Array.isArray(window.__referenceShooters) ? window.__referenceShooters : [];
+      const shooter = shooters.find(s => s.id === id);
+      if (!shooter) {
+        alert('Fant ikke referanseskytter');
+        return;
+      }
+      openShooterModal('edit', shooter);
+    };
+
+    window.deleteReferenceShooter = async (id) => {
+      if (!confirm(`Er du sikker på at du vil slette referanseskytter "${id}"?`)) return;
+      try {
+        await deleteDoc(doc(db, 'referenceShooters', id));
+        await loadReferenceShooters();
+      } catch (error) {
+        alert('Feil ved sletting: ' + error.message);
+      }
+    };
+
+    async function loadMatches() {
+      try {
+        const snap = await getDocs(collection(db, 'matches'));
+        const matches = [];
+        snap.forEach(docSnap => matches.push({ id: docSnap.id, ...docSnap.data() }));
+        matches.sort((a, b) => {
+          const da = new Date(a.date || 0).getTime();
+          const dbv = new Date(b.date || 0).getTime();
+          return dbv - da;
+        });
+        allMatches = matches;
+        window.__matches = matches;
+
+        const totalParticipants = matches.reduce((sum, match) => sum + (Array.isArray(match.participants) ? match.participants.length : 0), 0);
+        const uniqueParticipants = new Set();
+        const uniqueOwners = new Set();
+        matches.forEach(match => {
+          if (match.ownerId) uniqueOwners.add(match.ownerId);
+          (match.participants || []).forEach(id => uniqueParticipants.add(id));
+        });
+
+        document.getElementById('statMatchesTotal').textContent = matches.length;
+        document.getElementById('statMatchesParticipants').textContent = totalParticipants;
+        document.getElementById('statMatchesUniqueUsers').textContent = uniqueParticipants.size;
+        document.getElementById('statMatchesOwners').textContent = uniqueOwners.size;
+
+        if (matches.length === 0) {
+          matchesTable.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                <h3>Ingen matcher funnet</h3>
+                <p>Når brukere oppretter matcher, vises de her.</p>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        matchesTable.innerHTML = matches.map(match => {
+          const owner = getUserById(match.ownerId);
+          const participants = Array.isArray(match.participants) ? match.participants.length : 0;
+          const stages = Array.isArray(match.stages) ? match.stages.length : 0;
+          return `
+            <tr>
+              <td><strong>${escapeHtml(match.name || 'Uten navn')}</strong><div class="muted mono">${escapeHtml(match.id)}</div></td>
+              <td>${formatDateOnly(match.date)}</td>
+              <td>${escapeHtml(getUserDisplayName(owner))}</td>
+              <td>${participants}</td>
+              <td>${stages}</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-sm btn-blue" onclick="openManageMatch('${escapeAttr(match.id)}')">Administrer</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (error) {
+        console.error('Error loading matches:', error);
+        matchesTable.innerHTML = `
+          <tr>
+            <td colspan="6" class="error">Feil ved lasting av matcher: ${escapeHtml(error.message)}</td>
+          </tr>
+        `;
+      }
+    }
+
+    refreshMatchesBtn.onclick = async () => {
+      await loadUsers();
+      await loadMatches();
+    };
+
+    window.openManageMatch = async (id) => {
+      currentManagedMatchId = id;
+      matchError.style.display = 'none';
+      matchUserSearch.value = '';
+      matchSearchResults.innerHTML = '';
+      await renderManagedMatch();
+      matchModal.classList.add('open');
+    };
+
+    closeMatchModalBtn.onclick = () => matchModal.classList.remove('open');
+
+    async function renderManagedMatch() {
+      const match = allMatches.find(item => item.id === currentManagedMatchId);
+      if (!match) {
+        matchInfoContent.textContent = 'Fant ikke match.';
+        participantList.innerHTML = '';
+        participantListEmpty.style.display = 'block';
+        return;
+      }
+
+      const owner = getUserById(match.ownerId);
+      matchModalTitle.textContent = `Administrer match: ${match.name || currentManagedMatchId}`;
+      matchInfoContent.innerHTML = `
+        <div><strong>Navn:</strong> ${escapeHtml(match.name || 'Uten navn')}</div>
+        <div><strong>Dato:</strong> ${escapeHtml(formatDateOnly(match.date))}</div>
+        <div><strong>Eier:</strong> ${escapeHtml(getUserDisplayName(owner))}</div>
+        <div><strong>Match ID:</strong> <span class="mono">${escapeHtml(String(match.id))}</span></div>
+        <div><strong>Antall deltakere:</strong> ${(match.participants || []).length}</div>
+      `;
+
+      const participantIds = Array.isArray(match.participants) ? match.participants : [];
+      if (participantIds.length === 0) {
+        participantList.innerHTML = '';
+        participantListEmpty.style.display = 'block';
+      } else {
+        participantListEmpty.style.display = 'none';
+        participantList.innerHTML = participantIds.map(userId => {
+          const user = getUserById(userId);
+          const isOwner = userId === match.ownerId;
+          return `
+            <div class="participant-item">
+              <div class="participant-meta">
+                <div class="participant-name">${escapeHtml(getUserDisplayName(user))} ${isOwner ? '<span class="badge badge-owner">Eier</span>' : ''}</div>
+                <div class="participant-email">${escapeHtml(user?.email || userId)}</div>
+              </div>
+              <div class="action-btns">
+                <button class="btn btn-sm btn-danger" ${isOwner ? 'disabled' : ''} onclick="removeMatchParticipant('${escapeAttr(match.id)}','${escapeAttr(userId)}')">
+                  ${isOwner ? 'Kan ikke fjernes' : 'Fjern'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    matchUserSearchBtn.onclick = renderMatchSearchResults;
+    matchUserSearch.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        renderMatchSearchResults();
+      }
+    });
+
+    function renderMatchSearchResults() {
+      const query = matchUserSearch.value.trim().toLowerCase();
+      const match = allMatches.find(item => item.id === currentManagedMatchId);
+      if (!match) return;
+      const participantSet = new Set(match.participants || []);
+
+      const filtered = allUsers
+        .filter(user => {
+          const haystack = `${user.email || ''} ${user.firstName || ''} ${user.lastName || ''} ${user.name || ''}`.toLowerCase();
+          return !query || haystack.includes(query);
+        })
+        .slice(0, 30);
+
+      if (filtered.length === 0) {
+        matchSearchResults.innerHTML = '<div class="helper">Ingen brukere funnet.</div>';
+        return;
+      }
+
+      matchSearchResults.innerHTML = filtered.map(user => {
+        const inMatch = participantSet.has(user.id);
+        return `
+          <div class="search-result-item">
+            <div class="search-result-meta">
+              <div class="search-result-name">${escapeHtml(getUserDisplayName(user))}</div>
+              <div class="search-result-email">${escapeHtml(user.email || user.id)}</div>
+            </div>
+            <div class="action-btns">
+              <button class="btn btn-sm ${inMatch ? 'btn-secondary' : 'btn-primary'}" ${inMatch ? 'disabled' : ''} onclick="addMatchParticipant('${escapeAttr(match.id)}','${escapeAttr(user.id)}')">
+                ${inMatch ? 'Allerede i matchen' : 'Legg til'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.addMatchParticipant = async (matchId, userId) => {
+      try {
+        const match = allMatches.find(item => item.id === matchId);
+        if (!match) throw new Error('Fant ikke match');
+        const participants = Array.isArray(match.participants) ? [...match.participants] : [];
+        if (participants.includes(userId)) return;
+        participants.push(userId);
+        if (match.ownerId && !participants.includes(match.ownerId)) participants.push(match.ownerId);
+
+        await updateDoc(doc(db, 'matches', matchId), {
+          participants,
+          updatedAt: new Date().toISOString()
+        });
+
+        await loadMatches();
+        await renderManagedMatch();
+        renderMatchSearchResults();
+      } catch (error) {
+        showError(matchError, 'Kunne ikke legge til deltaker: ' + error.message);
+      }
+    };
+
+    window.removeMatchParticipant = async (matchId, userId) => {
+      try {
+        const match = allMatches.find(item => item.id === matchId);
+        if (!match) throw new Error('Fant ikke match');
+        if (match.ownerId === userId) {
+          showError(matchError, 'Eier kan ikke fjernes fra matchen');
+          return;
+        }
+        const participants = (Array.isArray(match.participants) ? match.participants : []).filter(id => id !== userId);
+        if (match.ownerId && !participants.includes(match.ownerId)) participants.push(match.ownerId);
+
+        await updateDoc(doc(db, 'matches', matchId), {
+          participants,
+          updatedAt: new Date().toISOString()
+        });
+
+        await loadMatches();
+        await renderManagedMatch();
+        renderMatchSearchResults();
+      } catch (error) {
+        showError(matchError, 'Kunne ikke fjerne deltaker: ' + error.message);
+      }
+    };
+
+    function suggestNextShooterId() {
+      const shooters = Array.isArray(window.__referenceShooters) ? window.__referenceShooters : [];
+      let max = 0;
+      for (const shooter of shooters) {
+        const match = String(shooter.id || '').match(/^shooter_(\d+)$/i);
+        if (match) max = Math.max(max, parseInt(match[1], 10));
+      }
+      return `shooter_${String(max + 1).padStart(3, '0')}`;
+    }
+
+    function parseOptionalNumber(value) {
+      const trimmed = String(value ?? '').trim();
+      if (!trimmed) return null;
+      const num = Number(trimmed.replace(',', '.'));
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function formatNumber(value, decimals = 2) {
+      return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(decimals) : '—';
+    }
+
+    function getUserById(id) {
+      return window.__userMap?.get(id) || null;
+    }
+
+    function getUserDisplayName(user) {
+      if (!user) return 'Ukjent bruker';
+      const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      return fullName || user.name || user.email || user.id || 'Ukjent bruker';
+    }
+
+    function showError(element, message) {
+      element.textContent = message;
+      element.style.display = 'block';
+      setTimeout(() => { element.style.display = 'none'; }, 5000);
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '—';
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return '—';
+      return date.toLocaleDateString('no-NO', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function formatDateOnly(dateString) {
+      if (!dateString) return '—';
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return '—';
+      return date.toLocaleDateString('no-NO', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function escapeAttr(value) {
+      return String(value ?? '').replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+    }
+
+    createModal.addEventListener('click', (e) => {
+      if (e.target === createModal) createModal.classList.remove('open');
+    });
+    shooterModal.addEventListener('click', (e) => {
+      if (e.target === shooterModal) shooterModal.classList.remove('open');
+    });
+    matchModal.addEventListener('click', (e) => {
+      if (e.target === matchModal) matchModal.classList.remove('open');
+    });
+  </script>
 </body>
 </html>

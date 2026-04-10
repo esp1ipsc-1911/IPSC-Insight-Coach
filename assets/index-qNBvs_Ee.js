@@ -927,7 +927,14 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </div>
  <div class="field-group">
  <div class="field-label">${d("division")}</div>
- <select class="field-select" id="new-shooter-division"></select>
+ <select class="field-select" id="new-shooter-division">
+ <option value="Standard">Standard</option>
+ <option value="Open">Open</option>
+ <option value="Production">Production</option>
+ <option value="Production Optics">Production Optics</option>
+ <option value="Classic">Classic</option>
+ <option value="Revolver">Revolver</option>
+ </select>
  </div>
  <div class="field-group">
  <div class="field-label">${d("power_factor")}</div>

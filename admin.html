@@ -29,20 +29,21 @@
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-      padding: 20px;
+      padding: 16px;
       min-height: 100vh;
     }
 
-    .container { max-width: 1380px; margin: 0 auto; }
-    .header { margin-bottom: 28px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    .header { margin-bottom: 24px; }
     .header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
     .header h1 span { color: var(--accent); }
-    .header p { color: var(--muted); font-size: 14px; }
+    .header p { color: var(--muted); font-size: 14px; line-height: 1.4; }
 
     .tabs {
       display: flex;
       gap: 10px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
     }
 
@@ -55,6 +56,7 @@
       cursor: pointer;
       font-size: 14px;
       font-weight: 600;
+      min-height: 44px;
     }
 
     .tab-btn.active {
@@ -69,19 +71,19 @@
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 14px;
+      margin-bottom: 20px;
     }
 
     .stat-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 18px;
     }
 
     .stat-value {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 700;
       color: var(--accent);
       margin-bottom: 8px;
@@ -97,23 +99,30 @@
     .actions {
       display: flex;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
       align-items: center;
     }
 
     .btn {
-      padding: 12px 20px;
+      padding: 12px 18px;
       border-radius: var(--radius-sm);
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       border: none;
       transition: all 0.2s;
+      min-height: 44px;
     }
 
-    .btn-primary { background: var(--accent); color: var(--bg); }
-    .btn-primary:hover { background: var(--accent2); }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent2);
+    }
 
     .btn-secondary {
       background: var(--bg3);
@@ -121,19 +130,24 @@
       border: 1px solid var(--border);
     }
 
-    .btn-secondary:hover { background: var(--card); }
+    .btn-secondary:hover {
+      background: var(--card);
+    }
 
     .btn-danger {
       background: var(--red);
       color: white;
     }
 
-    .btn-danger:hover { filter: brightness(1.05); }
+    .btn-danger:hover {
+      filter: brightness(1.05);
+    }
 
     .btn-sm {
-      padding: 6px 12px;
+      padding: 8px 12px;
       font-size: 12px;
       border-radius: 6px;
+      min-height: 36px;
     }
 
     .table-container {
@@ -144,8 +158,14 @@
       overflow-x: auto;
     }
 
-    table { width: 100%; border-collapse: collapse; }
-    thead { background: var(--bg3); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: var(--bg3);
+    }
 
     th {
       padding: 14px 16px;
@@ -165,7 +185,9 @@
       vertical-align: top;
     }
 
-    tr:hover { background: var(--bg3); }
+    tr:hover {
+      background: var(--bg3);
+    }
 
     .badge {
       display: inline-block;
@@ -194,7 +216,7 @@
       border: 1px solid rgba(74,158,255,.25);
     }
 
-    .badge-owner {
+    .badge-admin {
       background: rgba(232,184,75,.14);
       color: var(--accent);
       border: 1px solid rgba(232,184,75,.3);
@@ -206,16 +228,6 @@
       border: 1px solid rgba(74,158,255,.25);
     }
 
-    .badge-role {
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .muted { color: var(--muted); }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .nowrap { white-space: nowrap; }
-
     .modal {
       display: none;
       position: fixed;
@@ -224,7 +236,7 @@
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      padding: 24px;
+      padding: 16px;
     }
 
     .modal.open { display: flex; }
@@ -233,17 +245,19 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px;
-      max-width: 1080px;
+      padding: 24px;
+      max-width: 1020px;
       width: 100%;
-      max-height: 90vh;
+      max-height: 92vh;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .modal-title {
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 10px;
+      line-height: 1.2;
     }
 
     .modal-subtitle {
@@ -259,13 +273,21 @@
       gap: 16px;
     }
 
-    .form-grid-3 {
+    .split-2 {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
 
-    .form-group { margin-bottom: 18px; }
+    .split-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
 
     .form-label {
       display: block;
@@ -283,9 +305,10 @@
       background: var(--bg3);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 12px 16px;
+      padding: 12px 14px;
       color: var(--text);
       font-size: 14px;
+      min-height: 44px;
     }
 
     .form-textarea {
@@ -303,8 +326,20 @@
     .form-actions {
       display: flex;
       gap: 12px;
-      margin-top: 24px;
+      margin-top: 20px;
       flex-wrap: wrap;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
     }
 
     .error {
@@ -327,15 +362,9 @@
       white-space: pre-wrap;
     }
 
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: var(--muted);
-    }
-
     .empty-state {
       text-align: center;
-      padding: 40px 20px;
+      padding: 36px 20px;
       color: var(--muted);
     }
 
@@ -345,109 +374,193 @@
       color: var(--sub);
     }
 
-    .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 20px;
-    }
-
-    .card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 16px;
-    }
+    .muted { color: var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .nowrap { white-space: nowrap; }
+    #logoutBtn { margin-left: auto; }
 
     .section-title {
       font-size: 16px;
       font-weight: 700;
-      margin: 0 0 12px;
+      margin: 22px 0 12px;
       color: var(--text);
     }
 
-    .helper {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.45;
-      margin-top: 6px;
-    }
-
-    .user-row,
-    .person-row,
-    .stage-row {
+    .participant-card,
+    .user-search-item {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
       padding: 12px 14px;
       background: var(--bg3);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
       margin-bottom: 10px;
     }
 
-    .user-meta,
-    .person-meta,
-    .stage-meta {
+    .participant-meta,
+    .user-search-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       min-width: 0;
       flex: 1;
     }
 
-    .user-name,
-    .person-name,
-    .stage-name {
+    .participant-name,
+    .user-search-name {
       font-weight: 600;
       color: var(--text);
       overflow-wrap: anywhere;
     }
 
-    .user-sub,
-    .person-sub,
-    .stage-sub {
+    .participant-sub,
+    .user-search-sub {
       font-size: 12px;
       color: var(--muted);
-      margin-top: 4px;
       overflow-wrap: anywhere;
     }
 
-    .inline-summary {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .summary-pill {
-      padding: 6px 10px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 12px;
-      color: var(--text);
-    }
-
-    .grid-stages {
-      display: grid;
-      gap: 10px;
-    }
-
-    .small-note {
+    .inline-note {
       font-size: 12px;
       color: var(--muted);
-      margin-top: 4px;
+      margin-top: 6px;
+      line-height: 1.4;
     }
 
-    @media (max-width: 980px) {
-      .form-grid,
-      .form-grid-3,
-      .two-col {
-        grid-template-columns: 1fr;
+    .stage-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .stage-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+
+    .stage-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stage-card-title {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    /* Mobilvennlige tabeller */
+    @media (max-width: 820px) {
+      body {
+        padding: 12px;
+      }
+
+      .header h1 {
+        font-size: 26px;
       }
 
       .modal-content {
-        padding: 20px;
+        padding: 18px;
+        max-height: 94vh;
+      }
+
+      .form-grid,
+      .split-2,
+      .split-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        gap: 10px;
+      }
+
+      .actions .form-input {
+        width: 100%;
+      }
+
+      .table-container {
+        overflow: visible;
+        background: transparent;
+        border: none;
+      }
+
+      .table-container table,
+      .table-container thead,
+      .table-container tbody,
+      .table-container th,
+      .table-container tr,
+      .table-container td {
+        display: block;
+        width: 100%;
+      }
+
+      .table-container thead {
+        display: none;
+      }
+
+      .table-container tbody {
+        display: grid;
+        gap: 12px;
+      }
+
+      .table-container tr {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .table-container td {
+        border-top: 1px solid var(--border);
+        padding: 10px 14px;
+        text-align: left;
+        position: relative;
+      }
+
+      .table-container td:first-child {
+        border-top: none;
+      }
+
+      .table-container td::before {
+        content: attr(data-label);
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 4px;
+      }
+
+      #logoutBtn {
+        margin-left: 0;
+      }
+
+      .btn,
+      .tab-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .action-btns {
+        width: 100%;
+      }
+
+      .action-btns .btn {
+        flex: 1 1 auto;
+      }
+
+      .participant-card,
+      .user-search-item {
+        flex-direction: column;
+        align-items: stretch;
       }
     }
   </style>
@@ -456,11 +569,11 @@
   <div class="container">
     <div class="header">
       <h1>IPSC <span>INSIGHT</span> Admin</h1>
-      <p>Administrer invitasjonskoder, referanseskyttere, brukere, roller og matcher</p>
+      <p>Administrer invitasjonskoder, roller, referanseskyttere og matcher</p>
     </div>
 
     <div id="loginSection">
-      <div class="modal-content" style="margin: 100px auto; max-width: 460px;">
+      <div class="modal-content" style="margin: 60px auto; max-width: 520px;">
         <div class="modal-title">Admin Login</div>
         <div id="loginError" class="error" style="display:none;"></div>
         <div class="form-group">
@@ -478,9 +591,9 @@
     <div id="adminContent" style="display:none;">
       <div class="tabs">
         <button id="tabCodesBtn" class="tab-btn active" type="button">Invitasjonskoder</button>
+        <button id="tabRolesBtn" class="tab-btn" type="button">Roller</button>
         <button id="tabShootersBtn" class="tab-btn" type="button">Referanseskyttere</button>
         <button id="tabMatchesBtn" class="tab-btn" type="button">Matcher</button>
-        <button id="tabUsersBtn" class="tab-btn" type="button">Brukere og roller</button>
       </div>
 
       <div id="codesPanel" class="panel active">
@@ -523,7 +636,45 @@
               </tr>
             </thead>
             <tbody id="codesTable">
-              <tr><td colspan="7" class="loading">Laster...</td></tr>
+              <tr><td data-label="Status" colspan="7" class="loading">Laster...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="rolesPanel" class="panel">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statRolesTotal">0</div>
+            <div class="stat-label">Totalt roller</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statAdminsTotal">0</div>
+            <div class="stat-label">Admins</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statDirectorsTotal">0</div>
+            <div class="stat-label">Match directors</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="createRoleBtn" class="btn btn-primary">+ Ny rolle</button>
+          <button id="refreshRolesBtn" class="btn btn-secondary">↻ Oppdater</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>E-post</th>
+                <th>Navn</th>
+                <th>Rolle</th>
+                <th>Handlinger</th>
+              </tr>
+            </thead>
+            <tbody id="rolesTable">
+              <tr><td data-label="Status" colspan="4" class="loading">Laster...</td></tr>
             </tbody>
           </table>
         </div>
@@ -572,7 +723,7 @@
               </tr>
             </thead>
             <tbody id="shootersTable">
-              <tr><td colspan="11" class="loading">Laster...</td></tr>
+              <tr><td data-label="Status" colspan="11" class="loading">Laster...</td></tr>
             </tbody>
           </table>
         </div>
@@ -594,7 +745,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-value" id="statParticipantsTotal">0</div>
-            <div class="stat-label">Deltakelser</div>
+            <div class="stat-label">Totalt deltakere</div>
           </div>
         </div>
 
@@ -617,53 +768,7 @@
               </tr>
             </thead>
             <tbody id="matchesTable">
-              <tr><td colspan="8" class="loading">Laster...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="usersPanel" class="panel">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value" id="statUsersTotalPanel">0</div>
-            <div class="stat-label">Brukere</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="statUsersAdmins">0</div>
-            <div class="stat-label">Admin-brukere</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="statUsersMatchDirectors">0</div>
-            <div class="stat-label">Match directors</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="statUsersClassic">0</div>
-            <div class="stat-label">Classic</div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <input id="usersSearchInput" class="form-input" type="text" placeholder="Søk etter navn eller e-post" style="max-width:360px;">
-          <button id="searchUsersBtn" class="btn btn-primary">Søk</button>
-          <button id="refreshUsersBtn" class="btn btn-secondary">↻ Oppdater</button>
-        </div>
-
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>UID</th>
-                <th>Navn</th>
-                <th>E-post</th>
-                <th>Divisjon</th>
-                <th>Klubb</th>
-                <th>Rolle</th>
-                <th>Handlinger</th>
-              </tr>
-            </thead>
-            <tbody id="usersTable">
-              <tr><td colspan="7" class="loading">Laster...</td></tr>
+              <tr><td data-label="Status" colspan="8" class="loading">Laster...</td></tr>
             </tbody>
           </table>
         </div>
@@ -672,9 +777,9 @@
   </div>
 
   <div id="createModal" class="modal">
-    <div class="modal-content" style="max-width:560px;">
+    <div class="modal-content" style="max-width: 520px;">
       <div class="modal-title">Opprett ny kode</div>
-      <div id="createError" class="error" style="display:none;"></div>
+      <div id="createError" class="error" style="display: none;"></div>
       <div class="form-group">
         <label class="form-label">Kode</label>
         <input id="newCode" class="form-input" type="text" placeholder="IPSC2026" style="text-transform: uppercase;">
@@ -694,10 +799,36 @@
     </div>
   </div>
 
+  <div id="roleModal" class="modal">
+    <div class="modal-content" style="max-width: 560px;">
+      <div class="modal-title" id="roleModalTitle">Opprett rolle</div>
+      <div id="roleError" class="error" style="display:none;"></div>
+      <div class="form-group">
+        <label class="form-label">E-post</label>
+        <input id="roleEmail" class="form-input" type="email" placeholder="bruker@domene.no">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Navn (valgfritt)</label>
+        <input id="roleName" class="form-input" type="text" placeholder="Fullt navn">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rolle</label>
+        <select id="roleType" class="form-select">
+          <option value="admin">Admin</option>
+          <option value="match_director">Match director</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button id="saveRoleBtn" class="btn btn-primary">Lagre</button>
+        <button id="cancelRoleBtn" class="btn btn-secondary">Avbryt</button>
+      </div>
+    </div>
+  </div>
+
   <div id="shooterModal" class="modal">
     <div class="modal-content">
       <div class="modal-title" id="shooterModalTitle">Opprett referanseskytter</div>
-      <div id="shooterError" class="error" style="display:none;"></div>
+      <div id="shooterError" class="error" style="display: none;"></div>
 
       <div class="form-grid">
         <div class="form-group">
@@ -763,165 +894,74 @@
     </div>
   </div>
 
-  <div id="userRoleModal" class="modal">
-    <div class="modal-content" style="max-width:620px;">
-      <div class="modal-title">Brukerrolle</div>
-      <div id="userRoleError" class="error" style="display:none;"></div>
-      <div class="modal-subtitle" id="userRoleSubtitle"></div>
-
-      <div class="form-group">
-        <label class="form-label">App-rolle</label>
-        <select id="userRoleSelect" class="form-select">
-          <option value="user">user</option>
-          <option value="match_director">match_director</option>
-          <option value="admin">admin</option>
-        </select>
-      </div>
-
-      <div class="helper">
-        Admin-tilgang styres også av dokument i <span class="mono">adminUsers/{email}</span>. Når du velger <span class="mono">admin</span>, forsøker denne siden å opprette admin-dokumentet automatisk.
-      </div>
-
-      <div class="form-actions">
-        <button id="saveUserRoleBtn" class="btn btn-primary">Lagre rolle</button>
-        <button id="cancelUserRoleBtn" class="btn btn-secondary">Avbryt</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="stageModal" class="modal">
-    <div class="modal-content" style="max-width:720px;">
-      <div class="modal-title" id="stageModalTitle">Opprett stage</div>
-      <div id="stageError" class="error" style="display:none;"></div>
-
-      <div class="form-grid-3">
-        <div class="form-group">
-          <label class="form-label">Nummer</label>
-          <input id="stageNumber" class="form-input" type="number" min="1">
-        </div>
-        <div class="form-group" style="grid-column: span 2;">
-          <label class="form-label">Navn</label>
-          <input id="stageName" class="form-input" type="text" placeholder="Stage navn">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Paper targets</label>
-          <input id="stagePaperTargets" class="form-input" type="number" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Poppers</label>
-          <input id="stagePoppers" class="form-input" type="number" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Plates</label>
-          <input id="stagePlates" class="form-input" type="number" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label class="form-label">No-Shoots</label>
-          <input id="stageNoShoots" class="form-input" type="number" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Bonus Paper targets</label>
-          <input id="stageBonusPaperTargets" class="form-input" type="number" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Bonus Included</label>
-          <select id="stageBonusIncluded" class="form-select">
-            <option value="false">Nei</option>
-            <option value="true">Ja</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="small-note">
-        Beregnet minimum rounds: <span id="stageMinRounds">0</span> · Beregnet max points: <span id="stageMaxPoints">0</span>
-      </div>
-
-      <div class="form-actions">
-        <button id="saveStageBtn" class="btn btn-primary">Lagre stage</button>
-        <button id="cancelStageBtn" class="btn btn-secondary">Avbryt</button>
-      </div>
-    </div>
-  </div>
-
   <div id="matchModal" class="modal">
     <div class="modal-content">
       <div class="modal-title" id="matchModalTitle">Administrer match</div>
       <div id="matchSuccess" class="success" style="display:none;"></div>
       <div id="matchError" class="error" style="display:none;"></div>
-      <div class="modal-subtitle" id="matchModalSubtitle"></div>
+      <div class="modal-subtitle" id="matchModalSubtitle">Rediger match, deltakere, invitasjoner og stages.</div>
 
+      <div class="section-title">Matchinformasjon</div>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Matchnavn</label>
-          <input id="matchEditName" class="form-input" type="text">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Lokasjon</label>
-          <input id="matchEditLocation" class="form-input" type="text">
+          <label class="form-label">Navn</label>
+          <input id="matchNameInput" class="form-input" type="text">
         </div>
         <div class="form-group">
           <label class="form-label">Dato</label>
-          <input id="matchEditDate" class="form-input" type="text" placeholder="2026-04-10">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Type</label>
-          <select id="matchEditType" class="form-select">
-            <option value="Training">Training</option>
-            <option value="Level 1">Level 1</option>
-            <option value="Level 2">Level 2</option>
-            <option value="Level 3">Level 3</option>
-            <option value="Level 4">Level 4</option>
-            <option value="Level 5">Level 5</option>
-          </select>
+          <input id="matchDateInput" class="form-input" type="text" placeholder="2026-04-10">
         </div>
         <div class="form-group">
           <label class="form-label">Status</label>
-          <select id="matchEditStatus" class="form-select">
+          <select id="matchStatusInput" class="form-select">
             <option value="active">active</option>
             <option value="finished">finished</option>
+            <option value="draft">draft</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Søkbar</label>
-          <select id="matchEditSearchable" class="form-select">
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </select>
+          <label class="form-label">Lokasjon</label>
+          <input id="matchLocationInput" class="form-input" type="text">
         </div>
+        <div class="form-group">
+          <label class="form-label">Divisjon</label>
+          <input id="matchDivisionInput" class="form-input" type="text" placeholder="Classic / Optics / Open">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Power Factor</label>
+          <input id="matchPowerFactorInput" class="form-input" type="text" placeholder="Minor / Major">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Director emails (komma-separert)</label>
+        <input id="matchDirectorEmailsInput" class="form-input" type="text" placeholder="director@domene.no, annen@domene.no">
       </div>
 
       <div class="form-actions" style="margin-top:0;">
         <button id="saveMatchMetaBtn" class="btn btn-primary">Lagre matchinfo</button>
       </div>
 
-      <div class="two-col" style="margin-top:20px;">
-        <div class="card">
-          <div class="section-title">Søk bruker</div>
-          <div class="form-group">
-            <label class="form-label">Navn eller e-post</label>
-            <input id="matchUserSearch" class="form-input" type="text" placeholder="Eks. Espen eller navn@epost.no">
-          </div>
-          <div class="form-actions" style="margin-top:0;">
-            <button id="searchMatchUsersBtn" class="btn btn-primary">Søk</button>
-          </div>
-          <div id="matchUserSearchResults" style="margin-top:14px;"></div>
-        </div>
-
-        <div class="card">
-          <div class="section-title">Matchroller</div>
-          <div class="helper">Du kan gi brukere rollen match director på denne matchen. Dette lagres i feltet <span class="mono">directors</span>.</div>
-          <div id="directorsList" style="margin-top:12px;"></div>
-        </div>
-      </div>
-
-      <div class="section-title">Deltakere</div>
+      <div class="section-title">Eksisterende deltakere</div>
       <div id="participantsList"></div>
 
-      <div class="section-title">Stages</div>
-      <div class="form-actions" style="margin-top:0; margin-bottom:12px;">
-        <button id="createStageBtn" class="btn btn-primary">+ Ny stage</button>
+      <div class="section-title">Finn bruker</div>
+      <div class="form-group">
+        <label class="form-label">Søk etter navn eller e-post</label>
+        <input id="matchUserSearch" class="form-input" type="text" placeholder="Eks. Espen eller navn@epost.no">
+        <div class="inline-note">Du kan legge til direkte eller sende invitasjon.</div>
       </div>
-      <div id="stagesList" class="grid-stages"></div>
+      <div class="form-actions" style="margin-top:0;">
+        <button id="searchMatchUsersBtn" class="btn btn-primary">Søk</button>
+      </div>
+      <div id="matchUserSearchResults" style="margin-top:14px;"></div>
+
+      <div class="section-title">Stages / scoring-oppsett</div>
+      <div class="form-actions" style="margin-top:0;">
+        <button id="addStageBtn" class="btn btn-primary">+ Ny stage</button>
+        <button id="saveStagesBtn" class="btn btn-secondary">Lagre stages</button>
+      </div>
+      <div id="stageList" class="stage-list" style="margin-top:14px;"></div>
 
       <div class="form-actions">
         <button id="closeMatchModalBtn" class="btn btn-secondary">Lukk</button>
@@ -953,17 +993,13 @@
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
 
     const functions = getFunctions();
-
     let currentUser = null;
     let currentTab = 'codes';
-    let editingShooterId = null;
     let currentMatch = null;
-    let editingStageIndex = null;
-    let currentRoleUser = null;
-
-    let usersCache = [];
-    let matchesCache = [];
-    let shootersCache = [];
+    let currentMatchStages = [];
+    let allMatchesCache = [];
+    let allUsersCache = [];
+    let allRolesCache = [];
 
     const loginSection = document.getElementById('loginSection');
     const adminContent = document.getElementById('adminContent');
@@ -974,14 +1010,13 @@
     const logoutBtn = document.getElementById('logoutBtn');
 
     const tabCodesBtn = document.getElementById('tabCodesBtn');
+    const tabRolesBtn = document.getElementById('tabRolesBtn');
     const tabShootersBtn = document.getElementById('tabShootersBtn');
     const tabMatchesBtn = document.getElementById('tabMatchesBtn');
-    const tabUsersBtn = document.getElementById('tabUsersBtn');
-
     const codesPanel = document.getElementById('codesPanel');
+    const rolesPanel = document.getElementById('rolesPanel');
     const shootersPanel = document.getElementById('shootersPanel');
     const matchesPanel = document.getElementById('matchesPanel');
-    const usersPanel = document.getElementById('usersPanel');
 
     const createCodeBtn = document.getElementById('createCodeBtn');
     const refreshBtn = document.getElementById('refreshBtn');
@@ -991,6 +1026,18 @@
     const cancelCreateBtn = document.getElementById('cancelCreateBtn');
     const codesTable = document.getElementById('codesTable');
 
+    const createRoleBtn = document.getElementById('createRoleBtn');
+    const refreshRolesBtn = document.getElementById('refreshRolesBtn');
+    const rolesTable = document.getElementById('rolesTable');
+    const roleModal = document.getElementById('roleModal');
+    const roleModalTitle = document.getElementById('roleModalTitle');
+    const roleError = document.getElementById('roleError');
+    const roleEmailInput = document.getElementById('roleEmail');
+    const roleNameInput = document.getElementById('roleName');
+    const roleTypeInput = document.getElementById('roleType');
+    const saveRoleBtn = document.getElementById('saveRoleBtn');
+    const cancelRoleBtn = document.getElementById('cancelRoleBtn');
+
     const createShooterBtn = document.getElementById('createShooterBtn');
     const refreshShootersBtn = document.getElementById('refreshShootersBtn');
     const shootersTable = document.getElementById('shootersTable');
@@ -999,7 +1046,6 @@
     const shooterError = document.getElementById('shooterError');
     const saveShooterBtn = document.getElementById('saveShooterBtn');
     const cancelShooterBtn = document.getElementById('cancelShooterBtn');
-
     const shooterIdInput = document.getElementById('shooterId');
     const shooterNameInput = document.getElementById('shooterName');
     const shooterDivisionInput = document.getElementById('shooterDivision');
@@ -1011,59 +1057,29 @@
     const shooterLongHFInput = document.getElementById('shooterLongHF');
     const shooterBenchmarkInput = document.getElementById('shooterBenchmark');
 
-    const usersSearchInput = document.getElementById('usersSearchInput');
-    const searchUsersBtn = document.getElementById('searchUsersBtn');
-    const refreshUsersBtn = document.getElementById('refreshUsersBtn');
-    const usersTable = document.getElementById('usersTable');
-
-    const userRoleModal = document.getElementById('userRoleModal');
-    const userRoleSubtitle = document.getElementById('userRoleSubtitle');
-    const userRoleSelect = document.getElementById('userRoleSelect');
-    const userRoleError = document.getElementById('userRoleError');
-    const saveUserRoleBtn = document.getElementById('saveUserRoleBtn');
-    const cancelUserRoleBtn = document.getElementById('cancelUserRoleBtn');
-
     const refreshMatchesBtn = document.getElementById('refreshMatchesBtn');
     const matchesTable = document.getElementById('matchesTable');
-
     const matchModal = document.getElementById('matchModal');
     const matchModalTitle = document.getElementById('matchModalTitle');
     const matchModalSubtitle = document.getElementById('matchModalSubtitle');
     const matchSuccess = document.getElementById('matchSuccess');
     const matchError = document.getElementById('matchError');
-
-    const matchEditName = document.getElementById('matchEditName');
-    const matchEditLocation = document.getElementById('matchEditLocation');
-    const matchEditDate = document.getElementById('matchEditDate');
-    const matchEditType = document.getElementById('matchEditType');
-    const matchEditStatus = document.getElementById('matchEditStatus');
-    const matchEditSearchable = document.getElementById('matchEditSearchable');
+    const matchNameInput = document.getElementById('matchNameInput');
+    const matchDateInput = document.getElementById('matchDateInput');
+    const matchStatusInput = document.getElementById('matchStatusInput');
+    const matchLocationInput = document.getElementById('matchLocationInput');
+    const matchDivisionInput = document.getElementById('matchDivisionInput');
+    const matchPowerFactorInput = document.getElementById('matchPowerFactorInput');
+    const matchDirectorEmailsInput = document.getElementById('matchDirectorEmailsInput');
     const saveMatchMetaBtn = document.getElementById('saveMatchMetaBtn');
-
+    const participantsList = document.getElementById('participantsList');
     const matchUserSearch = document.getElementById('matchUserSearch');
     const searchMatchUsersBtn = document.getElementById('searchMatchUsersBtn');
     const matchUserSearchResults = document.getElementById('matchUserSearchResults');
-    const participantsList = document.getElementById('participantsList');
-    const directorsList = document.getElementById('directorsList');
-    const stagesList = document.getElementById('stagesList');
+    const addStageBtn = document.getElementById('addStageBtn');
+    const saveStagesBtn = document.getElementById('saveStagesBtn');
+    const stageList = document.getElementById('stageList');
     const closeMatchModalBtn = document.getElementById('closeMatchModalBtn');
-    const createStageBtn = document.getElementById('createStageBtn');
-
-    const stageModal = document.getElementById('stageModal');
-    const stageModalTitle = document.getElementById('stageModalTitle');
-    const stageError = document.getElementById('stageError');
-    const stageNumber = document.getElementById('stageNumber');
-    const stageName = document.getElementById('stageName');
-    const stagePaperTargets = document.getElementById('stagePaperTargets');
-    const stagePoppers = document.getElementById('stagePoppers');
-    const stagePlates = document.getElementById('stagePlates');
-    const stageNoShoots = document.getElementById('stageNoShoots');
-    const stageBonusPaperTargets = document.getElementById('stageBonusPaperTargets');
-    const stageBonusIncluded = document.getElementById('stageBonusIncluded');
-    const stageMinRounds = document.getElementById('stageMinRounds');
-    const stageMaxPoints = document.getElementById('stageMaxPoints');
-    const saveStageBtn = document.getElementById('saveStageBtn');
-    const cancelStageBtn = document.getElementById('cancelStageBtn');
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -1073,7 +1089,13 @@
             currentUser = user;
             loginSection.style.display = 'none';
             adminContent.style.display = 'block';
-            await refreshAll();
+            await Promise.all([
+              loadCodes(),
+              loadRoles(),
+              loadReferenceShooters(),
+              loadMatches(),
+              loadAllUsers()
+            ]);
           } else {
             alert('Du har ikke admin-tilgang');
             await signOut(auth);
@@ -1089,24 +1111,13 @@
       }
     });
 
-    async function refreshAll() {
-      await Promise.all([
-        loadCodes(),
-        loadReferenceShooters(),
-        loadUsers(),
-        loadMatches()
-      ]);
-    }
-
     loginBtn.onclick = async () => {
       const email = loginEmail.value.trim();
       const password = loginPassword.value;
-
       if (!email || !password) {
         showError(loginError, 'Fyll ut alle feltene');
         return;
       }
-
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (error) {
@@ -1117,21 +1128,21 @@
     logoutBtn.onclick = async () => { await signOut(auth); };
 
     tabCodesBtn.onclick = () => setTab('codes');
+    tabRolesBtn.onclick = () => setTab('roles');
     tabShootersBtn.onclick = () => setTab('shooters');
     tabMatchesBtn.onclick = () => setTab('matches');
-    tabUsersBtn.onclick = () => setTab('users');
 
     function setTab(tab) {
       currentTab = tab;
       tabCodesBtn.classList.toggle('active', tab === 'codes');
+      tabRolesBtn.classList.toggle('active', tab === 'roles');
       tabShootersBtn.classList.toggle('active', tab === 'shooters');
       tabMatchesBtn.classList.toggle('active', tab === 'matches');
-      tabUsersBtn.classList.toggle('active', tab === 'users');
 
       codesPanel.classList.toggle('active', tab === 'codes');
+      rolesPanel.classList.toggle('active', tab === 'roles');
       shootersPanel.classList.toggle('active', tab === 'shooters');
       matchesPanel.classList.toggle('active', tab === 'matches');
-      usersPanel.classList.toggle('active', tab === 'users');
     }
 
     async function loadCodes() {
@@ -1144,11 +1155,8 @@
         const activeCodes = codes.filter(c => c.active).length;
         const totalUsed = codes.reduce((sum, c) => sum + (c.usedCount || 0), 0);
         const uniqueUsers = new Set();
-
         codes.forEach(c => {
-          if (Array.isArray(c.usedBy)) {
-            c.usedBy.forEach(u => uniqueUsers.add(u));
-          }
+          if (Array.isArray(c.usedBy)) c.usedBy.forEach(u => uniqueUsers.add(u));
         });
 
         document.getElementById('statTotal').textContent = totalCodes;
@@ -1157,48 +1165,30 @@
         document.getElementById('statUsers').textContent = uniqueUsers.size;
 
         if (codes.length === 0) {
-          codesTable.innerHTML = `
-            <tr>
-              <td colspan="7" class="empty-state">
-                <h3>Ingen koder ennå</h3>
-                <p>Klikk "Ny kode" for å opprette din første invitasjonskode</p>
-              </td>
-            </tr>
-          `;
+          codesTable.innerHTML = `<tr><td data-label="Info" colspan="7" class="empty-state"><h3>Ingen koder ennå</h3><p>Klikk "Ny kode" for å opprette din første invitasjonskode</p></td></tr>`;
           return;
         }
 
         codesTable.innerHTML = codes.map(code => `
           <tr>
-            <td><strong>${escapeHtml(code.code)}</strong></td>
-            <td>
-              <span class="badge ${code.active ? 'badge-active' : 'badge-inactive'}">
-                ${code.active ? 'Aktiv' : 'Inaktiv'}
-              </span>
-            </td>
-            <td>${code.maxUses || '∞'}</td>
-            <td>${code.usedCount || 0}</td>
-            <td>${escapeHtml(code.description || '—')}</td>
-            <td>${formatDate(code.createdAt)}</td>
-            <td>
+            <td data-label="Kode"><strong>${escapeHtml(code.code)}</strong></td>
+            <td data-label="Status"><span class="badge ${code.active ? 'badge-active' : 'badge-inactive'}">${code.active ? 'Aktiv' : 'Inaktiv'}</span></td>
+            <td data-label="Maks bruk">${code.maxUses || '∞'}</td>
+            <td data-label="Brukt">${code.usedCount || 0}</td>
+            <td data-label="Beskrivelse">${escapeHtml(code.description || '—')}</td>
+            <td data-label="Opprettet">${formatDate(code.createdAt)}</td>
+            <td data-label="Handlinger">
               <div class="action-btns">
                 <button class="btn btn-sm btn-secondary" onclick="toggleCode('${escapeAttr(code.code)}', ${!code.active})">
                   ${code.active ? 'Deaktiver' : 'Aktiver'}
                 </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteCode('${escapeAttr(code.code)}')">
-                  Slett
-                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCode('${escapeAttr(code.code)}')">Slett</button>
               </div>
             </td>
           </tr>
         `).join('');
       } catch (error) {
-        console.error('Error loading codes:', error);
-        codesTable.innerHTML = `
-          <tr>
-            <td colspan="7" class="error">Feil ved lasting av koder: ${escapeHtml(error.message)}</td>
-          </tr>
-        `;
+        codesTable.innerHTML = `<tr><td data-label="Feil" colspan="7" class="error">Feil ved lasting av koder: ${escapeHtml(error.message)}</td></tr>`;
       }
     }
 
@@ -1210,7 +1200,9 @@
       document.getElementById('newDescription').value = '';
     };
 
-    cancelCreateBtn.onclick = () => createModal.classList.remove('open');
+    cancelCreateBtn.onclick = () => {
+      createModal.classList.remove('open');
+    };
 
     confirmCreateBtn.onclick = async () => {
       const code = document.getElementById('newCode').value.trim().toUpperCase();
@@ -1259,43 +1251,142 @@
 
     refreshBtn.onclick = loadCodes;
 
-    async function loadReferenceShooters() {
+    async function loadRoles() {
       try {
-        const snap = await getDocs(collection(db, 'referenceShooters'));
-        shootersCache = [];
-        snap.forEach(docSnap => shootersCache.push({ id: docSnap.id, ...docSnap.data() }));
-        shootersCache.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'no'));
+        const snap = await getDocs(collection(db, 'adminUsers'));
+        const roles = [];
+        snap.forEach(docSnap => roles.push({ email: docSnap.id, ...docSnap.data() }));
+        roles.sort((a, b) => String(a.email).localeCompare(String(b.email), 'no'));
+        allRolesCache = roles;
 
-        document.getElementById('statShootersTotal').textContent = shootersCache.length;
-        document.getElementById('statShootersClassic').textContent = shootersCache.filter(s => (s.division || '') === 'Classic').length;
-        document.getElementById('statShootersMinor').textContent = shootersCache.filter(s => String(s.powerFactor || '').toLowerCase() === 'minor').length;
-        document.getElementById('statBenchmarks').textContent = shootersCache.filter(s => !!s.isBenchmark).length;
+        document.getElementById('statRolesTotal').textContent = roles.length;
+        document.getElementById('statAdminsTotal').textContent = roles.filter(r => r.role === 'admin').length;
+        document.getElementById('statDirectorsTotal').textContent = roles.filter(r => r.role === 'match_director').length;
 
-        if (shootersCache.length === 0) {
-          shootersTable.innerHTML = `
-            <tr>
-              <td colspan="11" class="empty-state">
-                <h3>Ingen referanseskyttere ennå</h3>
-                <p>Klikk "Ny referanseskytter" for å opprette første profil</p>
-              </td>
-            </tr>
-          `;
+        if (!roles.length) {
+          rolesTable.innerHTML = `<tr><td data-label="Info" colspan="4" class="empty-state"><h3>Ingen roller</h3><p>Legg til admin eller match director</p></td></tr>`;
           return;
         }
 
-        shootersTable.innerHTML = shootersCache.map(shooter => `
+        rolesTable.innerHTML = roles.map(role => `
           <tr>
-            <td class="mono nowrap">${escapeHtml(shooter.id)}</td>
-            <td><strong>${escapeHtml(shooter.name || '—')}</strong></td>
-            <td>${escapeHtml(shooter.division || '—')}</td>
-            <td>${escapeHtml(shooter.powerFactor || '—')}</td>
-            <td>${formatNumber(shooter.drawTime, 2)}</td>
-            <td>${formatNumber(shooter.reloadTime, 2)}</td>
-            <td>${formatNumber(shooter.shortHF, 4)}</td>
-            <td>${formatNumber(shooter.mediumHF, 4)}</td>
-            <td>${formatNumber(shooter.longHF, 4)}</td>
-            <td><span class="badge badge-benchmark">${shooter.isBenchmark ? 'Benchmark' : 'Profil'}</span></td>
-            <td>
+            <td data-label="E-post">${escapeHtml(role.email)}</td>
+            <td data-label="Navn">${escapeHtml(role.name || '—')}</td>
+            <td data-label="Rolle"><span class="badge ${role.role === 'admin' ? 'badge-admin' : 'badge-director'}">${escapeHtml(role.role || '—')}</span></td>
+            <td data-label="Handlinger">
+              <div class="action-btns">
+                <button class="btn btn-sm btn-secondary" onclick="editRole('${escapeAttr(role.email)}')">Rediger</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteRole('${escapeAttr(role.email)}')">Slett</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        rolesTable.innerHTML = `<tr><td data-label="Feil" colspan="4" class="error">Feil ved lasting av roller: ${escapeHtml(error.message)}</td></tr>`;
+      }
+    }
+
+    function openRoleModal(mode, role = null) {
+      roleError.style.display = 'none';
+
+      if (mode === 'create') {
+        roleModalTitle.textContent = 'Opprett rolle';
+        roleEmailInput.disabled = false;
+        roleEmailInput.value = '';
+        roleNameInput.value = '';
+        roleTypeInput.value = 'admin';
+      } else {
+        roleModalTitle.textContent = 'Rediger rolle';
+        roleEmailInput.disabled = true;
+        roleEmailInput.value = role.email || '';
+        roleNameInput.value = role.name || '';
+        roleTypeInput.value = role.role || 'match_director';
+      }
+
+      roleModal.classList.add('open');
+    }
+
+    createRoleBtn.onclick = () => openRoleModal('create');
+    cancelRoleBtn.onclick = () => roleModal.classList.remove('open');
+    refreshRolesBtn.onclick = loadRoles;
+
+    saveRoleBtn.onclick = async () => {
+      const email = roleEmailInput.value.trim().toLowerCase();
+      const payload = {
+        name: roleNameInput.value.trim(),
+        role: roleTypeInput.value
+      };
+
+      if (!email) {
+        showError(roleError, 'E-post er påkrevd');
+        return;
+      }
+
+      if (!payload.role) {
+        showError(roleError, 'Rolle er påkrevd');
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, 'adminUsers', email), payload, { merge: true });
+        roleModal.classList.remove('open');
+        await loadRoles();
+      } catch (error) {
+        showError(roleError, 'Kunne ikke lagre rolle: ' + error.message);
+      }
+    };
+
+    window.editRole = (email) => {
+      const role = allRolesCache.find(r => r.email === email);
+      if (!role) return;
+      openRoleModal('edit', role);
+    };
+
+    window.deleteRole = async (email) => {
+      if (String(email).toLowerCase() === String(currentUser?.email || '').toLowerCase()) {
+        alert('Du kan ikke slette din egen rolle mens du er logget inn.');
+        return;
+      }
+
+      if (!confirm(`Er du sikker på at du vil slette rollen for "${email}"?`)) return;
+      try {
+        await deleteDoc(doc(db, 'adminUsers', email));
+        await loadRoles();
+      } catch (error) {
+        alert('Feil ved sletting: ' + error.message);
+      }
+    };
+
+    async function loadReferenceShooters() {
+      try {
+        const snap = await getDocs(collection(db, 'referenceShooters'));
+        const shooters = [];
+        snap.forEach(docSnap => shooters.push({ id: docSnap.id, ...docSnap.data() }));
+        shooters.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'no'));
+
+        document.getElementById('statShootersTotal').textContent = shooters.length;
+        document.getElementById('statShootersClassic').textContent = shooters.filter(s => (s.division || '') === 'Classic').length;
+        document.getElementById('statShootersMinor').textContent = shooters.filter(s => String(s.powerFactor || '').toLowerCase() === 'minor').length;
+        document.getElementById('statBenchmarks').textContent = shooters.filter(s => !!s.isBenchmark).length;
+
+        if (shooters.length === 0) {
+          shootersTable.innerHTML = `<tr><td data-label="Info" colspan="11" class="empty-state"><h3>Ingen referanseskyttere ennå</h3><p>Klikk "Ny referanseskytter" for å opprette første profil</p></td></tr>`;
+          return;
+        }
+
+        shootersTable.innerHTML = shooters.map(shooter => `
+          <tr>
+            <td data-label="ID" class="mono nowrap">${escapeHtml(shooter.id)}</td>
+            <td data-label="Navn"><strong>${escapeHtml(shooter.name || '—')}</strong></td>
+            <td data-label="Divisjon">${escapeHtml(shooter.division || '—')}</td>
+            <td data-label="PF">${escapeHtml(shooter.powerFactor || '—')}</td>
+            <td data-label="Draw">${formatNumber(shooter.drawTime, 2)}</td>
+            <td data-label="Reload">${formatNumber(shooter.reloadTime, 2)}</td>
+            <td data-label="Short HF">${formatNumber(shooter.shortHF, 4)}</td>
+            <td data-label="Medium HF">${formatNumber(shooter.mediumHF, 4)}</td>
+            <td data-label="Long HF">${formatNumber(shooter.longHF, 4)}</td>
+            <td data-label="Status"><span class="badge badge-benchmark">${shooter.isBenchmark ? 'Benchmark' : 'Profil'}</span></td>
+            <td data-label="Handlinger">
               <div class="action-btns">
                 <button class="btn btn-sm btn-secondary" onclick="editReferenceShooter('${escapeAttr(shooter.id)}')">Rediger</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteReferenceShooter('${escapeAttr(shooter.id)}')">Slett</button>
@@ -1303,20 +1394,17 @@
             </td>
           </tr>
         `).join('');
+
+        window.__referenceShooters = shooters;
       } catch (error) {
-        console.error('Error loading reference shooters:', error);
-        shootersTable.innerHTML = `
-          <tr>
-            <td colspan="11" class="error">Feil ved lasting av referanseskyttere: ${escapeHtml(error.message)}</td>
-          </tr>
-        `;
+        shootersTable.innerHTML = `<tr><td data-label="Feil" colspan="11" class="error">Feil ved lasting av referanseskyttere: ${escapeHtml(error.message)}</td></tr>`;
       }
     }
 
     function openShooterModal(mode, shooter = null) {
       shooterError.style.display = 'none';
+
       if (mode === 'create') {
-        editingShooterId = null;
         shooterModalTitle.textContent = 'Opprett referanseskytter';
         shooterIdInput.disabled = false;
         shooterIdInput.value = suggestNextShooterId();
@@ -1330,7 +1418,6 @@
         shooterLongHFInput.value = '';
         shooterBenchmarkInput.value = 'true';
       } else {
-        editingShooterId = shooter.id;
         shooterModalTitle.textContent = 'Rediger referanseskytter';
         shooterIdInput.disabled = true;
         shooterIdInput.value = shooter.id || '';
@@ -1344,6 +1431,7 @@
         shooterLongHFInput.value = shooter.longHF ?? '';
         shooterBenchmarkInput.value = String(!!shooter.isBenchmark);
       }
+
       shooterModal.classList.add('open');
     }
 
@@ -1395,11 +1483,9 @@
     };
 
     window.editReferenceShooter = (id) => {
-      const shooter = shootersCache.find(s => s.id === id);
-      if (!shooter) {
-        alert('Fant ikke referanseskytter');
-        return;
-      }
+      const shooters = Array.isArray(window.__referenceShooters) ? window.__referenceShooters : [];
+      const shooter = shooters.find(s => s.id === id);
+      if (!shooter) return;
       openShooterModal('edit', shooter);
     };
 
@@ -1413,229 +1499,130 @@
       }
     };
 
-    async function loadUsers() {
-      try {
-        const snap = await getDocs(collection(db, 'users'));
-        usersCache = [];
-        snap.forEach(docSnap => usersCache.push({ id: docSnap.id, ...docSnap.data() }));
-
-        const adminCount = usersCache.filter(u => String(u.role || 'user') === 'admin').length;
-        const mdCount = usersCache.filter(u => String(u.role || 'user') === 'match_director').length;
-        const classicCount = usersCache.filter(u => String(u.division || '') === 'Classic').length;
-
-        document.getElementById('statUsersTotalPanel').textContent = usersCache.length;
-        document.getElementById('statUsersAdmins').textContent = adminCount;
-        document.getElementById('statUsersMatchDirectors').textContent = mdCount;
-        document.getElementById('statUsersClassic').textContent = classicCount;
-
-        renderUsersTable(usersCache);
-      } catch (error) {
-        console.error('Error loading users:', error);
-        usersTable.innerHTML = `
-          <tr>
-            <td colspan="7" class="error">Feil ved lasting av brukere: ${escapeHtml(error.message)}</td>
-          </tr>
-        `;
-      }
-    }
-
-    function renderUsersTable(list) {
-      if (!list.length) {
-        usersTable.innerHTML = `
-          <tr>
-            <td colspan="7" class="empty-state">
-              <h3>Ingen brukere</h3>
-              <p>Brukere vises her når de er registrert</p>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      usersTable.innerHTML = list.map(user => {
-        const name = userDisplayName(user);
-        return `
-          <tr>
-            <td class="mono nowrap">${escapeHtml(user.id)}</td>
-            <td>${escapeHtml(name)}</td>
-            <td>${escapeHtml(user.email || '—')}</td>
-            <td>${escapeHtml(user.division || '—')}</td>
-            <td>${escapeHtml(user.club || '—')}</td>
-            <td><span class="badge badge-role">${escapeHtml(user.role || 'user')}</span></td>
-            <td>
-              <div class="action-btns">
-                <button class="btn btn-sm btn-secondary" onclick="openUserRoleModal('${escapeAttr(user.id)}')">Rolle</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    searchUsersBtn.onclick = () => {
-      const term = usersSearchInput.value.trim().toLowerCase();
-      if (!term) {
-        renderUsersTable(usersCache);
-        return;
-      }
-      const filtered = usersCache.filter(user => {
-        const fullName = userDisplayName(user).toLowerCase();
-        const email = String(user.email || '').toLowerCase();
-        return fullName.includes(term) || email.includes(term);
-      });
-      renderUsersTable(filtered);
-    };
-
-    refreshUsersBtn.onclick = loadUsers;
-
-    window.openUserRoleModal = (userId) => {
-      currentRoleUser = usersCache.find(u => u.id === userId) || null;
-      if (!currentRoleUser) {
-        alert('Fant ikke bruker');
-        return;
-      }
-      userRoleSubtitle.textContent = `${userDisplayName(currentRoleUser)} · ${currentRoleUser.email || 'ingen e-post'}`;
-      userRoleSelect.value = currentRoleUser.role || 'user';
-      userRoleError.style.display = 'none';
-      userRoleModal.classList.add('open');
-    };
-
-    saveUserRoleBtn.onclick = async () => {
-      if (!currentRoleUser) return;
-      const nextRole = userRoleSelect.value;
-
-      try {
-        await updateDoc(doc(db, 'users', currentRoleUser.id), {
-          role: nextRole
-        });
-
-        if (currentRoleUser.email) {
-          if (nextRole === 'admin') {
-            await setDoc(doc(db, 'adminUsers', currentRoleUser.email), {
-              email: currentRoleUser.email,
-              updatedAt: new Date().toISOString()
-            }, { merge: true });
-          } else if ((currentRoleUser.role || 'user') === 'admin') {
-            try {
-              await deleteDoc(doc(db, 'adminUsers', currentRoleUser.email));
-            } catch (e) {
-              console.warn('Could not delete adminUsers doc:', e);
-            }
-          }
-        }
-
-        userRoleModal.classList.remove('open');
-        currentRoleUser = null;
-        await loadUsers();
-      } catch (error) {
-        showError(userRoleError, 'Kunne ikke lagre rolle: ' + error.message);
-      }
-    };
-
-    cancelUserRoleBtn.onclick = () => {
-      userRoleModal.classList.remove('open');
-      currentRoleUser = null;
-    };
-
     async function loadMatches() {
       try {
         const snap = await getDocs(collection(db, 'matches'));
-        matchesCache = [];
-        snap.forEach(docSnap => matchesCache.push({ id: docSnap.id, ...docSnap.data() }));
+        const matches = [];
+        snap.forEach(docSnap => matches.push({ id: docSnap.id, ...docSnap.data() }));
 
-        matchesCache.sort((a, b) => {
+        matches.sort((a, b) => {
           const da = a.date ? new Date(a.date).getTime() : 0;
-          const db = b.date ? new Date(b.date).getTime() : 0;
-          return db - da;
+          const dbv = b.date ? new Date(b.date).getTime() : 0;
+          return dbv - da;
         });
 
-        document.getElementById('statMatchesTotal').textContent = matchesCache.length;
-        document.getElementById('statMatchesActive').textContent = matchesCache.filter(m => (m.status || 'active') !== 'finished').length;
-        document.getElementById('statMatchesFinished').textContent = matchesCache.filter(m => (m.status || '') === 'finished').length;
-        document.getElementById('statParticipantsTotal').textContent = matchesCache.reduce((sum, m) => sum + ((m.participants || []).length), 0);
+        allMatchesCache = matches;
 
-        if (!matchesCache.length) {
-          matchesTable.innerHTML = `
-            <tr>
-              <td colspan="8" class="empty-state">
-                <h3>Ingen matcher</h3>
-                <p>Matcher vises her når de er opprettet i appen</p>
-              </td>
-            </tr>
-          `;
+        document.getElementById('statMatchesTotal').textContent = matches.length;
+        document.getElementById('statMatchesActive').textContent = matches.filter(m => (m.status || 'active') !== 'finished').length;
+        document.getElementById('statMatchesFinished').textContent = matches.filter(m => (m.status || '') === 'finished').length;
+        document.getElementById('statParticipantsTotal').textContent = matches.reduce((sum, m) => sum + ((m.participants || []).length), 0);
+
+        if (matches.length === 0) {
+          matchesTable.innerHTML = `<tr><td data-label="Info" colspan="8" class="empty-state"><h3>Ingen matcher</h3><p>Matcher vises her når de er opprettet i appen</p></td></tr>`;
           return;
         }
 
-        matchesTable.innerHTML = matchesCache.map(match => `
-          <tr>
-            <td class="mono nowrap">${escapeHtml(match.id)}</td>
-            <td><strong>${escapeHtml(match.name || '—')}</strong></td>
-            <td>${escapeHtml(match.date || '—')}</td>
-            <td><span class="badge ${(match.status || 'active') === 'finished' ? 'badge-inactive' : 'badge-active'}">${escapeHtml(match.status || 'active')}</span></td>
-            <td>${escapeHtml(resolveUserLabel(match.ownerId))}</td>
-            <td>${(match.participants || []).length}</td>
-            <td>${(match.stages || []).length}</td>
-            <td>
-              <div class="action-btns">
-                <button class="btn btn-sm btn-secondary" onclick="openMatchAdmin('${escapeAttr(match.id)}')">Administrer</button>
-              </div>
-            </td>
-          </tr>
-        `).join('');
+        matchesTable.innerHTML = matches.map(match => {
+          const ownerName = resolveUserLabel(match.ownerId);
+          const stageCount = Array.isArray(match.stages) ? match.stages.length : 0;
+          return `
+            <tr>
+              <td data-label="ID" class="mono nowrap">${escapeHtml(match.id)}</td>
+              <td data-label="Navn"><strong>${escapeHtml(match.name || '—')}</strong></td>
+              <td data-label="Dato">${escapeHtml(match.date || '—')}</td>
+              <td data-label="Status"><span class="badge ${String(match.status || 'active') === 'finished' ? 'badge-inactive' : 'badge-active'}">${escapeHtml(match.status || 'active')}</span></td>
+              <td data-label="Eier">${escapeHtml(ownerName)}</td>
+              <td data-label="Deltakere">${(match.participants || []).length}</td>
+              <td data-label="Stages">${stageCount}</td>
+              <td data-label="Handlinger">
+                <div class="action-btns">
+                  <button class="btn btn-sm btn-secondary" onclick="openMatchAdmin('${escapeAttr(match.id)}')">Administrer</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
       } catch (error) {
-        console.error('Error loading matches:', error);
-        matchesTable.innerHTML = `
-          <tr>
-            <td colspan="8" class="error">Feil ved lasting av matcher: ${escapeHtml(error.message)}</td>
-          </tr>
-        `;
+        matchesTable.innerHTML = `<tr><td data-label="Feil" colspan="8" class="error">Feil ved lasting av matcher: ${escapeHtml(error.message)}</td></tr>`;
       }
     }
 
-    window.openMatchAdmin = (matchId) => {
-      const match = matchesCache.find(m => String(m.id) === String(matchId));
+    async function loadAllUsers() {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        const users = [];
+        snap.forEach(docSnap => users.push({ id: docSnap.id, ...docSnap.data() }));
+        allUsersCache = users;
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    }
+
+    function resolveUserLabel(uid) {
+      const user = allUsersCache.find(u => String(u.id) === String(uid));
+      if (!user) return uid || '—';
+      const name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      return name || user.email || uid;
+    }
+
+    function normalizeStage(stage, index) {
+      return {
+        number: parseInt(stage?.number ?? (index + 1), 10) || (index + 1),
+        name: String(stage?.name ?? `Stage ${index + 1}`),
+        paperTargets: parseInt(stage?.paperTargets ?? 0, 10) || 0,
+        poppers: parseInt(stage?.poppers ?? 0, 10) || 0,
+        plates: parseInt(stage?.plates ?? 0, 10) || 0,
+        minRounds: parseInt(stage?.minRounds ?? 0, 10) || 0,
+        maxPoints: parseInt(stage?.maxPoints ?? 0, 10) || 0
+      };
+    }
+
+    window.openMatchAdmin = async (matchId) => {
+      const match = allMatchesCache.find(m => String(m.id) === String(matchId));
       if (!match) {
         alert('Fant ikke match');
         return;
       }
 
       currentMatch = JSON.parse(JSON.stringify(match));
-      editingStageIndex = null;
-
-      hideMatchMessages();
-      matchUserSearch.value = '';
-      matchUserSearchResults.innerHTML = '';
+      currentMatchStages = (Array.isArray(currentMatch.stages) ? currentMatch.stages : []).map((stage, index) => normalizeStage(stage, index));
 
       matchModalTitle.textContent = `Administrer match: ${currentMatch.name || currentMatch.id}`;
       matchModalSubtitle.textContent = `Match ID ${currentMatch.id} · Eier: ${resolveUserLabel(currentMatch.ownerId)}`;
 
-      matchEditName.value = currentMatch.name || '';
-      matchEditLocation.value = currentMatch.location || '';
-      matchEditDate.value = currentMatch.date || '';
-      matchEditType.value = currentMatch.type || 'Training';
-      matchEditStatus.value = currentMatch.status || 'active';
-      matchEditSearchable.value = String(currentMatch.searchable !== false);
+      matchNameInput.value = currentMatch.name || '';
+      matchDateInput.value = currentMatch.date || '';
+      matchStatusInput.value = currentMatch.status || 'active';
+      matchLocationInput.value = currentMatch.location || '';
+      matchDivisionInput.value = currentMatch.division || '';
+      matchPowerFactorInput.value = currentMatch.powerFactor || '';
+      matchDirectorEmailsInput.value = Array.isArray(currentMatch.directorEmails) ? currentMatch.directorEmails.join(', ') : '';
 
+      matchUserSearch.value = '';
+      matchUserSearchResults.innerHTML = '';
+      hideMatchMessages();
       renderParticipants();
-      renderDirectors();
       renderStages();
       matchModal.classList.add('open');
     };
 
     function renderParticipants() {
       const participants = Array.isArray(currentMatch?.participants) ? currentMatch.participants : [];
+
       if (!participants.length) {
-        participantsList.innerHTML = `<div class="empty-state" style="padding:20px 0;"><p>Ingen deltakere registrert</p></div>`;
+        participantsList.innerHTML = `<div class="empty-state" style="padding:24px 0;"><p>Ingen deltakere registrert</p></div>`;
         return;
       }
 
       participantsList.innerHTML = participants.map(uid => {
+        const label = resolveUserLabel(uid);
         const isOwner = uid === currentMatch.ownerId;
         return `
-          <div class="person-row">
-            <div class="person-meta">
-              <div class="person-name">${escapeHtml(resolveUserLabel(uid))}</div>
-              <div class="person-sub mono">${escapeHtml(uid)}${isOwner ? ' · Eier' : ''}</div>
+          <div class="participant-card">
+            <div class="participant-meta">
+              <div class="participant-name">${escapeHtml(label)}</div>
+              <div class="participant-sub mono">${escapeHtml(uid)}${isOwner ? ' · Eier' : ''}</div>
             </div>
             <div class="action-btns">
               <button class="btn btn-sm ${isOwner ? 'btn-secondary' : 'btn-danger'}" ${isOwner ? 'disabled' : ''} onclick="removeParticipantFromMatch('${escapeAttr(uid)}')">
@@ -1647,82 +1634,7 @@
       }).join('');
     }
 
-    function renderDirectors() {
-      const directors = Array.isArray(currentMatch?.directors) ? currentMatch.directors : [];
-      if (!directors.length) {
-        directorsList.innerHTML = `<div class="empty-state" style="padding:16px 0;"><p>Ingen match directors lagt til</p></div>`;
-        return;
-      }
-
-      directorsList.innerHTML = directors.map(uid => `
-        <div class="person-row">
-          <div class="person-meta">
-            <div class="person-name">${escapeHtml(resolveUserLabel(uid))}</div>
-            <div class="person-sub mono">${escapeHtml(uid)}</div>
-          </div>
-          <div class="action-btns">
-            <button class="btn btn-sm btn-danger" onclick="removeDirectorFromMatch('${escapeAttr(uid)}')">Fjern</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderStages() {
-      const stages = Array.isArray(currentMatch?.stages) ? currentMatch.stages : [];
-      if (!stages.length) {
-        stagesList.innerHTML = `<div class="empty-state" style="padding:16px 0;"><p>Ingen stages lagt til ennå</p></div>`;
-        return;
-      }
-
-      const sorted = stages
-        .map((stage, index) => ({ stage, index }))
-        .sort((a, b) => (a.stage.number || 0) - (b.stage.number || 0));
-
-      stagesList.innerHTML = sorted.map(({ stage, index }) => `
-        <div class="stage-row">
-          <div class="stage-meta">
-            <div class="stage-name">Stage ${escapeHtml(stage.number || '—')} · ${escapeHtml(stage.name || 'Uten navn')}</div>
-            <div class="stage-sub">
-              Paper: ${escapeHtml(stage.paperTargets || 0)} · Poppers: ${escapeHtml(stage.poppers || 0)} · Plates: ${escapeHtml(stage.plates || 0)} · No-Shoots: ${escapeHtml(stage.noShoots || 0)} · Bonus Paper: ${escapeHtml(stage.bonusPaperTargets || 0)} · Bonus Included: ${stage.bonusIncluded ? 'Ja' : 'Nei'}
-            </div>
-            <div class="inline-summary">
-              <span class="summary-pill">Min rounds: ${calcStageMinRounds(stage)}</span>
-              <span class="summary-pill">Max points: ${calcStageMaxPoints(stage)}</span>
-            </div>
-          </div>
-          <div class="action-btns">
-            <button class="btn btn-sm btn-secondary" onclick="openStageEditor(${index})">Rediger</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteStageFromMatch(${index})">Slett</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    saveMatchMetaBtn.onclick = async () => {
-      if (!currentMatch?.id) return;
-      hideMatchMessages();
-
-      const payload = {
-        name: matchEditName.value.trim(),
-        location: matchEditLocation.value.trim(),
-        date: matchEditDate.value.trim(),
-        type: matchEditType.value,
-        status: matchEditStatus.value,
-        searchable: matchEditSearchable.value === 'true',
-        updatedAt: new Date().toISOString()
-      };
-
-      try {
-        await updateDoc(doc(db, 'matches', String(currentMatch.id)), payload);
-        Object.assign(currentMatch, payload);
-        await loadMatches();
-        showMatchSuccess('Matchinfo lagret');
-      } catch (error) {
-        showMatchError('Kunne ikke lagre matchinfo: ' + error.message);
-      }
-    };
-
-    searchMatchUsersBtn.onclick = () => {
+    searchMatchUsersBtn.onclick = async () => {
       const term = matchUserSearch.value.trim().toLowerCase();
       matchUserSearchResults.innerHTML = '';
 
@@ -1733,8 +1645,12 @@
 
       hideMatchMessages();
 
-      const results = usersCache.filter(user => {
-        const fullName = userDisplayName(user).toLowerCase();
+      if (!allUsersCache.length) {
+        await loadAllUsers();
+      }
+
+      const results = allUsersCache.filter(user => {
+        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim().toLowerCase();
         const email = String(user.email || '').toLowerCase();
         return fullName.includes(term) || email.includes(term);
       }).slice(0, 30);
@@ -1744,27 +1660,22 @@
         return;
       }
 
-      const participants = new Set(currentMatch?.participants || []);
-      const directors = new Set(currentMatch?.directors || []);
+      const existing = new Set(currentMatch?.participants || []);
 
       matchUserSearchResults.innerHTML = results.map(user => {
-        const uid = user.id;
-        const inMatch = participants.has(uid);
-        const isDirector = directors.has(uid);
+        const alreadyInMatch = existing.has(user.id);
+        const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || user.id;
         return `
           <div class="user-search-item">
             <div class="user-search-meta">
-              <div class="user-search-name">${escapeHtml(userDisplayName(user))}</div>
-              <div class="user-search-sub">${escapeHtml(user.email || '—')} · <span class="mono">${escapeHtml(uid)}</span></div>
+              <div class="user-search-name">${escapeHtml(name)}</div>
+              <div class="user-search-sub">${escapeHtml(user.email || '—')} · <span class="mono">${escapeHtml(user.id)}</span></div>
             </div>
             <div class="action-btns">
-              <button class="btn btn-sm ${inMatch ? 'btn-secondary' : 'btn-primary'}" ${inMatch ? 'disabled' : ''} onclick="addParticipantToMatch('${escapeAttr(uid)}')">
-                ${inMatch ? 'Allerede deltaker' : 'Legg til'}
+              <button class="btn btn-sm ${alreadyInMatch ? 'btn-secondary' : 'btn-primary'}" ${alreadyInMatch ? 'disabled' : ''} onclick="addParticipantToMatch('${escapeAttr(user.id)}')">
+                ${alreadyInMatch ? 'Allerede med' : 'Legg til'}
               </button>
-              <button class="btn btn-sm ${isDirector ? 'btn-secondary' : 'btn-primary'}" ${isDirector ? 'disabled' : ''} onclick="addDirectorToMatch('${escapeAttr(uid)}')">
-                ${isDirector ? 'Allerede MD' : 'Gjør MD'}
-              </button>
-              <button class="btn btn-sm btn-secondary" onclick="sendInvitationFromAdmin('${escapeAttr(uid)}')">
+              <button class="btn btn-sm btn-secondary" onclick="sendInvitationToUser('${escapeAttr(user.id)}')">
                 Inviter
               </button>
             </div>
@@ -1784,15 +1695,14 @@
 
       try {
         await updateDoc(doc(db, 'matches', String(currentMatch.id)), {
-          participants: arrayUnion(userId),
-          updatedAt: new Date().toISOString()
+          participants: arrayUnion(userId)
         });
 
         currentMatch.participants = [...(currentMatch.participants || []), userId];
         renderParticipants();
         await loadMatches();
         showMatchSuccess('Bruker lagt til i matchen');
-        if (matchUserSearch.value.trim()) searchMatchUsersBtn.click();
+        searchMatchUsersBtn.click();
       } catch (error) {
         showMatchError('Kunne ikke legge til deltaker: ' + error.message);
       }
@@ -1811,8 +1721,7 @@
 
       try {
         await updateDoc(doc(db, 'matches', String(currentMatch.id)), {
-          participants: arrayRemove(userId),
-          updatedAt: new Date().toISOString()
+          participants: arrayRemove(userId)
         });
 
         currentMatch.participants = (currentMatch.participants || []).filter(uid => uid !== userId);
@@ -1825,268 +1734,184 @@
       }
     };
 
-    window.addDirectorToMatch = async (userId) => {
+    window.sendInvitationToUser = async (userId) => {
       if (!currentMatch?.id) return;
       hideMatchMessages();
 
-      if ((currentMatch.directors || []).includes(userId)) {
-        showMatchError('Brukeren er allerede match director');
-        return;
-      }
-
       try {
-        await updateDoc(doc(db, 'matches', String(currentMatch.id)), {
-          directors: arrayUnion(userId),
-          updatedAt: new Date().toISOString()
-        });
+        const invitationRef = doc(db, 'users', String(userId), 'invitations', String(currentMatch.id));
+        const invitationSnap = await getDoc(invitationRef);
 
-        currentMatch.directors = [...(currentMatch.directors || []), userId];
-        renderDirectors();
-        await loadMatches();
-        showMatchSuccess('Bruker lagt til som match director');
-        if (matchUserSearch.value.trim()) searchMatchUsersBtn.click();
-      } catch (error) {
-        showMatchError('Kunne ikke legge til match director: ' + error.message);
-      }
-    };
-
-    window.removeDirectorFromMatch = async (userId) => {
-      if (!currentMatch?.id) return;
-      hideMatchMessages();
-
-      if (!confirm(`Fjerne ${resolveUserLabel(userId)} som match director?`)) return;
-
-      try {
-        await updateDoc(doc(db, 'matches', String(currentMatch.id)), {
-          directors: arrayRemove(userId),
-          updatedAt: new Date().toISOString()
-        });
-
-        currentMatch.directors = (currentMatch.directors || []).filter(uid => uid !== userId);
-        renderDirectors();
-        await loadMatches();
-        showMatchSuccess('Match director fjernet');
-        if (matchUserSearch.value.trim()) searchMatchUsersBtn.click();
-      } catch (error) {
-        showMatchError('Kunne ikke fjerne match director: ' + error.message);
-      }
-    };
-
-    window.sendInvitationFromAdmin = async (userId) => {
-      if (!currentMatch?.id) return;
-      hideMatchMessages();
-
-      const user = usersCache.find(u => u.id === userId);
-      if (!user) {
-        showMatchError('Fant ikke bruker');
-        return;
-      }
-
-      try {
-        const inviteRef = doc(db, 'users', userId, 'invitations', String(currentMatch.id));
-        const existing = await getDoc(inviteRef);
-
-        if (existing.exists()) {
-          const status = String(existing.data().status || '').toLowerCase();
+        if (invitationSnap.exists()) {
+          const status = String(invitationSnap.data()?.status || '').toLowerCase();
           if (status === 'pending') {
-            showMatchError('Invitasjon er allerede sendt');
+            showMatchError('Invitasjon er allerede sendt til denne brukeren');
             return;
           }
           if (status === 'accepted') {
             showMatchError('Brukeren har allerede akseptert invitasjonen');
             return;
           }
-          if (status === 'declined') {
-            showMatchError('Brukeren har tidligere avslått invitasjonen');
-            return;
-          }
         }
 
-        await setDoc(inviteRef, {
-          matchId: currentMatch.id,
-          matchName: currentMatch.name || ('Match ' + currentMatch.id),
-          invitedBy: currentUser.email || '',
-          invitedByUid: currentUser.uid,
-          timestamp: new Date().toISOString(),
-          status: 'pending'
-        });
+        await setDoc(invitationRef, {
+          matchId: String(currentMatch.id),
+          matchName: currentMatch.name || '',
+          invitedBy: currentUser?.email || '',
+          invitedByUid: currentUser?.uid || '',
+          status: 'pending',
+          timestamp: new Date().toISOString()
+        }, { merge: true });
 
-        showMatchSuccess(`Invitasjon sendt til ${userDisplayName(user)}`);
+        showMatchSuccess('Invitasjon sendt');
       } catch (error) {
         showMatchError('Kunne ikke sende invitasjon: ' + error.message);
       }
     };
 
-    createStageBtn.onclick = () => {
+    saveMatchMetaBtn.onclick = async () => {
       if (!currentMatch?.id) return;
-      editingStageIndex = null;
-      stageModalTitle.textContent = 'Opprett stage';
-      resetStageForm(nextStageNumber());
-      stageModal.classList.add('open');
-    };
-
-    window.openStageEditor = (index) => {
-      if (!currentMatch?.id) return;
-      const stages = currentMatch.stages || [];
-      const stage = stages[index];
-      if (!stage) return;
-
-      editingStageIndex = index;
-      stageModalTitle.textContent = `Rediger stage ${stage.number || ''}`;
-      resetStageForm(stage.number || 1, stage);
-      stageModal.classList.add('open');
-    };
-
-    window.deleteStageFromMatch = async (index) => {
-      if (!currentMatch?.id) return;
-      const stages = Array.isArray(currentMatch.stages) ? [...currentMatch.stages] : [];
-      const stage = stages[index];
-      if (!stage) return;
-
-      if (!confirm(`Slette stage ${stage.number || ''} ${stage.name || ''}?`)) return;
-
-      stages.splice(index, 1);
+      hideMatchMessages();
 
       try {
-        await updateDoc(doc(db, 'matches', String(currentMatch.id)), {
-          stages,
-          updatedAt: new Date().toISOString()
-        });
+        const directorEmails = matchDirectorEmailsInput.value
+          .split(',')
+          .map(item => item.trim().toLowerCase())
+          .filter(Boolean);
 
-        currentMatch.stages = stages;
-        renderStages();
+        const payload = {
+          name: matchNameInput.value.trim(),
+          date: matchDateInput.value.trim(),
+          status: matchStatusInput.value.trim(),
+          location: matchLocationInput.value.trim(),
+          division: matchDivisionInput.value.trim(),
+          powerFactor: matchPowerFactorInput.value.trim(),
+          directorEmails,
+          updatedAt: new Date().toISOString()
+        };
+
+        await setDoc(doc(db, 'matches', String(currentMatch.id)), payload, { merge: true });
+
+        Object.assign(currentMatch, payload);
         await loadMatches();
-        showMatchSuccess('Stage slettet');
+        showMatchSuccess('Matchinformasjon lagret');
       } catch (error) {
-        showMatchError('Kunne ikke slette stage: ' + error.message);
+        showMatchError('Kunne ikke lagre matchinfo: ' + error.message);
       }
     };
 
-    function resetStageForm(numberValue = 1, stage = null) {
-      stageError.style.display = 'none';
-
-      stageNumber.value = numberValue;
-      stageName.value = stage?.name || '';
-      stagePaperTargets.value = stage?.paperTargets ?? 0;
-      stagePoppers.value = stage?.poppers ?? 0;
-      stagePlates.value = stage?.plates ?? 0;
-      stageNoShoots.value = stage?.noShoots ?? 0;
-      stageBonusPaperTargets.value = stage?.bonusPaperTargets ?? 0;
-      stageBonusIncluded.value = String(!!stage?.bonusIncluded);
-      updateStageDerived();
-    }
-
-    function nextStageNumber() {
-      const numbers = (currentMatch?.stages || []).map(s => Number(s.number || 0)).filter(n => Number.isFinite(n));
-      return numbers.length ? Math.max(...numbers) + 1 : 1;
-    }
-
-    function calcStageMinRounds(stage) {
-      return ((Number(stage.paperTargets || 0) + Number(stage.bonusPaperTargets || 0)) * 2)
-        + Number(stage.poppers || 0)
-        + Number(stage.plates || 0);
-    }
-
-    function calcStageMaxPoints(stage) {
-      return calcStageMinRounds(stage) * 5;
-    }
-
-    function updateStageDerived() {
-      const stage = {
-        paperTargets: toInt(stagePaperTargets.value),
-        poppers: toInt(stagePoppers.value),
-        plates: toInt(stagePlates.value),
-        bonusPaperTargets: toInt(stageBonusPaperTargets.value)
-      };
-      stageMinRounds.textContent = String(calcStageMinRounds(stage));
-      stageMaxPoints.textContent = String(calcStageMaxPoints(stage));
-    }
-
-    [stagePaperTargets, stagePoppers, stagePlates, stageBonusPaperTargets].forEach(input => {
-      input.addEventListener('input', updateStageDerived);
-    });
-
-    saveStageBtn.onclick = async () => {
-      if (!currentMatch?.id) return;
-
-      const stage = {
-        number: toInt(stageNumber.value, 1),
-        name: stageName.value.trim(),
-        paperTargets: toInt(stagePaperTargets.value),
-        poppers: toInt(stagePoppers.value),
-        plates: toInt(stagePlates.value),
-        noShoots: toInt(stageNoShoots.value),
-        bonusPaperTargets: toInt(stageBonusPaperTargets.value),
-        bonusIncluded: stageBonusIncluded.value === 'true'
-      };
-
-      if (!stage.number) {
-        showError(stageError, 'Stage må ha nummer');
+    function renderStages() {
+      if (!currentMatchStages.length) {
+        stageList.innerHTML = `<div class="empty-state" style="padding:24px 0;"><p>Ingen stages lagt inn ennå</p></div>`;
         return;
       }
 
-      const stages = Array.isArray(currentMatch.stages) ? [...currentMatch.stages] : [];
+      stageList.innerHTML = currentMatchStages.map((stage, index) => `
+        <div class="stage-card">
+          <div class="stage-card-header">
+            <div class="stage-card-title">Stage ${index + 1}</div>
+            <div class="action-btns">
+              <button class="btn btn-sm btn-danger" onclick="removeStage(${index})">Slett stage</button>
+            </div>
+          </div>
 
-      const duplicateNumber = stages.some((s, idx) => idx !== editingStageIndex && Number(s.number) === Number(stage.number));
-      if (duplicateNumber) {
-        showError(stageError, 'Det finnes allerede en stage med dette nummeret');
-        return;
-      }
+          <div class="split-2">
+            <div class="form-group">
+              <label class="form-label">Nummer</label>
+              <input class="form-input" type="number" value="${escapeHtml(String(stage.number))}" onchange="updateStageField(${index}, 'number', this.value)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Navn</label>
+              <input class="form-input" type="text" value="${escapeHtml(stage.name)}" onchange="updateStageField(${index}, 'name', this.value)">
+            </div>
+          </div>
 
-      if (editingStageIndex === null) {
-        stages.push(stage);
+          <div class="split-3">
+            <div class="form-group">
+              <label class="form-label">Paper targets</label>
+              <input class="form-input" type="number" value="${escapeHtml(String(stage.paperTargets))}" onchange="updateStageField(${index}, 'paperTargets', this.value)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Poppers</label>
+              <input class="form-input" type="number" value="${escapeHtml(String(stage.poppers))}" onchange="updateStageField(${index}, 'poppers', this.value)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Plates</label>
+              <input class="form-input" type="number" value="${escapeHtml(String(stage.plates))}" onchange="updateStageField(${index}, 'plates', this.value)">
+            </div>
+          </div>
+
+          <div class="split-2">
+            <div class="form-group">
+              <label class="form-label">Min rounds</label>
+              <input class="form-input" type="number" value="${escapeHtml(String(stage.minRounds))}" onchange="updateStageField(${index}, 'minRounds', this.value)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Max points</label>
+              <input class="form-input" type="number" value="${escapeHtml(String(stage.maxPoints))}" onchange="updateStageField(${index}, 'maxPoints', this.value)">
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    addStageBtn.onclick = () => {
+      currentMatchStages.push(normalizeStage({}, currentMatchStages.length));
+      renderStages();
+    };
+
+    window.updateStageField = (index, field, value) => {
+      if (!currentMatchStages[index]) return;
+      if (['number', 'paperTargets', 'poppers', 'plates', 'minRounds', 'maxPoints'].includes(field)) {
+        currentMatchStages[index][field] = parseInt(String(value || '0'), 10) || 0;
       } else {
-        stages[editingStageIndex] = stage;
+        currentMatchStages[index][field] = value;
       }
+    };
 
-      stages.sort((a, b) => Number(a.number || 0) - Number(b.number || 0));
+    window.removeStage = (index) => {
+      currentMatchStages.splice(index, 1);
+      renderStages();
+    };
+
+    saveStagesBtn.onclick = async () => {
+      if (!currentMatch?.id) return;
+      hideMatchMessages();
 
       try {
-        await updateDoc(doc(db, 'matches', String(currentMatch.id)), {
+        const stages = currentMatchStages.map((stage, index) => normalizeStage(stage, index));
+        await setDoc(doc(db, 'matches', String(currentMatch.id)), {
           stages,
           updatedAt: new Date().toISOString()
-        });
+        }, { merge: true });
 
         currentMatch.stages = stages;
-        stageModal.classList.remove('open');
-        renderStages();
         await loadMatches();
-        showMatchSuccess('Stage lagret');
+        showMatchSuccess('Stages lagret');
       } catch (error) {
-        showMatchError('Kunne ikke lagre stage: ' + error.message);
+        showMatchError('Kunne ikke lagre stages: ' + error.message);
       }
     };
 
-    cancelStageBtn.onclick = () => {
-      stageModal.classList.remove('open');
-      editingStageIndex = null;
-    };
-
+    refreshRolesBtn.onclick = loadRoles;
+    refreshShootersBtn.onclick = loadReferenceShooters;
     refreshMatchesBtn.onclick = async () => {
-      await Promise.all([loadMatches(), loadUsers()]);
+      await Promise.all([loadMatches(), loadAllUsers()]);
     };
 
     closeMatchModalBtn.onclick = () => {
       matchModal.classList.remove('open');
       currentMatch = null;
-      matchUserSearch.value = '';
+      currentMatchStages = [];
       matchUserSearchResults.innerHTML = '';
+      matchUserSearch.value = '';
       hideMatchMessages();
     };
 
-    function resolveUserLabel(uid) {
-      const user = usersCache.find(u => String(u.id) === String(uid));
-      return user ? userDisplayName(user) : (uid || '—');
-    }
-
-    function userDisplayName(user) {
-      const name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-      return name || user.email || user.id || '—';
-    }
-
     function suggestNextShooterId() {
+      const shooters = Array.isArray(window.__referenceShooters) ? window.__referenceShooters : [];
       let max = 0;
-      for (const shooter of shootersCache) {
+      for (const shooter of shooters) {
         const match = String(shooter.id || '').match(/^shooter_(\d+)$/i);
         if (match) max = Math.max(max, parseInt(match[1], 10));
       }
@@ -2100,11 +1925,6 @@
       return Number.isFinite(num) ? num : null;
     }
 
-    function toInt(value, fallback = 0) {
-      const num = parseInt(String(value ?? '').trim(), 10);
-      return Number.isFinite(num) ? Math.max(0, num) : fallback;
-    }
-
     function formatNumber(value, decimals = 2) {
       return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(decimals) : '—';
     }
@@ -2114,7 +1934,7 @@
       element.style.display = 'block';
       setTimeout(() => {
         element.style.display = 'none';
-      }, 6000);
+      }, 5000);
     }
 
     function showMatchError(message) {
@@ -2166,31 +1986,22 @@
       if (e.target === createModal) createModal.classList.remove('open');
     });
 
-    shooterModal.addEventListener('click', (e) => {
-      if (e.target === shooterModal) shooterModal.classList.remove('open');
+    roleModal.addEventListener('click', (e) => {
+      if (e.target === roleModal) roleModal.classList.remove('open');
     });
 
-    userRoleModal.addEventListener('click', (e) => {
-      if (e.target === userRoleModal) {
-        userRoleModal.classList.remove('open');
-        currentRoleUser = null;
-      }
+    shooterModal.addEventListener('click', (e) => {
+      if (e.target === shooterModal) shooterModal.classList.remove('open');
     });
 
     matchModal.addEventListener('click', (e) => {
       if (e.target === matchModal) {
         matchModal.classList.remove('open');
         currentMatch = null;
-        matchUserSearch.value = '';
+        currentMatchStages = [];
         matchUserSearchResults.innerHTML = '';
+        matchUserSearch.value = '';
         hideMatchMessages();
-      }
-    });
-
-    stageModal.addEventListener('click', (e) => {
-      if (e.target === stageModal) {
-        stageModal.classList.remove('open');
-        editingStageIndex = null;
       }
     });
   </script>

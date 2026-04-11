@@ -1,1290 +1,963 @@
-import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";import{getAuth as yt,onAuthStateChanged as wt,signInWithEmailAndPassword as kt,createUserWithEmailAndPassword as xt,signOut as St}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";import{getFirestore as Lt,getDoc as be,doc as U,setDoc as Ne,query as $e,collection as Le,where as Fe,getDocs as He,onSnapshot as ze,serverTimestamp as Ie,updateDoc as de,arrayUnion as st,deleteDoc as Pt}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";import{getFunctions as Et,httpsCallable as Tt}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";(function(){const i=document.createElement("link").relList;if(i&&i.supports&&i.supports("modulepreload"))return;for(const a of document.querySelectorAll('link[rel="modulepreload"]'))s(a);new MutationObserver(a=>{for(const n of a)if(n.type==="childList")for(const r of n.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&s(r)}).observe(document,{childList:!0,subtree:!0});function t(a){const n={};return a.integrity&&(n.integrity=a.integrity),a.referrerPolicy&&(n.referrerPolicy=a.referrerPolicy),a.crossOrigin==="use-credentials"?n.credentials="include":a.crossOrigin==="anonymous"?n.credentials="omit":n.credentials="same-origin",n}function s(a){if(a.ep)return;a.ep=!0;const n=t(a);fetch(a.href,n)}})();const Mt={apiKey:"AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5p7Q",authDomain:"ipsc-insight-coach.firebaseapp.com",projectId:"ipsc-insight-coach",storageBucket:"ipsc-insight-coach.firebasestorage.app",messagingSenderId:"864793320312",appId:"1:864793320312:web:c586e384bbe365444bc68d",measurementId:"G-3Y4NZTBBS2"},at=bt(Mt),Ae=yt(at),O=Lt(at),It=Et();let je=null,oe=null;function Ct(e){wt(Ae,async i=>{if(i){je=i;try{const t=await be(U(O,"users",i.uid));t.exists()?oe={uid:i.uid,...t.data()}:oe={uid:i.uid,email:i.email,name:i.email?i.email.split("@")[0]:"Bruker",role:"user"},e(oe)}catch(t){console.error("Feil ved lasting av brukerprofil:",t),oe={uid:i.uid,email:i.email,name:i.email?i.email.split("@")[0]:"Bruker",role:"user"},e(oe)}}else je=null,oe=null,e(null)})}async function _t(e,i){try{const t=(e||"").trim();return{success:!0,user:(await kt(Ae,t,i||"")).user}}catch(t){console.error("Innlogging feilet:",t);let s="Innlogging feilet";return t.code==="auth/user-not-found"||t.code==="auth/wrong-password"||t.code==="auth/invalid-credential"?s="Feil e-post eller passord":t.code==="auth/invalid-email"?s="Ugyldig e-postadresse":t.code==="auth/user-disabled"&&(s="Denne kontoen er deaktivert"),{success:!1,error:s}}}async function Nt(e,i,t,s,a,n,r,u,m,b){try{const f=(e||"").trim(),p=i||"",h=(t||"").trim(),E=(s||"").trim(),k=(a||"").trim(),P=(n||"").trim(),C=(r||"").trim(),L=(u||"minor").trim(),M=(m||"").trim(),D=(b||"").trim(),_=(await xt(Ae,f,p)).user,K=Tt(It,"validateInviteCode");try{await K({code:h,userId:_.uid,userEmail:f})}catch(j){await _.delete();let w="Ugyldig invitasjonskode";return j.code==="functions/not-found"?w="Ugyldig invitasjonskode":j.code==="functions/permission-denied"?w="Denne koden er deaktivert":j.code==="functions/resource-exhausted"?w="Denne koden har nådd maksimalt antall bruk":j.code==="functions/already-exists"?w="Du har allerede brukt denne koden":j.message&&(w=j.message),{success:!1,error:w}}return await Ne(U(O,"users",_.uid),{email:f,firstName:E,lastName:k,division:P,category:C,powerFactor:L,region:M,club:D,role:"user",inviteCode:h,createdAt:new Date,draw:null,reloadTime:null,gdprConsent:!0,gdprConsentDate:new Date,gdprVersion:"1.0"}),{success:!0,user:_}}catch(f){console.error("Registrering feilet:",f);let p="Registrering feilet";return f.code==="auth/email-already-in-use"?p="E-postadressen er allerede i bruk":f.code==="auth/weak-password"?p="Passordet må være minst 6 tegn":f.code==="auth/invalid-email"?p="Ugyldig e-postadresse":f.message&&(p=f.message),{success:!1,error:p}}}async function $t(){try{return await St(Ae),{success:!0}}catch(e){return console.error("Utlogging feilet:",e),{success:!1,error:"Kunne ikke logge ut"}}}function W(){return je}function Pe(){return oe}const Ft=`
+import{initializeApp as at}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";import{getAuth as ot,onAuthStateChanged as rt,signInWithEmailAndPassword as lt,createUserWithEmailAndPassword as dt,signOut as ct}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";import{getFirestore as ut,getDoc as we,doc as B,setDoc as pt,query as oe,collection as X,where as re,getDocs as Fe,onSnapshot as pe,serverTimestamp as le,addDoc as gt,updateDoc as $e,deleteDoc as vt}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";import{getFunctions as mt,httpsCallable as ht}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))i(n);new MutationObserver(n=>{for(const a of n)if(a.type==="childList")for(const r of a.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&i(r)}).observe(document,{childList:!0,subtree:!0});function s(n){const a={};return n.integrity&&(a.integrity=n.integrity),n.referrerPolicy&&(a.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?a.credentials="include":n.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function i(n){if(n.ep)return;n.ep=!0;const a=s(n);fetch(n.href,a)}})();const ft={apiKey:"AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5p7Q",authDomain:"ipsc-insight-coach.firebaseapp.com",projectId:"ipsc-insight-coach",storageBucket:"ipsc-insight-coach.firebasestorage.app",messagingSenderId:"864793320312",appId:"1:864793320312:web:c586e384bbe365444bc68d",measurementId:"G-3Y4NZTBBS2"},De=at(ft),de=ot(De),L=ut(De),bt=mt();let ge=null,U=null;function wt(e){rt(de,async t=>{if(t){ge=t;try{const s=await we(B(L,"users",t.uid));s.exists()?U={uid:t.uid,...s.data()}:U={uid:t.uid,email:t.email,name:t.email?t.email.split("@")[0]:"Bruker",role:"user"},e(U)}catch(s){console.error("Feil ved lasting av brukerprofil:",s),U={uid:t.uid,email:t.email,name:t.email?t.email.split("@")[0]:"Bruker",role:"user"},e(U)}}else ge=null,U=null,e(null)})}async function yt(e,t){try{const s=(e||"").trim();return{success:!0,user:(await lt(de,s,t||"")).user}}catch(s){console.error("Innlogging feilet:",s);let i="Innlogging feilet";return s.code==="auth/user-not-found"||s.code==="auth/wrong-password"||s.code==="auth/invalid-credential"?i="Feil e-post eller passord":s.code==="auth/invalid-email"?i="Ugyldig e-postadresse":s.code==="auth/user-disabled"&&(i="Denne kontoen er deaktivert"),{success:!1,error:i}}}async function kt(e,t,s,i,n,a,r,l,v,d){try{const g=(e||"").trim(),u=t||"",b=(s||"").trim(),P=(i||"").trim(),E=(n||"").trim(),I=(a||"").trim(),O=(r||"").trim(),x=(l||"minor").trim(),T=(v||"").trim(),R=(d||"").trim(),$=(await dt(de,g,u)).user,ce=ht(bt,"validateInviteCode");try{await ce({code:b,userId:$.uid,userEmail:g})}catch(D){await $.delete();let h="Ugyldig invitasjonskode";return D.code==="functions/not-found"?h="Ugyldig invitasjonskode":D.code==="functions/permission-denied"?h="Denne koden er deaktivert":D.code==="functions/resource-exhausted"?h="Denne koden har nådd maksimalt antall bruk":D.code==="functions/already-exists"?h="Du har allerede brukt denne koden":D.message&&(h=D.message),{success:!1,error:h}}return await pt(B(L,"users",$.uid),{email:g,firstName:P,lastName:E,division:I,category:O,powerFactor:x,region:T,club:R,role:"user",inviteCode:b,createdAt:new Date,draw:null,reloadTime:null,gdprConsent:!0,gdprConsentDate:new Date,gdprVersion:"1.0"}),{success:!0,user:$}}catch(g){console.error("Registrering feilet:",g);let u="Registrering feilet";return g.code==="auth/email-already-in-use"?u="E-postadressen er allerede i bruk":g.code==="auth/weak-password"?u="Passordet må være minst 6 tegn":g.code==="auth/invalid-email"?u="Ugyldig e-postadresse":g.message&&(u=g.message),{success:!1,error:u}}}async function xt(){try{return await ct(de),{success:!0}}catch(e){return console.error("Utlogging feilet:",e),{success:!1,error:"Kunne ikke logge ut"}}}function H(){return ge}function _e(){return U}const Et=`
 <div class="gdpr-content">
- <h2>Personvernerklæring og samtykke</h2>
- 
- <p class="gdpr-intro">
- Ved å registrere deg i IPSC Insight godtar du at vi behandler dine personopplysninger 
- i henhold til denne personvernerklæringen og GDPR (Personvernforordningen).
- </p>
+  <h2>Personvernerklæring og samtykke</h2>
+  
+  <p class="gdpr-intro">
+    Ved å registrere deg i IPSC Insight godtar du at vi behandler dine personopplysninger 
+    i henhold til denne personvernerklæringen og GDPR (Personvernforordningen).
+  </p>
 
- <h3>1. Behandlingsansvarlig</h3>
- <p>
- IPSC Insight er ansvarlig for behandlingen av dine personopplysninger.
- </p>
+  <h3>1. Behandlingsansvarlig</h3>
+  <p>
+    IPSC Insight er ansvarlig for behandlingen av dine personopplysninger.
+  </p>
 
- <h3>2. Hvilke opplysninger samler vi inn?</h3>
- <p>Vi behandler følgende personopplysninger om deg:</p>
- <ul>
- <li><strong>Kontaktinformasjon:</strong> E-postadresse</li>
- <li><strong>Personlige data:</strong> Fornavn og etternavn</li>
- <li><strong>IPSC-relaterte opplysninger:</strong> Division, kategori, powerfactor, region og klubb</li>
- <li><strong>Prestasjonsdata:</strong> Match-resultater, stages, skudd, tider og poeng fra IPSC-konkurranser</li>
- <li><strong>Teknisk informasjon:</strong> Bruker-ID, registreringsdato, siste oppdatering</li>
- <li><strong>Invitasjonskode:</strong> For å verifisere din tilgang til tjenesten</li>
- </ul>
+  <h3>2. Hvilke opplysninger samler vi inn?</h3>
+  <p>Vi behandler følgende personopplysninger om deg:</p>
+  <ul>
+    <li><strong>Kontaktinformasjon:</strong> E-postadresse</li>
+    <li><strong>Personlige data:</strong> Fornavn og etternavn</li>
+    <li><strong>IPSC-relaterte opplysninger:</strong> Division, kategori, powerfactor, region og klubb</li>
+    <li><strong>Prestasjonsdata:</strong> Match-resultater, stages, skudd, tider og poeng fra IPSC-konkurranser</li>
+    <li><strong>Teknisk informasjon:</strong> Bruker-ID, registreringsdato, siste oppdatering</li>
+    <li><strong>Invitasjonskode:</strong> For å verifisere din tilgang til tjenesten</li>
+  </ul>
 
- <h3>3. Formål og behandlingsgrunnlag</h3>
- <p>Vi behandler dine personopplysninger for følgende formål:</p>
- <ul>
- <li><strong>Brukerkonto og autentisering:</strong> For å opprette og administrere din konto (behandlingsgrunnlag: samtykke)</li>
- <li><strong>Treningsanalyse:</strong> For å gi deg innsikt i dine prestasjoner og treningsutvikling (behandlingsgrunnlag: samtykke)</li>
- <li><strong>Deling av match-data:</strong> For å dele resultater med andre brukere du inviterer (behandlingsgrunnlag: samtykke)</li>
- <li><strong>Teknisk drift:</strong> For å sikre at tjenesten fungerer korrekt (behandlingsgrunnlag: berettiget interesse)</li>
- </ul>
+  <h3>3. Formål og behandlingsgrunnlag</h3>
+  <p>Vi behandler dine personopplysninger for følgende formål:</p>
+  <ul>
+    <li><strong>Brukerkonto og autentisering:</strong> For å opprette og administrere din konto (behandlingsgrunnlag: samtykke)</li>
+    <li><strong>Treningsanalyse:</strong> For å gi deg innsikt i dine prestasjoner og treningsutvikling (behandlingsgrunnlag: samtykke)</li>
+    <li><strong>Deling av match-data:</strong> For å dele resultater med andre brukere du inviterer (behandlingsgrunnlag: samtykke)</li>
+    <li><strong>Teknisk drift:</strong> For å sikre at tjenesten fungerer korrekt (behandlingsgrunnlag: berettiget interesse)</li>
+  </ul>
 
- <h3>4. Lagring og teknisk løsning</h3>
- <p>Dine opplysninger lagres og behandles ved hjelp av:</p>
- <ul>
- <li><strong>Google Firebase Authentication:</strong> Sikker håndtering av pålogging og brukerkonto</li>
- <li><strong>Google Firebase Firestore:</strong> Databaselagring av brukerprofil og match-data</li>
- <li><strong>Google Firebase Cloud Functions:</strong> Validering av invitasjonskoder og serverlogikk</li>
- <li><strong>GitHub Pages:</strong> Hosting av webapplikasjonen</li>
- </ul>
- <p>
- Alle tjenester er hostet i EU/EØS-regionen og følger GDPR-kravene. 
- Google Firebase er sertifisert under EU-U.S. Data Privacy Framework.
- </p>
+  <h3>4. Lagring og teknisk løsning</h3>
+  <p>Dine opplysninger lagres og behandles ved hjelp av:</p>
+  <ul>
+    <li><strong>Google Firebase Authentication:</strong> Sikker håndtering av pålogging og brukerkonto</li>
+    <li><strong>Google Firebase Firestore:</strong> Databaselagring av brukerprofil og match-data</li>
+    <li><strong>Google Firebase Cloud Functions:</strong> Validering av invitasjonskoder og serverlogikk</li>
+    <li><strong>GitHub Pages:</strong> Hosting av webapplikasjonen</li>
+  </ul>
+  <p>
+    Alle tjenester er hostet i EU/EØS-regionen og følger GDPR-kravene. 
+    Google Firebase er sertifisert under EU-U.S. Data Privacy Framework.
+  </p>
 
- <h3>5. Deling av opplysninger</h3>
- <p>Dine personopplysninger deles kun i følgende tilfeller:</p>
- <ul>
- <li><strong>Match-deltakere:</strong> Når du inviterer andre brukere til å se eller samarbeide om en match, vil de se dine match-resultater og ditt navn</li>
- <li><strong>Tekniske leverandører:</strong> Google Firebase og GitHub (databehandlere) har tilgang til opplysningene som nødvendig for å levere tjenesten</li>
- </ul>
- <p>Vi selger eller utleverer aldri dine opplysninger til tredjeparter for markedsføringsformål.</p>
+  <h3>5. Deling av opplysninger</h3>
+  <p>Dine personopplysninger deles kun i følgende tilfeller:</p>
+  <ul>
+    <li><strong>Match-deltakere:</strong> Når du inviterer andre brukere til å se eller samarbeide om en match, vil de se dine match-resultater og ditt navn</li>
+    <li><strong>Tekniske leverandører:</strong> Google Firebase og GitHub (databehandlere) har tilgang til opplysningene som nødvendig for å levere tjenesten</li>
+  </ul>
+  <p>Vi selger eller utleverer aldri dine opplysninger til tredjeparter for markedsføringsformål.</p>
 
- <h3>6. Lagringstid</h3>
- <p>
- Dine personopplysninger lagres så lenge du har en aktiv konto hos oss. 
- Når du sletter kontoen din, vil alle dine personopplysninger bli slettet innen 30 dager.
- Match-data du har delt med andre brukere vil fortsatt være synlig for dem, men koblingen til din konto fjernes.
- </p>
+  <h3>6. Lagringstid</h3>
+  <p>
+    Dine personopplysninger lagres så lenge du har en aktiv konto hos oss. 
+    Når du sletter kontoen din, vil alle dine personopplysninger bli slettet innen 30 dager.
+    Match-data du har delt med andre brukere vil fortsatt være synlig for dem, men koblingen til din konto fjernes.
+  </p>
 
- <h3>7. Dine rettigheter</h3>
- <p>Du har følgende rettigheter knyttet til dine personopplysninger:</p>
- <ul>
- <li><strong>Innsyn:</strong> Du kan når som helst be om å få innsyn i hvilke opplysninger vi har om deg</li>
- <li><strong>Retting:</strong> Du kan endre dine profildata direkte i appen</li>
- <li><strong>Sletting:</strong> Du kan slette din konto og alle tilhørende data</li>
- <li><strong>Tilbaketrekking av samtykke:</strong> Du kan når som helst trekke tilbake samtykket ditt ved å slette kontoen</li>
- <li><strong>Dataportabilitet:</strong> Du kan be om å få utlevert dine data i et maskinlesbart format</li>
- <li><strong>Klage:</strong> Du kan klage til Datatilsynet dersom du mener vi behandler dine opplysninger i strid med personvernregelverket</li>
- </ul>
+  <h3>7. Dine rettigheter</h3>
+  <p>Du har følgende rettigheter knyttet til dine personopplysninger:</p>
+  <ul>
+    <li><strong>Innsyn:</strong> Du kan når som helst be om å få innsyn i hvilke opplysninger vi har om deg</li>
+    <li><strong>Retting:</strong> Du kan endre dine profildata direkte i appen</li>
+    <li><strong>Sletting:</strong> Du kan slette din konto og alle tilhørende data</li>
+    <li><strong>Tilbaketrekking av samtykke:</strong> Du kan når som helst trekke tilbake samtykket ditt ved å slette kontoen</li>
+    <li><strong>Dataportabilitet:</strong> Du kan be om å få utlevert dine data i et maskinlesbart format</li>
+    <li><strong>Klage:</strong> Du kan klage til Datatilsynet dersom du mener vi behandler dine opplysninger i strid med personvernregelverket</li>
+  </ul>
 
- <h3>8. Informasjonssikkerhet</h3>
- <p>
- Vi bruker Firebase Authentication med sikker kryptering for pålogging. 
- All kommunikasjon mellom deg og tjenesten er kryptert med HTTPS. 
- Tilgangskontroll sikrer at kun du og de du inviterer kan se dine match-data.
- </p>
+  <h3>8. Informasjonssikkerhet</h3>
+  <p>
+    Vi bruker Firebase Authentication med sikker kryptering for pålogging. 
+    All kommunikasjon mellom deg og tjenesten er kryptert med HTTPS. 
+    Tilgangskontroll sikrer at kun du og de du inviterer kan se dine match-data.
+  </p>
 
- <h3>9. Kontaktinformasjon</h3>
- <p>
- Har du spørsmål om personvern eller ønsker å utøve dine rettigheter, kan du kontakte oss på:<br>
- <strong>E-post:</strong> [DIN KONTAKT E-POST HER]
- </p>
+  <h3>9. Kontaktinformasjon</h3>
+  <p>
+    Har du spørsmål om personvern eller ønsker å utøve dine rettigheter, kan du kontakte oss på:<br>
+    <strong>E-post:</strong> [DIN KONTAKT E-POST HER]
+  </p>
 
- <h3>10. Endringer i personvernerklæringen</h3>
- <p>
- Vi forbeholder oss retten til å oppdatere denne personvernerklæringen. 
- Ved vesentlige endringer vil du bli varslet ved innlogging.
- </p>
+  <h3>10. Endringer i personvernerklæringen</h3>
+  <p>
+    Vi forbeholder oss retten til å oppdatere denne personvernerklæringen. 
+    Ved vesentlige endringer vil du bli varslet ved innlogging.
+  </p>
 
- <div class="gdpr-consent-box">
- <p><strong>Ved å godta denne erklæringen samtykker du til:</strong></p>
- <ul>
- <li>At vi lagrer og behandler dine personopplysninger som beskrevet over</li>
- <li>At vi bruker Firebase (Google) som databehandler</li>
- <li>At match-data du deler med andre brukere blir synlig for dem</li>
- </ul>
- </div>
+  <div class="gdpr-consent-box">
+    <p><strong>Ved å godta denne erklæringen samtykker du til:</strong></p>
+    <ul>
+      <li>At vi lagrer og behandler dine personopplysninger som beskrevet over</li>
+      <li>At vi bruker Firebase (Google) som databehandler</li>
+      <li>At match-data du deler med andre brukere blir synlig for dem</li>
+    </ul>
+  </div>
 
- <p class="gdpr-version">Versjon 1.0 - Sist oppdatert: ${new Date().toLocaleDateString("nb-NO")}</p>
+  <p class="gdpr-version">Versjon 1.0 - Sist oppdatert: ${new Date().toLocaleDateString("nb-NO")}</p>
 </div>
-`;function At(e,i){const t=document.getElementById("gdpr-modal");t&&t.remove();const s=document.createElement("div");s.id="gdpr-modal",s.className="gdpr-modal",s.innerHTML=`
- <div class="gdpr-modal-overlay"></div>
- <div class="gdpr-modal-container">
- <div class="gdpr-modal-header">
- <h2>Personvernerklæring</h2>
- <button class="gdpr-close-btn" aria-label="Lukk">&times;</button>
- </div>
- <div class="gdpr-modal-body">
- ${Ft}
- </div>
- <div class="gdpr-modal-footer">
- <button class="gdpr-btn gdpr-btn-decline">Avvis</button>
- <button class="gdpr-btn gdpr-btn-accept">Godta og fortsett</button>
- </div>
- </div>
- `,document.body.appendChild(s);const a=s.querySelector(".gdpr-close-btn"),n=s.querySelector(".gdpr-btn-accept"),r=s.querySelector(".gdpr-btn-decline"),u=s.querySelector(".gdpr-modal-overlay"),m=()=>{s.remove()};a.addEventListener("click",()=>{m(),i&&i()}),u.addEventListener("click",()=>{m(),i&&i()}),r.addEventListener("click",()=>{m(),i&&i()}),n.addEventListener("click",()=>{m(),e&&e()}),document.body.style.overflow="hidden";const b=m,f=()=>{document.body.style.overflow="",b()};a.onclick=()=>{f(),i&&i()},u.onclick=()=>{f(),i&&i()},r.onclick=()=>{f(),i&&i()},n.onclick=()=>{f(),e&&e()}}function Rt(){const e=document.createElement("div");return e.className="gdpr-checkbox-container",e.innerHTML=`
- <label class="gdpr-checkbox-label">
- <input type="checkbox" id="gdpr-consent-checkbox" class="gdpr-checkbox" required>
- <span class="gdpr-checkbox-text">
- Jeg har lest og godtar 
- <a href="#" class="gdpr-link" id="gdpr-open-modal">personvernerklæringen</a>
- </span>
- </label>
- `,setTimeout(()=>{const i=e.querySelector("#gdpr-open-modal");i&&i.addEventListener("click",t=>{t.preventDefault(),At(()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!0)},()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!1)})})},0),e}function Dt(){const e=document.getElementById("gdpr-consent-checkbox");return!e||!e.checked?{valid:!1,error:"Du må godta personvernerklæringen for å registrere deg"}:{valid:!0}}function Bt(e,i){e.innerHTML=`
- <style>
- * {
- box-sizing: border-box;
- }
+`;function St(e,t){const s=document.getElementById("gdpr-modal");s&&s.remove();const i=document.createElement("div");i.id="gdpr-modal",i.className="gdpr-modal",i.innerHTML=`
+    <div class="gdpr-modal-overlay"></div>
+    <div class="gdpr-modal-container">
+      <div class="gdpr-modal-header">
+        <h2>Personvernerklæring</h2>
+        <button class="gdpr-close-btn" aria-label="Lukk">&times;</button>
+      </div>
+      <div class="gdpr-modal-body">
+        ${Et}
+      </div>
+      <div class="gdpr-modal-footer">
+        <button class="gdpr-btn gdpr-btn-decline">Avvis</button>
+        <button class="gdpr-btn gdpr-btn-accept">Godta og fortsett</button>
+      </div>
+    </div>
+  `,document.body.appendChild(i);const n=i.querySelector(".gdpr-close-btn"),a=i.querySelector(".gdpr-btn-accept"),r=i.querySelector(".gdpr-btn-decline"),l=i.querySelector(".gdpr-modal-overlay"),v=()=>{i.remove()};n.addEventListener("click",()=>{v(),t&&t()}),l.addEventListener("click",()=>{v(),t&&t()}),r.addEventListener("click",()=>{v(),t&&t()}),a.addEventListener("click",()=>{v(),e&&e()}),document.body.style.overflow="hidden";const d=v,g=()=>{document.body.style.overflow="",d()};n.onclick=()=>{g(),t&&t()},l.onclick=()=>{g(),t&&t()},r.onclick=()=>{g(),t&&t()},a.onclick=()=>{g(),e&&e()}}function Pt(){const e=document.createElement("div");return e.className="gdpr-checkbox-container",e.innerHTML=`
+    <label class="gdpr-checkbox-label">
+      <input type="checkbox" id="gdpr-consent-checkbox" class="gdpr-checkbox" required>
+      <span class="gdpr-checkbox-text">
+        Jeg har lest og godtar 
+        <a href="#" class="gdpr-link" id="gdpr-open-modal">personvernerklæringen</a>
+      </span>
+    </label>
+  `,setTimeout(()=>{const t=e.querySelector("#gdpr-open-modal");t&&t.addEventListener("click",s=>{s.preventDefault(),St(()=>{const i=document.getElementById("gdpr-consent-checkbox");i&&(i.checked=!0)},()=>{const i=document.getElementById("gdpr-consent-checkbox");i&&(i.checked=!1)})})},0),e}function Lt(){const e=document.getElementById("gdpr-consent-checkbox");return!e||!e.checked?{valid:!1,error:"Du må godta personvernerklæringen for å registrere deg"}:{valid:!0}}function Mt(e,t){e.innerHTML=`
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
- html, body {
- margin: 0;
- padding: 0;
- }
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
 
- .ipsc-login-page {
- min-height: 100vh;
- width: 100%;
- background:
- radial-gradient(circle at top right, rgba(224, 182, 73, 0.10), transparent 34%),
- radial-gradient(circle at bottom left, rgba(9, 35, 89, 0.16), transparent 34%),
- linear-gradient(135deg, #04070d 0%, #101010 56%, #16120e 100%);
- display: flex;
- justify-content: center;
- align-items: flex-start;
- padding: 14px 14px 24px;
- font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
- color: #f5f7fb;
- }
+      .ipsc-login-page {
+        min-height: 100vh;
+        width: 100%;
+        background:
+          radial-gradient(circle at top right, rgba(224, 182, 73, 0.10), transparent 34%),
+          radial-gradient(circle at bottom left, rgba(9, 35, 89, 0.16), transparent 34%),
+          linear-gradient(135deg, #04070d 0%, #101010 56%, #16120e 100%);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 14px 14px 24px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        color: #f5f7fb;
+      }
 
- .ipsc-login-shell {
- width: 100%;
- max-width: 360px;
- position: relative;
- }
+      .ipsc-login-shell {
+        width: 100%;
+        max-width: 360px;
+        position: relative;
+      }
 
- .ipsc-header {
- width: 100%;
- display: flex;
- align-items: center;
- justify-content: space-between;
- margin-bottom: 18px;
- }
+      .ipsc-header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
 
- .brand-icon {
- width: 58px;
- height: 58px;
- border-radius: 16px;
- overflow: hidden;
- box-shadow: 0 8px 24px rgba(224, 182, 73, 0.14);
- flex-shrink: 0;
- }
+      .brand-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(224, 182, 73, 0.14);
+        flex-shrink: 0;
+      }
 
- .brand-icon img {
- width: 100%;
- height: 100%;
- object-fit: cover;
- }
+      .brand-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
 
- .lang-flags {
- display: flex;
- gap: 8px;
- }
+      .lang-flags {
+        display: flex;
+        gap: 8px;
+      }
 
- .lang-btn {
- width: 46px;
- height: 36px;
- border-radius: 10px;
- border: 1px solid rgba(255,255,255,0.08);
- background: rgba(19, 25, 40, 0.72);
- display: flex;
- align-items: center;
- justify-content: center;
- font-size: 20px;
- line-height: 1;
- cursor: pointer;
- opacity: 0.72;
- }
+      .lang-btn {
+        width: 46px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(19, 25, 40, 0.72);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0.72;
+      }
 
- .lang-btn.active {
- opacity: 1;
- border: 2px solid #e0b649;
- box-shadow: 0 0 0 1px rgba(224, 182, 73, 0.15);
- }
+      .lang-btn.active {
+        opacity: 1;
+        border: 2px solid #e0b649;
+        box-shadow: 0 0 0 1px rgba(224, 182, 73, 0.15);
+      }
 
- .brand-title {
- line-height: 0.92;
- letter-spacing: -1px;
- margin-bottom: 12px;
- }
+      .brand-title {
+        line-height: 0.92;
+        letter-spacing: -1px;
+        margin-bottom: 12px;
+      }
 
- .brand-title .top,
- .brand-title .bottom {
- display: block;
- font-size: clamp(34px, 8.2vw, 42px);
- font-weight: 900;
- }
+      .brand-title .top,
+      .brand-title .bottom {
+        display: block;
+        font-size: clamp(34px, 8.2vw, 42px);
+        font-weight: 900;
+      }
 
- .brand-title .top {
- color: #f5f7fb;
- }
+      .brand-title .top {
+        color: #f5f7fb;
+      }
 
- .brand-title .bottom {
- color: #e0b649;
- }
+      .brand-title .bottom {
+        color: #e0b649;
+      }
 
- .brand-subtitle {
- font-size: clamp(13px, 3.7vw, 16px);
- color: #7d8598;
- font-weight: 500;
- margin-bottom: 26px;
- }
+      .brand-subtitle {
+        font-size: clamp(13px, 3.7vw, 16px);
+        color: #7d8598;
+        font-weight: 500;
+        margin-bottom: 26px;
+      }
 
- .field-label {
- font-size: clamp(12px, 3.5vw, 15px);
- color: #7d8598;
- margin-bottom: 6px;
- text-transform: uppercase;
- letter-spacing: 0.7px;
- }
+      .field-label {
+        font-size: clamp(12px, 3.5vw, 15px);
+        color: #7d8598;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+      }
 
- .field {
- width: 100%;
- height: 50px;
- border-radius: 14px;
- border: 1px solid #27314a;
- background: rgba(18, 26, 50, 0.88);
- color: #f5f7fb;
- font-size: clamp(15px, 4vw, 17px);
- padding: 0 16px;
- outline: none;
- margin-bottom: 14px;
- box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
- }
+      .field {
+        width: 100%;
+        height: 50px;
+        border-radius: 14px;
+        border: 1px solid #27314a;
+        background: rgba(18, 26, 50, 0.88);
+        color: #f5f7fb;
+        font-size: clamp(15px, 4vw, 17px);
+        padding: 0 16px;
+        outline: none;
+        margin-bottom: 14px;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+      }
 
- .field::placeholder {
- color: #8b91a1;
- }
+      .field::placeholder {
+        color: #8b91a1;
+      }
 
- .field-select {
- width: 100%;
- height: 50px;
- border-radius: 14px;
- border: 1px solid #27314a;
- background: rgba(18, 26, 50, 0.88);
- color: #f5f7fb;
- font-size: clamp(15px, 4vw, 17px);
- padding: 0 16px;
- outline: none;
- margin-bottom: 14px;
- box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
- -webkit-appearance: none;
- appearance: none;
- background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238b91a1' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
- background-repeat: no-repeat;
- background-position: right 16px center;
- padding-right: 40px;
- }
+      .field-select {
+        width: 100%;
+        height: 50px;
+        border-radius: 14px;
+        border: 1px solid #27314a;
+        background: rgba(18, 26, 50, 0.88);
+        color: #f5f7fb;
+        font-size: clamp(15px, 4vw, 17px);
+        padding: 0 16px;
+        outline: none;
+        margin-bottom: 14px;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238b91a1' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+      }
 
- .pf-selector {
- display: flex;
- gap: 10px;
- margin-bottom: 14px;
- }
+      .pf-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
 
- .pf-option {
- flex: 1;
- height: 50px;
- border-radius: 14px;
- border: 1px solid #27314a;
- background: rgba(18, 26, 50, 0.88);
- color: #8b91a1;
- display: flex;
- align-items: center;
- justify-content: center;
- cursor: pointer;
- font-weight: 600;
- transition: all 0.2s;
- }
+      .pf-option {
+        flex: 1;
+        height: 50px;
+        border-radius: 14px;
+        border: 1px solid #27314a;
+        background: rgba(18, 26, 50, 0.88);
+        color: #8b91a1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
 
- .pf-option.selected {
- border-color: #e0b649;
- background: rgba(224, 182, 73, 0.1);
- color: #e0b649;
- }
+      .pf-option.selected {
+        border-color: #e0b649;
+        background: rgba(224, 182, 73, 0.1);
+        color: #e0b649;
+      }
 
- .primary-btn {
- width: 100%;
- height: 54px;
- border: none;
- border-radius: 16px;
- background: #e0b649;
- color: #111111;
- font-size: clamp(17px, 4vw, 20px);
- font-weight: 800;
- cursor: pointer;
- margin-top: 4px;
- box-shadow: 0 10px 24px rgba(224, 182, 73, 0.14);
- }
+      .primary-btn {
+        width: 100%;
+        height: 54px;
+        border: none;
+        border-radius: 16px;
+        background: #e0b649;
+        color: #111111;
+        font-size: clamp(17px, 4vw, 20px);
+        font-weight: 800;
+        cursor: pointer;
+        margin-top: 4px;
+        box-shadow: 0 10px 24px rgba(224, 182, 73, 0.14);
+      }
 
- .separator {
- display: flex;
- align-items: center;
- gap: 12px;
- color: #7d8598;
- font-size: 14px;
- margin: 16px 0;
- }
+      .separator {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #7d8598;
+        font-size: 14px;
+        margin: 16px 0;
+      }
 
- .separator::before,
- .separator::after {
- content: "";
- flex: 1;
- height: 1px;
- background: rgba(255,255,255,0.12);
- }
+      .separator::before,
+      .separator::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: rgba(255,255,255,0.12);
+      }
 
- .secondary-btn {
- width: 100%;
- height: 50px;
- border-radius: 14px;
- border: 1px solid #2c3446;
- background: rgba(19, 25, 40, 0.74);
- color: #f3f5fb;
- font-size: clamp(15px, 4vw, 17px);
- font-weight: 700;
- cursor: pointer;
- }
+      .secondary-btn {
+        width: 100%;
+        height: 50px;
+        border-radius: 14px;
+        border: 1px solid #2c3446;
+        background: rgba(19, 25, 40, 0.74);
+        color: #f3f5fb;
+        font-size: clamp(15px, 4vw, 17px);
+        font-weight: 700;
+        cursor: pointer;
+      }
 
- .ghost-btn {
- width: 100%;
- height: 48px;
- border-radius: 14px;
- border: 1px solid #2c3446;
- background: transparent;
- color: #d7dbe4;
- font-size: 16px;
- font-weight: 700;
- cursor: pointer;
- margin-top: 10px;
- }
+      .ghost-btn {
+        width: 100%;
+        height: 48px;
+        border-radius: 14px;
+        border: 1px solid #2c3446;
+        background: transparent;
+        color: #d7dbe4;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 10px;
+      }
 
- .section {
- display: none;
- }
+      .section {
+        display: none;
+      }
 
- .section.active {
- display: block;
- }
+      .section.active {
+        display: block;
+      }
 
- .strength-wrap {
- margin-top: -6px;
- margin-bottom: 12px;
- }
+      .strength-wrap {
+        margin-top: -6px;
+        margin-bottom: 12px;
+      }
 
- .strength-bar-bg {
- width: 100%;
- height: 8px;
- border-radius: 999px;
- background: rgba(255,255,255,0.10);
- overflow: hidden;
- }
+      .strength-bar-bg {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        overflow: hidden;
+      }
 
- .strength-bar-fill {
- height: 100%;
- width: 0%;
- border-radius: 999px;
- transition: width 0.2s ease;
- background: #ff6b6b;
- }
+      .strength-bar-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        transition: width 0.2s ease;
+        background: #ff6b6b;
+      }
 
- .strength-text {
- font-size: 13px;
- color: #9aa3b2;
- margin-top: 6px;
- min-height: 18px;
- }
+      .strength-text {
+        font-size: 13px;
+        color: #9aa3b2;
+        margin-top: 6px;
+        min-height: 18px;
+      }
 
- .error-text {
- color: #ff8a8a;
- font-size: 14px;
- margin-top: 12px;
- min-height: 20px;
- }
+      .error-text {
+        color: #ff8a8a;
+        font-size: 14px;
+        margin-top: 12px;
+        min-height: 20px;
+      }
 
- @media (min-width: 700px) {
- .ipsc-login-page {
- align-items: center;
- padding: 24px;
- }
+      @media (min-width: 700px) {
+        .ipsc-login-page {
+          align-items: center;
+          padding: 24px;
+        }
 
- .ipsc-login-shell {
- max-width: 380px;
- }
- }
- </style>
+        .ipsc-login-shell {
+          max-width: 380px;
+        }
+      }
+    </style>
 
- <div class="ipsc-login-page">
- <div class="ipsc-login-shell">
- <div class="ipsc-header">
- <div class="brand-icon">
- <img src="Logo_IPSC-insight.png" alt="IPSC Insight">
- </div>
- <div class="lang-flags">
- <button id="langNo" class="lang-btn active" type="button" aria-label="Norsk"></button>
- <button id="langEn" class="lang-btn" type="button" aria-label="English"></button>
- </div>
- </div>
+    <div class="ipsc-login-page">
+      <div class="ipsc-login-shell">
+        <div class="ipsc-header">
+          <div class="brand-icon">
+            <img src="Logo_IPSC-insight.png" alt="IPSC Insight">
+          </div>
+          <div class="lang-flags">
+            <button id="langNo" class="lang-btn active" type="button" aria-label="Norsk">🇳🇴</button>
+            <button id="langEn" class="lang-btn" type="button" aria-label="English">🇺🇸</button>
+          </div>
+        </div>
 
- <div class="brand-title">
- <span class="top">IPSC</span>
- <span class="bottom">INSIGHT</span>
- </div>
+        <div class="brand-title">
+          <span class="top">IPSC</span>
+          <span class="bottom">INSIGHT</span>
+        </div>
 
- <div id="brandSubtitle" class="brand-subtitle">Analyse. Prognose. Resultat.</div>
+        <div id="brandSubtitle" class="brand-subtitle">Analyse. Prognose. Resultat.</div>
 
- <div id="loginSection" class="section active">
- <div id="loginEmailLabel" class="field-label">E-post</div>
- <input id="loginEmail" class="field" type="email" placeholder="navn@epost.no" />
+        <div id="loginSection" class="section active">
+          <div id="loginEmailLabel" class="field-label">E-post</div>
+          <input id="loginEmail" class="field" type="email" placeholder="navn@epost.no" />
 
- <div id="loginPasswordLabel" class="field-label">Passord</div>
- <input id="loginPassword" class="field" type="password" placeholder="Passord" />
+          <div id="loginPasswordLabel" class="field-label">Passord</div>
+          <input id="loginPassword" class="field" type="password" placeholder="Passord" />
 
- <button id="loginBtn" class="primary-btn">Logg inn</button>
+          <button id="loginBtn" class="primary-btn">Logg inn</button>
 
- <div id="separatorText" class="separator">eller</div>
+          <div id="separatorText" class="separator">eller</div>
 
- <button id="showRegisterBtn" class="secondary-btn">Registrer ny bruker</button>
- </div>
+          <button id="showRegisterBtn" class="secondary-btn">Registrer ny bruker</button>
+        </div>
 
- <div id="registerSection" class="section">
- <div id="registerFirstNameLabel" class="field-label">Fornavn</div>
- <input id="registerFirstName" class="field" type="text" placeholder="Fornavn" />
+        <div id="registerSection" class="section">
+          <div id="registerFirstNameLabel" class="field-label">Fornavn</div>
+          <input id="registerFirstName" class="field" type="text" placeholder="Fornavn" />
 
- <div id="registerLastNameLabel" class="field-label">Etternavn</div>
- <input id="registerLastName" class="field" type="text" placeholder="Etternavn" />
+          <div id="registerLastNameLabel" class="field-label">Etternavn</div>
+          <input id="registerLastName" class="field" type="text" placeholder="Etternavn" />
 
- <div id="registerEmailLabel" class="field-label">E-post</div>
- <input id="registerEmail" class="field" type="email" placeholder="navn@epost.no" />
+          <div id="registerEmailLabel" class="field-label">E-post</div>
+          <input id="registerEmail" class="field" type="email" placeholder="navn@epost.no" />
 
- <div id="registerEmailConfirmLabel" class="field-label">Bekreft e-post</div>
- <input id="registerEmailConfirm" class="field" type="email" placeholder="Gjenta e-post" />
+          <div id="registerEmailConfirmLabel" class="field-label">Bekreft e-post</div>
+          <input id="registerEmailConfirm" class="field" type="email" placeholder="Gjenta e-post" />
 
- <div id="registerPasswordLabel" class="field-label">Passord</div>
- <input id="registerPassword" class="field" type="password" placeholder="Passord" />
+          <div id="registerPasswordLabel" class="field-label">Passord</div>
+          <input id="registerPassword" class="field" type="password" placeholder="Passord" />
 
- <div class="strength-wrap">
- <div class="strength-bar-bg">
- <div id="passwordStrengthBar" class="strength-bar-fill"></div>
- </div>
- <div id="passwordStrengthText" class="strength-text"></div>
- </div>
+          <div class="strength-wrap">
+            <div class="strength-bar-bg">
+              <div id="passwordStrengthBar" class="strength-bar-fill"></div>
+            </div>
+            <div id="passwordStrengthText" class="strength-text"></div>
+          </div>
 
- <div id="registerPasswordConfirmLabel" class="field-label">Bekreft passord</div>
- <input id="registerPasswordConfirm" class="field" type="password" placeholder="Gjenta passord" />
+          <div id="registerPasswordConfirmLabel" class="field-label">Bekreft passord</div>
+          <input id="registerPasswordConfirm" class="field" type="password" placeholder="Gjenta passord" />
 
- <div id="registerDivisionLabel" class="field-label">Divisjon</div>
- <select id="registerDivision" class="field-select">
- <option value="">Velg divisjon</option>
- <option value="Standard">Standard</option>
- <option value="Open">Open</option>
- <option value="Production">Production</option>
- <option value="Production Optics">Production Optics</option>
- <option value="Classic">Classic</option>
- <option value="Revolver">Revolver</option>
- </select>
+          <div id="registerDivisionLabel" class="field-label">Divisjon</div>
+          <select id="registerDivision" class="field-select">
+            <option value="">Velg divisjon</option>
+            <option value="Standard">Standard</option>
+            <option value="Open">Open</option>
+            <option value="Production">Production</option>
+            <option value="Production Optics">Production Optics</option>
+            <option value="Classic">Classic</option>
+            <option value="Revolver">Revolver</option>
+          </select>
 
- <div id="registerCategoryLabel" class="field-label">Kategori</div>
- <select id="registerCategory" class="field-select">
- <option value="">Velg kategori (valgfri)</option>
- <option value="Junior">Junior</option>
- <option value="Senior">Senior</option>
- <option value="Super Senior">Super Senior</option>
- <option value="Lady">Lady</option>
- <option value="Lady Junior">Lady Junior</option>
- <option value="Lady Senior">Lady Senior</option>
- </select>
+          <div id="registerCategoryLabel" class="field-label">Kategori</div>
+          <select id="registerCategory" class="field-select">
+            <option value="">Velg kategori (valgfri)</option>
+            <option value="Junior">Junior</option>
+            <option value="Senior">Senior</option>
+            <option value="Super Senior">Super Senior</option>
+            <option value="Lady">Lady</option>
+            <option value="Lady Junior">Lady Junior</option>
+            <option value="Lady Senior">Lady Senior</option>
+          </select>
 
- <div id="registerPowerFactorLabel" class="field-label">Power Factor</div>
- <div class="pf-selector">
- <div class="pf-option selected" data-pf="minor" id="pfMinor">Minor</div>
- <div class="pf-option" data-pf="major" id="pfMajor">Major</div>
- </div>
+          <div id="registerPowerFactorLabel" class="field-label">Power Factor</div>
+          <div class="pf-selector">
+            <div class="pf-option selected" data-pf="minor" id="pfMinor">Minor</div>
+            <div class="pf-option" data-pf="major" id="pfMajor">Major</div>
+          </div>
 
- <div id="registerRegionLabel" class="field-label">Region</div>
- <select id="registerRegion" class="field-select">
- <option value="">Velg region (valgfri)</option>
- <option value="Norge">Norge</option>
- <option value="Sverige">Sverige</option>
- <option value="Danmark">Danmark</option>
- <option value="Finland">Finland</option>
- <option value="Tyskland">Tyskland</option>
- <option value="Storbritannia">Storbritannia</option>
- <option value="USA">USA</option>
- <option value="Annet">Annet</option>
- </select>
+          <div id="registerRegionLabel" class="field-label">Region</div>
+          <select id="registerRegion" class="field-select">
+            <option value="">Velg region (valgfri)</option>
+            <option value="Norge">Norge</option>
+            <option value="Sverige">Sverige</option>
+            <option value="Danmark">Danmark</option>
+            <option value="Finland">Finland</option>
+            <option value="Tyskland">Tyskland</option>
+            <option value="Storbritannia">Storbritannia</option>
+            <option value="USA">USA</option>
+            <option value="Annet">Annet</option>
+          </select>
 
- <div id="registerClubLabel" class="field-label">Klubb</div>
- <input id="registerClub" class="field" type="text" placeholder="Klubbnavn (valgfri)" />
+          <div id="registerClubLabel" class="field-label">Klubb</div>
+          <input id="registerClub" class="field" type="text" placeholder="Klubbnavn (valgfri)" />
 
- <div id="registerCodeLabel" class="field-label">Invitasjonskode</div>
- <input id="registerCode" class="field" type="text" placeholder="Invitasjonskode" />
+          <div id="registerCodeLabel" class="field-label">Invitasjonskode</div>
+          <input id="registerCode" class="field" type="text" placeholder="Invitasjonskode" />
 
- <div id="gdprCheckboxContainer"></div>
+          <div id="gdprCheckboxContainer"></div>
 
- <button id="registerBtn" class="primary-btn">Opprett bruker</button>
- <button id="cancelRegisterBtn" class="ghost-btn">Avbryt</button>
- </div>
+          <button id="registerBtn" class="primary-btn">Opprett bruker</button>
+          <button id="cancelRegisterBtn" class="ghost-btn">Avbryt</button>
+        </div>
 
- <div id="error" class="error-text"></div>
- </div>
- </div>
- `;const t={no:{subtitle:"Analyse. Prognose. Resultat.",loginEmailLabel:"E-post",loginEmailPlaceholder:"navn@epost.no",loginPasswordLabel:"Passord",loginPasswordPlaceholder:"Passord",login:"Logg inn",or:"eller",showRegister:"Registrer ny bruker",registerFirstNameLabel:"Fornavn",registerFirstNamePlaceholder:"Fornavn",registerLastNameLabel:"Etternavn",registerLastNamePlaceholder:"Etternavn",registerEmailLabel:"E-post",registerEmailPlaceholder:"navn@epost.no",registerEmailConfirmLabel:"Bekreft e-post",registerEmailConfirmPlaceholder:"Gjenta e-post",registerPasswordLabel:"Passord",registerPasswordPlaceholder:"Passord",registerPasswordConfirmLabel:"Bekreft passord",registerPasswordConfirmPlaceholder:"Gjenta passord",registerDivisionLabel:"Divisjon",registerCategoryLabel:"Kategori",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Klubb",registerCodeLabel:"Invitasjonskode",registerCodePlaceholder:"Invitasjonskode",register:"Opprett bruker",cancel:"Avbryt",emailMismatch:"E-postadressene er ikke like",passwordMismatch:"Passordene er ikke like",missingFields:"Fyll ut alle påkrevde feltene",missingName:"Du må skrive inn fornavn og etternavn",missingDivision:"Du må velge divisjon",weakPassword:"Passordet er for svakt",strengthEmpty:"",strengthVeryWeak:"Passordstyrke: Svært svak",strengthWeak:"Passordstyrke: Svak",strengthMedium:"Passordstyrke: Middels",strengthStrong:"Passordstyrke: Sterk",strengthVeryStrong:"Passordstyrke: Svært sterk",gdprRequired:"Du må godta personvernerklæringen for å registrere deg"},en:{subtitle:"Analyze. Predict. Perform.",loginEmailLabel:"Email",loginEmailPlaceholder:"name@email.com",loginPasswordLabel:"Password",loginPasswordPlaceholder:"Password",login:"Log in",or:"or",showRegister:"Create new user",registerFirstNameLabel:"First Name",registerFirstNamePlaceholder:"First name",registerLastNameLabel:"Last Name",registerLastNamePlaceholder:"Last name",registerEmailLabel:"Email",registerEmailPlaceholder:"name@email.com",registerEmailConfirmLabel:"Confirm email",registerEmailConfirmPlaceholder:"Repeat email",registerPasswordLabel:"Password",registerPasswordPlaceholder:"Password",registerPasswordConfirmLabel:"Confirm password",registerPasswordConfirmPlaceholder:"Repeat password",registerDivisionLabel:"Division",registerCategoryLabel:"Category",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Club",registerCodeLabel:"Invite code",registerCodePlaceholder:"Invite code",register:"Create account",cancel:"Cancel",emailMismatch:"The email addresses do not match",passwordMismatch:"Passwords do not match",missingFields:"Please fill in all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"The password is too weak",strengthEmpty:"",strengthVeryWeak:"Password strength: Very weak",strengthWeak:"Password strength: Weak",strengthMedium:"Password strength: Medium",strengthStrong:"Password strength: Strong",strengthVeryStrong:"Password strength: Very strong",gdprRequired:"You must accept the privacy policy to register"}};let s="no",a="minor";const n=document.getElementById("error"),r=document.getElementById("loginSection"),u=document.getElementById("registerSection"),m=document.getElementById("showRegisterBtn"),b=document.getElementById("cancelRegisterBtn"),f=document.getElementById("loginBtn"),p=document.getElementById("registerBtn"),h=document.getElementById("langNo"),E=document.getElementById("langEn"),k=document.getElementById("registerPassword"),P=document.getElementById("passwordStrengthBar"),C=document.getElementById("passwordStrengthText"),L=document.getElementById("pfMinor"),M=document.getElementById("pfMajor");L.onclick=()=>{a="minor",L.classList.add("selected"),M.classList.remove("selected")},M.onclick=()=>{a="major",M.classList.add("selected"),L.classList.remove("selected")};function D(w){let y=0;return w?(w.length>=8&&(y+=1),w.length>=12&&(y+=1),/[a-z]/.test(w)&&/[A-Z]/.test(w)&&(y+=1),/\d/.test(w)&&(y+=1),/[^A-Za-z0-9]/.test(w)&&(y+=1),y<=1?{score:y,width:"20%",labelKey:"strengthVeryWeak",color:"#ff6b6b"}:y===2?{score:y,width:"40%",labelKey:"strengthWeak",color:"#ff9f43"}:y===3?{score:y,width:"60%",labelKey:"strengthMedium",color:"#feca57"}:y===4?{score:y,width:"80%",labelKey:"strengthStrong",color:"#1dd1a1"}:{score:y,width:"100%",labelKey:"strengthVeryStrong",color:"#10ac84"}):{score:0,width:"0%",labelKey:"strengthEmpty",color:"#ff6b6b"}}function B(){const w=t[s],y=k.value,H=D(y);P.style.width=H.width,P.style.background=H.color,C.innerText=w[H.labelKey]}function _(w){s=w;const y=t[w];document.getElementById("brandSubtitle").innerText=y.subtitle,document.getElementById("loginEmailLabel").innerText=y.loginEmailLabel,document.getElementById("loginEmail").placeholder=y.loginEmailPlaceholder,document.getElementById("loginPasswordLabel").innerText=y.loginPasswordLabel,document.getElementById("loginPassword").placeholder=y.loginPasswordPlaceholder,document.getElementById("loginBtn").innerText=y.login,document.getElementById("separatorText").innerText=y.or,document.getElementById("showRegisterBtn").innerText=y.showRegister,document.getElementById("registerFirstNameLabel").innerText=y.registerFirstNameLabel,document.getElementById("registerFirstName").placeholder=y.registerFirstNamePlaceholder,document.getElementById("registerLastNameLabel").innerText=y.registerLastNameLabel,document.getElementById("registerLastName").placeholder=y.registerLastNamePlaceholder,document.getElementById("registerEmailLabel").innerText=y.registerEmailLabel,document.getElementById("registerEmail").placeholder=y.registerEmailPlaceholder,document.getElementById("registerEmailConfirmLabel").innerText=y.registerEmailConfirmLabel,document.getElementById("registerEmailConfirm").placeholder=y.registerEmailConfirmPlaceholder,document.getElementById("registerPasswordLabel").innerText=y.registerPasswordLabel,document.getElementById("registerPassword").placeholder=y.registerPasswordPlaceholder,document.getElementById("registerPasswordConfirmLabel").innerText=y.registerPasswordConfirmLabel,document.getElementById("registerPasswordConfirm").placeholder=y.registerPasswordConfirmPlaceholder,document.getElementById("registerDivisionLabel").innerText=y.registerDivisionLabel,document.getElementById("registerCategoryLabel").innerText=y.registerCategoryLabel,document.getElementById("registerPowerFactorLabel").innerText=y.registerPowerFactorLabel,document.getElementById("registerRegionLabel").innerText=y.registerRegionLabel,document.getElementById("registerClubLabel").innerText=y.registerClubLabel,document.getElementById("registerCodeLabel").innerText=y.registerCodeLabel,document.getElementById("registerCode").placeholder=y.registerCodePlaceholder,document.getElementById("registerBtn").innerText=y.register,document.getElementById("cancelRegisterBtn").innerText=y.cancel,h.classList.toggle("active",w==="no"),E.classList.toggle("active",w==="en"),B()}function K(){r.classList.remove("active"),u.classList.add("active"),n.innerText="";const w=document.getElementById("gdprCheckboxContainer");if(w&&!w.hasChildNodes()){const y=Rt();w.appendChild(y)}}function j(){u.classList.remove("active"),r.classList.add("active"),n.innerText=""}h.onclick=()=>_("no"),E.onclick=()=>_("en"),m.onclick=K,b.onclick=j,k.oninput=B,f.onclick=async()=>{n.innerText="";const w=document.getElementById("loginEmail").value.trim(),y=document.getElementById("loginPassword").value,H=await _t(w,y);H.success?i():n.innerText=H.error},p.onclick=async()=>{n.innerText="";const w=t[s],y=document.getElementById("registerFirstName").value.trim(),H=document.getElementById("registerLastName").value.trim(),Y=document.getElementById("registerEmail").value.trim(),ce=document.getElementById("registerEmailConfirm").value.trim(),X=document.getElementById("registerPassword").value,pe=document.getElementById("registerPasswordConfirm").value,se=document.getElementById("registerDivision").value,ae=document.getElementById("registerCategory").value,T=document.getElementById("registerRegion").value,I=document.getElementById("registerClub").value.trim(),c=document.getElementById("registerCode").value.trim();if(!y||!H){n.innerText=w.missingName;return}if(!Y||!ce||!X||!pe||!c){n.innerText=w.missingFields;return}if(!se){n.innerText=w.missingDivision;return}if(Y!==ce){n.innerText=w.emailMismatch;return}if(X!==pe){n.innerText=w.passwordMismatch;return}if(D(X).score<=1){n.innerText=w.weakPassword;return}if(!Dt().valid){n.innerText=w.gdprRequired;return}const v=await Nt(Y,X,c,y,H,se,ae,a,T,I);v.success?i():n.innerText=v.error},_("no"),B()}async function Ot(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{return await de(U(O,"users",i.uid),{...e,updatedAt:Ie()}),{success:!0}}catch(t){return console.error("Save profile error:",t),{success:!1,error:t.message}}}async function jt(){const e=W();if(!e)return null;try{const i=await be(U(O,"users",e.uid));return i.exists()?{uid:e.uid,...i.data()}:null}catch(i){return console.error("Get profile error:",i),null}}async function Ut(e){try{const i=await be(U(O,"users",e));return i.exists()?{uid:e,...i.data()}:null}catch(i){return console.error("Get user by ID error:",i),null}}async function Ht(){const e=U(O,"counters","matchId");try{const i=await be(e);if(!i.exists())return await Ne(e,{value:1}),1;const s=i.data().value+1;return await de(e,{value:s}),s}catch(i){throw console.error("Error getting next match ID:",i),i}}async function zt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=await Ht(),s={id:t,...e,searchable:e.searchable!==!1,ownerId:i.uid,participants:[i.uid],createdAt:Ie(),updatedAt:Ie()};return await Ne(U(O,"matches",t.toString()),s),{success:!0,matchId:t}}catch(t){return console.error("Create match error:",t),{success:!1,error:t.message}}}async function Ee(e,i){if(!W())return{success:!1,error:"Not authenticated"};try{return await de(U(O,"matches",e.toString()),{...i,updatedAt:Ie()}),{success:!0}}catch(s){return console.error("Update match error:",s),{success:!1,error:s.message}}}async function Gt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=await be(U(O,"matches",e.toString()));return t.exists()?t.data().ownerId!==i.uid?{success:!1,error:"Only the creator can delete this match"}:(await Pt(U(O,"matches",e.toString())),{success:!0}):{success:!1,error:"Match not found"}}catch(t){return console.error("Delete match error:",t),{success:!1,error:t.message}}}async function Kt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=e.toString().trim(),s=await Vt(),a=s.find(n=>n.id&&n.id.toString()===t);return a?{success:!0,match:a}:{success:!1,error:"Du har ikke tilgang til denne matchen. Bruk invitasjoner for å få tilgang."}}catch(t){return console.error("Search match error:",t),{success:!1,error:t.message}}}async function Vt(){const e=W();if(!e)return[];try{const i=$e(Le(O,"matches"),Fe("participants","array-contains",e.uid)),t=await He(i),s=[];return t.forEach(a=>{s.push({id:a.id,...a.data()})}),s.sort((a,n)=>{var m,b;const r=a.date||((m=a.createdAt)==null?void 0:m.toDate())||new Date(0);return(n.date||((b=n.createdAt)==null?void 0:b.toDate())||new Date(0))-r}),s}catch(i){return console.error("Get user matches error:",i),[]}}function qt(e){const i=W();if(!i)return()=>{};const t=$e(Le(O,"matches"),Fe("participants","array-contains",i.uid));return ze(t,a=>{const n=[];a.forEach(r=>{n.push({id:r.id,...r.data()})}),n.sort((r,u)=>{var f,p;const m=r.date||((f=r.createdAt)==null?void 0:f.toDate())||new Date(0);return(u.date||((p=u.createdAt)==null?void 0:p.toDate())||new Date(0))-m}),e(n)},a=>{console.error("Listen to matches error:",a)})}function Wt(e,i){return ze(U(O,"matches",e.toString()),s=>{s.exists()?i({id:s.id,...s.data()}):i(null)},s=>{console.error("Listen to match error:",s)})}async function Ge(e,i){const t=W();if(!t)return{success:!1,error:"Not authenticated"};try{console.log(" Søker etter bruker med email:",e);const s=$e(Le(O,"users"),Fe("email","==",e)),a=await He(s);if(a.empty)return console.error(" Bruker ikke funnet:",e),{success:!1,error:"Bruker ikke funnet"};const n=a.docs[0],r=n.id;return console.log(" Bruker funnet:",r,n.data()),console.log(" Sender invitasjon..."),await Ne(U(O,"users",r,"invitations",i.matchId.toString()),{matchId:i.matchId,matchName:i.matchName,invitedBy:t.email,invitedByUid:t.uid,timestamp:new Date().toISOString(),status:"pending"}),console.log(" Invitasjon sendt!"),{success:!0}}catch(s){return console.error(" Send invitation error:",s),{success:!1,error:s.message}}}async function Ke(e){const i=W();if(!i)return[];try{const t=e.toLowerCase().trim();if(t.length===0)return[];console.log(" Søker etter brukere:",t);const s=await He(Le(O,"users")),a=[];return s.forEach(n=>{const r=n.data(),u=`${r.firstName||""} ${r.lastName||""}`.toLowerCase(),m=(r.email||"").toLowerCase();n.id!==i.uid&&(u.includes(t)||m.includes(t))&&a.push({uid:n.id,email:r.email,firstName:r.firstName||"",lastName:r.lastName||"",displayName:`${r.firstName||""} ${r.lastName||""}`.trim()})}),console.log(` Fant ${a.length} brukere`),a}catch(t){return console.error(" Search users error:",t),[]}}async function Jt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{return await de(U(O,"matches",e.toString()),{participants:st(i.uid)}),await de(U(O,"users",i.uid,"invitations",e.toString()),{status:"accepted"}),{success:!0}}catch(t){return console.error("Accept invitation error:",t),{success:!1,error:t.message}}}async function Yt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{return await de(U(O,"users",i.uid,"invitations",e.toString()),{status:"declined"}),{success:!0}}catch(t){return console.error("Decline invitation error:",t),{success:!1,error:t.message}}}function Zt(e){const i=W();if(!i)return()=>{};const t=Le(O,"users",i.uid,"invitations"),s=$e(t,Fe("status","==","pending"));return ze(s,a=>{const n=[];a.forEach(r=>{n.push({id:r.id,...r.data()})}),e(n)})}async function loadReferenceShooters(){try{const e=await He(Le(O,"referenceShooters")),i=[];return e.forEach(t=>{i.push({id:t.id,...t.data()})}),i}catch(e){return console.error("Load reference shooters error:",e),[]}}function initReferenceEditState(e){refEditState={enabled:!!(e&&e.referenceShootersEnabled),ids:Array.isArray(e&&e.referenceShooterIds)?e.referenceShooterIds.slice():[],overrides:JSON.parse(JSON.stringify(e&&e.referenceOverrides||{}))}}function renderReferenceShooterConfig(){const e=o("reference-shooters-config"),i=o("edit-match-reference-enabled");if(!e)return;const t=i?!!i.checked:!!refEditState.enabled;if(refEditState.enabled=t,e.style.display=t?"block":"none",!t){e.innerHTML="";return}let s='<div style="padding:12px;background:var(--bg);border-radius:8px;">';refShooters.length===0?s+='<div style="color:var(--muted);font-size:13px;">Ingen referanseskyttere lastet.</div>':refShooters.forEach(a=>{const n=refEditState.ids.includes(a.id),r=refEditState.overrides[a.id]||{},u=r.drawTime!=null?r.drawTime:a.drawTime,m=r.reloadTime!=null?r.reloadTime:a.reloadTime;s+='<div style="padding:10px 0;border-bottom:1px solid var(--border);">',s+='<label style="display:flex;align-items:center;gap:10px;cursor:pointer;">',s+='<input type="checkbox" '+(n?"checked":"")+' onchange="toggleReferenceShooterChoice(\''+a.id+'\')" style="width:18px;height:18px;">',s+='<span style="font-weight:600;">'+a.name+'</span>',s+='</label>',s+='<div style="font-size:12px;color:var(--muted);margin-top:4px;">'+(a.division||"")+' · '+(a.powerFactor||"")+' · HF S/M/L: '+(a.shortHF||0).toFixed(2)+' / '+(a.mediumHF||0).toFixed(2)+' / '+(a.longHF||0).toFixed(2)+'</div>',n&&(s+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">',s+='<div><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Draw</div><input class="field-input" type="number" step="0.01" id="ref-draw-'+a.id+'" value="'+u+'" oninput="updateReferenceShooterOverride(\''+a.id+'\',\'drawTime\',this.value)"></div>',s+='<div><div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Reload</div><input class="field-input" type="number" step="0.01" id="ref-reload-'+a.id+'" value="'+m+'" oninput="updateReferenceShooterOverride(\''+a.id+'\',\'reloadTime\',this.value)"></div>',s+='</div>'),s+='</div>'}),s+='</div>',e.innerHTML=s}function toggleReferenceShootersEnabled(){const e=o("edit-match-reference-enabled");refEditState.enabled=!!(e&&e.checked),renderReferenceShooterConfig()}function toggleReferenceShooterChoice(e){const i=refEditState.ids.indexOf(e);if(i>=0)refEditState.ids.splice(i,1);else{refEditState.ids.push(e);const t=refShooters.find(s=>s.id===e);t&&!refEditState.overrides[e]&&(refEditState.overrides[e]={drawTime:t.drawTime,reloadTime:t.reloadTime})}renderReferenceShooterConfig()}function updateReferenceShooterOverride(e,i,t){refEditState.overrides[e]||(refEditState.overrides[e]={});const s=parseFloat(t);isNaN(s)||(refEditState.overrides[e][i]=s)}function getActiveReferenceShooters(e){if(!e||!e.referenceShootersEnabled)return[];const i=Array.isArray(e.referenceShooterIds)?e.referenceShooterIds:[],t=e.referenceOverrides||{};return refShooters.filter(s=>i.includes(s.id)).map(s=>{const a=t[s.id]||{};return{...s,drawTime:a.drawTime!=null?a.drawTime:s.drawTime,reloadTime:a.reloadTime!=null?a.reloadTime:s.reloadTime}})}function getReferenceCourseType(e){const i=icStageMaxPts(e);return i<=60?"short":i<=120?"medium":"long"}function projectReferenceShooterForStage(e,i){if(!e||!i)return null;const t=icStageShots(i),s=icStageMaxPts(i),a=getReferenceCourseType(i),n=a==="short"?e.shortHF:a==="medium"?e.mediumHF:e.longHF;if(!n||n<=0)return null;const r=Math.max(0,Math.ceil(t/10)-1),u=s/n,m=Number(e.drawTime||0),b=Number(e.reloadTime||0),f=u+m+r*b;return{shooterId:e.id,name:e.name,courseType:a,shots:t,maxPoints:s,benchmarkHF:n,reloads:r,baseTime:u,drawTime:m,reloadTime:b,projectedTotalTime:f}}function renderReferenceBenchmarkBlock(e,i,t){const s=getActiveReferenceShooters(e);if(!i||!s.length)return"";let a='<div style="margin-top:15px;padding:12px;background:var(--bg);border-radius:8px;border-left:3px solid var(--accent);">';return a+='<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">REFERANSESKYTTERE</div>',s.forEach(n=>{const r=projectReferenceShooterForStage(n,i);if(!r)return;const u=t&&t.estHF!=null?r.benchmarkHF-t.estHF:null,m=t&&t.expTime!=null?t.expTime-r.projectedTotalTime:null;a+='<div style="padding:10px 0;border-bottom:1px solid var(--border);">',a+='<div style="font-size:14px;font-weight:700;margin-bottom:8px;">'+r.name+'</div>',a+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px;">',a+='<div><div style="color:var(--muted);margin-bottom:4px;">Benchmark HF</div><div style="font-weight:700;color:var(--accent);">'+r.benchmarkHF.toFixed(2)+'</div></div>',a+='<div><div style="color:var(--muted);margin-bottom:4px;">Forventet tid</div><div style="font-weight:700;">'+r.projectedTotalTime.toFixed(2)+'s</div></div>',a+='<div><div style="color:var(--muted);margin-bottom:4px;">Reloads</div><div style="font-weight:700;">'+r.reloads+'</div></div>',a+='</div>',(u!=null||m!=null)&&(a+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;margin-top:8px;">',a+='<div><div style="color:var(--muted);margin-bottom:4px;">Delta HF mot deg</div><div style="font-weight:700;color:'+(u!=null&&u>0?'var(--red)':'var(--green)')+';">'+(u!=null?(u>0?'+':'')+u.toFixed(2):'—')+'</div></div>',a+='<div><div style="color:var(--muted);margin-bottom:4px;">Delta tid mot deg</div><div style="font-weight:700;color:'+(m!=null&&m>0?'var(--green)':'var(--red)')+';">'+(m!=null?(m>0?'-':'')+Math.abs(m).toFixed(2)+'s':'—')+'</div></div>',a+='</div>'),a+='</div>'}),a+='</div>'}function Qt(e){return e&&e.__esModule&&Object.prototype.hasOwnProperty.call(e,"default")?e.default:e}var Xt={exports:{}};(function(e){var i=function(t){var s=Object.prototype,a=s.hasOwnProperty,n=Object.defineProperty||function(c,l,v){c[l]=v.value},r,u=typeof Symbol=="function"?Symbol:{},m=u.iterator||"@@iterator",b=u.asyncIterator||"@@asyncIterator",f=u.toStringTag||"@@toStringTag";function p(c,l,v){return Object.defineProperty(c,l,{value:v,enumerable:!0,configurable:!0,writable:!0}),c[l]}try{p({},"")}catch{p=function(l,v,S){return l[v]=S}}function h(c,l,v,S){var x=l&&l.prototype instanceof D?l:D,N=Object.create(x.prototype),z=new ae(S||[]);return n(N,"_invoke",{value:ce(c,v,z)}),N}t.wrap=h;function E(c,l,v){try{return{type:"normal",arg:c.call(l,v)}}catch(S){return{type:"throw",arg:S}}}var k="suspendedStart",P="suspendedYield",C="executing",L="completed",M={};function D(){}function B(){}function _(){}var K={};p(K,m,function(){return this});var j=Object.getPrototypeOf,w=j&&j(j(T([])));w&&w!==s&&a.call(w,m)&&(K=w);var y=_.prototype=D.prototype=Object.create(K);B.prototype=_,n(y,"constructor",{value:_,configurable:!0}),n(_,"constructor",{value:B,configurable:!0}),B.displayName=p(_,f,"GeneratorFunction");function H(c){["next","throw","return"].forEach(function(l){p(c,l,function(v){return this._invoke(l,v)})})}t.isGeneratorFunction=function(c){var l=typeof c=="function"&&c.constructor;return l?l===B||(l.displayName||l.name)==="GeneratorFunction":!1},t.mark=function(c){return Object.setPrototypeOf?Object.setPrototypeOf(c,_):(c.__proto__=_,p(c,f,"GeneratorFunction")),c.prototype=Object.create(y),c},t.awrap=function(c){return{__await:c}};function Y(c,l){function v(N,z,V,J){var q=E(c[N],c,z);if(q.type==="throw")J(q.arg);else{var Be=q.arg,we=Be.value;return we&&typeof we=="object"&&a.call(we,"__await")?l.resolve(we.__await).then(function(ne){v("next",ne,V,J)},function(ne){v("throw",ne,V,J)}):l.resolve(we).then(function(ne){Be.value=ne,V(Be)},function(ne){return v("throw",ne,V,J)})}}var S;function x(N,z){function V(){return new l(function(J,q){v(N,z,J,q)})}return S=S?S.then(V,V):V()}n(this,"_invoke",{value:x})}H(Y.prototype),p(Y.prototype,b,function(){return this}),t.AsyncIterator=Y,t.async=function(c,l,v,S,x){x===void 0&&(x=Promise);var N=new Y(h(c,l,v,S),x);return t.isGeneratorFunction(l)?N:N.next().then(function(z){return z.done?z.value:N.next()})};function ce(c,l,v){var S=k;return function(N,z){if(S===C)throw new Error("Generator is already running");if(S===L){if(N==="throw")throw z;return I()}for(v.method=N,v.arg=z;;){var V=v.delegate;if(V){var J=X(V,v);if(J){if(J===M)continue;return J}}if(v.method==="next")v.sent=v._sent=v.arg;else if(v.method==="throw"){if(S===k)throw S=L,v.arg;v.dispatchException(v.arg)}else v.method==="return"&&v.abrupt("return",v.arg);S=C;var q=E(c,l,v);if(q.type==="normal"){if(S=v.done?L:P,q.arg===M)continue;return{value:q.arg,done:v.done}}else q.type==="throw"&&(S=L,v.method="throw",v.arg=q.arg)}}}function X(c,l){var v=l.method,S=c.iterator[v];if(S===r)return l.delegate=null,v==="throw"&&c.iterator.return&&(l.method="return",l.arg=r,X(c,l),l.method==="throw")||v!=="return"&&(l.method="throw",l.arg=new TypeError("The iterator does not provide a '"+v+"' method")),M;var x=E(S,c.iterator,l.arg);if(x.type==="throw")return l.method="throw",l.arg=x.arg,l.delegate=null,M;var N=x.arg;if(!N)return l.method="throw",l.arg=new TypeError("iterator result is not an object"),l.delegate=null,M;if(N.done)l[c.resultName]=N.value,l.next=c.nextLoc,l.method!=="return"&&(l.method="next",l.arg=r);else return N;return l.delegate=null,M}H(y),p(y,f,"Generator"),p(y,m,function(){return this}),p(y,"toString",function(){return"[object Generator]"});function pe(c){var l={tryLoc:c[0]};1 in c&&(l.catchLoc=c[1]),2 in c&&(l.finallyLoc=c[2],l.afterLoc=c[3]),this.tryEntries.push(l)}function se(c){var l=c.completion||{};l.type="normal",delete l.arg,c.completion=l}function ae(c){this.tryEntries=[{tryLoc:"root"}],c.forEach(pe,this),this.reset(!0)}t.keys=function(c){var l=Object(c),v=[];for(var S in l)v.push(S);return v.reverse(),function x(){for(;v.length;){var N=v.pop();if(N in l)return x.value=N,x.done=!1,x}return x.done=!0,x}};function T(c){if(c){var l=c[m];if(l)return l.call(c);if(typeof c.next=="function")return c;if(!isNaN(c.length)){var v=-1,S=function x(){for(;++v<c.length;)if(a.call(c,v))return x.value=c[v],x.done=!1,x;return x.value=r,x.done=!0,x};return S.next=S}}return{next:I}}t.values=T;function I(){return{value:r,done:!0}}return ae.prototype={constructor:ae,reset:function(c){if(this.prev=0,this.next=0,this.sent=this._sent=r,this.done=!1,this.delegate=null,this.method="next",this.arg=r,this.tryEntries.forEach(se),!c)for(var l in this)l.charAt(0)==="t"&&a.call(this,l)&&!isNaN(+l.slice(1))&&(this[l]=r)},stop:function(){this.done=!0;var c=this.tryEntries[0],l=c.completion;if(l.type==="throw")throw l.arg;return this.rval},dispatchException:function(c){if(this.done)throw c;var l=this;function v(J,q){return N.type="throw",N.arg=c,l.next=J,q&&(l.method="next",l.arg=r),!!q}for(var S=this.tryEntries.length-1;S>=0;--S){var x=this.tryEntries[S],N=x.completion;if(x.tryLoc==="root")return v("end");if(x.tryLoc<=this.prev){var z=a.call(x,"catchLoc"),V=a.call(x,"finallyLoc");if(z&&V){if(this.prev<x.catchLoc)return v(x.catchLoc,!0);if(this.prev<x.finallyLoc)return v(x.finallyLoc)}else if(z){if(this.prev<x.catchLoc)return v(x.catchLoc,!0)}else if(V){if(this.prev<x.finallyLoc)return v(x.finallyLoc)}else throw new Error("try statement without catch or finally")}}},abrupt:function(c,l){for(var v=this.tryEntries.length-1;v>=0;--v){var S=this.tryEntries[v];if(S.tryLoc<=this.prev&&a.call(S,"finallyLoc")&&this.prev<S.finallyLoc){var x=S;break}}x&&(c==="break"||c==="continue")&&x.tryLoc<=l&&l<=x.finallyLoc&&(x=null);var N=x?x.completion:{};return N.type=c,N.arg=l,x?(this.method="next",this.next=x.finallyLoc,M):this.complete(N)},complete:function(c,l){if(c.type==="throw")throw c.arg;return c.type==="break"||c.type==="continue"?this.next=c.arg:c.type==="return"?(this.rval=this.arg=c.arg,this.method="return",this.next="end"):c.type==="normal"&&l&&(this.next=l),M},finish:function(c){for(var l=this.tryEntries.length-1;l>=0;--l){var v=this.tryEntries[l];if(v.finallyLoc===c)return this.complete(v.completion,v.afterLoc),se(v),M}},catch:function(c){for(var l=this.tryEntries.length-1;l>=0;--l){var v=this.tryEntries[l];if(v.tryLoc===c){var S=v.completion;if(S.type==="throw"){var x=S.arg;se(v)}return x}}throw new Error("illegal catch attempt")},delegateYield:function(c,l,v){return this.delegate={iterator:T(c),resultName:l,nextLoc:v},this.method==="next"&&(this.arg=r),M}},t}(e.exports);try{regeneratorRuntime=i}catch{typeof globalThis=="object"?globalThis.regeneratorRuntime=i:Function("r","regeneratorRuntime = r")(i)}})(Xt);var Ve=(e,i)=>`${e}-${i}-${Math.random().toString(16).slice(3,8)}`;const ei=Ve;let Ze=0;var nt=({id:e,action:i,payload:t={}})=>{let s=e;return typeof s>"u"&&(s=ei("Job",Ze),Ze+=1),{id:s,action:i,payload:t}},ye={};let qe=!1;ye.logging=qe;ye.setLogging=e=>{qe=e};ye.log=(...e)=>qe?console.log.apply(void 0,e):null;const ti=nt,{log:Te}=ye,ii=Ve;let Qe=0;var si=()=>{const e=ii("Scheduler",Qe),i={},t={};let s=[];Qe+=1;const a=()=>s.length,n=()=>Object.keys(i).length,r=()=>{if(s.length!==0){const p=Object.keys(i);for(let h=0;h<p.length;h+=1)if(typeof t[p[h]]>"u"){s[0](i[p[h]]);break}}},u=(p,h)=>new Promise((E,k)=>{const P=ti({action:p,payload:h});s.push(async C=>{s.shift(),t[C.id]=P;try{E(await C[p].apply(void 0,[...h,P.id]))}catch(L){k(L)}finally{delete t[C.id],r()}}),Te(`[${e}]: Add ${P.id} to JobQueue`),Te(`[${e}]: JobQueue length=${s.length}`),r()});return{addWorker:p=>(i[p.id]=p,Te(`[${e}]: Add ${p.id}`),Te(`[${e}]: Number of workers=${n()}`),r(),p.id),addJob:async(p,...h)=>{if(n()===0)throw Error(`[${e}]: You need to have at least one worker before adding jobs`);return u(p,h)},terminate:async()=>{Object.keys(i).forEach(async p=>{await i[p].terminate()}),s=[]},getQueueLen:a,getNumWorkers:n}};function ai(e){throw new Error('Could not dynamically require "'+e+'". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.')}var ni=e=>{const i={};return typeof WorkerGlobalScope<"u"?i.type="webworker":typeof document=="object"?i.type="browser":typeof process=="object"&&typeof ai=="function"&&(i.type="node"),typeof e>"u"?i:i[e]};const ri=ni("type")==="browser",oi=ri?e=>new URL(e,window.location.href).href:e=>e;var li=e=>{const i={...e};return["corePath","workerPath","langPath"].forEach(t=>{e[t]&&(i[t]=oi(i[t]))}),i},rt={TESSERACT_ONLY:0,LSTM_ONLY:1,TESSERACT_LSTM_COMBINED:2,DEFAULT:3};const di="7.0.0",ci={version:di};var pi={workerBlobURL:!0,logger:()=>{}};const ui=ci.version,gi=pi;var vi={...gi,workerPath:`https://cdn.jsdelivr.net/npm/tesseract.js@v${ui}/dist/worker.min.js`},mi=({workerPath:e,workerBlobURL:i})=>{let t;if(Blob&&URL&&i){const s=new Blob([`importScripts("${e}");`],{type:"application/javascript"});t=new Worker(URL.createObjectURL(s))}else t=new Worker(e);return t},hi=e=>{e.terminate()},fi=(e,i)=>{e.onmessage=({data:t})=>{i(t)}},bi=async(e,i)=>{e.postMessage(i)};const Oe=e=>new Promise((i,t)=>{const s=new FileReader;s.onload=()=>{i(s.result)},s.onerror=({target:{error:{code:a}}})=>{t(Error(`File could not be read! Code=${a}`))},s.readAsArrayBuffer(e)}),Ue=async e=>{let i=e;if(typeof e>"u")return"undefined";if(typeof e=="string")/data:image\/([a-zA-Z]*);base64,([^"]*)/.test(e)?i=atob(e.split(",")[1]).split("").map(t=>t.charCodeAt(0)):i=await(await fetch(e)).arrayBuffer();else if(typeof HTMLElement<"u"&&e instanceof HTMLElement)e.tagName==="IMG"&&(i=await Ue(e.src)),e.tagName==="VIDEO"&&(i=await Ue(e.poster)),e.tagName==="CANVAS"&&await new Promise(t=>{e.toBlob(async s=>{i=await Oe(s),t()})});else if(typeof OffscreenCanvas<"u"&&e instanceof OffscreenCanvas){const t=await e.convertToBlob();i=await Oe(t)}else(e instanceof File||e instanceof Blob)&&(i=await Oe(e));return new Uint8Array(i)};var yi=Ue;const wi=vi,ki=mi,xi=hi,Si=fi,Li=bi,Pi=yi;var Ei={defaultOptions:wi,spawnWorker:ki,terminateWorker:xi,onMessage:Si,send:Li,loadImage:Pi};const Ti=li,Z=nt,{log:Xe}=ye,Mi=Ve,re=rt,{defaultOptions:Ii,spawnWorker:Ci,terminateWorker:_i,onMessage:Ni,loadImage:et,send:$i}=Ei;let tt=0;var ot=async(e="eng",i=re.LSTM_ONLY,t={},s={})=>{const a=Mi("Worker",tt),{logger:n,errorHandler:r,...u}=Ti({...Ii,...t}),m={},b=typeof e=="string"?e.split("+"):e;let f=i,p=s;const h=[re.DEFAULT,re.LSTM_ONLY].includes(i)&&!u.legacyCore;let E,k;const P=new Promise((T,I)=>{k=T,E=I}),C=T=>{E(T.message)};let L=Ci(u);L.onerror=C,tt+=1;const M=({id:T,action:I,payload:c})=>new Promise((l,v)=>{Xe(`[${a}]: Start ${T}, action=${I}`);const S=`${I}-${T}`;m[S]={resolve:l,reject:v},$i(L,{workerId:a,jobId:T,action:I,payload:c})}),D=()=>console.warn("`load` is depreciated and should be removed from code (workers now come pre-loaded)"),B=T=>M(Z({id:T,action:"load",payload:{options:{lstmOnly:h,corePath:u.corePath,logging:u.logging}}})),_=(T,I,c)=>M(Z({id:c,action:"FS",payload:{method:"writeFile",args:[T,I]}})),K=(T,I)=>M(Z({id:I,action:"FS",payload:{method:"readFile",args:[T,{encoding:"utf8"}]}})),j=(T,I)=>M(Z({id:I,action:"FS",payload:{method:"unlink",args:[T]}})),w=(T,I,c)=>M(Z({id:c,action:"FS",payload:{method:T,args:I}})),y=(T,I)=>M(Z({id:I,action:"loadLanguage",payload:{langs:T,options:{langPath:u.langPath,dataPath:u.dataPath,cachePath:u.cachePath,cacheMethod:u.cacheMethod,gzip:u.gzip,lstmOnly:[re.DEFAULT,re.LSTM_ONLY].includes(f)&&!u.legacyLang}}})),H=(T,I,c,l)=>M(Z({id:l,action:"initialize",payload:{langs:T,oem:I,config:c}})),Y=(T="eng",I,c,l)=>{if(h&&[re.TESSERACT_ONLY,re.TESSERACT_LSTM_COMBINED].includes(I))throw Error("Legacy model requested but code missing.");const v=I||f;f=v;const S=c||p;p=S;const N=(typeof T=="string"?T.split("+"):T).filter(z=>!b.includes(z));return b.push(...N),N.length>0?y(N,l).then(()=>H(T,v,S,l)):H(T,v,S,l)},ce=(T={},I)=>M(Z({id:I,action:"setParameters",payload:{params:T}})),X=async(T,I={},c={text:!0},l)=>M(Z({id:l,action:"recognize",payload:{image:await et(T),options:I,output:c}})),pe=async(T,I)=>{if(h)throw Error("`worker.detect` requires Legacy model, which was not loaded.");return M(Z({id:I,action:"detect",payload:{image:await et(T)}}))},se=async()=>(L!==null&&(_i(L),L=null),Promise.resolve());Ni(L,({workerId:T,jobId:I,status:c,action:l,data:v})=>{const S=`${l}-${I}`;if(c==="resolve")Xe(`[${T}]: Complete ${I}`),m[S].resolve({jobId:I,data:v}),delete m[S];else if(c==="reject")if(m[S].reject(v),delete m[S],l==="load"&&E(v),r)r(v);else throw Error(v);else c==="progress"&&n({...v,userJobId:I})});const ae={id:a,worker:L,load:D,writeText:_,readText:K,removeFile:j,FS:w,reinitialize:Y,setParameters:ce,recognize:X,detect:pe,terminate:se};return B().then(()=>y(e)).then(()=>H(e,i,s)).then(()=>k(ae)).catch(()=>{}),P};const lt=ot,Fi=async(e,i,t)=>{const s=await lt(i,1,t);return s.recognize(e).finally(async()=>{await s.terminate()})},Ai=async(e,i)=>{const t=await lt("osd",0,i);return t.detect(e).finally(async()=>{await t.terminate()})};var Ri={recognize:Fi,detect:Ai},Di={AFR:"afr",AMH:"amh",ARA:"ara",ASM:"asm",AZE:"aze",AZE_CYRL:"aze_cyrl",BEL:"bel",BEN:"ben",BOD:"bod",BOS:"bos",BUL:"bul",CAT:"cat",CEB:"ceb",CES:"ces",CHI_SIM:"chi_sim",CHI_TRA:"chi_tra",CHR:"chr",CYM:"cym",DAN:"dan",DEU:"deu",DZO:"dzo",ELL:"ell",ENG:"eng",ENM:"enm",EPO:"epo",EST:"est",EUS:"eus",FAS:"fas",FIN:"fin",FRA:"fra",FRK:"frk",FRM:"frm",GLE:"gle",GLG:"glg",GRC:"grc",GUJ:"guj",HAT:"hat",HEB:"heb",HIN:"hin",HRV:"hrv",HUN:"hun",IKU:"iku",IND:"ind",ISL:"isl",ITA:"ita",ITA_OLD:"ita_old",JAV:"jav",JPN:"jpn",KAN:"kan",KAT:"kat",KAT_OLD:"kat_old",KAZ:"kaz",KHM:"khm",KIR:"kir",KOR:"kor",KUR:"kur",LAO:"lao",LAT:"lat",LAV:"lav",LIT:"lit",MAL:"mal",MAR:"mar",MKD:"mkd",MLT:"mlt",MSA:"msa",MYA:"mya",NEP:"nep",NLD:"nld",NOR:"nor",ORI:"ori",PAN:"pan",POL:"pol",POR:"por",PUS:"pus",RON:"ron",RUS:"rus",SAN:"san",SIN:"sin",SLK:"slk",SLV:"slv",SPA:"spa",SPA_OLD:"spa_old",SQI:"sqi",SRP:"srp",SRP_LATN:"srp_latn",SWA:"swa",SWE:"swe",SYR:"syr",TAM:"tam",TEL:"tel",TGK:"tgk",TGL:"tgl",THA:"tha",TIR:"tir",TUR:"tur",UIG:"uig",UKR:"ukr",URD:"urd",UZB:"uzb",UZB_CYRL:"uzb_cyrl",VIE:"vie",YID:"yid"},Bi={OSD_ONLY:"0",AUTO_OSD:"1",AUTO_ONLY:"2",AUTO:"3",SINGLE_COLUMN:"4",SINGLE_BLOCK_VERT_TEXT:"5",SINGLE_BLOCK:"6",SINGLE_LINE:"7",SINGLE_WORD:"8",CIRCLE_WORD:"9",SINGLE_CHAR:"10",SPARSE_TEXT:"11",SPARSE_TEXT_OSD:"12",RAW_LINE:"13"};const Oi=si,ji=ot,Ui=Ri,Hi=Di,zi=rt,Gi=Bi,{setLogging:Ki}=ye;var Vi={languages:Hi,OEM:zi,PSM:Gi,createScheduler:Oi,createWorker:ji,setLogging:Ki,...Ui};const qi=Qt(Vi);let g,R=null,ue="all",$=[],ke=null,xe=null,refShooters=[],refEditState={enabled:!1,ids:[],overrides:{}};const Wi={no:{tracker:"INSIGHT",tagline:"Analyse. Prognose. Resultat.",home:"Hjem",matches:"Matcher",prognosis:"Prognose",results:"Live",profile:"Profil",leading:"LEDER",behind:"BAK",active:"Aktiv",no_match_selected:"Ingen match valgt",new_match:"Ny match",match_name:"Matchnavn",location:"Sted",date:"Dato",type:"Type",planned_stages:"Antall stages",save:"Lagre",cancel:"Avbryt",delete:"Slett",edit_profile:"Rediger profil",first_name:"Fornavn",last_name:"Etternavn",club:"Klubb",region:"Region",category:"Kategori",division:"Divisjon",power_factor:"Power Factor",draw_seconds:"Trekk (s)",reload_seconds:"Reload (s)",save_profile:"Lagre profil",logout:"Logg ut",matches_count:"Matcher",stages_count:"Stages",avg_hf:"Snitt HF",a_rate:"A-andel",shots:"Skudd",targets:"Skiver",steel:"Stål",move_seconds:"Beveg. (s)",calculate:"Beregn",add_shooter:"Legg til skytter",add_result:"Legg til resultat",save_shooter:"Lagre skytter",save_result:"Lagre resultat",match_types_trening:"Trening",match_types_level1:"Level 1",match_types_level2:"Level 2",match_types_level3:"Level 3",match_types_level4:"Level 4",match_types_level5:"Level 5",allow_search:"Tillat at andre kan finne denne matchen",search_match_placeholder:"Skriv inn match-ID (f.eks. 12345)",select_power_factor:"Velg Power Factor",stages_added_later:"Stages legges til senere",edit_match:"Rediger match",create_stage:"Opprett stage",edit_stage:"Rediger stage",stage_number:"Nummer",stage_name:"Navn",paper_targets:"Paper targets",poppers:"Poppers",plates:"Plates",no_shoots:"No-Shoots",bonus_paper_targets:"Bonus Paper targets",included:"Included",invite_user:"Invite user",invite:"Invite",search_user_email:"Search for user email",invitation_sent:"Invitation sent",invitations:"Invitations",accept:"Accept",decline:"Decline",invited_to_match:"You are invited to",no_invitations:"No invitations",invite_user:"Inviter bruker",invite:"Inviter",search_user_email:"Søk etter brukers e-post",invitation_sent:"Invitasjon sendt",invitations:"Invitasjoner",accept:"Aksepter",decline:"Avvis",invited_to_match:"Du er invitert til",no_invitations:"Ingen invitasjoner"},en:{tracker:"INSIGHT",tagline:"Analysis. Prognosis. Results.",home:"Home",matches:"Matches",prognosis:"Prognosis",results:"Live",profile:"Profile",leading:"LEADING",behind:"BEHIND",active:"Active",no_match_selected:"No match selected",new_match:"New Match",match_name:"Match Name",location:"Location",date:"Date",type:"Type",planned_stages:"Number of stages",save:"Save",cancel:"Cancel",delete:"Delete",edit_profile:"Edit Profile",first_name:"First Name",last_name:"Last Name",club:"Club",region:"Region",category:"Category",division:"Division",power_factor:"Power Factor",draw_seconds:"Draw (s)",reload_seconds:"Reload (s)",save_profile:"Save Profile",logout:"Log Out",matches_count:"Matches",stages_count:"Stages",avg_hf:"Avg HF",a_rate:"A-rate",shots:"Shots",targets:"Targets",steel:"Steel",move_seconds:"Move (s)",calculate:"Calculate",add_shooter:"Add Shooter",add_result:"Add Result",save_shooter:"Save Shooter",save_result:"Save Result",match_types_trening:"Training",match_types_level1:"Level 1",match_types_level2:"Level 2",match_types_level3:"Level 3",match_types_level4:"Level 4",match_types_level5:"Level 5",allow_search:"Allow others to find this match",search_match_placeholder:"Enter match ID (e.g. 12345)",select_power_factor:"Select Power Factor",stages_added_later:"Stages will be added later"}};let dt="no";function d(e){return Wi[dt][e]||e}const it={major:{A:5,C:4,D:2,miss:-10,ns:-10,proc:-10},minor:{A:5,C:3,D:1,miss:-10,ns:-10,proc:-10}},Ji={Standard:{minor:20,major:17},Open:{minor:28,major:28},Production:{minor:15,major:15},"Production Optics":{minor:15,major:15},"Production Optics Carbine":{minor:15,major:15},Classic:{minor:10,major:8},Revolver:{minor:8,major:6},"Pistol Caliber Carbine":{minor:30,major:30},"Pistol Caliber Carbine Optics":{minor:30,major:30},Optics:{minor:20,major:17}},Yi=["Standard","Open","Production","Production Optics","Production Optics Carbine","Classic","Revolver","Pistol Caliber Carbine","Pistol Caliber Carbine Optics"],Zi={Standard:["minor","major"],Open:["minor","major"],Production:["minor"],"Production Optics":["minor"],"Production Optics Carbine":["minor"],Classic:["minor","major"],Revolver:["minor","major"],"Pistol Caliber Carbine":["minor","major"],"Pistol Caliber Carbine Optics":["minor","major"]},Qi=["","Junior","Senior","Super Senior","Lady","Lady Junior","Lady Senior"],Xi=["Norge","Sverige","Danmark","Finland","Tyskland","Storbritannia","USA","Annet"];function es(e,i){const t=Ji[e];return t&&(t[i]||t.minor)||15}function Se(e,i,t){return Math.max(0,Math.ceil(e/es(i,t))-1)}function icStageShots(e){return Math.max(0,((e==null?void 0:e.paperTargets)||0)*2+((e==null?void 0:e.poppers)||0)+((e==null?void 0:e.plates)||0))}function icStageMaxPts(e){return Math.max(0,((e==null?void 0:e.paperTargets)||0)*10+(((e==null?void 0:e.poppers)||0)+((e==null?void 0:e.plates)||0))*5)}function icResultPF(e){const i=(e||"").toString().toLowerCase();return i==="major"?"major":"minor"}function icScoreFromHits(e,i,t,s,a,n){const r=it[icResultPF(e)]||it.minor;return Math.max(0,(i||0)*r.A+(t||0)*r.C+(s||0)*r.D+(a||0)*r.miss+(n||0)*r.ns+((arguments.length>6?arguments[6]:0)||0)*r.proc)}let icResultEntryMode="ocr",icUploadShooterSel=null;function icSetResultDialogMode(e){icResultEntryMode=e;const i=o("ocr-confirm-title"),t=o("ocr-confirm-desc"),s=o("ocr-save-btn");i&&(i.textContent=e==="manual"?"Registrer resultat":"Bekreft resultat"),t&&(t.textContent=e==="manual"?"Legg inn resultat manuelt. Poeng beregnes automatisk fra Minor/Major og treffbildet.":"Kontroller og rediger verdiene fra skanningen. Poeng beregnes automatisk fra Minor/Major og treffbildet."),s&&(s.textContent=e==="manual"?"Lagre manuelt resultat":"Lagre resultat")}function icStageDefForPrefix(e){const i=$.find(s=>s.id!=null&&s.id.toString()===String(R));if(!i)return null;const t=e==="ocr"?Me||F("upload-stage-select")||F("new-result-stage"):F("new-result-stage");return icStageDefs(i).find(s=>String(s.number)===String(t))||null}function icUpdateLockedStageInfo(e){const i=icStageDefForPrefix(e),t=o(e+"-stage-info"),s=o(e+"-stage-shots-info");if(t&&(t.textContent=i?(i.name&&i.name!=="Stage "+i.number?"Stage "+i.number+" – "+i.name:"Stage "+i.number):"Ingen stage valgt"),s)if(i){const a=icStageShots(i),n=(i.paperTargets||0)+((i.poppers||0)||0)+((i.plates||0)||0),r=((i.poppers||0)||0)+((i.plates||0)||0);s.textContent="Stage krever "+a+" treff totalt ("+(i.paperTargets||0)+" paper, "+r+" stål / "+n+" mål)."}else s.textContent=""}function icGetLockedShotTotalForPrefix(e){const i=icStageDefForPrefix(e);return i?icStageShots(i):0}function icNormalizeHitCounts(e){const i=icGetLockedShotTotalForPrefix(e);if(!i)return 0;const t=Math.max(0,A(e+"-c",0)),s=Math.max(0,A(e+"-d",0)),a=Math.max(0,A(e+"-miss",0)),n=Math.max(0,A(e+"-steel",0)),r=Math.min(i,t+s+a+n),u=Math.max(0,i-r);return o(e+"-c")&&(o(e+"-c").value=t),o(e+"-d")&&(o(e+"-d").value=s),o(e+"-miss")&&(o(e+"-miss").value=a),o(e+"-steel")&&(o(e+"-steel").value=n),o(e+"-a")&&(o(e+"-a").value=u),u}window.icAdjustResultCount=function(e,i,t){const s=o(e+"-"+i);if(!s)return;const a=Math.max(0,parseInt(s.value||"0",10)||0),n=Math.max(0,parseInt(t||0,10)||0),r=t<0?-n:n;if(i==="c"||i==="d"||i==="miss"||i==="steel"){const u=["c","d","miss","steel"],m=icGetLockedShotTotalForPrefix(e),b=u.filter(p=>p!==i).reduce((p,h)=>p+Math.max(0,A(e+"-"+h,0)),0),f=Math.max(0,m-b),x=Math.max(0,Math.min(a+r,f));s.value=x}else s.value=Math.max(0,a+r);icRecalcPoints(e)}function icRecalcPoints(e){const i=o(e+"-points");if(!i)return 0;(e==="ocr"||e==="new-result")&&icNormalizeHitCounts(e);const t=A(e+"-a",0)+A(e+"-steel",0),s=A(e+"-c",0),a=A(e+"-d",0),n=A(e+"-miss",0),r=A(e+"-ns",0),u=A(e+"-proc",0),m=e==="ocr"?icUploadShooterSel||F("upload-shooter-select")||icCurrentShooterId():icCurrentShooterId(),b=$.find(f=>f.id!=null&&f.id.toString()===String(R)),p=b?icFindShooter(b,m):null,h=icResultPF((p==null?void 0:p.pf)||g.powerFactor||"minor"),E=icScoreFromHits(h,t,s,a,n,r,u);return i.value=E,E}function icPrepareNewResultModal(){const e=$.find(t=>t.id!=null&&t.id.toString()===String(R));if(!e)return;const i=o("new-result-stage"),t=icStageDefs(e);i&&!i.value&&(i.value=t.length?t[0].number:1),o("new-result-time")&&(o("new-result-time").value=""),o("new-result-c")&&(o("new-result-c").value=0),o("new-result-d")&&(o("new-result-d").value=0),o("new-result-miss")&&(o("new-result-miss").value=0),o("new-result-ns")&&(o("new-result-ns").value=0),o("new-result-proc")&&(o("new-result-proc").value=0),icUpdateLockedStageInfo("new-result"),icNormalizeHitCounts("new-result"),icRecalcPoints("new-result")}function icOpenManualResult(){const e=$.find(t=>t.id!=null&&t.id.toString()===String(R));if(!e){alert("Ingen aktiv match valgt");return}const i=o("upload-stage-select"),t=o("upload-shooter-select");if(!i.value||!t.value){alert("Velg stage og skytter");return}Me=i.value,icUploadShooterSel=t.value,icSetResultDialogMode("manual"),o("ocr-time").value="",o("ocr-c").value=0,o("ocr-d").value=0,o("ocr-miss").value=0,o("ocr-ns").value=0,o("ocr-proc").value=0,icUpdateLockedStageInfo("ocr"),icNormalizeHitCounts("ocr"),icRecalcPoints("ocr"),G("modal-upload-result"),ie("modal-ocr-confirm")}function icCurrentShooterId(){const e=Pe();return e&&e.uid?e.uid:"me"}function icFindShooter(e,i){if(!e||!e.shooters)return null;for(const t of e.shooters)if(t.id===i||i==="me"&&t.isMe)return t;return null}function icCurrentShooter(e){const i=icCurrentShooterId();return icFindShooter(e,i)||icFindShooter(e,"me")}function icLegacyResults(e){return[]}function icCurrentResults(e){const i=icCurrentShooter(e);if(i&&i.stages&&i.stages.length)return i.stages.slice().sort((t,s)=>(t.num||0)-(s.num||0));return[]}function icStageDefs(e){if(!e||!e.stages)return[];return e.stages.filter(i=>i&&((i.number!=null)||(i.num!=null)||i.name||i.paperTargets||i.poppers||i.plates)).map((i,t)=>{const s=i.number!=null?i.number:i.num!=null?i.num:t+1;return{number:s,name:i.name||("Stage "+s),paperTargets:i.paperTargets||0,poppers:i.poppers||0,plates:i.plates||0,noShoots:i.noShoots||0,bonusPaperTargets:i.bonusPaperTargets||0,bonusIncluded:!!i.bonusIncluded}}).sort((i,t)=>(i.number||0)-(t.number||0))}async function icEnsureShooter(e,i){e.shooters||(e.shooters=[]);let t=icFindShooter(e,i);if(t)return t;const s=icCurrentShooterId();if(i===s||i==="me")return t={id:s,isMe:!0,firstName:g.firstName||"Meg",lastName:g.lastName||"",division:g.division||"Classic",pf:g.powerFactor||"minor",club:g.club||"",stages:[]},e.shooters.push(t),t;try{const a=await Ut(i);return t={id:i,isMe:!1,firstName:(a==null?void 0:a.firstName)||"Skytter",lastName:(a==null?void 0:a.lastName)||"",division:(a==null?void 0:a.division)||"Classic",pf:(a==null?void 0:a.powerFactor)||"minor",club:(a==null?void 0:a.club)||"",stages:[]},e.shooters.push(t),t}catch{return null}}function icUpsertStageResult(e,i){e.stages||(e.stages=[]);const t=e.stages.findIndex(s=>(s.num||s.number)==i.num);t>=0?e.stages[t]={...e.stages[t],...i}:e.stages.push(i),e.stages.sort((s,a)=>(s.num||0)-(a.num||0))}function icFormFromResults(e,i,t){const s=(e||[]).filter(m=>m&&m.time&&m.pts&&(!i||(m.num||m.number)<=i));if(!s.length)return null;const a=(t==null?void 0:t.division)||g.division||"Classic",n=(t==null?void 0:t.pf)||g.powerFactor||"minor",r=(t==null?void 0:t.draw)||g.draw||1.42,u=(t==null?void 0:t.reloadTime)||g.reloadTime||1.8;let m=0,b=0,f=0,p=0,h=0,E=0;for(const k of s){const P=icStageShots(k);if(!P)continue;const C=Se(P,a,n),L=(k.time||0)-r-C*u;L>0&&(m+=P,b+=L,f+=k.a||0,p+=k.c||0,h+=k.d||0,E+=k.miss||0)}if(!m||!b)return null;const k=f+p+h+E;return{avgSplit:b/m,aPercent:k>0?f/k:0,cPercent:k>0?p/k:0,dPercent:k>0?h/k:0,missPercent:k>0?E/k:0,completedStages:s.length,division:a,pf:n,draw:r,reloadTime:u}}function icProjectNext(e,i){if(!e||!i)return null;const t=icStageShots(i);if(!t)return null;const s=Se(t,e.division||"Classic",e.pf||"minor"),a=e.draw+t*e.avgSplit+s*e.reloadTime,n=it[e.pf]||it.minor,r=t*(e.aPercent*n.A+e.cPercent*n.C+e.dPercent*n.D),u=a>0?r/a:0;return{shots:t,reloads:s,expTime:a,expPts:r,maxPts:icStageMaxPts(i),estHF:u}}function icStageMetricsForMatch(e,i){if(!e||!i)return[];const t=[],s=i.number!=null?i.number:i.num,a=icStageMaxPts(i);(e.shooters||[]).forEach(n=>{const r=(n.stages||[]).find(u=>String(u.num||u.number)===String(s)&&u.time&&u.pts>=0);if(r){const u=((n.firstName||"")+" "+(n.lastName||"")).trim()||"Skytter",m=r.hf&&r.hf>0?r.hf:(r.time>0?(r.pts||0)/r.time:0);t.push({id:n.id,name:u,isMe:!!n.isMe,pts:r.pts||0,hf:m,res:r,division:n.division||"",pf:n.pf||"minor"})}});t.sort((n,r)=>(r.hf||0)-(n.hf||0)||((r.pts||0)-(n.pts||0)));const n=t.length>0?(t[0].hf||0):0;return t.map((r,u)=>{const m=n>0?r.hf/n*100:0,b=n>0?r.hf/n*a:0;return{...r,rank:u+1,stagePct:m,stagePts:b,maxStagePts:a}})}function icMatchTotals(e){const i={};if(!e)return[];(e.shooters||[]).forEach(t=>{i[String(t.id)]={id:t.id,name:((t.firstName||"")+" "+(t.lastName||"")).trim()||"Skytter",division:t.division||"",pf:t.pf||"minor",totalStagePts:0,totalRawPts:0}});icStageDefs(e).forEach(t=>{icStageMetricsForMatch(e,t).forEach(s=>{const a=String(s.id);i[a]||(i[a]={id:s.id,name:s.name,division:s.division||"",pf:s.pf||"minor",totalStagePts:0,totalRawPts:0}),i[a].totalStagePts+=(s.stagePts||0),i[a].totalRawPts+=(s.pts||0)})});return Object.values(i).sort((t,s)=>s.totalStagePts-t.totalStagePts||s.totalRawPts-t.totalRawPts)}function ct(){const e=$.find(k=>k.id!=null&&k.id.toString()===String(R));if(!e)return null;const i=icCurrentShooter(e),t=icCurrentResults(e),s=icFormFromResults(t,null,i);return s?{avgSplit:s.avgSplit,completedStages:s.completedStages,totalStages:icStageDefs(e).length,aPercent:s.aPercent,cPercent:s.cPercent,dPercent:s.dPercent,missPercent:s.missPercent,division:s.division,pf:s.pf,draw:s.draw,reloadTime:s.reloadTime}:null}function ge(e){return e.charAt(0).toUpperCase()+e.slice(1)}function We(e){if(!e)return"";try{const i=dt==="no"?"nb-NO":"en-US";return new Date(e).toLocaleDateString(i,{day:"numeric",month:"short",year:"numeric"})}catch{return e}}function o(e){return document.getElementById(e)}function F(e){const i=o(e);return i?i.value:""}function he(e,i){const t=parseFloat(F(e));return isNaN(t)?i||0:t}function A(e,i){const t=parseInt(F(e));return isNaN(t)?i||0:t}function le(){const e=(g==null?void 0:g.firstName)||"",i=(g==null?void 0:g.lastName)||"";return(e.charAt(0)+i.charAt(0)).toUpperCase()||"U"}async function ts(e){var s;const i=await jt(),t=Pe();i?g=i:g={firstName:t.name||((s=t.email)==null?void 0:s.split("@")[0])||"",lastName:"",division:"",category:"",powerFactor:"",region:"",club:"",draw:null,reloadTime:null},refShooters=await loadReferenceShooters(),$=await Vt();if($&&$.length>0){const a=new Date,n=$.filter(r=>r.status!=="finished"&&r.date);if(n.length>0){let r=n[0],u=Math.abs(new Date(n[0].date)-a);for(const m of n){const b=new Date(m.date),f=Math.abs(b-a);f<u&&(u=f,r=m)}R=r.id}}ke&&ke(),ke=qt(a=>{$=a,fe(),te()}),Zt(a=>{ee=a,Ye()}),e.innerHTML=`
+        <div id="error" class="error-text"></div>
+      </div>
+    </div>
+  `;const s={no:{subtitle:"Analyse. Prognose. Resultat.",loginEmailLabel:"E-post",loginEmailPlaceholder:"navn@epost.no",loginPasswordLabel:"Passord",loginPasswordPlaceholder:"Passord",login:"Logg inn",or:"eller",showRegister:"Registrer ny bruker",registerFirstNameLabel:"Fornavn",registerFirstNamePlaceholder:"Fornavn",registerLastNameLabel:"Etternavn",registerLastNamePlaceholder:"Etternavn",registerEmailLabel:"E-post",registerEmailPlaceholder:"navn@epost.no",registerEmailConfirmLabel:"Bekreft e-post",registerEmailConfirmPlaceholder:"Gjenta e-post",registerPasswordLabel:"Passord",registerPasswordPlaceholder:"Passord",registerPasswordConfirmLabel:"Bekreft passord",registerPasswordConfirmPlaceholder:"Gjenta passord",registerDivisionLabel:"Divisjon",registerCategoryLabel:"Kategori",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Klubb",registerCodeLabel:"Invitasjonskode",registerCodePlaceholder:"Invitasjonskode",register:"Opprett bruker",cancel:"Avbryt",emailMismatch:"E-postadressene er ikke like",passwordMismatch:"Passordene er ikke like",missingFields:"Fyll ut alle påkrevde feltene",missingName:"Du må skrive inn fornavn og etternavn",missingDivision:"Du må velge divisjon",weakPassword:"Passordet er for svakt",strengthEmpty:"",strengthVeryWeak:"Passordstyrke: Svært svak",strengthWeak:"Passordstyrke: Svak",strengthMedium:"Passordstyrke: Middels",strengthStrong:"Passordstyrke: Sterk",strengthVeryStrong:"Passordstyrke: Svært sterk",gdprRequired:"Du må godta personvernerklæringen for å registrere deg"},en:{subtitle:"Analyze. Predict. Perform.",loginEmailLabel:"Email",loginEmailPlaceholder:"name@email.com",loginPasswordLabel:"Password",loginPasswordPlaceholder:"Password",login:"Log in",or:"or",showRegister:"Create new user",registerFirstNameLabel:"First Name",registerFirstNamePlaceholder:"First name",registerLastNameLabel:"Last Name",registerLastNamePlaceholder:"Last name",registerEmailLabel:"Email",registerEmailPlaceholder:"name@email.com",registerEmailConfirmLabel:"Confirm email",registerEmailConfirmPlaceholder:"Repeat email",registerPasswordLabel:"Password",registerPasswordPlaceholder:"Password",registerPasswordConfirmLabel:"Confirm password",registerPasswordConfirmPlaceholder:"Repeat password",registerDivisionLabel:"Division",registerCategoryLabel:"Category",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Club",registerCodeLabel:"Invite code",registerCodePlaceholder:"Invite code",register:"Create account",cancel:"Cancel",emailMismatch:"The email addresses do not match",passwordMismatch:"Passwords do not match",missingFields:"Please fill in all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"The password is too weak",strengthEmpty:"",strengthVeryWeak:"Password strength: Very weak",strengthWeak:"Password strength: Weak",strengthMedium:"Password strength: Medium",strengthStrong:"Password strength: Strong",strengthVeryStrong:"Password strength: Very strong",gdprRequired:"You must accept the privacy policy to register"}};let i="no",n="minor";const a=document.getElementById("error"),r=document.getElementById("loginSection"),l=document.getElementById("registerSection"),v=document.getElementById("showRegisterBtn"),d=document.getElementById("cancelRegisterBtn"),g=document.getElementById("loginBtn"),u=document.getElementById("registerBtn"),b=document.getElementById("langNo"),P=document.getElementById("langEn"),E=document.getElementById("registerPassword"),I=document.getElementById("passwordStrengthBar"),O=document.getElementById("passwordStrengthText"),x=document.getElementById("pfMinor"),T=document.getElementById("pfMajor");x.onclick=()=>{n="minor",x.classList.add("selected"),T.classList.remove("selected")},T.onclick=()=>{n="major",T.classList.add("selected"),x.classList.remove("selected")};function R(h){let m=0;return h?(h.length>=8&&(m+=1),h.length>=12&&(m+=1),/[a-z]/.test(h)&&/[A-Z]/.test(h)&&(m+=1),/\d/.test(h)&&(m+=1),/[^A-Za-z0-9]/.test(h)&&(m+=1),m<=1?{score:m,width:"20%",labelKey:"strengthVeryWeak",color:"#ff6b6b"}:m===2?{score:m,width:"40%",labelKey:"strengthWeak",color:"#ff9f43"}:m===3?{score:m,width:"60%",labelKey:"strengthMedium",color:"#feca57"}:m===4?{score:m,width:"80%",labelKey:"strengthStrong",color:"#1dd1a1"}:{score:m,width:"100%",labelKey:"strengthVeryStrong",color:"#10ac84"}):{score:0,width:"0%",labelKey:"strengthEmpty",color:"#ff6b6b"}}function ne(){const h=s[i],m=E.value,A=R(m);I.style.width=A.width,I.style.background=A.color,O.innerText=h[A.labelKey]}function $(h){i=h;const m=s[h];document.getElementById("brandSubtitle").innerText=m.subtitle,document.getElementById("loginEmailLabel").innerText=m.loginEmailLabel,document.getElementById("loginEmail").placeholder=m.loginEmailPlaceholder,document.getElementById("loginPasswordLabel").innerText=m.loginPasswordLabel,document.getElementById("loginPassword").placeholder=m.loginPasswordPlaceholder,document.getElementById("loginBtn").innerText=m.login,document.getElementById("separatorText").innerText=m.or,document.getElementById("showRegisterBtn").innerText=m.showRegister,document.getElementById("registerFirstNameLabel").innerText=m.registerFirstNameLabel,document.getElementById("registerFirstName").placeholder=m.registerFirstNamePlaceholder,document.getElementById("registerLastNameLabel").innerText=m.registerLastNameLabel,document.getElementById("registerLastName").placeholder=m.registerLastNamePlaceholder,document.getElementById("registerEmailLabel").innerText=m.registerEmailLabel,document.getElementById("registerEmail").placeholder=m.registerEmailPlaceholder,document.getElementById("registerEmailConfirmLabel").innerText=m.registerEmailConfirmLabel,document.getElementById("registerEmailConfirm").placeholder=m.registerEmailConfirmPlaceholder,document.getElementById("registerPasswordLabel").innerText=m.registerPasswordLabel,document.getElementById("registerPassword").placeholder=m.registerPasswordPlaceholder,document.getElementById("registerPasswordConfirmLabel").innerText=m.registerPasswordConfirmLabel,document.getElementById("registerPasswordConfirm").placeholder=m.registerPasswordConfirmPlaceholder,document.getElementById("registerDivisionLabel").innerText=m.registerDivisionLabel,document.getElementById("registerCategoryLabel").innerText=m.registerCategoryLabel,document.getElementById("registerPowerFactorLabel").innerText=m.registerPowerFactorLabel,document.getElementById("registerRegionLabel").innerText=m.registerRegionLabel,document.getElementById("registerClubLabel").innerText=m.registerClubLabel,document.getElementById("registerCodeLabel").innerText=m.registerCodeLabel,document.getElementById("registerCode").placeholder=m.registerCodePlaceholder,document.getElementById("registerBtn").innerText=m.register,document.getElementById("cancelRegisterBtn").innerText=m.cancel,b.classList.toggle("active",h==="no"),P.classList.toggle("active",h==="en"),ne()}function ce(){r.classList.remove("active"),l.classList.add("active"),a.innerText="";const h=document.getElementById("gdprCheckboxContainer");if(h&&!h.hasChildNodes()){const m=Pt();h.appendChild(m)}}function D(){l.classList.remove("active"),r.classList.add("active"),a.innerText=""}b.onclick=()=>$("no"),P.onclick=()=>$("en"),v.onclick=ce,d.onclick=D,E.oninput=ne,g.onclick=async()=>{a.innerText="";const h=document.getElementById("loginEmail").value.trim(),m=document.getElementById("loginPassword").value,A=await yt(h,m);A.success?t():a.innerText=A.error},u.onclick=async()=>{a.innerText="";const h=s[i],m=document.getElementById("registerFirstName").value.trim(),A=document.getElementById("registerLastName").value.trim(),ue=document.getElementById("registerEmail").value.trim(),Le=document.getElementById("registerEmailConfirm").value.trim(),ae=document.getElementById("registerPassword").value,Me=document.getElementById("registerPasswordConfirm").value,Te=document.getElementById("registerDivision").value,st=document.getElementById("registerCategory").value,it=document.getElementById("registerRegion").value,nt=document.getElementById("registerClub").value.trim(),Ne=document.getElementById("registerCode").value.trim();if(!m||!A){a.innerText=h.missingName;return}if(!ue||!Le||!ae||!Me||!Ne){a.innerText=h.missingFields;return}if(!Te){a.innerText=h.missingDivision;return}if(ue!==Le){a.innerText=h.emailMismatch;return}if(ae!==Me){a.innerText=h.passwordMismatch;return}if(R(ae).score<=1){a.innerText=h.weakPassword;return}if(!Lt().valid){a.innerText=h.gdprRequired;return}const Ce=await kt(ue,ae,Ne,m,A,Te,st,n,it,nt);Ce.success?t():a.innerText=Ce.error},$("no"),ne()}function ee(e){if(!e)return e;const t=e.ownerId||null,s=Array.isArray(e.participants)?e.participants:[],i=[...new Set(s.filter(Boolean))];return t&&!i.includes(t)&&i.unshift(t),{...e,ownerId:t,participants:i,stages:Array.isArray(e.stages)?e.stages:[],shooters:Array.isArray(e.shooters)?e.shooters:[]}}function Tt(e){return e.sort((t,s)=>{var a,r,l,v;const i=t.date||((r=(a=t.createdAt)==null?void 0:a.toDate)==null?void 0:r.call(a))||new Date(0);return(s.date||((v=(l=s.createdAt)==null?void 0:l.toDate)==null?void 0:v.call(l))||new Date(0))-i}),e}function Be(...e){const t=new Map;return e.flat().forEach(s=>{s!=null&&s.id&&t.set(s.id,ee(s))}),Tt([...t.values()])}async function Nt(e){const t=H();if(!t)return{success:!1,error:"Not authenticated"};try{return await $e(B(L,"users",t.uid),{...e,stages:Array.isArray(matchData.stages)?matchData.stages:[],shooters:Array.isArray(matchData.shooters)?matchData.shooters:[],updatedAt:le()}),{success:!0}}catch(s){return console.error("Save profile error:",s),{success:!1,error:s.message}}}async function Ct(e){var t;try{const s=e||((t=H())==null?void 0:t.uid);if(!s)return null;const i=await we(B(L,"users",s));return i.exists()?{uid:s,...i.data()}:null}catch(s){return console.error("Get user profile error:",s),null}}async function Ft(e){const t=H();if(console.log("🔍 [CREATE MATCH] User:",t==null?void 0:t.uid),!t)return console.error("❌ [CREATE MATCH] Not authenticated"),{success:!1,error:"Not authenticated"};try{const s=ee({...e,ownerId:t.uid,participants:[t.uid],createdAt:le(),stages:Array.isArray(e.stages)?e.stages:[],shooters:Array.isArray(e.shooters)?e.shooters:[],updatedAt:le()});console.log("📝 [CREATE MATCH] Match document to save:",{name:s.name,ownerId:s.ownerId,participants:s.participants,date:s.date,type:s.type});const i=await gt(X(L,"matches"),s);return console.log("✅ [CREATE MATCH] Success! Match ID:",i.id),{success:!0,matchId:i.id}}catch(s){return console.error("❌ [CREATE MATCH] Error:",s),console.error("   Error code:",s.code),console.error("   Error message:",s.message),{success:!1,error:s.message}}}async function ie(e,t){if(!H())return{success:!1,error:"Not authenticated"};try{const i=await we(B(L,"matches",e));if(!i.exists())return{success:!1,error:"Match ikke funnet"};const n=ee(i.data()),a={...t,ownerId:n.ownerId,participants:Array.isArray(t.participants)?ee({ownerId:n.ownerId,participants:t.participants}).participants:n.participants,updatedAt:le()};return await $e(B(L,"matches",e),a),{success:!0}}catch(i){return console.error("Update match error:",i),{success:!1,error:i.message}}}async function At(e){if(!H())return{success:!1,error:"Not authenticated"};try{return await vt(B(L,"matches",e)),{success:!0}}catch(s){return console.error("Delete match error:",s),{success:!1,error:s.message}}}async function It(){const e=H();if(console.log("📊 [GET USER MATCHES] User:",e==null?void 0:e.uid),!e)return console.warn("⚠️ [GET USER MATCHES] Not authenticated"),[];try{const t=oe(X(L,"matches"),re("participants","array-contains",e.uid)),s=oe(X(L,"matches"),re("ownerId","==",e.uid));console.log("🔍 [GET USER MATCHES] Running queries...");const[i,n]=await Promise.all([Fe(t),Fe(s)]),a=[];i.forEach(v=>{const d={id:v.id,...v.data()};console.log("  📌 Participant match:",v.id,"-",d.name),a.push(d)});const r=[];n.forEach(v=>{const d={id:v.id,...v.data()};console.log("  👑 Owner match:",v.id,"-",d.name),r.push(d)});const l=Be(a,r);return console.log("✅ [GET USER MATCHES] Total matches:",l.length),l}catch(t){return console.error("❌ [GET USER MATCHES] Error:",t),console.error("   Error code:",t.code),console.error("   Error message:",t.message),[]}}function Rt(e){const t=H();if(console.log("👂 [LISTEN USER MATCHES] Setting up listeners for user:",t==null?void 0:t.uid),!t)return console.warn("⚠️ [LISTEN USER MATCHES] No user, skipping listeners"),()=>{};const s=oe(X(L,"matches"),re("participants","array-contains",t.uid)),i=oe(X(L,"matches"),re("ownerId","==",t.uid));let n=[],a=[];const r=()=>{const d=Be(n,a);console.log("🔄 [LISTEN USER MATCHES] Emitting",d.length,"matches"),e(d)},l=pe(s,d=>{console.log("📊 [LISTEN USER MATCHES] Participant snapshot:",d.size,"docs"),n=[],d.forEach(g=>{const u={id:g.id,...g.data()};console.log("  📌 Participant match:",g.id,"-",u.name),n.push(u)}),r()},d=>{console.error("❌ [LISTEN USER MATCHES] Participant query error:",d),console.error("   Error code:",d.code),console.error("   Error message:",d.message)}),v=pe(i,d=>{console.log("👑 [LISTEN USER MATCHES] Owner snapshot:",d.size,"docs"),a=[],d.forEach(g=>{const u={id:g.id,...g.data()};console.log("  👑 Owner match:",g.id,"-",u.name),a.push(u)}),r()},d=>{console.error("❌ [LISTEN USER MATCHES] Owner query error:",d),console.error("   Error code:",d.code),console.error("   Error message:",d.message)});return()=>{console.log("🔌 [LISTEN USER MATCHES] Unsubscribing from listeners"),l(),v()}}function $t(e,t){return pe(B(L,"matches",e),i=>{i.exists()?t(ee({id:i.id,...i.data()})):t(null)},i=>{console.error("Listen to match error:",i)})}let o,y=null,q="all",w=[],Y=null,Z=null;const Dt={no:{tracker:"INSIGHT",tagline:"Analyse. Prognose. Resultat.",home:"Hjem",matches:"Matcher",prognosis:"Prognose",results:"Live",profile:"Profil",leading:"LEDER",behind:"BAK",active:"Aktiv",no_match_selected:"Ingen match valgt",new_match:"Ny match",match_name:"Matchnavn",location:"Sted",date:"Dato",type:"Type",planned_stages:"Planlagte stages",save:"Lagre",cancel:"Avbryt",delete:"Slett",edit_profile:"Rediger profil",first_name:"Fornavn",last_name:"Etternavn",club:"Klubb",region:"Region",category:"Kategori",division:"Divisjon",power_factor:"Power Factor",draw_seconds:"Trekk (s)",reload_seconds:"Reload (s)",save_profile:"Lagre profil",logout:"Logg ut",matches_count:"Matcher",stages_count:"Stages",avg_hf:"Snitt HF",a_rate:"A-andel",shots:"Skudd",targets:"Skiver",steel:"Stål",move_seconds:"Beveg. (s)",calculate:"Beregn",add_shooter:"Legg til skytter",add_result:"Legg til resultat",save_shooter:"Lagre skytter",save_result:"Lagre resultat",match_types_stevne:"Stevne",match_types_trening:"Trening",match_types_klubbmatch:"Klubbmatch",match_types_landsmesterskap:"Landsmesterskap",match_types_internasjonalt:"Internasjonalt",select_power_factor:"Velg Power Factor",stages_added_later:"Stages legges til senere"},en:{tracker:"INSIGHT",tagline:"Analysis. Prognosis. Results.",home:"Home",matches:"Matches",prognosis:"Prognosis",results:"Live",profile:"Profile",leading:"LEADING",behind:"BEHIND",active:"Active",no_match_selected:"No match selected",new_match:"New Match",match_name:"Match Name",location:"Location",date:"Date",type:"Type",planned_stages:"Planned Stages",save:"Save",cancel:"Cancel",delete:"Delete",edit_profile:"Edit Profile",first_name:"First Name",last_name:"Last Name",club:"Club",region:"Region",category:"Category",division:"Division",power_factor:"Power Factor",draw_seconds:"Draw (s)",reload_seconds:"Reload (s)",save_profile:"Save Profile",logout:"Log Out",matches_count:"Matches",stages_count:"Stages",avg_hf:"Avg HF",a_rate:"A-rate",shots:"Shots",targets:"Targets",steel:"Steel",move_seconds:"Move (s)",calculate:"Calculate",add_shooter:"Add Shooter",add_result:"Add Result",save_shooter:"Save Shooter",save_result:"Save Result",match_types_stevne:"Competition",match_types_trening:"Training",match_types_klubbmatch:"Club Match",match_types_landsmesterskap:"Nationals",match_types_internasjonalt:"International",select_power_factor:"Select Power Factor",stages_added_later:"Stages will be added later"}};let He="no";function p(e){return Dt[He][e]||e}const Ae={major:{A:5,C:4,D:2,miss:-10,ns:-10,proc:-10},minor:{A:5,C:3,D:1,miss:-10,ns:-10,proc:-10}},_t={Standard:{minor:20,major:17},Open:{minor:28,major:28},Production:{minor:15,major:15},"Production Optics":{minor:15,major:15},"Production Optics Carbine":{minor:15,major:15},Classic:{minor:10,major:8},Revolver:{minor:8,major:6},"Pistol Caliber Carbine":{minor:30,major:30},"Pistol Caliber Carbine Optics":{minor:30,major:30}},ve=["Standard","Open","Production","Production Optics","Production Optics Carbine","Classic","Revolver","Pistol Caliber Carbine","Pistol Caliber Carbine Optics"],je={Standard:["minor","major"],Open:["minor","major"],Production:["minor"],"Production Optics":["minor"],"Production Optics Carbine":["minor"],Classic:["minor","major"],Revolver:["minor","major"],"Pistol Caliber Carbine":["minor","major"],"Pistol Caliber Carbine Optics":["minor","major"]},Bt=["—","Junior","Senior","Super Senior","Lady","Lady Junior","Lady Senior"],Ht=["Norge","Sverige","Danmark","Finland","Tyskland","Storbritannia","USA","Annet"];function jt(e,t){const s=_t[e];return s&&(s[t]||s.minor)||15}function Ot(e,t,s){return Math.max(0,Math.ceil(e/jt(t,s))-1)}function Oe(e,t,s,i,n,a,r){const l=Ae[r]||Ae.minor;return e*l.A+t*l.C+s*l.D+i*l.miss+n*l.ns+(a||0)*l.proc}function G(e){return e.charAt(0).toUpperCase()+e.slice(1)}function ye(e){if(!e)return"";try{const t=He==="no"?"nb-NO":"en-US";return new Date(e).toLocaleDateString(t,{day:"numeric",month:"short",year:"numeric"})}catch{return e}}function c(e){return document.getElementById(e)}function f(e){const t=c(e);return t?t.value:""}function me(e,t){const s=parseFloat(f(e));return isNaN(s)?t||0:s}function k(e,t){const s=parseInt(f(e));return isNaN(s)?t||0:s}function K(){const e=(o==null?void 0:o.firstName)||"",t=(o==null?void 0:o.lastName)||"";return(e.charAt(0)+t.charAt(0)).toUpperCase()||"U"}function ke(){var e,t;return((e=H())==null?void 0:e.uid)||((t=_e())==null?void 0:t.uid)||null}function he(e){return e==null?null:String(e)}function S(e,t){return he(e)===he(t)}function xe(e,t){return(e.num||e.number||0)-(t.num||t.number||0)}function z(e){if(!e)return 0;if(typeof e.maxPoints=="number")return e.maxPoints;const t=Number(e.targets||e.paperTargets||0),s=Number(e.steel||e.poppers||e.plates||0);return(t+s)*10}function _(e){if(!e)return 0;if(typeof e.shots=="number")return e.shots;const t=Number(e.targets||e.paperTargets||0),s=Number(e.steel||e.poppers||e.plates||0);return t*2+s}function te(e,t={}){const s=Number(t.targets??t.paperTargets??0),i=Number(t.steel??t.poppers??t.plates??0),n=Number(t.shots??Math.max(s*2+i,0)),a=Number(t.maxPoints??(s+i)*10);return{number:e,name:t.name||`Stage ${e}`,targets:s,steel:i,shots:n,maxPoints:a}}function M(e){if(!e)return[];const s=(Array.isArray(e.stages)?e.stages:[]).filter(n=>n&&(n.number!=null||n.num!=null)&&!(n.time!=null||n.pts!=null||n.hf!=null)).map((n,a)=>te(Number(n.number??n.num??a+1),n));if(s.length)return s.sort(xe);const i=Number(e.plannedStages||0);return Array.from({length:i},(n,a)=>te(a+1))}function j(e){const t=M(e);return e.stages=t,e.plannedStages=Math.max(Number(e.plannedStages||0),t.length),e}function se(e){var s;if(!((s=e==null?void 0:e.shooters)!=null&&s.length))return null;const t=ke();return e.shooters.find(i=>i.isMe||t&&i.id===t)||e.shooters[0]||null}function Ee(e){e.shooters||(e.shooters=[]);const t=se(e);if(t)return Array.isArray(t.stages)||(t.stages=[]),t;const s={id:ke()||`me_${Date.now()}`,isMe:!0,firstName:(o==null?void 0:o.firstName)||"Meg",lastName:(o==null?void 0:o.lastName)||"",division:(o==null?void 0:o.division)||"Production",pf:(o==null?void 0:o.powerFactor)||"minor",club:(o==null?void 0:o.club)||"",stages:[]};return e.shooters.push(s),s}function J(e){return(Array.isArray(e==null?void 0:e.stages)?e.stages:[]).filter(Boolean).map(t=>({...t,num:Number(t.num??t.number)})).filter(t=>Number.isFinite(t.num)).sort(xe)}function Ut(e,t,s){var r;const i=(r=e==null?void 0:e.shooters)==null?void 0:r.find(l=>l.id===t);if(!i)return!1;Array.isArray(i.stages)||(i.stages=[]);const n=Number(s.num??s.number),a=i.stages.findIndex(l=>Number(l.num??l.number)===n);return a>=0?i.stages[a]={...i.stages[a],...s,num:n}:i.stages.push({...s,num:n}),i.stages.sort(xe),!0}function fe(e,t){return J(e).find(s=>Number(s.num)===Number(t))||null}function Ue(e,t){const s=M(e),i=J(t),n=i.reduce((g,u)=>g+Number(u.pts||0),0),a=i.reduce((g,u)=>g+Number(u.time||0),0),r=i.reduce((g,u)=>g+Number(u.a||0),0),l=i.reduce((g,u)=>g+Number(u.a||0)+Number(u.c||0)+Number(u.d||0),0),v=s.reduce((g,u)=>g+z(u),0),d=i.reduce((g,u)=>{const b=s.find(P=>P.number===u.num);return g+z(b)},0);return{totalPts:n,totalTime:a,aRate:l?r/l:0,scoredMax:d,totalMax:v,percentOfAvailable:d?n/d:0,hf:a>0?n/a:0}}function Ke(e,t){const s=M(e),n=J(t).filter(u=>Number(u.time)>0),a=n.reduce((u,b)=>{const P=s.find(E=>E.number===b.num);return u+_(P)},0),r=n.reduce((u,b)=>u+Number(b.time||0),0),l=n.reduce((u,b)=>u+Number(b.a||0),0),v=n.reduce((u,b)=>u+Number(b.a||0)+Number(b.c||0)+Number(b.d||0),0),d=n.reduce((u,b)=>u+Number(b.pts||0),0),g=n.reduce((u,b)=>{const P=s.find(E=>E.number===b.num);return u+z(P)},0);return{completedCount:n.length,timePerShot:a?r/a:0,aRate:v?l/v:0,pointsRatio:g?d/g:0,totalPts:d,totalTime:r,totalShots:a,scoredMax:g}}function Ge(e,t){const s=M(e),i=new Set(J(t).map(n=>Number(n.num)));return s.find(n=>!i.has(Number(n.number)))||null}function Ie(e,t,s){if(!e||!t||!s)return null;const i=Ke(e,t);if(!i.completedCount||!i.timePerShot)return null;const n=t.division||(o==null?void 0:o.division)||"Production",a=t.pf||(o==null?void 0:o.powerFactor)||"minor",r=Ot(_(s),n,a),l=Number((o==null?void 0:o.draw)||1.4),v=Number((o==null?void 0:o.reloadTime)||1.8),d=l+_(s)*i.timePerShot+r*v,g=Math.max(0,z(s)*(i.pointsRatio||0));return{estHF:d>0?g/d:0,estPoints:g,estTime:d,reloadCount:r,form:i}}function Re(e,t,s,i){if(!i||!s)return"Skyt stage for stage. Bygg videre på dagsformen.";const n=Math.round((i.form.aRate||0)*100),a=i.form.timePerShot||0,r=[];return n<70?r.push("Gi siktebildet litt mer tid."):r.push("Behold tempoet."),i.reloadCount>0?r.push(`Planlegg ${i.reloadCount} magasinbytte${i.reloadCount>1?"r":""}.`):r.push("Ingen reloads forventet."),r.push(`Baseline nå er ${n}%A og ${a.toFixed(3)}s/skudd.`),r.join(" ")}function Kt(e,t){const s=((e==null?void 0:e.shooters)||[]).map(l=>({shooter:l,...Ue(e,l)})).sort((l,v)=>v.totalPts-l.totalPts),i=s.findIndex(l=>l.shooter.id===(t==null?void 0:t.id));if(i<0)return"Ingen sammenligningsdata ennå.";const n=s[i],a=s[i-1]||null,r=s[i+1]||null;return!a&&!r?"Du leder alene akkurat nå.":!a&&r?`Du leder med ${(n.totalPts-r.totalPts).toFixed(1)} poeng. Hold konkurrentene bak deg.`:a&&!r?`Du trenger ${(a.totalPts-n.totalPts+.1).toFixed(1)} poeng for å gå forbi ${a.shooter.firstName}.`:`Til leder mangler du ${(a.totalPts-n.totalPts+.1).toFixed(1)} poeng. Bak har du ${(n.totalPts-r.totalPts).toFixed(1)} poeng margin.`}function Gt(e,t){var n;const s=c(e);if(!s)return;const i=w.find(a=>S(a.id,y));if(!((n=i==null?void 0:i.shooters)!=null&&n.length)){s.innerHTML='<option value="">Ingen skyttere</option>';return}s.innerHTML=i.shooters.map(a=>{const r=a.isMe?`Meg (${a.firstName||""} ${a.lastName||""})`.trim():`${a.firstName||""} ${a.lastName||""}`.trim();return`<option value="${a.id}"${t===a.id?" selected":""}>${r}</option>`}).join("")}function Vt(e,t){const s=c(e);if(!s)return;const i=w.find(a=>S(a.id,y)),n=M(i);if(!n.length){s.innerHTML='<option value="">Ingen stages</option>';return}s.innerHTML=n.map(a=>`<option value="${a.number}"${Number(t)===Number(a.number)?" selected":""}>${a.name}</option>`).join("")}async function qt(e){var i;const t=await Ct(),s=_e();t?o=t:o={firstName:s.name||((i=s.email)==null?void 0:i.split("@")[0])||"",lastName:"",division:"",category:"",powerFactor:"",region:"",club:"",draw:null,reloadTime:null},w=await It(),Y&&Y(),Y=Rt(n=>{w=n,V(),N()}),e.innerHTML=`
 <div class="phone">
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
- <div class="navbar">
- <div class="nav-title">IPSC <span>INSIGHT</span></div>
- <div class="match-chip" onclick="switchTab('screen-matches')">
- <div class="match-chip-dot"></div>
- <div class="match-chip-name" id="home-chip-name">${d("no_match_selected")}</div>
- <div class="match-chip-arrow">&#9660;</div>
- </div>
- <div class="nav-avatar" id="nav-av-home" onclick="switchTab('screen-profile')">${le()}</div>
- </div>
- <div class="scroll-content" id="home-content"></div>
- <button class="fab" onclick="openModal('modal-add')">+</button>
- <div class="tab-bar">
- <div class="tab-item active" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${d("home")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
- </div>
+  <div class="navbar">
+    <div class="nav-title">IPSC <span>INSIGHT</span></div>
+    <div class="match-chip-wrapper">
+      <div class="match-chip" onclick="toggleMatchDropdown('match-dropdown-home')">
+        <div class="match-chip-dot"></div>
+        <div class="match-chip-name" id="home-chip-name">${p("no_match_selected")}</div>
+        <div class="match-chip-arrow">&#9660;</div>
+      </div>
+      <div class="match-dropdown" id="match-dropdown-home"></div>
+    </div>
+    <div class="nav-avatar" id="nav-av-home" onclick="switchTab('screen-profile')">${K()}</div>
+  </div>
+  <div class="scroll-content" id="home-content"></div>
+  <button class="fab" onclick="openModal('modal-add')">+</button>
+  <div class="tab-bar">
+    <div class="tab-item active" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${p("home")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${p("matches")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${p("prognosis")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${p("results")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${p("profile")}</span></div>
+  </div>
 </div>
 
 <!-- MATCHES -->
 <div class="screen" id="screen-matches">
- <div class="navbar">
- <div class="nav-title">MATCH<span>ER</span></div>
- <div style="display:flex;align-items:center;gap:15px;">
- <div style="position:relative;cursor:pointer;" onclick="openInvitationsModal()">
- <div style="font-size:24px;"></div>
- <div id="invitation-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;width:20px;height:20px;font-size:12px;font-weight:bold;align-items:center;justify-content:center;">0</div>
- </div>
- <div class="nav-avatar" id="nav-av-matches" onclick="switchTab('screen-profile')">${le()}</div>
- </div>
- </div>
- <div class="scroll-content">
- <div class="search-wrap"><span class="search-icon"></span><input class="search-input" id="match-id-search" placeholder="${d("search_match_placeholder")}" type="number"><button class="btn-primary" style="margin-left:10px;padding:8px 16px;font-size:14px;" onclick="searchMatchByIdHandler()">Søk</button></div>
- <div class="filter-row">
- <div class="filter-chip active" onclick="setFilter('all',this)">Alle</div>
- <div class="filter-chip" onclick="setFilter('active',this)">Aktiv</div>
- <div class="filter-chip" onclick="setFilter('2026',this)">2026</div>
- <div class="filter-chip" onclick="setFilter('2025',this)">2025</div>
- <div class="filter-chip" onclick="setFilter('trening',this)">Trening</div>
- <div class="filter-chip" onclick="setFilter('stevne',this)">Stevne</div>
- </div>
- <div id="match-list-container"></div>
- </div>
- <button class="fab" onclick="openModal('modal-new-match')">+</button>
- <div class="tab-bar">
- <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${d("home")}</span></div>
- <div class="tab-item active" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
- </div>
+  <div class="navbar">
+    <div class="nav-title">MATCH<span>ER</span></div>
+    <div class="nav-avatar" id="nav-av-matches" onclick="switchTab('screen-profile')">${K()}</div>
+  </div>
+  <div class="scroll-content">
+    <div class="search-wrap"><span class="search-icon">&#128269;</span><input class="search-input" id="match-search" placeholder="Søk match, sted..." oninput="renderMatchList()"></div>
+    <div class="filter-row">
+      <div class="filter-chip active" onclick="setFilter('all',this)">Alle</div>
+      <div class="filter-chip" onclick="setFilter('active',this)">Aktiv</div>
+      <div class="filter-chip" onclick="setFilter('2026',this)">2026</div>
+      <div class="filter-chip" onclick="setFilter('2025',this)">2025</div>
+      <div class="filter-chip" onclick="setFilter('trening',this)">Trening</div>
+      <div class="filter-chip" onclick="setFilter('stevne',this)">Stevne</div>
+    </div>
+    <div id="match-list-container"></div>
+  </div>
+  <button class="fab" onclick="openModal('modal-new-match')">+</button>
+  <div class="tab-bar">
+    <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${p("home")}</span></div>
+    <div class="tab-item active" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${p("matches")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${p("prognosis")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${p("results")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${p("profile")}</span></div>
+  </div>
 </div>
 
 <!-- PROGNOSE -->
 <div class="screen" id="screen-prognose">
- <div class="navbar">
- <div class="nav-title">PROG<span>NOSE</span></div>
- <div class="match-chip-wrapper">
- <div class="match-chip" onclick="toggleMatchDropdown('prog')">
- <div class="match-chip-dot"></div>
- <div class="match-chip-name" id="prog-chip-name">${d("no_match_selected")}</div>
- <div class="match-chip-arrow">&#9660;</div>
- </div>
- <div class="match-dropdown" id="prog-match-dropdown"></div>
- </div>
- <div class="nav-avatar" id="nav-av-prog" onclick="switchTab('screen-profile')">${le()}</div>
- </div>
- <div class="scroll-content">
- <div id="prog-match-context"></div>
- <div id="snapshot-container"></div>
- <div class="card">
- <div class="card-header"><div class="card-title">Skytterdata (snitt)</div><span class="badge badge-blue">Auto</span></div>
- <div class="stats-grid">
- <div class="stat-block"><div class="stat-value">${g.draw||""}s</div><div class="stat-label">Draw</div></div>
- <div class="stat-block"><div class="stat-value">${g.reloadTime||""}s</div><div class="stat-label">Reload</div></div>
- <div class="stat-block"><div class="stat-value" id="prog-a-rate"></div><div class="stat-label">A-andel</div></div>
- </div>
- <div id="prog-data-status" style="margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;color:var(--muted);text-align:center;display:none;">
-  Ingen skutte stages ennå. Data vil vises etter at du har lagt til resultater.
- </div>
- </div>
- <div id="prog-stages-container"></div>
- </div>
- <button class="fab" onclick="openModal('modal-upload-result')">+</button>
- <div class="tab-bar">
- <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${d("home")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
- <div class="tab-item active" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
- </div>
+  <div class="navbar">
+    <div class="nav-title">PROG<span>NOSE</span></div>
+    <div class="match-chip-wrapper">
+      <div class="match-chip" onclick="toggleMatchDropdown('match-dropdown-prog')">
+        <div class="match-chip-dot"></div>
+        <div class="match-chip-name" id="prog-chip-name">${p("no_match_selected")}</div>
+        <div class="match-chip-arrow">&#9660;</div>
+      </div>
+      <div class="match-dropdown" id="match-dropdown-prog"></div>
+    </div>
+    <div class="nav-avatar" id="nav-av-prog" onclick="switchTab('screen-profile')">${K()}</div>
+  </div>
+  <div class="scroll-content">
+    <div id="prog-match-context"></div>
+    <div id="snapshot-container"></div>
+    <div id="prog-stage-list"></div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${p("home")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${p("matches")}</span></div>
+    <div class="tab-item active" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${p("prognosis")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${p("results")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${p("profile")}</span></div>
+  </div>
 </div>
 
 <!-- RESULTS -->
 <div class="screen" id="screen-results">
- <div class="navbar">
- <div class="nav-title">LIVE<span></span></div>
- <div class="match-chip" onclick="switchTab('screen-matches')">
- <div class="match-chip-dot"></div>
- <div class="match-chip-name" id="results-chip-name">${d("no_match_selected")}</div>
- <div class="match-chip-arrow">&#9660;</div>
- </div>
- <div class="nav-avatar" id="nav-av-results" onclick="switchTab('screen-profile')">${le()}</div>
- </div>
- <div class="scroll-content" id="results-content"></div>
- <button class="fab" onclick="openModal('modal-add-shooter')">+</button>
- <div class="tab-bar">
- <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${d("home")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
- <div class="tab-item active" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
- </div>
+  <div class="navbar">
+    <div class="nav-title">LIVE<span></span></div>
+    <div class="match-chip-wrapper">
+      <div class="match-chip" onclick="toggleMatchDropdown('match-dropdown-results')">
+        <div class="match-chip-dot"></div>
+        <div class="match-chip-name" id="results-chip-name">${p("no_match_selected")}</div>
+        <div class="match-chip-arrow">&#9660;</div>
+      </div>
+      <div class="match-dropdown" id="match-dropdown-results"></div>
+    </div>
+    <div class="nav-avatar" id="nav-av-results" onclick="switchTab('screen-profile')">${K()}</div>
+  </div>
+  <div class="scroll-content" id="results-content"></div>
+  <button class="fab" onclick="openModal(&quot;modal-add-shooter&quot;)">+</button>
+  <div class="tab-bar">
+    <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${p("home")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${p("matches")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${p("prognosis")}</span></div>
+    <div class="tab-item active" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${p("results")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${p("profile")}</span></div>
+  </div>
 </div>
 
 <!-- PROFILE -->
 <div class="screen" id="screen-profile">
- <div class="navbar">
- <div class="nav-title">PRO<span>FIL</span></div>
- <div class="nav-avatar" id="prof-avatar" onclick="switchTab('screen-home')">${le()}</div>
- </div>
- <div class="scroll-content">
- <div class="profile-header">
- <div class="profile-avatar">${le()}</div>
- <div class="profile-name" id="prof-name">${g.firstName||""} ${g.lastName||""}</div>
- <div class="profile-div" id="prof-div">${g.division||""} · ${g.club||""}</div>
- <div class="profile-badges">
- <span class="badge badge-gold" id="prof-badge-pf">${g.powerFactor?ge(g.powerFactor):""}</span>
- <span class="badge badge-green">Verified</span>
- <span class="badge badge-blue" id="prof-badge-region">${g.region||""}</span>
- </div>
- <button class="btn-primary" onclick="openEditProfile()"> ${d("edit_profile")}</button>
- </div>
+  <div class="navbar">
+    <div class="nav-title">PRO<span>FIL</span></div>
+    <div class="nav-avatar" id="prof-avatar" onclick="switchTab('screen-home')">${K()}</div>
+  </div>
+  <div class="scroll-content">
+    <div class="profile-header">
+      <div class="profile-avatar">${K()}</div>
+      <div class="profile-name" id="prof-name">${o.firstName||""} ${o.lastName||""}</div>
+      <div class="profile-div" id="prof-div">${o.division||"—"} · ${o.club||"—"}</div>
+      <div class="profile-badges">
+        <span class="badge badge-gold" id="prof-badge-pf">${o.powerFactor?G(o.powerFactor):"—"}</span>
+        <span class="badge badge-green">Verified</span>
+        <span class="badge badge-blue" id="prof-badge-region">${o.region||"—"}</span>
+      </div>
+      <button class="btn-primary" onclick="openEditProfile()">✏️ ${p("edit_profile")}</button>
+    </div>
 
- <div class="card">
- <div class="card-header"><div class="card-title">Personlig informasjon</div></div>
- <div class="info-row">
- <span class="info-key">Fornavn</span>
- <span id="info-firstname">${g.firstName||""}</span>
- </div>
- <div class="info-row">
- <span class="info-key">Etternavn</span>
- <span id="info-lastname">${g.lastName||""}</span>
- </div>
- <div class="info-row">
- <span class="info-key">Divisjon</span>
- <span id="info-division">${g.division||""}</span>
- </div>
- <div class="info-row">
- <span class="info-key">Kategori</span>
- <span id="info-category">${g.category||""}</span>
- </div>
- <div class="info-row">
- <span class="info-key">Power Factor</span>
- <span id="info-pf">${g.powerFactor?ge(g.powerFactor):""}</span>
- </div>
- <div class="info-row">
- <span class="info-key">Region</span>
- <span id="info-region">${g.region||""}</span>
- </div>
- <div class="info-row">
- <span class="info-key">Klubb</span>
- <span id="info-club">${g.club||""}</span>
- </div>
- </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Personlig informasjon</div></div>
+      <div class="info-row">
+        <span class="info-key">Fornavn</span>
+        <span id="info-firstname">${o.firstName||"—"}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Etternavn</span>
+        <span id="info-lastname">${o.lastName||"—"}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Divisjon</span>
+        <span id="info-division">${o.division||"—"}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Kategori</span>
+        <span id="info-category">${o.category||"—"}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Power Factor</span>
+        <span id="info-pf">${o.powerFactor?G(o.powerFactor):"—"}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Region</span>
+        <span id="info-region">${o.region||"—"}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Klubb</span>
+        <span id="info-club">${o.club||"—"}</span>
+      </div>
+    </div>
 
- <div class="card">
- <div class="card-header"><div class="card-title">Sesongstatistikk</div></div>
- <div class="stats-grid">
- <div class="stat-block"><div class="stat-value" id="stat-matches">0</div><div class="stat-label">${d("matches_count")}</div></div>
- <div class="stat-block"><div class="stat-value" id="stat-stages">0</div><div class="stat-label">${d("stages_count")}</div></div>
- <div class="stat-block"><div class="stat-value" id="stat-avg-hf"></div><div class="stat-label">${d("avg_hf")}</div></div>
- <div class="stat-block"><div class="stat-value" id="stat-a-rate"></div><div class="stat-label">${d("a_rate")}</div></div>
- </div>
- </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Sesongstatistikk</div></div>
+      <div class="stats-grid">
+        <div class="stat-block"><div class="stat-value" id="stat-matches">0</div><div class="stat-label">${p("matches_count")}</div></div>
+        <div class="stat-block"><div class="stat-value" id="stat-stages">0</div><div class="stat-label">${p("stages_count")}</div></div>
+        <div class="stat-block"><div class="stat-value" id="stat-avg-hf">—</div><div class="stat-label">${p("avg_hf")}</div></div>
+        <div class="stat-block"><div class="stat-value" id="stat-a-rate">—</div><div class="stat-label">${p("a_rate")}</div></div>
+      </div>
+    </div>
 
- <button class="btn-primary btn-logout" onclick="handleLogout()"> ${d("logout")}</button>
- <div class="profile-spacer"></div>
- </div>
- <div class="tab-bar">
- <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${d("home")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item active" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
- </div>
+    <button class="btn-primary btn-logout" onclick="handleLogout()">🚪 ${p("logout")}</button>
+    <div class="profile-spacer"></div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${p("home")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${p("matches")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${p("prognosis")}</span></div>
+    <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${p("results")}</span></div>
+    <div class="tab-item active" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${p("profile")}</span></div>
+  </div>
 </div>
 
 <!-- MODALS -->
 <div class="modal-overlay" id="modal-new-match" onclick="closeModalOutside(event,'modal-new-match')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title">${d("new_match")}</div>
- <div class="modal-close" onclick="closeModal('modal-new-match')"></div>
- </div>
- <div class="modal-body">
- <div class="field-group">
- <div class="field-label">${d("match_name")}</div>
- <input class="field-input" type="text" id="new-match-name" placeholder="Bergen Open 2026">
- </div>
- <div class="field-group">
- <div class="field-label">${d("type")}</div>
- <select class="field-select" id="new-match-type">
- <option value="Trening">${d("match_types_trening")}</option>
- <option value="Level 1">${d("match_types_level1")}</option>
- <option value="Level 2">${d("match_types_level2")}</option>
- <option value="Level 3">${d("match_types_level3")}</option>
- <option value="Level 4">${d("match_types_level4")}</option>
- <option value="Level 5">${d("match_types_level5")}</option>
- </select>
- </div>
- <div class="field-group">
- <div class="field-label">${d("date")}</div>
- <input class="field-input" type="date" id="new-match-date" value="${new Date().toISOString().split("T")[0]}">
- </div>
- <div class="field-group">
- <div class="field-label">${d("location")}</div>
- <input class="field-input" type="text" id="new-match-location" placeholder="Bergen">
- </div>
- <div class="field-group">
- <div class="field-label">${d("planned_stages")}</div>
- <input class="field-input" type="number" id="new-match-stages" value="6">
- </div>
- <div style="margin-top:10px;">
- <button class="btn-primary" onclick="openCreateStageFromNewMatch()" style="width:100%;">Ny stage</button>
- </div>
- <div class="field-group">
- <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
- <input type="checkbox" id="new-match-searchable" checked style="width:18px;height:18px;">
- <span>${d("allow_search")}</span>
- </label>
- </div>
- <div class="field-group">
- <div class="field-label">Inviter brukere (valgfritt)</div>
- <div style="display:flex;gap:8px;margin-bottom:10px;">
- <input class="field-input" type="text" id="new-match-user-search" placeholder="Søk etter navn eller e-post..." style="flex:1;">
- <button onclick="searchUsersNewMatch()" style="width:80px;padding:12px;background:#e8b84b;color:#1a202c;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Søk</button>
- </div>
- <div id="new-match-search-results"></div>
- </div>
- <button class="btn-primary" onclick="createMatch()">${d("save")}</button>
- </div>
- </div>
-</div>
-
-<div class="modal-overlay" id="modal-edit-match" onclick="closeModalOutside(event,'modal-edit-match')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title">${d("edit_match")}</div>
- <div class="modal-close" onclick="closeModal('modal-edit-match')"></div>
- </div>
- <div class="modal-body">
- <div class="field-group">
- <div class="field-label">${d("match_name")}</div>
- <input class="field-input" type="text" id="edit-match-name" placeholder="Bergen Open 2026">
- </div>
- <div class="field-group">
- <div class="field-label">${d("type")}</div>
- <select class="field-select" id="edit-match-type">
- <option value="Trening">${d("match_types_trening")}</option>
- <option value="Level 1">${d("match_types_level1")}</option>
- <option value="Level 2">${d("match_types_level2")}</option>
- <option value="Level 3">${d("match_types_level3")}</option>
- <option value="Level 4">${d("match_types_level4")}</option>
- <option value="Level 5">${d("match_types_level5")}</option>
- </select>
- </div>
- <div class="field-group">
- <div class="field-label">${d("date")}</div>
- <input class="field-input" type="date" id="edit-match-date">
- </div>
- <div class="field-group">
- <div class="field-label">${d("location")}</div>
- <input class="field-input" type="text" id="edit-match-location" placeholder="Bergen">
- </div>
- <div class="field-group">
- <div class="field-label">${d("planned_stages")}</div>
- <input class="field-input" type="number" id="edit-match-stages">
- </div>
- <div style="margin-top:10px;">
- <button class="btn-primary" onclick="openCreateStageFromEdit()" style="width:100%;">Ny stage</button>
- </div>
- <div class="field-group">
- <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
- <input type="checkbox" id="edit-match-searchable" style="width:18px;height:18px;">
- <span>${d("allow_search")}</span>
- </label>
- </div>
- <div class="field-group">
- <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
- <input type="checkbox" id="edit-match-finished" style="width:18px;height:18px;">
- <span>Marker som ferdig</span>
- </label>
- </div>
- <div class="field-group">
- <div class="field-label">Velg rival/motstander (valgfritt)</div>
- <select class="field-select" id="edit-match-rival">
- <option value="">Ingen rival valgt</option>
- </select>
- </div>
- <div style="margin-top:10px;">
- <button class="btn-primary" onclick="openModal('modal-add-shooter')" style="width:100%;">Ny skytter i match</button>
- </div>
- <div id="edit-match-shooters-list" style="margin-top:10px;"></div>
- <div class="field-group">
- <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
- <input type="checkbox" id="edit-match-reference-enabled" onchange="toggleReferenceShootersEnabled()" style="width:18px;height:18px;">
- <span>Bruk referanseskyttere</span>
- </label>
- </div>
- <div class="field-group" id="reference-shooters-config" style="display:none;"></div>
- <div class="field-group">
- <div class="field-label">Inviter brukere (valgfritt)</div>
- <div style="display:flex;gap:8px;margin-bottom:10px;">
- <input class="field-input" type="text" id="edit-match-user-search" placeholder="Søk etter navn eller e-post..." style="flex:1;">
- <button onclick="searchUsersEditMatch()" style="width:80px;padding:12px;background:#e8b84b;color:#1a202c;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Søk</button>
- </div>
- <div id="edit-match-search-results"></div>
- </div>
- <button class="btn-primary" onclick="saveEditMatch()">${d("save")}</button>
- <button id="delete-match-btn" onclick="confirmDeleteMatch()" style="width:100%;margin-top:10px;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;display:none;">Slett match</button>
- </div>
- </div>
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">${p("new_match")}</div>
+      <div class="modal-close" onclick="closeModal('modal-new-match')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <div class="field-label">${p("match_name")}</div>
+        <input class="field-input" type="text" id="new-match-name" placeholder="Bergen Open 2026">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("type")}</div>
+        <select class="field-select" id="new-match-type">
+          <option value="Stevne">${p("match_types_stevne")}</option>
+          <option value="Trening">${p("match_types_trening")}</option>
+          <option value="Klubbmatch">${p("match_types_klubbmatch")}</option>
+          <option value="Landsmesterskap">${p("match_types_landsmesterskap")}</option>
+          <option value="Internasjonalt">${p("match_types_internasjonalt")}</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("date")}</div>
+        <input class="field-input" type="date" id="new-match-date" value="${new Date().toISOString().split("T")[0]}">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("location")}</div>
+        <input class="field-input" type="text" id="new-match-location" placeholder="Bergen">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("planned_stages")}</div>
+        <input class="field-input" type="number" id="new-match-stages" value="6">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="createMatch()">${p("save")}</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="modal-edit-profile" onclick="closeModalOutside(event,'modal-edit-profile')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title">${d("edit_profile")}</div>
- <div class="modal-close" onclick="closeModal('modal-edit-profile')"></div>
- </div>
- <div class="modal-body">
- <div class="field-group">
- <div class="field-label">${d("first_name")}</div>
- <input class="field-input" type="text" id="edit-firstname" value="${g.firstName||""}">
- </div>
- <div class="field-group">
- <div class="field-label">${d("last_name")}</div>
- <input class="field-input" type="text" id="edit-lastname" value="${g.lastName||""}">
- </div>
- <div class="field-group">
- <div class="field-label">${d("division")}</div>
- <select class="field-select" id="edit-division" onchange="updatePFOptions()"></select>
- </div>
- <div class="field-group">
- <div class="field-label">${d("category")}</div>
- <select class="field-select" id="edit-category"></select>
- </div>
- <div class="field-group">
- <div class="field-label">${d("select_power_factor")}</div>
- <div id="pf-options" class="pf-options"></div>
- </div>
- <div class="field-group">
- <div class="field-label">${d("region")}</div>
- <select class="field-select" id="edit-region"></select>
- </div>
- <div class="field-group">
- <div class="field-label">${d("club")}</div>
- <input class="field-input" type="text" id="edit-club" value="${g.club||""}">
- </div>
- <div class="field-group">
- <div class="field-label">${d("draw_seconds")}</div>
- <input class="field-input" type="number" step="0.01" id="edit-draw" value="${g.draw||""}">
- </div>
- <div class="field-group">
- <div class="field-label">${d("reload_seconds")}</div>
- <input class="field-input" type="number" step="0.01" id="edit-reload" value="${g.reloadTime||""}">
- </div>
- <button class="btn-primary" id="save-profile-btn" onclick="saveProfileData()">${d("save_profile")}</button>
- </div>
- </div>
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">${p("edit_profile")}</div>
+      <div class="modal-close" onclick="closeModal('modal-edit-profile')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <div class="field-label">${p("first_name")}</div>
+        <input class="field-input" type="text" id="edit-firstname" value="${o.firstName||""}">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("last_name")}</div>
+        <input class="field-input" type="text" id="edit-lastname" value="${o.lastName||""}">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("division")}</div>
+        <select class="field-select" id="edit-division" onchange="updatePFOptions()"></select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("category")}</div>
+        <select class="field-select" id="edit-category"></select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("select_power_factor")}</div>
+        <div id="pf-options" class="pf-options"></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("region")}</div>
+        <select class="field-select" id="edit-region"></select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("club")}</div>
+        <input class="field-input" type="text" id="edit-club" value="${o.club||""}">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("draw_seconds")}</div>
+        <input class="field-input" type="number" step="0.01" id="edit-draw" value="${o.draw||""}">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("reload_seconds")}</div>
+        <input class="field-input" type="number" step="0.01" id="edit-reload" value="${o.reloadTime||""}">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="save-profile-btn" onclick="saveProfileData()">${p("save_profile")}</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="modal-add-shooter" onclick="closeModalOutside(event,'modal-add-shooter')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title">${d("add_shooter")}</div>
- <div class="modal-close" onclick="closeModal('modal-add-shooter')"></div>
- </div>
- <div class="modal-body">
- <div class="field-group">
- <div class="field-label">${d("first_name")}</div>
- <input class="field-input" type="text" id="new-shooter-firstname">
- </div>
- <div class="field-group">
- <div class="field-label">${d("last_name")}</div>
- <input class="field-input" type="text" id="new-shooter-lastname">
- </div>
- <div class="field-group">
- <div class="field-label">${d("division")}</div>
- <select class="field-select" id="new-shooter-division">
- <option value="Standard">Standard</option>
- <option value="Open">Open</option>
- <option value="Production">Production</option>
- <option value="Production Optics">Production Optics</option>
- <option value="Classic">Classic</option>
- <option value="Revolver">Revolver</option>
- </select>
- </div>
- <div class="field-group">
- <div class="field-label">${d("power_factor")}</div>
- <select class="field-select" id="new-shooter-pf">
- <option value="minor">Minor</option>
- <option value="major">Major</option>
- </select>
- </div>
- <button class="btn-primary" onclick="addShooter()">${d("save_shooter")}</button>
- </div>
- </div>
-</div>
-
-<div class="modal-overlay" id="modal-upload-result" onclick="closeModalOutside(event,'modal-upload-result')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title">Last opp resultat</div>
- <div class="modal-close" onclick="closeModal('modal-upload-result')"></div>
- </div>
- <div class="modal-body">
- <div style="margin-bottom:15px;padding:10px;background:var(--bg);border-radius:8px;">
- <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Match:</div>
- <div id="upload-match-name" style="font-size:14px;font-weight:600;color:var(--text);"></div>
- </div>
- <div class="field-group">
- <div class="field-label">Velg stage</div>
- <select class="field-select" id="upload-stage-select"></select>
- <button class="btn-secondary" style="margin-top:10px;" onclick="openCreateStageFromUpload()">Opprett ny stage</button>
- </div>
- <div class="field-group">
- <div class="field-label">Velg skytter</div>
- <select class="field-select" id="upload-shooter-select"></select>
- </div>
- <div class="field-group">
- <div class="field-label">Last opp bilde (png, jpg, pdf)</div>
- <input class="field-input" type="file" id="upload-result-file" accept="image/png,image/jpeg,image/jpg,application/pdf">
- </div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button class="btn-secondary" id="upload-manual-btn" onclick="icOpenManualResult()">Registrer manuelt</button><button class="btn-primary" id="upload-scan-btn" onclick="uploadAndScanResult(event)">Last opp og skann</button></div>
- </div>
- </div>
-</div>
-
-<div class="modal-overlay" id="modal-ocr-confirm" onclick="closeModalOutside(event,'modal-ocr-confirm')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title" id="ocr-confirm-title">Bekreft resultat</div>
- <div class="modal-close" onclick="closeModal('modal-ocr-confirm')"></div>
- </div>
- <div class="modal-body">
- <div id="ocr-confirm-desc" style="margin-bottom:15px;color:var(--muted);font-size:13px;">Kontroller og rediger verdiene. Poeng beregnes automatisk fra Minor/Major og treffbildet.</div>
- <div class="field-group" style="background:var(--bg);padding:12px;border-radius:10px;margin-bottom:10px;">
- <div class="field-label">Stage</div>
- <div id="ocr-stage-info" style="font-weight:600;">Ingen stage valgt</div>
- <div id="ocr-stage-shots-info" style="margin-top:6px;color:var(--muted);font-size:12px;"></div>
- </div>
- <div class="field-group" style="background:var(--bg);padding:12px;border-radius:10px;">
- <div class="field-label">Stage info</div>
- <div id="new-result-stage-info" style="font-weight:600;">Ingen stage valgt</div>
- <div id="new-result-stage-shots-info" style="margin-top:6px;color:var(--muted);font-size:12px;"></div>
- </div>
- <div class="field-group">
- <div class="field-label">Time (s)</div>
- <input class="field-input" type="number" step="0.01" id="ocr-time">
- </div>
- <div class="field-group">
- <div class="field-label">Points</div>
- <input class="field-input" type="number" id="ocr-points" readonly style="background:var(--bg);">
- </div>
- <div class="section-label" style="margin-top:15px;">Treffbilde</div>
- <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;">
- <div class="field-group">
- <div class="field-label">A (auto)</div>
- <input class="field-input" type="number" id="ocr-a" value="0" readonly style="text-align:center;background:var(--bg);">
- </div>
- <div class="field-group">
- <div class="field-label">C</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','c',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-c" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','c',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">D</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','d',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-d" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','d',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">Miss</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','miss',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-miss" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','miss',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- </div>
- <div class="section-label" style="margin-top:15px;">Straffer</div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
- <div class="field-group">
- <div class="field-label">NS (No-Shoot)</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','ns',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-ns" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','ns',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">Proc (Procedural)</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','proc',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="ocr-proc" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('ocr','proc',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- </div>
- <button class="btn-primary" id="ocr-save-btn" onclick="saveOCRResult()">Lagre resultat</button>
- </div>
- </div>
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">${p("add_shooter")}</div>
+      <div class="modal-close" onclick="closeModal('modal-add-shooter')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <div class="field-label">${p("first_name")}</div>
+        <input class="field-input" type="text" id="new-shooter-firstname">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("last_name")}</div>
+        <input class="field-input" type="text" id="new-shooter-lastname">
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("division")}</div>
+        <select class="field-select" id="new-shooter-division" onchange="updateAddShooterPFOptions()"></select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">${p("power_factor")}</div>
+        <select class="field-select" id="new-shooter-pf"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="addShooter()">${p("save_shooter")}</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="modal-add" onclick="closeModalOutside(event,'modal-add')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title">${d("add_result")}</div>
- <div class="modal-close" onclick="closeModal('modal-add')"></div>
- </div>
- <div class="modal-body">
- <div class="field-group">
- <div class="field-label">Stage Number</div>
- <input class="field-input" type="number" id="new-result-stage" oninput="icUpdateLockedStageInfo('new-result');icRecalcPoints('new-result')">
- </div>
- <div class="field-group">
- <div class="field-label">Time (s)</div>
- <input class="field-input" type="number" step="0.01" id="new-result-time">
- </div>
- <div class="field-group">
- <div class="field-label">Points</div>
- <input class="field-input" type="number" id="new-result-points" readonly style="background:var(--bg);">
- </div>
- <div class="section-label" style="margin-top:15px;">Treffbilde</div>
- <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;">
- <div class="field-group">
- <div class="field-label">A (auto)</div>
- <input class="field-input" type="number" id="new-result-a" value="0" readonly style="text-align:center;background:var(--bg);">
- </div>
- <div class="field-group">
- <div class="field-label">C</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','c',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="new-result-c" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','c',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">D</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','d',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="new-result-d" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','d',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">Miss</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','miss',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="new-result-miss" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','miss',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- </div>
- <div class="section-label" style="margin-top:15px;">Straffer</div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
- <div class="field-group">
- <div class="field-label">NS (No-Shoot)</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','ns',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="new-result-ns" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','ns',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">Proc (Procedural)</div>
- <div style="display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','proc',-1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">−</button>
- <input class="field-input" type="number" id="new-result-proc" value="0" readonly style="text-align:center;">
- <button type="button" onclick="icAdjustResultCount('new-result','proc',1)" style="height:50px;font-size:28px;background:#2d3748;color:white;border:none;border-radius:10px;cursor:pointer;">+</button>
- </div>
- </div>
- </div>
- <button class="btn-primary" onclick="addStageResult()">${d("save_result")}</button>
- </div>
- </div>
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">${p("add_result")}</div>
+      <div class="modal-close" onclick="closeModal('modal-add')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="field-group"><div class="field-label">Skytter</div><select class="field-select" id="new-result-shooter" onchange="updateManualPoints()"></select></div>
+      <div class="field-group"><div class="field-label">Stage</div><select class="field-select" id="new-result-stage" onchange="handleResultStageChange()"></select></div>
+      <div class="field-group"><div class="field-label">Time (s)</div><input class="field-input" type="number" step="0.01" id="new-result-time"></div>
+      <div id="new-result-stage-info" style="font-size:12px;color:var(--muted);margin:-8px 0 8px 0;">Stagekrav: –</div>
+      <div class="field-group"><div class="field-label">A (auto)</div><input class="field-input" type="number" id="new-result-a" value="0" readonly></div>
+      <div class="field-group"><div class="field-label">C</div><div style="display:flex;gap:8px;align-items:center;"><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-c', -1)">−</button><input class="field-input" style="text-align:center;" type="number" id="new-result-c" value="0" readonly><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-c', 1)">+</button></div></div>
+      <div class="field-group"><div class="field-label">D</div><div style="display:flex;gap:8px;align-items:center;"><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-d', -1)">−</button><input class="field-input" style="text-align:center;" type="number" id="new-result-d" value="0" readonly><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-d', 1)">+</button></div></div>
+      <div class="field-group"><div class="field-label">Miss</div><div style="display:flex;gap:8px;align-items:center;"><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-miss', -1)">−</button><input class="field-input" style="text-align:center;" type="number" id="new-result-miss" value="0" readonly><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-miss', 1)">+</button></div></div>
+      <div class="field-group"><div class="field-label">NS</div><div style="display:flex;gap:8px;align-items:center;"><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-ns', -1)">−</button><input class="field-input" style="text-align:center;" type="number" id="new-result-ns" value="0" readonly><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-ns', 1)">+</button></div></div>
+      <div class="field-group"><div class="field-label">Proc</div><div style="display:flex;gap:8px;align-items:center;"><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-proc', -1)">−</button><input class="field-input" style="text-align:center;" type="number" id="new-result-proc" value="0" readonly><button type="button" class="btn-secondary" style="padding:10px 14px;min-width:44px;" onclick="adjustResultField('new-result-proc', 1)">+</button></div></div>
+      <div class="field-group"><div class="field-label">Points</div><input class="field-input" type="number" id="new-result-points" readonly></div>
+    </div>
+    <div class="modal-footer"><button class="btn-primary" onclick="addStageResult()">${p("save_result")}</button></div>
+  </div>
 </div>
 
-<div class="modal-overlay" id="modal-create-stage" onclick="closeModalOutside(event,'modal-create-stage')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title" id="stage-modal-title">${d("create_stage")}</div>
- <div class="modal-close" onclick="closeModal('modal-create-stage')"></div>
- </div>
- <div class="modal-body">
- <div class="field-group">
- <div class="field-label">${d("stage_number")}</div>
- <div style="display:flex;align-items:center;gap:10px;">
- <button onclick="changeStageNumber(-1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;"></button>
- <input class="field-input" type="number" id="stage-number" value="1" readonly style="text-align:center;font-size:20px;width:80px;">
- <button onclick="changeStageNumber(1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">${d("stage_name")}</div>
- <input class="field-input" type="text" id="stage-name" placeholder="Name">
- </div>
- <div class="field-group">
- <div class="field-label">${d("paper_targets")}</div>
- <div style="display:flex;align-items:center;gap:10px;">
- <button onclick="changeStageField('paper-targets', -1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;"></button>
- <input class="field-input" type="number" id="stage-paper-targets" value="0" readonly style="text-align:center;font-size:20px;width:80px;">
- <button onclick="changeStageField('paper-targets', 1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">${d("poppers")}</div>
- <div style="display:flex;align-items:center;gap:10px;">
- <button onclick="changeStageField('poppers', -1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;"></button>
- <input class="field-input" type="number" id="stage-poppers" value="0" readonly style="text-align:center;font-size:20px;width:80px;">
- <button onclick="changeStageField('poppers', 1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">${d("plates")}</div>
- <div style="display:flex;align-items:center;gap:10px;">
- <button onclick="changeStageField('plates', -1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;"></button>
- <input class="field-input" type="number" id="stage-plates" value="0" readonly style="text-align:center;font-size:20px;width:80px;">
- <button onclick="changeStageField('plates', 1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">${d("no_shoots")}</div>
- <div style="display:flex;align-items:center;gap:10px;">
- <button onclick="changeStageField('no-shoots', -1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;"></button>
- <input class="field-input" type="number" id="stage-no-shoots" value="0" readonly style="text-align:center;font-size:20px;width:80px;">
- <button onclick="changeStageField('no-shoots', 1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <div class="field-label">${d("bonus_paper_targets")}</div>
- <div style="display:flex;align-items:center;gap:10px;">
- <button onclick="changeStageField('bonus-paper-targets', -1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;"></button>
- <input class="field-input" type="number" id="stage-bonus-paper-targets" value="0" readonly style="text-align:center;font-size:20px;width:80px;">
- <button onclick="changeStageField('bonus-paper-targets', 1)" style="width:50px;height:50px;font-size:24px;background:#2d3748;color:white;border:none;border-radius:8px;cursor:pointer;">+</button>
- </div>
- </div>
- <div class="field-group">
- <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
- <input type="checkbox" id="stage-bonus-included" style="width:18px;height:18px;">
- <span>${d("included")}</span>
- </label>
- </div>
- <button class="btn-primary" onclick="saveStage()">${d("save")}</button>
- </div>
- </div>
+<div class="modal-overlay" id="modal-add-stage" onclick="closeModalOutside(event,'modal-add-stage')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header"><div class="modal-title">Ny stage</div><div class="modal-close" onclick="closeModal('modal-add-stage')">✕</div></div>
+    <div class="modal-body">
+      <div class="field-group"><div class="field-label">Navn</div><input class="field-input" type="text" id="new-stage-name" placeholder="Stage 1"></div>
+      <div class="field-group"><div class="field-label">Skudd</div><input class="field-input" type="number" id="new-stage-shots" value="12"></div>
+      <div class="field-group"><div class="field-label">Paper / targets</div><input class="field-input" type="number" id="new-stage-targets" value="6"></div>
+      <div class="field-group"><div class="field-label">Steel</div><input class="field-input" type="number" id="new-stage-steel" value="0"></div>
+      <div class="field-group"><div class="field-label">Max points</div><input class="field-input" type="number" id="new-stage-maxpoints" value="60"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-primary" onclick="saveStage()">Lagre stage</button></div>
+  </div>
 </div>
 
-<div class="modal-overlay" id="modal-invite-user" onclick="closeModalOutside(event,'modal-invite-user')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title">${d("invite_user")}</div>
- <div class="modal-close" onclick="closeModal('modal-invite-user')"></div>
- </div>
- <div class="modal-body">
- <div class="field-group">
- <div class="field-label">Søk etter navn eller e-post</div>
- <div style="display:flex;gap:8px;">
- <input class="field-input" type="text" id="user-search-input" placeholder="Søk..." style="flex:1;">
- <button onclick="searchUsers()" style="width:80px;padding:12px;background:#e8b84b;color:#1a202c;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Søk</button>
- </div>
- </div>
- <div id="user-search-results" style="margin-top:15px;">
- <!-- Populated by JavaScript -->
- </div>
- <button id="send-invitations-btn" class="btn-primary" onclick="sendMultipleInvitations()" style="margin-top:15px;display:none;">Send invitasjoner (0 valgt)</button>
- </div>
- </div>
+<!-- MODAL: EDIT MATCH -->
+<div class="modal-overlay" id="modal-edit-match" onclick="closeModalOutside(event,'modal-edit-match')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Rediger match</div>
+      <div class="modal-close" onclick="closeModal('modal-edit-match')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <div class="field-label">MATCHNAVN</div>
+        <input class="field-input" type="text" id="edit-match-name">
+      </div>
+      <div class="field-group">
+        <div class="field-label">DATO</div>
+        <input class="field-input" type="date" id="edit-match-date">
+      </div>
+      <div class="field-group">
+        <div class="field-label">STED</div>
+        <input class="field-input" type="text" id="edit-match-location">
+      </div>
+      <div class="field-group">
+        <div class="field-label">TYPE</div>
+        <select class="field-select" id="edit-match-type">
+          <option value="Trening">Trening</option>
+          <option value="Stevne">Stevne</option>
+          <option value="Landsmesterskap">Landsmesterskap</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">ANTALL STAGES</div>
+        <input class="field-input" type="number" id="edit-match-stages" min="1">
+      </div>
+      <div class="field-group" style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+        <input type="checkbox" id="edit-match-searchable" style="width:18px;height:18px;">
+        <label for="edit-match-searchable" style="font-size:14px;">Tillat at andre kan finne denne matchen</label>
+      </div>
+      <div class="field-group" style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+        <input type="checkbox" id="edit-match-finished" style="width:18px;height:18px;">
+        <label for="edit-match-finished" style="font-size:14px;">Marker som ferdig</label>
+      </div>
+      <div class="field-group" style="margin-top:18px;">
+        <div class="field-label">SKYTTERE I MATCHEN</div>
+        <div id="edit-match-shooters-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="saveEditMatch()">Lagre</button>
+      <button id="delete-match-btn" onclick="confirmDeleteMatch()" style="width:100%;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Slett match</button>
+    </div>
+  </div>
 </div>
 
-<div class="modal-overlay" id="modal-invitations" onclick="closeModalOutside(event,'modal-invitations')">
- <div class="modal-sheet" onclick="event.stopPropagation()">
- <div class="modal-header">
- <div class="modal-title">${d("invitations")}</div>
- <div class="modal-close" onclick="closeModal('modal-invitations')"></div>
- </div>
- <div class="modal-body" id="invitations-list">
- <!-- Populated by JavaScript -->
- </div>
- </div>
-</div>
-
+<!-- MODAL: CONFIRM DELETE MATCH -->
 <div class="modal-overlay" id="modal-confirm-delete" onclick="closeModalOutside(event,'modal-confirm-delete')">
- <div class="modal-sheet" onclick="event.stopPropagation()" style="max-width:400px;">
- <div class="modal-header">
- <div class="modal-title">Slett match</div>
- <div class="modal-close" onclick="closeModal('modal-confirm-delete')"></div>
- </div>
- <div class="modal-body">
- <p style="margin-bottom:15px;">Er du sikker på at du vil slette denne matchen?</p>
- <div id="delete-match-name" style="padding:12px;background:#374151;border-radius:8px;margin-bottom:15px;font-weight:600;"></div>
- <p style="color:#ef4444;margin-bottom:20px;">Denne handlingen kan ikke angres.</p>
- <div style="display:flex;gap:10px;">
- <button onclick="closeModal('modal-confirm-delete')" style="flex:1;padding:12px;background:#374151;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Avbryt</button>
- <button onclick="deleteMatchConfirmed()" style="flex:1;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Slett match</button>
- </div>
- </div>
- </div>
+  <div class="modal-sheet" onclick="event.stopPropagation()" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">Slett match</div>
+      <div class="modal-close" onclick="closeModal('modal-confirm-delete')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:20px;">Er du sikker på at du vil slette <strong id="delete-match-name"></strong>?</p>
+      <p style="color:var(--muted);font-size:13px;">Denne handlingen kan ikke angres.</p>
+    </div>
+    <div class="modal-footer">
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeModal('modal-confirm-delete')" style="flex:1;padding:12px;background:#374151;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Avbryt</button>
+        <button onclick="deleteMatchConfirmed()" style="flex:1;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Slett match</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 </div>
- `,is(),gt(),te(),fe(),vt(),De()}function is(){window.switchTab=ss,window.setFilter=rs,window.openModal=ie,window.closeModal=G,window.closeModalOutside=ns,window.createMatch=os,window.searchMatchByIdHandler=ls,window.openEditProfile=Ns,window.saveProfileData=Fs,window.selectPF=$s,window.updatePFOptions=mt,window.calcPrognose=De,window.renderMatchList=fe,window.selectMatch=pt,window.addShooter=Os,window.addStageResult=js,window.handleLogout=Ks,window.openEditMatch=ps,window.saveEditMatch=us,window.openCreateStage=Re,window.openCreateStageFromEdit=ms,window.openCreateStageFromNewMatch=hs,window.openEditStage=fs,window.changeStageNumber=bs,window.changeStageField=ys,window.saveStage=ws,window.openInviteUser=ks,window.openInvitationsModal=Is,window.acceptInvitation=Cs,window.declineInvitation=_s,window.searchUsers=xs,window.toggleUserSelection=Ss,window.sendMultipleInvitations=Ls,window.searchUsersNewMatch=Ps,window.toggleUserNewMatch=Es,window.searchUsersEditMatch=Ts,window.toggleUserEditMatch=Ms,window.removeEditMatchShooter=qs,window.confirmDeleteMatch=gs,window.deleteMatchConfirmed=vs,window.uploadAndScanResult=Hs,window.saveOCRResult=Gs,window.icOpenManualResult=icOpenManualResult,window.openCreateStageFromUpload=Us,window.toggleMatchDropdown=ds,window.selectMatchFromDropdown=cs,window.toggleReferenceShootersEnabled=toggleReferenceShootersEnabled,window.toggleReferenceShooterChoice=toggleReferenceShooterChoice,window.updateReferenceShooterOverride=updateReferenceShooterOverride}function ss(e){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")),document.querySelectorAll(".tab-item").forEach(s=>s.classList.remove("active")),o(e).classList.add("active");const i=["screen-home","screen-matches","screen-prognose","screen-results","screen-profile"].indexOf(e),t=document.querySelectorAll(".tab-item");t[i]&&t[i].classList.add("active"),e==="screen-home"&&te(),e==="screen-matches"&&fe(),e==="screen-results"&&_e()}function ie(e){o(e).classList.add("open"),e==="modal-upload-result"&&as(),e==="modal-add"&&icPrepareNewResultModal()}async function as(){const e=$.find(n=>n.id!=null&&n.id.toString()===String(R));if(!e)return;const i=o("upload-match-name");i&&(i.textContent=e.name||"Ukjent match");const t=o("upload-stage-select"),s=icStageDefs(e);if(t.innerHTML="",s.length>0)s.forEach(n=>{const r=document.createElement("option");r.value=n.number,r.textContent=n.name&&n.name!=="Stage "+n.number?`Stage ${n.number} - ${n.name}`:`Stage ${n.number}`,t.appendChild(r)});else{const n=document.createElement("option");n.value="",n.textContent="Ingen stages - opprett ny",t.appendChild(n)}const a=o("upload-shooter-select");a.innerHTML="";const n=new Set,r=icCurrentShooterId(),u=document.createElement("option");u.value=r,u.textContent="Meg ("+(g.firstName||"")+" "+(g.lastName||"")+")",a.appendChild(u),n.add(r);if(e.participants&&e.participants.length>0)for(const m of e.participants)if(!n.has(m))try{const b=await Ut(m);if(b){const f=document.createElement("option");f.value=m,f.textContent=(b.firstName||"")+" "+(b.lastName||""),a.appendChild(f),n.add(m)}}catch(b){console.error("Error fetching user:",m,b)}e.shooters&&e.shooters.length>0&&e.shooters.forEach(m=>{if(!n.has(m.id)){const b=document.createElement("option");b.value=m.id,b.textContent=(m.firstName||"")+" "+(m.lastName||""),a.appendChild(b),n.add(m.id)}})}function G(e){o(e).classList.remove("open")}function ns(e,i){e.target.id===i&&G(i)}function rs(e,i){ue=e,document.querySelectorAll(".filter-chip").forEach(t=>t.classList.remove("active")),i.classList.add("active"),fe()}async function os(){var t;const e={name:F("new-match-name")||"Ny match",type:F("new-match-type")||"Trening",date:F("new-match-date")||new Date().toISOString().split("T")[0],location:F("new-match-location")||"",plannedStages:A("new-match-stages",6),searchable:((t=o("new-match-searchable"))==null?void 0:t.checked)!==!1,status:"active",stages:[],shooters:[],referenceShootersEnabled:!1,referenceShooterIds:[],referenceOverrides:{}},i=await zt(e);if(i.success){let s=0;for(const a of ve)(await Ge(a.email,{matchId:i.matchId,matchName:e.name})).success&&s++;G("modal-new-match"),o("new-match-name").value="",o("new-match-location").value="",o("new-match-stages").value="6",o("new-match-searchable")&&(o("new-match-searchable").checked=!0),o("new-match-user-search").value="",o("new-match-search-results").innerHTML="",ve=[],s>0&&alert(`Match opprettet! Invitasjoner sendt til ${s} bruker(e).`)}else alert("Kunne ikke opprette match: "+i.error)}async function ls(){const e=F("match-id-search").trim();if(!e){alert("Skriv inn et match-ID");return}const i=await Kt(e);if(i.success){const t=$.findIndex(s=>s.id&&s.id.toString()===i.match.id.toString());t!==-1?R=$[t].id:($.unshift(i.match),R=i.match.id),pt(R),oe&&oe("screen-home"),o("match-id-search").value=""}else alert(`Fant ingen match med ID ${e}${i.error?": "+i.error:""}`)}function pt(e){R=e!=null?e.toString():e;const i=$.find(t=>t.id!=null&&t.id.toString()===R);if(i){const t=i.id?"Match ID "+i.id+" "+i.name:i.name||"Match";["home-chip-name","prog-chip-name","results-chip-name"].forEach(a=>{const n=o(a);n&&(n.textContent=t)})}xe&&xe(),R&&(xe=Wt(R,t=>{const s=$.findIndex(a=>a.id!=null&&a.id.toString()===R);s!==-1&&t&&($[s]=t,te(),_e())})),te(),_e(),De()}function ds(e){const i=e+"-match-dropdown",t=o(i);if(!t)return;if(t.classList.contains("open")){t.classList.remove("open");return}document.querySelectorAll(".match-dropdown").forEach(a=>a.classList.remove("open"));let s="";$.length===0?s+='<div class="match-dropdown-item" style="color:var(--muted);text-align:center;">Ingen matcher ennå</div>':$.forEach(a=>{const n=a.id!=null&&a.id.toString()===String(R),r=a.id?"Match ID "+a.id+" "+a.name:a.name||"Match";s+='<div class="match-dropdown-item '+(n?"active":"")+`" onclick="selectMatchFromDropdown('`+a.id+"', '"+e+`')">`,s+='<div class="match-dropdown-dot"></div>',s+='<div class="match-dropdown-info">',s+='<div class="match-dropdown-name">'+r+"</div>",s+='<div class="match-dropdown-meta">'+We(a.date)+" · "+a.location+"</div>",s+="</div>",s+="</div>"}),t.innerHTML=s,t.classList.add("open")}function cs(e,i){pt(e);const t=i+"-match-dropdown",s=o(t);s&&s.classList.remove("open")}function renderEditMatchShootersList(e){const i=o("edit-match-shooters-list");if(!i)return;const t=Array.isArray(e&&e.shooters)?e.shooters.filter(s=>!s.isMe):[];if(t.length===0){i.innerHTML='<div style="margin-top:10px;color:var(--muted);font-size:13px;">Ingen ekstra skyttere lagt til i matchen.</div>';return}let s='<div style="margin-top:10px;display:grid;gap:8px;">';t.forEach(a=>{const n=((a.firstName||"")+" "+(a.lastName||"")).trim()||"Ukjent skytter",r=a.division||"—",u=ge(a.pf||"minor");s+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;">';s+='<div style="min-width:0;flex:1;"><div style="font-size:14px;font-weight:600;overflow-wrap:anywhere;">'+n+'</div><div style="font-size:12px;color:var(--muted);">'+r+' · '+u+'</div></div>';s+='<button class="btn-danger edit-match-shooter-delete" data-shooter-id="'+a.id+'" style="width:auto;padding:8px 12px;min-width:72px;">Slett</button>';s+='</div>'}),s+='</div>',i.innerHTML=s,i.querySelectorAll('.edit-match-shooter-delete').forEach(a=>{a.onclick=()=>{const n=a.getAttribute('data-shooter-id');n&&window.removeEditMatchShooter&&window.removeEditMatchShooter(n)}})}async function qs(e){const i=$.find(t=>t.id!=null&&t.id.toString()===String(R));if(!i||!Array.isArray(i.shooters))return;const t=i.shooters.find(a=>String(a.id)===String(e));if(!t)return;const s=((t.firstName||"")+" "+(t.lastName||"")).trim()||"denne skytteren";if(!confirm('Slette '+s+' fra matchen?'))return;i.shooters=i.shooters.filter(a=>String(a.id)!==String(e));const a=o("edit-match-rival");let n=i.rivalId||null;a&&String(a.value)===String(e)&&(a.value="",n=null),i.rivalId=n;const r=await Ee(i.id,{shooters:i.shooters,rivalId:n});r&&r.success===!1?alert("Kunne ikke slette skytter: "+r.error):(renderEditMatchShootersList(i),_e())}function ps(){const e=$.find(n=>n.id!=null&&n.id.toString()===String(R));if(!e){alert("Ingen match valgt");return}o("edit-match-name").value=e.name||"",o("edit-match-type").value=e.type||"Trening",o("edit-match-date").value=e.date||"",o("edit-match-location").value=e.location||"",o("edit-match-stages").value=e.plannedStages||0,o("edit-match-searchable")&&(o("edit-match-searchable").checked=e.searchable!==!1),o("edit-match-finished")&&(o("edit-match-finished").checked=e.status==="finished");const i=o("edit-match-rival");i.innerHTML='<option value="">Ingen rival valgt</option>';const t=document.createElement("option");t.value="me",t.textContent="Meg ("+(g.firstName||"")+" "+(g.lastName||"")+")",i.appendChild(t),e.shooters&&e.shooters.length>0&&e.shooters.forEach(n=>{const r=document.createElement("option");r.value=n.id,r.textContent=n.firstName+" "+n.lastName,i.appendChild(r)}),e.rivalId&&(i.value=e.rivalId),o("edit-match-user-search").value="",o("edit-match-search-results").innerHTML="",me=[],initReferenceEditState(e),o("edit-match-reference-enabled")&&(o("edit-match-reference-enabled").checked=!!e.referenceShootersEnabled),renderReferenceShooterConfig(),renderEditMatchShootersList(e);const s=Pe(),a=o("delete-match-btn");a&&s&&e.ownerId===s.uid?a.style.display="block":a&&(a.style.display="none"),ie("modal-edit-match")}async function us(){var s,a;const e=$.find(n=>n.id!=null&&n.id.toString()===String(R));if(!e){alert("Ingen match valgt");return}const i=(refEditState.enabled=!!((o("edit-match-reference-enabled")||{}).checked),{name:F("edit-match-name")||e.name,type:F("edit-match-type")||e.type,date:F("edit-match-date")||e.date,location:F("edit-match-location")||e.location,plannedStages:A("edit-match-stages",e.plannedStages),searchable:((s=o("edit-match-searchable"))==null?void 0:s.checked)!==!1,status:(a=o("edit-match-finished"))!=null&&a.checked?"finished":"active",rivalId:F("edit-match-rival")||null,referenceShootersEnabled:!!refEditState.enabled,referenceShooterIds:(refEditState.ids||[]).slice(),referenceOverrides:JSON.parse(JSON.stringify(refEditState.overrides||{}))}),t=await Ee(e.id,i);if(t.success){let n=0;for(const r of me)(await Ge(r.email,{matchId:e.id,matchName:i.name})).success&&n++;G("modal-edit-match"),n>0&&alert(`Match oppdatert! Invitasjoner sendt til ${n} bruker(e).`)}else alert("Kunne ikke oppdatere match: "+t.error)}function gs(){const e=$.find(t=>t.id!=null&&t.id.toString()===String(R));if(!e){alert("Ingen match valgt");return}const i=e.id?"Match ID "+e.id+" "+e.name:e.name;o("delete-match-name").textContent=i,ie("modal-confirm-delete")}async function vs(){const e=$.find(t=>t.id!=null&&t.id.toString()===String(R));if(!e){alert("Ingen match valgt");return}const i=await Gt(e.id);i.success?(G("modal-confirm-delete"),G("modal-edit-match"),R=null,te(),fe(),alert("Match slettet")):alert("Kunne ikke slette match: "+i.error)}let Ce=null,Me=null;function Re(){var i;const e=$.find(t=>t.id!=null&&t.id.toString()===String(R));if(!e){alert("Ingen match valgt");return}Ce=null,o("stage-modal-title").textContent=d("create_stage"),o("stage-number").value=(((i=e.stages)==null?void 0:i.length)||0)+1,o("stage-name").value="",o("stage-paper-targets").value=0,o("stage-poppers").value=0,o("stage-plates").value=0,o("stage-no-shoots").value=0,o("stage-bonus-paper-targets").value=0,o("stage-bonus-included").checked=!1,ie("modal-create-stage")}function ms(){G("modal-edit-match"),Re()}function hs(){G("modal-new-match"),Re()}function fs(e){const i=$.find(s=>s.id!=null&&s.id.toString()===String(R));if(!i||!i.stages||!i.stages[e]){alert("Stage ikke funnet");return}Ce=e;const t=i.stages[e];o("stage-modal-title").textContent=d("edit_stage"),o("stage-number").value=t.number||e+1,o("stage-name").value=t.name||"",o("stage-paper-targets").value=t.paperTargets||0,o("stage-poppers").value=t.poppers||0,o("stage-plates").value=t.plates||0,o("stage-no-shoots").value=t.noShoots||0,o("stage-bonus-paper-targets").value=t.bonusPaperTargets||0,o("stage-bonus-included").checked=t.bonusIncluded||!1,ie("modal-create-stage")}function bs(e){const i=o("stage-number"),t=Math.max(1,parseInt(i.value)+e);i.value=t}function ys(e,i){const t=o("stage-"+e),s=Math.max(0,parseInt(t.value)+i);t.value=s}async function ws(){var a;const e=$.find(n=>n.id!=null&&n.id.toString()===String(R));if(!e){alert("Ingen match valgt");return}const i={number:A("stage-number",1),name:F("stage-name")||"",paperTargets:A("stage-paper-targets",0),poppers:A("stage-poppers",0),plates:A("stage-plates",0),noShoots:A("stage-no-shoots",0),bonusPaperTargets:A("stage-bonus-paper-targets",0),bonusIncluded:((a=o("stage-bonus-included"))==null?void 0:a.checked)||!1},t=e.stages||[];Ce!==null?t[Ce]=i:t.push(i);const s=await Ee(e.id,{stages:t});s.success?G("modal-create-stage"):alert("Kunne ikke lagre stage: "+s.error)}let ee=[],Q=[],ve=[],me=[];function ks(){if(!R){alert("Ingen match valgt");return}Q=[],o("user-search-input").value="",o("user-search-results").innerHTML="",o("send-invitations-btn").style.display="none",ie("modal-invite-user")}async function xs(){const e=F("user-search-input").trim();if(e.length===0){o("user-search-results").innerHTML='<p style="color:#9ca3af;text-align:center;">Skriv inn et søk</p>';return}const i=await Ke(e),t=o("user-search-results");if(!t)return;if(i.length===0){t.innerHTML='<p style="color:#9ca3af;text-align:center;">Ingen brukere funnet</p>';return}let s='<div style="margin-bottom:10px;font-weight:600;">RESULTATER ('+i.length+"):</div>";i.forEach(a=>{const n=a.displayName||a.email,r=Q.some(m=>m.uid===a.uid),u=n.replace(/'/g,"\\'");s+=`
- <label style="display:flex;align-items:center;gap:10px;padding:10px;background:#2d3748;border-radius:8px;margin-bottom:8px;cursor:pointer;">
- <input type="checkbox" ${r?"checked":""} onchange="toggleUserSelection('${a.uid}', '${a.email.replace(/'/g,"\\'")}', '${u}')" style="width:18px;height:18px;">
- <div>
- <div style="font-weight:600;">${n}</div>
- <div style="font-size:14px;color:#9ca3af;">${a.email}</div>
- </div>
- </label>
- `}),t.innerHTML=s,ut()}function Ss(e,i,t){const s=Q.findIndex(a=>a.uid===e);s>-1?Q.splice(s,1):Q.push({uid:e,email:i,displayName:t}),ut()}function ut(){const e=o("send-invitations-btn");e&&(Q.length>0?(e.style.display="block",e.textContent=`Send invitasjoner (${Q.length} valgt)`):e.style.display="none")}async function Ls(){if(Q.length===0){alert("Ingen brukere valgt");return}const e=$.find(s=>s.id!=null&&s.id.toString()===String(R));if(!e)return;let i=0,t=0;for(const s of Q)(await Ge(s.email,{matchId:e.id,matchName:e.name})).success?i++:t++;G("modal-invite-user"),i>0&&alert(`Invitasjoner sendt til ${i} bruker(e)!`),t>0&&alert(`${t} invitasjon(er) feilet.`),Q=[]}async function Ps(){const e=F("new-match-user-search").trim();if(e.length===0){o("new-match-search-results").innerHTML="";return}const i=await Ke(e),t=o("new-match-search-results");if(!t)return;if(i.length===0){t.innerHTML='<p style="color:#9ca3af;text-align:center;font-size:14px;">Ingen brukere funnet</p>';return}let s='<div style="margin-bottom:8px;font-size:14px;font-weight:600;">RESULTATER ('+i.length+"):</div>";i.forEach(a=>{const n=a.displayName||a.email,r=ve.some(m=>m.uid===a.uid),u=n.replace(/'/g,"\\'");s+=`
- <label style="display:flex;align-items:center;gap:8px;padding:8px;background:#2d3748;border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:14px;">
- <input type="checkbox" ${r?"checked":""} onchange="toggleUserNewMatch('${a.uid}', '${a.email.replace(/'/g,"\\'")}', '${u}')" style="width:16px;height:16px;">
- <div>
- <div style="font-weight:600;">${n}</div>
- <div style="font-size:12px;color:#9ca3af;">${a.email}</div>
- </div>
- </label>
- `}),t.innerHTML=s}function Es(e,i,t){const s=ve.findIndex(a=>a.uid===e);s>-1?ve.splice(s,1):ve.push({uid:e,email:i,displayName:t})}async function Ts(){console.log(" searchUsersEditMatch called");const e=F("edit-match-user-search").trim();if(console.log(" Search term:",e),e.length===0){console.log(" Empty search term"),o("edit-match-search-results").innerHTML="";return}console.log(" Calling searchUsersByNameOrEmail...");const i=await Ke(e);console.log(" Results received:",i);const t=o("edit-match-search-results");if(!t){console.error(" Container not found: edit-match-search-results");return}if(i.length===0){console.log(" No users found"),t.innerHTML='<p style="color:#9ca3af;text-align:center;font-size:14px;">Ingen brukere funnet</p>';return}console.log(" Rendering",i.length,"results");let s='<div style="margin-bottom:8px;font-size:14px;font-weight:600;">RESULTATER ('+i.length+"):</div>";i.forEach(a=>{const n=a.displayName||a.email,r=me.some(m=>m.uid===a.uid),u=n.replace(/'/g,"\\'");s+=`
- <label style="display:flex;align-items:center;gap:8px;padding:8px;background:#2d3748;border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:14px;">
- <input type="checkbox" ${r?"checked":""} onchange="toggleUserEditMatch('${a.uid}', '${a.email.replace(/'/g,"\\'")}', '${u}')" style="width:16px;height:16px;">
- <div>
- <div style="font-weight:600;">${n}</div>
- <div style="font-size:12px;color:#9ca3af;">${a.email}</div>
- </div>
- </label>
- `}),t.innerHTML=s,console.log(" HTML rendered to container")}function Ms(e,i,t){const s=me.findIndex(a=>a.uid===e);s>-1?me.splice(s,1):me.push({uid:e,email:i,displayName:t})}function Is(){Je(),ie("modal-invitations")}function Je(){const e=o("invitations-list");if(!e)return;if(!ee||ee.length===0){e.innerHTML='<div class="empty-state"><div class="empty-sub">'+d("no_invitations")+"</div></div>";return}let i="";ee.forEach((t,s)=>{i+='<div class="card" style="margin-bottom:10px;">',i+='<div style="margin-bottom:10px;"><strong>'+d("invited_to_match")+"</strong></div>",i+='<div style="margin-bottom:10px;">Match ID '+t.matchId+" "+t.matchName+"</div>",i+='<div style="margin-bottom:10px;color:#94a3b8;">Fra: '+t.invitedBy+"</div>",i+='<div style="display:flex;gap:10px;">',i+='<button class="btn-primary" onclick="acceptInvitation('+s+')" style="flex:1;">'+d("accept")+"</button>",i+='<button onclick="declineInvitation('+s+')" style="flex:1;padding:12px;background:#374151;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">'+d("decline")+"</button>",i+="</div>",i+="</div>"}),e.innerHTML=i}async function Cs(e){const i=ee[e];if(!i)return;const t=await Jt(i.matchId);t.success?(ee.splice(e,1),Ye(),Je()):alert("Kunne ikke akseptere invitasjon: "+t.error)}async function _s(e){const i=ee[e];if(!i)return;const t=await Yt(i.matchId);t.success?(ee.splice(e,1),Ye(),Je()):alert("Kunne ikke avvise invitasjon: "+t.error)}function Ye(){const e=o("invitation-badge");if(!e)return;const i=ee.length;i>0?(e.textContent=i,e.style.display="flex"):e.style.display="none"}function te(){var a,n;const e=o("home-content");if(!e)return;const i=$.find(r=>r.id!=null&&r.id.toString()===String(R));if(!i){e.innerHTML=`
- <div class="empty-state">
- <div class="empty-icon"></div>
- <div class="empty-title">Velg en match</div>
- <div class="empty-sub">Trykk på match-chip over eller gå til Matcher-fanen</div>
- <button class="btn-primary btn-home-action" onclick="switchTab('screen-matches')">Se matcher</button>
- </div>
- `;return}let t="";t+='<div class="card">',t+='<div class="mhc-name">'+i.name+"</div>",t+='<div class="mhc-meta">'+We(i.date)+" · "+i.type+"</div>",t+='<div class="mhc-stats">',t+='<div><div class="mhc-val">'+(((a=i.stages)==null?void 0:a.length)||0)+'</div><div class="mhc-lbl">Stages</div></div>',t+='<div><div class="mhc-val">'+(((n=i.shooters)==null?void 0:n.length)||0)+'</div><div class="mhc-lbl">Skyttere</div></div>',t+="</div>",t+='<div style="display:flex;gap:10px;margin-top:15px;">',t+='<button class="btn-primary" onclick="openEditMatch()" style="flex:1;">Rediger match</button>',t+='<button class="btn-primary" onclick="openCreateStage()" style="flex:1;">Ny stage</button>',t+="</div>",t+='<div style="margin-top:10px;">',t+='<button class="btn-primary" onclick="openInviteUser()" style="width:100%;">Inviter bruker</button>',t+="</div>";const s=Pe();s&&i.ownerId===s.uid&&(t+='<div style="margin-top:10px;">',t+='<button onclick="confirmDeleteMatch()" style="width:100%;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Slett match</button>',t+="</div>"),t+="</div>",i.stages&&i.stages.length>0&&(t+='<div class="section-title">Stages</div>',t+='<div class="card">',i.stages.forEach((r,u)=>{t+='<div class="stage-row" style="cursor:pointer;border-bottom:1px solid #2d3748;padding:12px 0;" onclick="openEditStage('+u+')">',t+='<div class="stage-num">S'+(r.number||u+1)+"</div>",t+='<div class="stage-info">',t+='<div class="stage-name">'+(r.name||"Stage "+(r.number||u+1))+"</div>",t+='<div class="stage-meta">',r.paperTargets&&(t+="Paper: "+r.paperTargets+" "),r.poppers&&(t+="Poppers: "+r.poppers+" "),r.plates&&(t+="Plates: "+r.plates+" "),r.noShoots&&(t+="NS: "+r.noShoots+" "),r.bonusPaperTargets&&(t+="Bonus: "+r.bonusPaperTargets+(r.bonusIncluded?" (included)":"")),t+="</div>",t+="</div>",t+="</div>"}),t+="</div>"),e.innerHTML=t}function fe(){const e=o("match-list-container");if(!e)return;let i=$.filter(s=>{if(ue==="all")return!0;if(ue==="active")return s.status!=="finished";if(ue==="trening")return s.type==="Trening";if(ue==="stevne")return s.type==="Stevne";const a=s.date?new Date(s.date).getFullYear().toString():"";return ue===a});if(i.length===0){e.innerHTML='<div class="empty-state"><div class="empty-sub">Ingen matcher funnet</div></div>';return}let t="";i.forEach(s=>{var r;const a=s.id!=null&&s.id.toString()===String(R),n=s.id?"Match ID "+s.id+" "+s.name:s.name;t+='<div class="match-row">',t+='<div class="match-row-icon'+(a?" is-active":"")+`" onclick="selectMatch('`+s.id+`')"></div>`,t+=`<div class="match-row-info" onclick="selectMatch('`+s.id+`')">`,t+='<div class="match-row-name">'+n+"</div>",t+='<div class="match-row-meta">'+We(s.date)+" · "+(s.location||s.type)+"</div>",t+="</div>",t+='<div class="match-row-right">',t+=`<button onclick="event.stopPropagation(); selectMatch('`+s.id+`'); openEditMatch();" style="padding:8px 16px;background:#e8b84b;color:#1a202c;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-bottom:8px;">Rediger</button>`,t+='<div class="match-stg-count">'+(((r=s.stages)==null?void 0:r.length)||0)+"</div>",t+='<div class="match-stg-lbl">stages</div>',t+="</div>",t+="</div>"}),e.innerHTML=t}function _e(){var n;const e=o("results-content");if(!e)return;const i=$.find(r=>r.id!=null&&r.id.toString()===String(R));if(!i){e.innerHTML='<div class="empty-state"><div class="empty-sub">Velg en match først</div></div>';return}if(!i.shooters||i.shooters.length===0){e.innerHTML='<div class="empty-state"><div class="empty-icon"></div><div class="empty-title">Ingen skyttere</div><div class="empty-sub">Trykk + for å legge til skyttere</div></div>';return}const t=icMatchTotals(i);if(!t.length){e.innerHTML='<div class="empty-state"><div class="empty-title">Ingen resultater ennå</div><div class="empty-sub">Live vises når stages har resultater</div></div>';return}let s='<div class="card">';s+='<div class="card-header"><div class="card-title">Standings</div></div>',s+='<div class="standings-table-wrap"><table class="standings-table">',s+='<thead><tr class="standings-header-row">',s+='<th class="standings-th standings-th-rank">#</th>',s+='<th class="standings-th standings-th-shooter">Skytter</th>',s+='<th class="standings-th standings-th-pts">STG PTS</th>',s+='<th class="standings-th standings-th-pct">%</th>',s+="</tr></thead>",s+="<tbody>";const a=((n=t[0])==null?void 0:n.totalStagePts)||0;t.forEach((r,u)=>{const m=a>0?(r.totalStagePts/a*100).toFixed(2):"0.00";s+='<tr class="standings-row">',s+='<td class="standings-td standings-td-rank">'+(u+1)+"</td>",s+='<td class="standings-td standings-td-shooter">',s+='<div class="standings-shooter-name">'+r.name+"</div>",s+='<div class="standings-shooter-meta">'+r.division+" · "+ge(r.pf||"minor")+"</div>",s+="</td>",s+='<td class="standings-td standings-td-pts">'+r.totalStagePts.toFixed(2)+"</td>",s+='<td class="standings-td standings-td-pct">'+m+"%</td>",s+="</tr>"}),s+="</tbody></table></div>",s+="</div>",e.innerHTML=s}function gt(){const e=le();["prof-avatar","nav-av-home","nav-av-matches","nav-av-prog","nav-av-results"].forEach(u=>{const m=o(u);m&&(m.textContent=e)});const t=o("prof-name");t&&(t.textContent=(g.firstName||"")+" "+(g.lastName||""));const s=o("prof-div");s&&(s.textContent=(g.division||"")+" · "+(g.club||""));const a=o("prof-badge-pf");a&&(a.textContent=g.powerFactor?ge(g.powerFactor):"");const n=o("prof-badge-region");n&&(n.textContent=g.region||"");const r={"info-firstname":g.firstName||"","info-lastname":g.lastName||"","info-division":g.division||"","info-category":g.category||"","info-pf":g.powerFactor?ge(g.powerFactor):"","info-region":g.region||"","info-club":g.club||""};Object.keys(r).forEach(u=>{const m=o(u);m&&(m.textContent=r[u])}),vt()}function vt(){const e=[];$.forEach(p=>{icCurrentResults(p).forEach(h=>e.push(h))});let i=0,t=0,s=0;e.forEach(p=>{i+=p.a||0,t+=(p.a||0)+(p.c||0)+(p.d||0),s+=p.hf||0});const a=e.length?(s/e.length).toFixed(2):"",n=t?Math.round(i/t*100)+"%":"",r=o("stat-matches");r&&(r.textContent=$.length);const u=o("stat-stages");u&&(u.textContent=e.length);const m=o("stat-avg-hf");m&&(m.textContent=a);const b=o("stat-a-rate");b&&(b.textContent=n);const f=o("prog-a-rate");f&&(f.textContent=n)}function Ns(){o("edit-firstname").value=g.firstName||"",o("edit-lastname").value=g.lastName||"",o("edit-club").value=g.club||"",o("edit-draw").value=g.draw||"",o("edit-reload").value=g.reloadTime||"";let e="";Yi.forEach(s=>{e+='<option value="'+s+'"'+(s===g.division?" selected":"")+">"+s+"</option>"}),o("edit-division").innerHTML=e;let i="";Qi.forEach(s=>{i+='<option value="'+s+'"'+(s===g.category?" selected":"")+">"+s+"</option>"}),o("edit-category").innerHTML=i;let t="";Xi.forEach(s=>{t+='<option value="'+s+'"'+(s===g.region?" selected":"")+">"+s+"</option>"}),o("edit-region").innerHTML=t,mt(),ie("modal-edit-profile")}function mt(){const e=F("edit-division"),i=Zi[e]||["minor","major"];let t="";i.forEach(s=>{const a=g.powerFactor===s;t+='<label class="pf-option'+(a?" active":"")+`" onclick="selectPF(this,'`+s+`')">`,t+='<input type="radio" name="pf" value="'+s+'">',t+='<div class="pf-label">'+s.toUpperCase()+"</div>",t+='<div class="pf-sub">'+(s==="major"?"170 PF":"<170 PF")+"</div>",t+="</label>"}),o("pf-options").innerHTML=t,i.indexOf(g.powerFactor)<0&&(g.powerFactor=i[0])}function $s(e,i){document.querySelectorAll(".pf-option").forEach(t=>t.classList.remove("active")),e.classList.add("active"),g.powerFactor=i}async function Fs(){g.firstName=F("edit-firstname").trim()||"",g.lastName=F("edit-lastname").trim()||"",g.division=F("edit-division")||"",g.category=F("edit-category")||"",g.region=F("edit-region")||"",g.club=F("edit-club").trim()||"",g.draw=he("edit-draw")||null,g.reloadTime=he("edit-reload")||null;const e=await Ot(g),i=o("save-profile-btn");e.success?(i.textContent=" Lagret!",i.style.background="var(--green)",setTimeout(()=>{i.textContent=d("save_profile"),i.style.background=""},1800)):(i.textContent=" Feil!",i.style.background="var(--red)",setTimeout(()=>{i.textContent=d("save_profile"),i.style.background=""},1800)),gt(),De(),te(),G("modal-edit-profile")}function As(e,i,t,s){if(!e||!i||!s)return null;const a=icCurrentShooter(e);if(!a)return null;const n=icMatchTotals(e),r=n.find(v=>String(v.id)===String(a.id));if(!r)return null;let u=null;if(e.rivalId&&e.rivalId!=="me")u=(e.shooters||[]).find(v=>v&&String(v.id)===String(e.rivalId));if(!u){const v=n.filter(S=>String(S.id)!==String(a.id)).sort((S,x)=>x.totalStagePts-S.totalStagePts);v.length&&(u=(e.shooters||[]).find(S=>String(S.id)===String(v[0].id))||null)}if(!u)return null;const m=n.find(v=>String(v.id)===String(u.id));if(!m)return null;const b=((u.firstName||"")+" "+(u.lastName||"")).trim()||"Rival",f=(r.totalStagePts||0)-(m.totalStagePts||0),p=f>=0,h=Math.abs(f),E=icProjectNext(i,s);if(!E)return{statusText:(p?"LEDER ":"BAK ")+h.toFixed(1)+" stg pts",advice:p?`Du leder ${b}. Hold prosessen stabil og unngå unødvendige tap.`:`Du ligger bak ${b}. Neste stage blir viktig.`,rivalName:b,gap:f,targetHF:null,estHF:null,deltaHF:null};const k=((u.stages||[]).slice().sort((v,S)=>(v.num||0)-(S.num||0))),P=icFormFromResults(k,null,u),C=P?icProjectNext(P,s):null,L=Math.max(E.estHF||0,(C&&C.estHF)||0,.01),M=L>0?(E.estHF/L*E.maxPts):0,D=L>0?(((C&&C.estHF)||0)/L*E.maxPts):0;let B=null,_=null,K=null,j="",w="";if(p){B=Math.max(0,D-h);_=L>0?(B/E.maxPts*L):null;K=_!=null?_-E.estHF:null;j=`LEDER ${h.toFixed(1)} stg pts`;w=B<=0?`Du leder ${b}. Holder du omtrent forventet nivå (${E.estHF.toFixed(2)} HF), skal det være nok til å beholde ledelsen.`:K!=null&&K<=0?`Du leder ${b}. For å holde ledelsen holder det omtrent med ${_.toFixed(2)} HF, altså under eller rundt forventet nivå.`:K!=null&&K<=.35?`Du leder ${b}, men ikke slipp deg helt ned. Det krever omtrent ${_.toFixed(2)} HF for å holde ledelsen, ca ${(K).toFixed(2)} HF over minimum.`:`Du leder ${b}, men stageen kan snu bildet. Hold prosessen stabil og unngå miss/procedurals.`}else{B=D+h+.01;_=L>0?(B/E.maxPts*L):null;K=_!=null?_-E.estHF:null;j=`BAK ${h.toFixed(1)} stg pts`;if(_==null)w=`Du ligger bak ${b}. Hold fokus på en ren og effektiv stage.`;else if(K<=.2)w=`Du er tett bak ${b}. For å ta inn forspranget trenger du omtrent ${_.toFixed(2)} HF, altså ca ${K.toFixed(2)} HF over forventet nivå. Dette kan du dekke med litt bedre flyt og null unødvendige feil.`;else if(K<=.75){const y=E.expTime&&_>0?Math.max(0,E.expTime-E.expPts/_):0,H=E.expTime?Math.max(0,_*E.expTime-E.expPts):0;w=`Du er bak ${b}. For å ta inn forspranget må du fra forventet ${E.estHF.toFixed(2)} HF opp mot ca ${_.toFixed(2)} HF. Det er en delta på ${K.toFixed(2)} HF. Tenk ca ${y.toFixed(2)} sek raskere totalt eller rundt ${H.toFixed(1)} flere råpoeng, helst som en kombinasjon av begge.`}else{const y=E.expTime&&_>0?Math.max(0,E.expTime-E.expPts/_):0,H=E.expTime?Math.max(0,_*E.expTime-E.expPts):0;w=`Du er et stykke bak ${b}. Target er omtrent ${_.toFixed(2)} HF mot forventet ${E.estHF.toFixed(2)} HF, altså en delta på ${K.toFixed(2)} HF. Det er krevende. Du må hente dette med både bedre tempo og renere treffbilde — ca ${y.toFixed(2)} sek raskere totalt og/eller rundt ${H.toFixed(1)} flere råpoeng.`}}return{statusText:j,advice:w,rivalName:b,gap:f,targetHF:_,estHF:E.estHF,deltaHF:K,rivalEstHF:(C&&C.estHF)||null,yourEstStagePts:M,rivalEstStagePts:D,requiredStagePts:B,maxStagePts:E.maxPts}}function De(){const e=ct(),i=o("prog-a-rate");i&&(i.textContent=e&&e.aPercent!==void 0?Math.round(e.aPercent*100)+"%":"");const t=o("prog-data-status");t&&(t.style.display=!e||e.completedStages===0?"block":"none"),Rs()}function Rs(){const e=$.find(a=>a.id!=null&&a.id.toString()===String(R)),i=o("prog-stages-container");if(!i||!e){i&&(i.innerHTML="");return}const t=icStageDefs(e);if(!t.length){i.innerHTML="";return}const s=icCurrentShooter(e),a=icCurrentResults(e),n=icCurrentShooterId(),rActive=getActiveReferenceShooters(e),nextStage=t.find(u=>!a.some(m=>String(m.num||m.number)===String(u.number))),overallForm=icFormFromResults(a,null,s),overallProjection=nextStage&&overallForm?icProjectNext(overallForm,nextStage):null;let r="";t.forEach(u=>{const m=icStageMetricsForMatch(e,u).map(E=>({...E,isMe:String(E.id)===String(n)||E.isMe})),b=m.length>0;let h=null;r+='<div class="card" style="margin-top:15px;border-left:4px solid '+(b?"var(--green)":"var(--muted)")+';">',r+='<div class="card-header">',r+='<div class="card-title">Stage '+u.number+". "+(u.name||("Stage "+u.number))+"</div>",r+='<span class="badge '+(b?"badge-green":"badge-gray")+'">'+(b?" SKUTT":" IKKE SKUTT")+"</span>",r+="</div>";if(b){r+='<div style="overflow-x:auto;margin-top:12px;">',r+='<table style="width:100%;font-size:12px;border-collapse:collapse;">',r+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);">',r+='<th style="padding:8px 6px;text-align:left;">#</th>',r+='<th style="padding:8px 6px;text-align:left;">NAVN</th>',r+='<th style="padding:8px 6px;text-align:right;">PTS</th>',r+='<th style="padding:8px 6px;text-align:right;">STG</th>',r+='<th style="padding:8px 6px;text-align:right;">%</th>',r+='<th style="padding:8px 6px;text-align:right;">HF</th>',r+="</tr>",m.forEach(E=>{const k=E.isMe?"background:var(--accent-fade);font-weight:600;":"";r+='<tr style="'+k+'border-bottom:1px solid var(--border);">',r+='<td style="padding:8px 6px;">'+E.rank+"</td>",r+='<td style="padding:8px 6px;">'+E.name+"</td>",r+='<td style="padding:8px 6px;text-align:right;color:var(--accent);">'+E.pts.toFixed(1)+"</td>",r+='<td style="padding:8px 6px;text-align:right;">'+E.stagePts.toFixed(2)+"</td>",r+='<td style="padding:8px 6px;text-align:right;">'+E.stagePct.toFixed(2)+"%</td>",r+='<td style="padding:8px 6px;text-align:right;">'+(E.hf||0).toFixed(2)+"</td>",r+="</tr>"}),r+="</table>",r+="</div>";const f=a.filter(E=>(E.num||E.number)<=u.number).sort((E,k)=>(E.num||0)-(k.num||0)),p=m.find(E=>E.isMe);h=p?p.res:null;const E=icFormFromResults(f,u.number,s);if(E){const k=t.find(P=>P.number>u.number&&!a.some(C=>String(C.num||C.number)===String(P.number))),P=k?icProjectNext(E,k):null;r+='<div style="margin-top:15px;padding:12px;background:var(--bg);border-radius:8px;">',r+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:13px;">',r+='<div><div style="color:var(--muted);margin-bottom:4px;">t/skudd</div><div style="font-weight:600;">'+E.avgSplit.toFixed(3)+"s</div></div>",r+='<div><div style="color:var(--muted);margin-bottom:4px;">Treff</div><div style="font-weight:600;color:var(--green);">'+(E.aPercent*100).toFixed(0)+"%A</div></div>",r+='<div><div style="color:var(--muted);margin-bottom:4px;">Est. HF neste</div><div style="font-weight:600;color:var(--accent);">'+(P?P.estHF.toFixed(2):"—")+"</div></div>",r+="</div>",r+="</div>",P&&k&&(r+='<div style="margin-top:15px;padding:12px;background:var(--accent-fade);border-radius:8px;border-left:3px solid var(--accent);">',r+='<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">NESTE: '+(k.name||("STAGE "+k.number)).toUpperCase()+" ("+P.shots+" SKUDD, "+P.reloads+" RELOAD"+(P.reloads===1?"":"S")+", MAX "+P.maxPts+" PTS)</div>",r+='<div style="font-size:14px;line-height:1.5;">'+Ds(h,k,E,e)+"</div>",r+="</div>");const C=Bs(f.length>1?f[f.length-2]:null,h,E),L=As(e,E,P?P.estHF:null,k||u);C&&(r+='<div style="margin-top:15px;padding:12px;background:var(--card-bg);border-radius:8px;">',r+='<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">💢 REFLEKSJON</div>',r+='<div style="font-size:13px;line-height:1.5;color:var(--text);">'+C+"</div>",r+="</div>"),L&&(r+='<div style="margin-top:15px;padding:12px;background:var(--bg);border-radius:8px;border-left:3px solid '+(L.gap>=0?"var(--green)":"var(--red)")+';">',r+='<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">KONKURRANSEBILDE</div>',r+='<div style="font-size:14px;font-weight:700;margin-bottom:8px;">'+L.statusText+"</div>",r+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px;margin-bottom:10px;">',r+='<div><div style="color:var(--muted);margin-bottom:4px;">Est HF</div><div style="font-weight:700;color:var(--accent);">'+(L.estHF!=null?L.estHF.toFixed(2):"—")+"</div></div>",r+='<div><div style="color:var(--muted);margin-bottom:4px;">Target HF</div><div style="font-weight:700;color:var(--text);">'+(L.targetHF!=null?L.targetHF.toFixed(2):"—")+"</div></div>",r+='<div><div style="color:var(--muted);margin-bottom:4px;">Delta HF</div><div style="font-weight:700;color:'+(L.deltaHF!=null&&L.deltaHF>0?"var(--red)":"var(--green)")+';">'+(L.deltaHF!=null?(L.deltaHF>0?"+":"")+L.deltaHF.toFixed(2):"—")+"</div></div>",r+="</div>",r+='<div style="font-size:14px;line-height:1.55;">'+L.advice+"</div>",r+="</div>")}}else r+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Ingen resultater ennå. Last opp resultat eller legg til manuelt.</div>';const refCompare=h?{estHF:h.hf!=null?h.hf:null,expTime:h.time!=null?h.time:null}:nextStage&&String(u.number)===String(nextStage.number)&&overallProjection?overallProjection:null;rActive.length&&(r+=renderReferenceBenchmarkBlock(e,u,refCompare)),r+="</div>"}),i.innerHTML=r}function Ds(e,i,t,s){if(!i||!t)return"Hold samme rytme som hittil.";const a=icStageShots(i),n=Se(a,t.division||"Classic",t.pf||"minor"),r=Math.round((t.aPercent||0)*100),u=t.avgSplit?t.avgSplit.toFixed(3):"0.000";return t.aPercent<.7?`Behold tempoet, men gi siktet litt mer tid. Neste stage er ${a} skudd med ${n} reload${n===1?"":"s"}. Baseline nå er ${r}%A og ${u}s/skudd.`:t.avgSplit<.22?`Bra flyt. Ikke jag mer tempo enn nødvendig. Neste stage er ${a} skudd med ${n} reload${n===1?"":"s"}. Hold ${r}%A og ${u}s/skudd.`:`Hold samme rytme som hittil. Neste stage er ${a} skudd med ${n} reload${n===1?"":"s"}. Baseline nå er ${r}%A og ${u}s/skudd.`}function Bs(e,i,t){if(!e||!i||!t)return null;const s=icStageShots(e),a=icStageShots(i);if(!s||!a)return null;const n=((e.time||0)-t.draw-Se(s,t.division||"Classic",t.pf||"minor")*t.reloadTime)/s,r=((i.time||0)-t.draw-Se(a,t.division||"Classic",t.pf||"minor")*t.reloadTime)/a,u=s>0?(e.a||0)/s:0,m=a>0?(i.a||0)/a:0;if(r>n+.05&&m<u-.1)return`Tempo og treff falt fra forrige stage (${n.toFixed(3)}s  ${r.toFixed(3)}s/skudd, ${(u*100).toFixed(0)}%A  ${(m*100).toFixed(0)}%A). Tenk gjennom hva som stjal tid og fokus.`;if(r>n+.05)return`Tempoet falt fra forrige stage (${n.toFixed(3)}s  ${r.toFixed(3)}s/skudd). Reflekter over hva som stjal tid.`;if(m<u-.1)return`Treffbildet falt fra forrige stage (${(u*100).toFixed(0)}%A  ${(m*100).toFixed(0)}%A). Vurder om du presset for hardt.`;if(r<n-.03&&m>=u-.05)return`Bra flyt. Du gikk raskere enn forrige stage uten stort tap i treffbildet.`;return null}async function Os(){const e=$.find(n=>n.id!=null&&n.id.toString()===String(R));if(!e)return;const i=F("new-shooter-firstname").trim(),t=F("new-shooter-lastname").trim(),s=F("new-shooter-division")||"Classic",a=(F("new-shooter-pf")||"minor").toLowerCase();if(!i||!t){alert("Fyll inn navn");return}const n={id:"s_"+Date.now(),isMe:!1,firstName:i,lastName:t,division:s,pf:a,club:"",stages:[]};e.shooters||(e.shooters=[]),e.shooters.push(n),await Ee(e.id,e),document.getElementById("new-shooter-firstname")&&(document.getElementById("new-shooter-firstname").value=""),document.getElementById("new-shooter-lastname")&&(document.getElementById("new-shooter-lastname").value=""),document.getElementById("new-shooter-pf")&&(document.getElementById("new-shooter-pf").value="minor"),document.getElementById("new-shooter-division")&&(document.getElementById("new-shooter-division").value="Standard"),typeof renderEditMatchShootersList=="function"&&renderEditMatchShootersList(e),G("modal-add-shooter"),_e()}async function js(){const e=$.find(f=>f.id!=null&&f.id.toString()===String(R));if(!e)return;const i=A("new-result-stage",1),t=he("new-result-time",0),s=icRecalcPoints("new-result"),a=A("new-result-a",0),n=A("new-result-c",0),r=A("new-result-d",0),u=A("new-result-miss",0),m=A("new-result-ns",0),b=A("new-result-proc",0);if(t<=0||s<=0){alert("Tid og poeng må være større enn 0");return}const f=icStageDefs(e).find(h=>h.number==i);if(!f){alert("Stage ikke funnet");return}const p=icStageShots(f),h=a+n+r+u;if(p>0&&h!==p){alert("Du må registrere nøyaktig "+p+" treff for denne stagen.");return}const E=await icEnsureShooter(e,icCurrentShooterId());if(!E){alert("Skytter ikke funnet");return}const k=t>0?s/t:0,P={num:f.number,name:f.name||("Stage "+f.number),hf:k,time:t,pts:s,pf:icResultPF(E.pf||"minor"),a:a,c:n,d:r,miss:u,ns:m,proc:b,paperTargets:f.paperTargets||0,poppers:f.poppers||0,plates:f.plates||0};icUpsertStageResult(E,P),await Ee(e.id,{shooters:e.shooters}),G("modal-add"),te(),_e(),De()}function Us(){G("modal-upload-result"),Re()}async function Hs(e){if(!$.find(u=>u.id!=null&&u.id.toString()===String(R))){alert("Ingen aktiv match valgt");return}const i=o("upload-stage-select"),t=o("upload-shooter-select"),s=o("upload-result-file");if(!i.value||!t.value){alert("Velg stage og skytter");return}if(!s.files||s.files.length===0){alert("Velg en fil");return}const a=s.files[0];Me=i.value,icUploadShooterSel=t.value,icSetResultDialogMode("ocr");const n=e&&e.currentTarget?e.currentTarget:o("upload-scan-btn"),r=n?n.textContent:"Last opp og skann";n&&(n.textContent="Skanner...",n.disabled=!0);try{const u=await new Promise((m,b)=>{const f=new FileReader;f.onerror=()=>b(new Error("Kunne ikke lese filen")),f.onload=p=>m(p.target.result),f.readAsDataURL(a)}),m=await qi.recognize(u,"eng+nor",{logger:b=>console.log(b)}),f=(m&&m.data&&m.data.text?m.data.text:"").trim();if(console.log("OCR Text:",f),!f)throw new Error("Ingen tekst funnet i bildet");const p=zs(f);if(p.time==null&&p.a===0&&p.c===0&&p.d===0&&p.miss===0&&p.ns===0&&p.proc===0)throw new Error("Fant ingen resultater i bildet");o("ocr-time").value=p.time||"",o("ocr-c").value=p.c||0,o("ocr-d").value=p.d||0,o("ocr-miss").value=p.miss||0,o("ocr-ns").value=p.ns||0,o("ocr-proc").value=p.proc||0,icUpdateLockedStageInfo("ocr"),icNormalizeHitCounts("ocr"),icRecalcPoints("ocr"),G("modal-upload-result"),ie("modal-ocr-confirm")}catch(u){console.error("OCR Error:",u),alert("Feil ved skanning: "+u.message)}finally{n&&(n.textContent=r,n.disabled=!1)}}function zs(e){const i={time:null,points:null,a:0,c:0,d:0,miss:0,ns:0,proc:0},t=e.replace(/[\n\r]+/g," ").toLowerCase(),s=[/time[:\s]*(\d+\.?\d*)/i,/(\d+\.\d+)\s*s(?:ec)?/i,/^(\d+\.\d+)$/m];for(const p of s){const h=t.match(p);if(h){i.time=parseFloat(h[1]);break}}const a=[/(?:points?|pts?)[:\s]*(\d+)/i,/score[:\s]*(\d+)/i];for(const p of a){const h=t.match(p);if(h){i.points=parseInt(h[1]);break}}const n=[/(\d+)\s*a(?:lpha)?(?:\s|$)/i,/a(?:lpha)?[:\s]*(\d+)/i];for(const p of n){const h=t.match(p);if(h){i.a=parseInt(h[1]);break}}const r=[/(\d+)\s*c(?:harlie)?(?:\s|$)/i,/c(?:harlie)?[:\s]*(\d+)/i];for(const p of r){const h=t.match(p);if(h){i.c=parseInt(h[1]);break}}const u=[/(\d+)\s*d(?:elta)?(?:\s|$)/i,/d(?:elta)?[:\s]*(\d+)/i];for(const p of u){const h=t.match(p);if(h){i.d=parseInt(h[1]);break}}const m=[/(\d+)\s*m(?:iss)?(?:\s|$)/i,/m(?:iss)?[:\s]*(\d+)/i];for(const p of m){const h=t.match(p);if(h){i.miss=parseInt(h[1]);break}}const b=[/(\d+)\s*ns(?:\s|$)/i,/ns[:\s]*(\d+)/i,/no-?shoot[:\s]*(\d+)/i];for(const p of b){const h=t.match(p);if(h){i.ns=parseInt(h[1]);break}}const f=[/(\d+)\s*p(?:roc)?(?:\s|$)/i,/p(?:roc)?[:\s]*(\d+)/i,/procedural[:\s]*(\d+)/i];for(const p of f){const h=t.match(p);if(h){i.proc=parseInt(h[1]);break}}return i}async function Gs(){const e=$.find(P=>P.id!=null&&P.id.toString()===String(R));if(!e)return;const i=he("ocr-time",0),t=icRecalcPoints("ocr"),s=A("ocr-a",0),a=A("ocr-c",0),n=A("ocr-d",0),r=A("ocr-miss",0),u=A("ocr-ns",0),m=A("ocr-proc",0);if(i<=0||t<=0){alert("Tid og poeng må være større enn 0");return}const b=icStageDefs(e).find(P=>P.number==Me);if(!b){alert("Stage ikke funnet");return}const f=icStageShots(b),p=s+a+n+r;if(f>0&&p!==f){alert("Du må registrere nøyaktig "+f+" treff for denne stagen.");return}const h=await icEnsureShooter(e,icUploadShooterSel||icCurrentShooterId());if(!h){alert("Skytter ikke funnet");return}const E=i>0?t/i:0,k={num:b.number,name:b.name||("Stage "+b.number),hf:E,time:i,pts:t,pf:icResultPF(h.pf||"minor"),a:s,c:a,d:n,miss:r,ns:u,proc:m,paperTargets:b.paperTargets||0,poppers:b.poppers||0,plates:b.plates||0};icUpsertStageResult(h,k),await Ee(e.id,{shooters:e.shooters}),G("modal-ocr-confirm"),te(),_e(),De(),Me=null,icUploadShooterSel=null,icSetResultDialogMode("ocr")}async function Ks(){ke&&ke(),xe&&xe(),await $t(),window.location.reload()}const ht=document.getElementById("app");function Vs(){Bt(ht,ft)}function ft(){ts(ht)}Ct(e=>{e?ft():Vs()});
+  `,zt(),ze(),N(),V(),We(),C()}function zt(){window.switchTab=Ve,window.setFilter=Jt,window.openModal=Q,window.closeModal=F,window.closeModalOutside=Wt,window.createMatch=Qt,window.toggleMatchDropdown=cs,window.selectMatchFromDropdown=us,window.renderMatchDropdown=Xe,window.openEditProfile=Yt,window.saveProfileData=Xt,window.selectPF=Zt,window.updatePFOptions=Je,window.calcPrognose=C,window.renderMatchList=V,window.selectMatch=qe,window.addShooter=ns,window.addStageResult=as,window.openAddResult=os,window.openAddStage=rs,window.saveStage=ls,window.updateManualPoints=Pe,window.adjustResultField=ss,window.handleResultStageChange=Ye,window.updateAddShooterPFOptions=()=>be("new-shooter-pf",f("new-shooter-division")||(o==null?void 0:o.division)||"Production",f("new-shooter-pf")||(o==null?void 0:o.powerFactor)||"minor"),window.handleLogout=ds,window.openEditMatch=ps,window.saveEditMatch=gs,window.confirmDeleteMatch=vs,window.deleteMatchConfirmed=ms,Qe("new-shooter-division",(o==null?void 0:o.division)||"Production"),be("new-shooter-pf",f("new-shooter-division")||(o==null?void 0:o.division)||"Production",(o==null?void 0:o.powerFactor)||"minor"),document.addEventListener("click",function(e){const t=e.target.closest(".match-chip"),s=e.target.closest(".match-dropdown");!t&&!s&&(document.querySelectorAll(".match-dropdown").forEach(i=>{i.classList.remove("open")}),document.querySelectorAll(".match-chip").forEach(i=>{i.classList.remove("open")}))})}function Ve(e){document.querySelectorAll(".screen").forEach(i=>i.classList.remove("active")),document.querySelectorAll(".tab-item").forEach(i=>i.classList.remove("active")),c(e).classList.add("active");const t=["screen-home","screen-matches","screen-prognose","screen-results","screen-profile"].indexOf(e),s=document.querySelectorAll(".tab-item");s[t]&&s[t].classList.add("active"),e==="screen-home"&&N(),e==="screen-matches"&&V(),e==="screen-results"&&W(),e==="screen-prognose"&&C()}function Q(e){c(e).classList.add("open")}function F(e){c(e).classList.remove("open")}function Wt(e,t){e.target.id===t&&F(t)}function Jt(e,t){q=e,document.querySelectorAll(".filter-chip").forEach(s=>s.classList.remove("active")),t.classList.add("active"),V()}async function Qt(){const e=Math.max(1,k("new-match-stages",6)),t=Array.from({length:e},(n,a)=>te(a+1)),s={name:f("new-match-name")||"Ny match",type:f("new-match-type")||"Stevne",date:f("new-match-date")||new Date().toISOString().split("T")[0],location:f("new-match-location")||"",plannedStages:e,stages:t,shooters:[]},i=await Ft(s);i.success?F("modal-new-match"):alert("Kunne ikke opprette match: "+i.error)}function qe(e){y=he(e);const t=w.find(s=>S(s.id,y));if(t){const s=t.name||"Match";["home-chip-name","prog-chip-name","results-chip-name"].forEach(n=>{const a=c(n);a&&(a.textContent=s)})}Z&&Z(),y&&(Z=$t(y,s=>{const i=w.findIndex(n=>S(n.id,y));i!==-1&&s&&(w[i]=j(s),N(),W(),C())})),N(),W(),C(),Ve("screen-home")}function N(){var r;const e=c("home-content");if(!e)return;const t=w.find(l=>S(l.id,y));if(!t){e.innerHTML=`
+      <div class="empty-state">
+        <div class="empty-icon">🏆</div>
+        <div class="empty-title">Velg en match</div>
+        <div class="empty-sub">Trykk på match-chip over eller gå til Matcher-fanen</div>
+        <button class="btn-primary btn-home-action" onclick="switchTab('screen-matches')">Se matcher</button>
+      </div>`;return}j(t),Ee(t);const s=se(t),i=J(s),n=M(t);let a="";a+='<div class="card">',a+='<div class="card-header"><div class="mhc-name">'+t.name+'</div><button class="btn-sm accent" onclick="openEditMatch()">⚙ Rediger</button></div>',a+='<div class="mhc-meta">'+ye(t.date)+" · "+t.type+"</div>",a+='<div class="mhc-stats"><div><div class="mhc-val">'+n.length+'</div><div class="mhc-lbl">Stages</div></div><div><div class="mhc-val">'+(((r=t.shooters)==null?void 0:r.length)||0)+'</div><div class="mhc-lbl">Skyttere</div></div></div>',a+='<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;"><button class="btn-primary" onclick="openAddStage()">Ny stage</button><button class="btn-primary" onclick="openModal(&quot;modal-add-shooter&quot;)">Ny skytter</button><button class="btn-primary" onclick="openAddResult()">Legg til resultat</button></div>',a+="</div>",a+='<div class="section-title">Stages</div><div class="card">',n.forEach(l=>{const v=fe(s,l.number);a+='<div class="stage-row"><div class="stage-num">S'+l.number+'</div><div class="stage-info"><div class="stage-name">'+l.name+'</div><div class="stage-meta">'+_(l)+" skudd · maks "+z(l)+' pts</div></div><div class="stage-hf">'+(v?Number(v.hf||0).toFixed(2):"—")+"</div></div>"}),a+="</div>",i.length&&(a+='<div class="section-title">Mine siste resultater</div><div class="card">',i.slice(-3).reverse().forEach(l=>{a+='<div class="stage-row"><div class="stage-num">S'+l.num+'</div><div class="stage-info"><div class="stage-name">Stage '+l.num+'</div><div class="stage-meta">'+Number(l.time||0).toFixed(2)+"s · "+Number(l.pts||0).toFixed(1)+' pts</div></div><div class="stage-hf">'+Number(l.hf||0).toFixed(2)+"</div></div>"}),a+="</div>"),e.innerHTML=a}function V(){const e=c("match-list-container");if(!e)return;const t=f("match-search").toLowerCase();let s=w.filter(n=>{var r;if(t&&!n.name.toLowerCase().includes(t)&&!((r=n.location)!=null&&r.toLowerCase().includes(t)))return!1;if(q==="all")return!0;if(q==="active")return n.id===y;if(q==="trening")return n.type==="Trening";if(q==="stevne")return n.type==="Stevne";const a=n.date?new Date(n.date).getFullYear().toString():"";return q===a});if(s.length===0){e.innerHTML='<div class="empty-state"><div class="empty-sub">Ingen matcher funnet</div></div>';return}let i="";s.forEach(n=>{var r;const a=S(n.id,y);i+=`<div class="match-row" onclick="selectMatch('`+n.id+`')">`,i+='<div class="match-row-icon'+(a?" is-active":"")+'">🏆</div>',i+='<div class="match-row-info">',i+='<div class="match-row-name">'+n.name+"</div>",i+='<div class="match-row-meta">'+ye(n.date)+" · "+(n.location||n.type)+"</div>",i+="</div>",i+='<div class="match-row-right">',i+='<div class="match-stg-count">'+(((r=n.stages)==null?void 0:r.length)||0)+"</div>",i+='<div class="match-stg-lbl">stages</div>',i+="</div>",i+="</div>"}),e.innerHTML=i}function W(){var a;const e=c("results-content");if(!e)return;const t=w.find(r=>S(r.id,y));if(!t){e.innerHTML='<div class="empty-state"><div class="empty-sub">Velg en match først</div></div>';return}if(!t.shooters||t.shooters.length===0){e.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Ingen skyttere</div><div class="empty-sub">Trykk + for å legge til skyttere</div></div>';return}const s=t.shooters.map(r=>({shooter:r,...Ue(t,r)})).sort((r,l)=>l.totalPts-r.totalPts),i=((a=s[0])==null?void 0:a.totalPts)||0;let n='<div class="card"><div class="card-header"><div class="card-title">Standings</div></div><div class="standings-table-wrap"><table class="standings-table"><thead><tr class="standings-header-row"><th class="standings-th standings-th-rank">#</th><th class="standings-th standings-th-shooter">Skytter</th><th class="standings-th standings-th-pts">Pts</th><th class="standings-th standings-th-pct">%</th></tr></thead><tbody>';s.forEach((r,l)=>{const v=i>0?(r.totalPts/i*100).toFixed(2):"0.00",d=r.shooter;n+='<tr class="standings-row"><td class="standings-td standings-td-rank">'+(l+1)+'</td><td class="standings-td standings-td-shooter"><div class="standings-shooter-name">'+d.firstName+" "+d.lastName+'</div><div class="standings-shooter-meta">'+(d.division||"—")+" · "+G(d.pf||"minor")+'</div></td><td class="standings-td standings-td-pts">'+r.totalPts.toFixed(1)+'</td><td class="standings-td standings-td-pct">'+v+"%</td></tr>"}),n+="</tbody></table></div></div>",e.innerHTML=n}function ze(){const e=K();["prof-avatar","nav-av-home","nav-av-matches","nav-av-prog","nav-av-results"].forEach(l=>{const v=c(l);v&&(v.textContent=e)});const s=c("prof-name");s&&(s.textContent=(o.firstName||"")+" "+(o.lastName||""));const i=c("prof-div");i&&(i.textContent=(o.division||"—")+" · "+(o.club||"—"));const n=c("prof-badge-pf");n&&(n.textContent=o.powerFactor?G(o.powerFactor):"—");const a=c("prof-badge-region");a&&(a.textContent=o.region||"—");const r={"info-firstname":o.firstName||"—","info-lastname":o.lastName||"—","info-division":o.division||"—","info-category":o.category||"—","info-pf":o.powerFactor?G(o.powerFactor):"—","info-region":o.region||"—","info-club":o.club||"—"};Object.keys(r).forEach(l=>{const v=c(l);v&&(v.textContent=r[l])}),We()}function We(){const e=ke(),t=[];w.forEach(u=>{var P;const b=(P=u==null?void 0:u.shooters)==null?void 0:P.find(E=>E.isMe||e&&E.id===e);J(b).forEach(E=>t.push(E))});let s=0,i=0,n=0;t.forEach(u=>{s+=Number(u.a||0),i+=Number(u.a||0)+Number(u.c||0)+Number(u.d||0),n+=Number(u.hf||0)});const a=t.length?(n/t.length).toFixed(2):"—",r=i?Math.round(s/i*100)+"%":"—",l=c("stat-matches");l&&(l.textContent=w.length);const v=c("stat-stages");v&&(v.textContent=t.length);const d=c("stat-avg-hf");d&&(d.textContent=a);const g=c("stat-a-rate");g&&(g.textContent=r)}function Yt(){c("edit-firstname").value=o.firstName||"",c("edit-lastname").value=o.lastName||"",c("edit-club").value=o.club||"",c("edit-draw").value=o.draw||"",c("edit-reload").value=o.reloadTime||"";let e="";ve.forEach(i=>{e+='<option value="'+i+'"'+(i===o.division?" selected":"")+">"+i+"</option>"}),c("edit-division").innerHTML=e;let t="";Bt.forEach(i=>{t+='<option value="'+i+'"'+(i===o.category?" selected":"")+">"+i+"</option>"}),c("edit-category").innerHTML=t;let s="";Ht.forEach(i=>{s+='<option value="'+i+'"'+(i===o.region?" selected":"")+">"+i+"</option>"}),c("edit-region").innerHTML=s,Je(),Q("modal-edit-profile")}function Je(){const e=f("edit-division"),t=je[e]||["minor","major"];let s="";t.forEach(i=>{const n=o.powerFactor===i;s+='<label class="pf-option'+(n?" active":"")+`" onclick="selectPF(this,'`+i+`')">`,s+='<input type="radio" name="pf" value="'+i+'">',s+='<div class="pf-label">'+i.toUpperCase()+"</div>",s+='<div class="pf-sub">'+(i==="major"?"≥170 PF":"<170 PF")+"</div>",s+="</label>"}),c("pf-options").innerHTML=s,t.indexOf(o.powerFactor)<0&&(o.powerFactor=t[0])}function Zt(e,t){document.querySelectorAll(".pf-option").forEach(s=>s.classList.remove("active")),e.classList.add("active"),o.powerFactor=t}async function Xt(){o.firstName=f("edit-firstname").trim()||"",o.lastName=f("edit-lastname").trim()||"",o.division=f("edit-division")||"",o.category=f("edit-category")||"",o.region=f("edit-region")||"",o.club=f("edit-club").trim()||"",o.draw=me("edit-draw")||null,o.reloadTime=me("edit-reload")||null;const e=await Nt(o),t=c("save-profile-btn");e.success?(t.textContent="✓ Lagret!",t.style.background="var(--green)",setTimeout(()=>{t.textContent=p("save_profile"),t.style.background=""},1800)):(t.textContent="❌ Feil!",t.style.background="var(--red)",setTimeout(()=>{t.textContent=p("save_profile"),t.style.background=""},1800)),ze(),C(),N(),F("modal-edit-profile")}function C(){const e=w.find(v=>S(v.id,y)),t=c("prog-match-context"),s=c("snapshot-container"),i=c("prog-stage-list");if(!t||!s||!i)return;if(!e){t.innerHTML='<div class="empty-state"><div class="empty-sub">Velg en match først</div></div>',s.innerHTML="",i.innerHTML="";return}j(e);const n=Ee(e),a=Ke(e,n),r=Kt(e,n);t.innerHTML='<div class="card"><div class="card-header"><div class="card-title">Skytterdata (snitt)</div><span class="badge badge-blue">Auto</span></div><div class="stats-grid"><div class="stat-block"><div class="stat-value">'+(a.timePerShot?a.timePerShot.toFixed(3)+"s":"—")+'</div><div class="stat-label">t/skudd</div></div><div class="stat-block"><div class="stat-value">'+(o.draw||"—")+'s</div><div class="stat-label">Draw</div></div><div class="stat-block"><div class="stat-value">'+(o.reloadTime||"—")+'s</div><div class="stat-label">Reload</div></div><div class="stat-block"><div class="stat-value">'+Math.round((a.aRate||0)*100)+'%</div><div class="stat-label">A-andel</div></div></div></div>',s.innerHTML='<div class="card"><div class="card-header"><div class="card-title">Refleksjon</div></div><div class="empty-sub" style="text-align:left;">'+r+"</div></div>";const l=M(e);i.innerHTML=l.map(v=>{const d=fe(n,v.number),g=d?null:Ie(e,n,v),u=Ge(e,n),b=d?Re(e,n,u,Ie(e,n,u)):Re(e,n,v,g),P=d?'<span class="badge" style="background:rgba(34,197,94,.18);color:#4ade80;">SKUTT</span>':'<span class="badge">IKKE SKUTT</span>',E=(e.shooters||[]).map(x=>({shooter:x,result:fe(x,v.number)})).filter(x=>x.result).sort((x,T)=>Number(T.result.hf||0)-Number(x.result.hf||0)),I=E.length?E.map((x,T)=>'<tr class="standings-row"><td class="standings-td standings-td-rank">'+(T+1)+'</td><td class="standings-td standings-td-shooter">'+x.shooter.firstName+" "+x.shooter.lastName+'</td><td class="standings-td standings-td-pts">'+Number(x.result.pts||0).toFixed(1)+'</td><td class="standings-td standings-th-pct">'+Number(x.result.hf||0).toFixed(2)+"</td></tr>").join(""):'<tr><td colspan="4" class="empty-sub">Ingen resultater ennå.</td></tr>',O=d?'<div class="stats-grid"><div class="stat-block"><div class="stat-value">'+(_(v)&&d.time?(d.time/_(v)).toFixed(3)+"s":"—")+'</div><div class="stat-label">t/skudd</div></div><div class="stat-block"><div class="stat-value">'+Math.round(Number(d.a||0)/Math.max(1,Number(d.a||0)+Number(d.c||0)+Number(d.d||0))*100)+'%A</div><div class="stat-label">Treff</div></div><div class="stat-block"><div class="stat-value">'+(g?g.estHF.toFixed(2):"—")+'</div><div class="stat-label">Est. HF neste</div></div></div>':'<div class="stats-grid"><div class="stat-block"><div class="stat-value">'+(g?g.estHF.toFixed(2):"—")+'</div><div class="stat-label">Est. HF</div></div><div class="stat-block"><div class="stat-value">'+_(v)+'</div><div class="stat-label">Skudd</div></div><div class="stat-block"><div class="stat-value">'+z(v)+'</div><div class="stat-label">Maks pts</div></div></div>';return'<div class="card"><div class="card-header"><div class="card-title">'+v.name+"</div>"+P+'</div><div class="standings-table-wrap"><table class="standings-table"><thead><tr class="standings-header-row"><th class="standings-th standings-th-rank">#</th><th class="standings-th standings-th-shooter">Navn</th><th class="standings-th standings-th-pts">Pts</th><th class="standings-th standings-th-pct">HF</th></tr></thead><tbody>'+I+"</tbody></table></div>"+O+'<div class="card" style="margin-top:12px;background:rgba(232,184,75,.08);">'+b+"</div></div>"}).join("")}function Qe(e,t){const s=c(e);s&&(s.innerHTML=ve.map(i=>`<option value="${i}">${i}</option>`).join(""),t&&ve.includes(t)&&(s.value=t))}function be(e,t,s){const i=c(e);if(!i)return;const n=je[t]||["minor"];i.innerHTML=n.map(r=>`<option value="${r}">${G(r)}</option>`).join("");const a=String(s||n[0]||"minor").toLowerCase();i.value=n.includes(a)?a:n[0]||"minor"}function es(){const e=w.find(s=>S(s.id,y));if(!e)return null;const t=k("new-result-stage",1);return M(e).find(s=>Number(s.number)===Number(t))||null}function Se(){const e=es();return Math.max(0,_(e))}function ts(e){const t=Se(),s=["new-result-c","new-result-d","new-result-miss","new-result-ns"],i={};s.forEach(d=>{i[d]=Math.max(0,k(d,0))});let n=Math.max(0,k("new-result-proc",0)),a=s.reduce((d,g)=>d+i[g],0);if(a>t){if(e&&s.includes(e)){const d=a-i[e];i[e]=Math.max(0,t-d)}else{let d=a-t;s.slice().reverse().forEach(g=>{if(d<=0)return;const u=Math.min(i[g],d);i[g]-=u,d-=u})}a=s.reduce((d,g)=>d+i[g],0)}const l={"new-result-a":Math.max(0,t-a),"new-result-c":i["new-result-c"],"new-result-d":i["new-result-d"],"new-result-miss":i["new-result-miss"],"new-result-ns":i["new-result-ns"],"new-result-proc":n};Object.entries(l).forEach(([d,g])=>{const u=c(d);u&&(u.value=g)});const v=c("new-result-stage-info");v&&(v.textContent=t>0?`Stagekrav: ${t} skudd`:"Stagekrav: –")}function Ye(){const e=Se(),t=c("new-result-a"),s=c("new-result-c"),i=c("new-result-d"),n=c("new-result-miss"),a=c("new-result-ns"),r=c("new-result-proc");t&&(t.value=e),s&&(s.value=0),i&&(i.value=0),n&&(n.value=0),a&&(a.value=0),r&&(r.value=0),Pe()}function ss(e,t){const s=c(e);if(!s)return;const i=Math.max(0,k(e,0));s.value=Math.max(0,i+t),Pe(e)}function Ze(e){const t=c("edit-match-shooters-list");if(!t)return;const s=Array.isArray(e==null?void 0:e.shooters)?e.shooters:[];if(!s.length){t.innerHTML='<div style="font-size:13px;color:var(--muted);padding:10px 0;">Ingen skyttere lagt til ennå.</div>';return}t.innerHTML=s.map(i=>{const n=`${i.firstName||""} ${i.lastName||""}`.trim()||"Ukjent",a=G(String(i.pf||"minor").toLowerCase()),r=i.isMe?'<span class="badge" style="background:rgba(74,158,255,.16);color:#60a5fa;margin-left:8px;">Meg</span>':"",l=!i.isMe;return`
+      <div class="stage-row" style="align-items:center;gap:12px;">
+        <div class="stage-info">
+          <div class="stage-name">${n}${r}</div>
+          <div class="stage-meta">${i.division||"—"} · ${a}</div>
+        </div>
+        ${l?`<button class="btn-secondary" style="padding:8px 12px;min-width:72px;" data-shooter-id="${i.id}">Slett</button>`:""}
+      </div>`}).join(""),t.querySelectorAll("[data-shooter-id]").forEach(i=>{i.onclick=()=>is(i.dataset.shooterId)})}async function is(e){const t=w.find(a=>S(a.id,y));if(!t)return;const s=(t.shooters||[]).find(a=>a.id===e);if(!s||s.isMe)return;const i=`${s.firstName||""} ${s.lastName||""}`.trim()||"denne skytteren";if(!confirm(`Slette ${i} fra matchen?`))return;t.shooters=(t.shooters||[]).filter(a=>a.id!==e);const n=await ie(t.id,j(t));if(!n.success)return alert("Kunne ikke slette skytter: "+n.error);Ze(t),N(),W(),C()}async function ns(){const e=w.find(l=>S(l.id,y));if(!e)return;const t=f("new-shooter-firstname").trim(),s=f("new-shooter-lastname").trim(),i=f("new-shooter-division")||"Classic",n=(f("new-shooter-pf")||(o==null?void 0:o.powerFactor)||"minor").toLowerCase();if(!t||!s){alert("Fyll inn navn");return}const a={id:"s_"+Date.now(),isMe:!1,firstName:t,lastName:s,division:i,pf:n,club:"",stages:[]};e.shooters||(e.shooters=[]),e.shooters.push(a);const r=await ie(e.id,j(e));if(!r.success)return alert("Kunne ikke lagre skytter: "+r.error);F("modal-add-shooter"),c("new-shooter-firstname")&&(c("new-shooter-firstname").value=""),c("new-shooter-lastname")&&(c("new-shooter-lastname").value=""),Qe("new-shooter-division",(o==null?void 0:o.division)||i),be("new-shooter-pf",f("new-shooter-division")||(o==null?void 0:o.division)||i,(o==null?void 0:o.powerFactor)||n),W(),N(),C()}async function as(){var T;const e=w.find(R=>S(R.id,y));if(!e)return;const t=f("new-result-shooter"),s=k("new-result-stage",1),i=me("new-result-time",0),n=k("new-result-a",0),a=k("new-result-c",0),r=k("new-result-d",0),l=k("new-result-miss",0),v=k("new-result-ns",0),d=k("new-result-proc",0),g=(T=e.shooters)==null?void 0:T.find(R=>R.id===t);if(!g)return alert("Velg skytter");const u=Se(),b=n+a+r+l+v;if(u>0&&b!==u)return alert("Totalt antall treff må være "+u+".");const P=g.pf||o.powerFactor||"minor",E=Oe(n,a,r,l,v,d,P),I=i>0?E/i:0,O={num:s,name:"Stage "+s,time:i,pts:E,hf:I,a:n,c:a,d:r,miss:l,ns:v,proc:d,pf:P};Ut(e,t,O);const x=await ie(e.id,j(e));if(!x.success)return alert("Kunne ikke lagre resultat: "+x.error);F("modal-add"),N(),W(),C()}function Pe(e){var r;const t=w.find(l=>S(l.id,y)),s=((r=t==null?void 0:t.shooters)==null?void 0:r.find(l=>l.id===f("new-result-shooter")))||se(t);ts(e);const i=(s==null?void 0:s.pf)||(o==null?void 0:o.powerFactor)||"minor",n=Oe(k("new-result-a",0),k("new-result-c",0),k("new-result-d",0),k("new-result-miss",0),k("new-result-ns",0),k("new-result-proc",0),i),a=c("new-result-points");a&&(a.value=n)}function os(){var s,i,n;const e=w.find(a=>S(a.id,y));if(!e)return alert("Velg en match først");j(e),Ee(e),Gt("new-result-shooter",(s=se(e))==null?void 0:s.id),Vt("new-result-stage",((i=Ge(e,se(e)))==null?void 0:i.number)||((n=M(e)[0])==null?void 0:n.number));const t=c("new-result-time");t&&(t.value=""),Ye(),Q("modal-add")}function rs(){const e=w.find(s=>S(s.id,y));if(!e)return alert("Velg en match først");const t=M(e).length+1;c("new-stage-name").value=`Stage ${t}`,c("new-stage-shots").value=12,c("new-stage-targets").value=6,c("new-stage-steel").value=0,c("new-stage-maxpoints").value=60,Q("modal-add-stage")}async function ls(){const e=w.find(n=>S(n.id,y));if(!e)return;const t=M(e),s=t.length+1;t.push(te(s,{name:f("new-stage-name")||`Stage ${s}`,shots:k("new-stage-shots",12),targets:k("new-stage-targets",6),steel:k("new-stage-steel",0),maxPoints:k("new-stage-maxpoints",60)})),e.stages=t,e.plannedStages=t.length;const i=await ie(e.id,e);if(!i.success)return alert("Kunne ikke lagre stage: "+i.error);F("modal-add-stage"),N(),C()}async function ds(){Y&&Y(),Z&&Z(),await xt(),window.location.reload()}function cs(e){const t=c(e);if(!t)return;const s=t.previousElementSibling,i=t.classList.contains("open");document.querySelectorAll(".match-dropdown").forEach(n=>{n.classList.remove("open")}),document.querySelectorAll(".match-chip").forEach(n=>{n.classList.remove("open")}),i||(t.classList.add("open"),s.classList.add("open"),Xe(e))}function us(e){qe(e),document.querySelectorAll(".match-dropdown").forEach(t=>{t.classList.remove("open")}),document.querySelectorAll(".match-chip").forEach(t=>{t.classList.remove("open")})}function Xe(e){const t=c(e);if(!t)return;if(w.length===0){t.innerHTML='<div class="match-dropdown-item" style="text-align:center;color:var(--muted);padding:20px;">Ingen matcher</div>';return}let s="";w.forEach((i,n)=>{const a=S(i.id,y);s+='<div class="match-dropdown-item'+(a?" active":"")+`" onclick="selectMatchFromDropdown('`+i.id+`')">`,s+='<div class="match-dropdown-name">',s+="Match ID "+(n+1)+" "+i.name,a&&(s+='<span class="match-dropdown-active-indicator"></span>'),s+="</div>",s+='<div class="match-dropdown-meta">'+ye(i.date)+" · "+(i.location||i.type)+"</div>",s+="</div>"}),t.innerHTML=s}function ps(){const e=w.find(n=>S(n.id,y));if(!e){alert("Ingen match valgt");return}j(e),c("edit-match-name").value=e.name||"",c("edit-match-date").value=e.date||"",c("edit-match-location").value=e.location||"",c("edit-match-type").value=e.type||"Trening",c("edit-match-stages").value=Math.max(Number(e.plannedStages||0),M(e).length);const t=c("edit-match-searchable");t&&(t.checked=e.searchable!==!1);const s=c("edit-match-finished");s&&(s.checked=e.status==="finished");const i=c("delete-match-btn");i&&(i.style.display="block"),Ze(e),Q("modal-edit-match")}async function gs(){const e=w.find(l=>S(l.id,y));if(!e){alert("Ingen match valgt");return}const t=c("edit-match-searchable"),s=c("edit-match-finished"),i=k("edit-match-stages",e.plannedStages),n=M(e);for(;n.length<i;)n.push(te(n.length+1));const a={name:f("edit-match-name")||e.name,type:f("edit-match-type")||e.type,date:f("edit-match-date")||e.date,location:f("edit-match-location")||e.location,plannedStages:i,searchable:t?t.checked:!0,status:s&&s.checked?"finished":"active",stages:n},r=await ie(e.id,a);r.success?(F("modal-edit-match"),N(),V(),C()):alert("Kunne ikke oppdatere match: "+r.error)}function vs(){const e=w.find(s=>s.id===y);if(!e){alert("Ingen match valgt");return}const t=e.id?"Match ID "+e.id+" "+e.name:e.name;c("delete-match-name").textContent=t,Q("modal-confirm-delete")}async function ms(){const e=w.find(s=>s.id===y);if(!e){alert("Ingen match valgt");return}const t=await At(e.id);t.success?(F("modal-confirm-delete"),F("modal-edit-match"),y=null,N(),V(),alert("Match slettet")):alert("Kunne ikke slette match: "+t.error)}const et=document.getElementById("app");function hs(){Mt(et,tt)}function tt(){qt(et)}wt(e=>{e?tt():hs()});
+
+

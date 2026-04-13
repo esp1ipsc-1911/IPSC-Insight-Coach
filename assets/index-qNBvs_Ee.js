@@ -1100,13 +1100,13 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
  <div class="field-group">
  <div class="field-label">A (auto)</div>
- <input class="field-input" type="number" id="new-result-a" value="0" readonly style="text-align:center;background:var(--bg);">
+ <input class="field-input" type="number" id="new-result-a" value="0" readonly style="text-align:center;background:var(--card);color:var(--text);">
  </div>
  <div class="field-group">
  <div class="field-label">C</div>
  <div style="display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center;">
  <button type="button" class="btn-secondary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-c',-1)">−</button>
- <input class="field-input" type="number" id="new-result-c" value="0" readonly style="text-align:center;background:var(--bg);">
+ <input class="field-input" type="number" id="new-result-c" value="0" readonly style="text-align:center;background:var(--card);color:var(--text);">
  <button type="button" class="btn-primary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-c',1)">+</button>
  </div>
  </div>
@@ -1114,7 +1114,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-label">D</div>
  <div style="display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center;">
  <button type="button" class="btn-secondary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-d',-1)">−</button>
- <input class="field-input" type="number" id="new-result-d" value="0" readonly style="text-align:center;background:var(--bg);">
+ <input class="field-input" type="number" id="new-result-d" value="0" readonly style="text-align:center;background:var(--card);color:var(--text);">
  <button type="button" class="btn-primary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-d',1)">+</button>
  </div>
  </div>
@@ -1122,7 +1122,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-label">Miss</div>
  <div style="display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center;">
  <button type="button" class="btn-secondary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-miss',-1)">−</button>
- <input class="field-input" type="number" id="new-result-miss" value="0" readonly style="text-align:center;background:var(--bg);">
+ <input class="field-input" type="number" id="new-result-miss" value="0" readonly style="text-align:center;background:var(--card);color:var(--text);">
  <button type="button" class="btn-primary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-miss',1)">+</button>
  </div>
  </div>
@@ -1133,7 +1133,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-label">NS (No-Shoot)</div>
  <div style="display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center;">
  <button type="button" class="btn-secondary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-ns',-1)">−</button>
- <input class="field-input" type="number" id="new-result-ns" value="0" readonly style="text-align:center;background:var(--bg);">
+ <input class="field-input" type="number" id="new-result-ns" value="0" readonly style="text-align:center;background:var(--card);color:var(--text);">
  <button type="button" class="btn-primary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-ns',1)">+</button>
  </div>
  </div>
@@ -1141,7 +1141,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-label">Proc (Procedural)</div>
  <div style="display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center;">
  <button type="button" class="btn-secondary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-proc',-1)">−</button>
- <input class="field-input" type="number" id="new-result-proc" value="0" readonly style="text-align:center;background:var(--bg);">
+ <input class="field-input" type="number" id="new-result-proc" value="0" readonly style="text-align:center;background:var(--card);color:var(--text);">
  <button type="button" class="btn-primary" style="height:44px;border:none;border-radius:8px;cursor:pointer;" onclick="adjustResultField('new-result-proc',1)">+</button>
  </div>
  </div>

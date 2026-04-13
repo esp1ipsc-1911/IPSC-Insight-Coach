@@ -1230,7 +1230,7 @@
             <td data-label="Divisjon">${escapeHtml(user.division || '—')}</td>
             <td data-label="Klubb">${escapeHtml(user.club || '—')}</td>
             <td data-label="Rolle"><span class="badge ${role === 'admin' ? 'badge-admin' : role === 'match_director' ? 'badge-director' : 'badge-user'}">${escapeHtml(role)}</span></td>
-            <td data-label="Handlinger"><button class="btn btn-sm btn-secondary" onclick="window.editUser('${escapeAttr(user.id)}')">Rediger</button></td>
+            <td data-label="Handlinger"><button class="btn btn-sm btn-secondary" onclick="window.editUser('${escapeAttr(user.id)}')">Rediger</button> <button class="btn btn-sm btn-danger" onclick="window.deleteUser('${escapeAttr(user.id)}', '${escapeAttr(displayName)}')">Slett</button></td>
           </tr>
         `;
       }).join('');
@@ -1319,6 +1319,17 @@
     $('cancelUserBtn').onclick = () => {
       currentEditingUserId = null;
       $('userModal').classList.remove('open');
+    };
+
+    window.deleteUser = async (userId, displayName) => {
+      if (!confirm(`Er du sikker på at du vil slette brukeren "${displayName}"?\n\nDette sletter brukerprofilen fra databasen. Firebase Auth-kontoen må slettes separat via Firebase Console.`)) return;
+      try {
+        await deleteDoc(doc(db, 'users', userId));
+        await loadRoles();
+        await loadAllUsers();
+      } catch (error) {
+        alert('Feil ved sletting av bruker: ' + error.message);
+      }
     };
 
     async function loadReferenceShooters() {
@@ -1490,7 +1501,7 @@
               <td data-label="Eier">${escapeHtml(ownerName)}</td>
               <td data-label="Deltakere">${(match.participants || []).length}</td>
               <td data-label="Stages">${stageCount}</td>
-              <td data-label="Handlinger"><button class="btn btn-sm btn-secondary" onclick="window.openMatchAdmin('${escapeAttr(match.id)}')">Administrer</button></td>
+              <td data-label="Handlinger"><button class="btn btn-sm btn-secondary" onclick="window.openMatchAdmin('${escapeAttr(match.id)}')">Administrer</button> <button class="btn btn-sm btn-danger" onclick="window.deleteMatch('${escapeAttr(match.id)}', '${escapeAttr(match.name || match.id)}')">Slett</button></td>
             </tr>
           `;
         }).join('');
@@ -1501,6 +1512,16 @@
 
     $('refreshMatchesBtn').onclick = async () => {
       await Promise.all([loadMatches(), loadAllUsers()]);
+    };
+
+    window.deleteMatch = async (matchId, matchName) => {
+      if (!confirm(`Er du sikker på at du vil slette matchen "${matchName}"?\n\nDette kan ikke angres.`)) return;
+      try {
+        await deleteDoc(doc(db, 'matches', String(matchId)));
+        await loadMatches();
+      } catch (error) {
+        alert('Feil ved sletting av match: ' + error.message);
+      }
     };
 
     window.openMatchAdmin = async (matchId) => {

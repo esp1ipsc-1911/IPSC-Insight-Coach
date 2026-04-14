@@ -1373,9 +1373,9 @@
             <td data-label="PF">${escapeHtml(shooter.powerFactor || '—')}</td>
             <td data-label="Draw">${formatNumber(shooter.drawTime, 2)}</td>
             <td data-label="Reload">${formatNumber(shooter.reloadTime, 2)}</td>
-            <td data-label="Short HF"><div>${formatNumber(shooter.shortHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.shortAP != null ? "A:"+shooter.shortAP : ""}${shooter.shortCP != null ? " C:"+shooter.shortCP : ""}${shooter.shortDP != null ? " D:"+shooter.shortDP : ""}</div></td>
-            <td data-label="Medium HF"><div>${formatNumber(shooter.mediumHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.mediumAP != null ? "A:"+shooter.mediumAP : ""}${shooter.mediumCP != null ? " C:"+shooter.mediumCP : ""}${shooter.mediumDP != null ? " D:"+shooter.mediumDP : ""}</div></td>
-            <td data-label="Long HF"><div>${formatNumber(shooter.longHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.longAP != null ? "A:"+shooter.longAP : ""}${shooter.longCP != null ? " C:"+shooter.longCP : ""}${shooter.longDP != null ? " D:"+shooter.longDP : ""}</div></td>
+            <td data-label="Short HF"><div>${formatNumber(shooter.shortHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.shortAP != null ? 'A:'+shooter.shortAP : ''}${shooter.shortCP != null ? ' C:'+shooter.shortCP : ''}${shooter.shortDP != null ? ' D:'+shooter.shortDP : ''}</div></td>
+            <td data-label="Medium HF"><div>${formatNumber(shooter.mediumHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.mediumAP != null ? 'A:'+shooter.mediumAP : ''}${shooter.mediumCP != null ? ' C:'+shooter.mediumCP : ''}${shooter.mediumDP != null ? ' D:'+shooter.mediumDP : ''}</div></td>
+            <td data-label="Long HF"><div>${formatNumber(shooter.longHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.longAP != null ? 'A:'+shooter.longAP : ''}${shooter.longCP != null ? ' C:'+shooter.longCP : ''}${shooter.longDP != null ? ' D:'+shooter.longDP : ''}</div></td>
             <td data-label="Status"><span class="badge badge-benchmark">${shooter.isBenchmark ? 'Benchmark' : 'Profil'}</span></td>
             <td data-label="Handlinger">
               <div class="action-btns">

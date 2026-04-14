@@ -897,6 +897,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </div>
  <div class="field-group">
  <div class="field-label">Ekstra skyttere i matchen</div>
+ <button class="btn-secondary" onclick="openModal('modal-add-shooter')" style="width:100%;margin-bottom:10px;">+ Legg til skytter</button>
  <div id="edit-match-shooters-list"></div>
  </div>
  <button class="btn-primary" onclick="saveEditMatch()">${d("save")}</button>

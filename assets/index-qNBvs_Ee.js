@@ -1018,7 +1018,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-label">Last opp bilde (png, jpg, pdf)</div>
  <input class="field-input" type="file" id="upload-result-file" accept="image/png,image/jpeg,image/jpg,application/pdf">
  </div>
- <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;"><button class="btn-secondary" id="upload-manual-btn" onclick="icOpenManualResult()">Registrer manuelt</button><button class="btn-secondary" id="upload-scan-btn" onclick="uploadAndScanResult(event)">Last opp og skann (OCR)</button><button class="btn-primary" id="upload-ess-btn" onclick="importESSVerify(event)">Importer ESS verify</button></div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button class="btn-secondary" id="upload-manual-btn" onclick="icOpenManualResult()">Registrer manuelt</button><button class="btn-primary" id="upload-ess-btn" onclick="importESSVerify(event)">Importer ESS verify</button></div>
  </div>
  </div>
 </div>

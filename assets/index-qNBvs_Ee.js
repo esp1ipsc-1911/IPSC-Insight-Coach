@@ -1331,8 +1331,10 @@ async function importESSVerify(e){
   const match=$.find(u=>u.id!=null&&u.id.toString()===String(R));
   if(!match){alert("Ingen aktiv match valgt");return;}
   const fileInput=o("upload-result-file");
-  if(!fileInput||!fileInput.files||fileInput.files.length===0){alert("Velg en fil (PDF, PNG eller JPG) f\u00f8r du importerer");return;}
+  if(!fileInput||!fileInput.files||fileInput.files.length===0){alert("Velg en fil (PNG eller JPG) f\u00f8r du importerer");return;}
   const file=fileInput.files[0];
+  const mtype=file.type||"image/jpeg";
+  if(!mtype.startsWith("image/")){alert("Kun PNG og JPG st\u00f8ttes. Last opp et skjermbilde av ESS verify-eposten.");return;}
   const btn=e&&e.currentTarget?e.currentTarget:o("upload-ess-btn");
   const origText=btn?btn.textContent:"Importer ESS verify";
   if(btn){btn.textContent="Leser...";btn.disabled=true;}
@@ -1343,27 +1345,15 @@ async function importESSVerify(e){
       fr.onload=ev=>res(ev.target.result.split(",")[1]);
       fr.readAsDataURL(file);
     });
-    const mtype=file.type||"application/pdf";
-    const isImg=mtype.startsWith("image/");
-    const mediaType=isImg?mtype:"application/pdf";
-    const msgContent=isImg
-      ?[{type:"image",source:{type:"base64",media_type:mediaType,data:b64}},{type:"text",text:"This is an IPSC ESS verify email/document. Extract ONLY these fields and return as JSON with no other text: {stageNumber, a, c, d, miss, ns, proc, time, hitFactor, division, powerFactor}. stageNumber is an integer from \"Stage X\". time and hitFactor are decimals. a/c/d/miss/ns/proc are integers. division is Classic/Standard/Open/Production etc. powerFactor is Minor or Major."}]
-      :[{type:"document",source:{type:"base64",media_type:"application/pdf",data:b64}},{type:"text",text:"This is an IPSC ESS verify email/document. Extract ONLY these fields and return as JSON with no other text: {stageNumber, a, c, d, miss, ns, proc, time, hitFactor, division, powerFactor}. stageNumber is an integer from \"Stage X\". time and hitFactor are decimals. a/c/d/miss/ns/proc are integers. division is Classic/Standard/Open/Production etc. powerFactor is Minor or Major."}];
-    const resp=await fetch("https://api.anthropic.com/v1/messages",{
+    const resp=await fetch("https://parseessverify-w2sou35ibq-uc.a.run.app",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",
-        max_tokens:1000,
-        messages:[{role:"user",content:msgContent}]
-      })
+      body:JSON.stringify({base64:b64,mediaType:mtype})
     });
-    const data=await resp.json();
-    const rawText=(data.content||[]).map(x=>x.text||"").join("").trim();
-    const clean=rawText.replace(/```json|```/g,"").trim();
-    let parsed;
-    try{parsed=JSON.parse(clean);}
-    catch(err){throw new Error("Kunne ikke tolke svar fra Claude: "+rawText.slice(0,200));}
+    if(!resp.ok){const errText=await resp.text();throw new Error("Serverfeil: "+errText);}
+    const result=await resp.json();
+    if(!result.success||!result.data){throw new Error(result.error||"Ingen data mottatt fra server");}
+    const parsed=result.data;
     const stageNum=parseInt(parsed.stageNumber||parsed.stage||0);
     const pTime=parseFloat(parsed.time||0);
     const pA=parseInt(parsed.a||0);
@@ -1373,7 +1363,7 @@ async function importESSVerify(e){
     const pNS=parseInt(parsed.ns||0);
     const pProc=parseInt(parsed.proc||0);
     const pPF=(parsed.powerFactor||parsed.factor||"minor").toLowerCase();
-    if(!stageNum||pTime<=0){throw new Error("Fant ikke gyldig stage-nummer eller tid i dokumentet");}
+    if(!stageNum||pTime<=0){throw new Error("Fant ikke gyldig stage-nummer eller tid i bildet");}
     const stageDef=icStageDefs(match).find(s=>Number(s.number)===stageNum);
     if(!stageDef){
       const stageNames=icStageDefs(match).map(s=>"Stage "+s.number).join(", ");
@@ -1381,7 +1371,6 @@ async function importESSVerify(e){
     }
     const pts=icScoreFromHits(pPF,pA,pC,pD,pMiss,pNS,pProc);
     const hf=pTime>0?pts/pTime:0;
-    // Vis bekreftelsesmodal med verdiene
     icSetResultDialogMode("ocr");
     o("ocr-time").value=pTime;
     o("ocr-a").value=pA;
@@ -1393,11 +1382,10 @@ async function importESSVerify(e){
     icRecalcPoints("ocr");
     Me=stageNum;
     icUploadShooterSel=icCurrentShooterId();
-    // Oppdater confirm-tittel
     const ct=o("ocr-confirm-title");
     if(ct)ct.textContent="Bekreft ESS verify - Stage "+stageNum;
     const cd=o("ocr-confirm-desc");
-    if(cd)cd.textContent="Kontroller verdiene hentet fra ESS verify. Divisjon: "+(parsed.division||"")+" · PF: "+(parsed.powerFactor||"")+" · HF: "+hf.toFixed(4);
+    if(cd)cd.textContent="Kontroller verdiene hentet fra ESS verify. Divisjon: "+(parsed.division||"")+" \u00b7 PF: "+(parsed.powerFactor||"")+" \u00b7 HF: "+hf.toFixed(4);
     G("modal-upload-result");
     ie("modal-ocr-confirm");
   }catch(err){

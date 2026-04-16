@@ -79,10 +79,12 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </p>
 
  <h3>9. Kontaktinformasjon</h3>
- <p>
+<p>
  Har du spørsmål om personvern eller ønsker å utøve dine rettigheter, kan du kontakte oss på:<br>
- <strong>E-post:</strong> [DIN KONTAKT E-POST HER]
- </p>
+ <a href="mailto:post@insight-dynamics-shooting.org">
+   <strong>post@insight-dynamics-shooting.org</strong>
+ </a>
+</p>
 
  <h3>10. Endringer i personvernerklæringen</h3>
  <p>

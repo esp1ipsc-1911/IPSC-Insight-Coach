@@ -415,8 +415,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  max-width: 380px;
  }
  }
- 
-    .match-row-icon.is-active { background: #22c55e !important; }</style>
+ </style>
 
  <div class="ipsc-login-page">
  <div class="ipsc-login-shell">

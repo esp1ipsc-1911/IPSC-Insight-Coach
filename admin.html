@@ -811,31 +811,24 @@
         <div class="form-group"><label class="form-label">Short HF</label><input id="shooterShortHF" class="form-input" type="number" step="0.0001" placeholder="5.6062" /></div>
         <div class="form-group"><label class="form-label">Medium HF</label><input id="shooterMediumHF" class="form-input" type="number" step="0.0001" placeholder="6.8997" /></div>
         <div class="form-group"><label class="form-label">Long HF</label><input id="shooterLongHF" class="form-input" type="number" step="0.0001" placeholder="7.1971" /></div>
-        <div style="margin:16px 0 8px;font-size:13px;font-weight:700;color:var(--accent);">Treffprofil per coursetype</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Legg inn prosentfordeling for A, C, D, M, NS og P. Totalen bør normalt være 100% per coursetype.</div>
-        <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;">
-          <div class="form-group"><label class="form-label">Short A%</label><input id="shooterShortAP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="84.3" /></div>
-          <div class="form-group"><label class="form-label">Short C%</label><input id="shooterShortCP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="12.0" /></div>
-          <div class="form-group"><label class="form-label">Short D%</label><input id="shooterShortDP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="2.8" /></div>
-          <div class="form-group"><label class="form-label">Short M%</label><input id="shooterShortMP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="0.9" /></div>
-          <div class="form-group"><label class="form-label">Short NS%</label><input id="shooterShortNSP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="0.0" /></div>
-          <div class="form-group"><label class="form-label">Short P%</label><input id="shooterShortPP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="0.0" /></div>
+        <div class="form-group"><label class="form-label">Short snitt tid/skudd</label><input id="shooterShortSplit" class="form-input" type="number" step="0.001" placeholder="0.280" /></div>
+        <div class="form-group"><label class="form-label">Medium snitt tid/skudd</label><input id="shooterMediumSplit" class="form-input" type="number" step="0.001" placeholder="0.320" /></div>
+        <div class="form-group"><label class="form-label">Long snitt tid/skudd</label><input id="shooterLongSplit" class="form-input" type="number" step="0.001" placeholder="0.350" /></div>
+        <div style="margin:16px 0 8px;font-size:13px;font-weight:700;color:var(--accent);">Treffbilde per coursetype</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="form-group"><label class="form-label">Short A%</label><input id="shooterShortAP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="85" /></div>
+          <div class="form-group"><label class="form-label">Short C%</label><input id="shooterShortCP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="10" /></div>
+          <div class="form-group"><label class="form-label">Short D%</label><input id="shooterShortDP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="5" /></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;">
-          <div class="form-group"><label class="form-label">Medium A%</label><input id="shooterMediumAP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="77.6" /></div>
-          <div class="form-group"><label class="form-label">Medium C%</label><input id="shooterMediumCP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="16.7" /></div>
-          <div class="form-group"><label class="form-label">Medium D%</label><input id="shooterMediumDP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="1.8" /></div>
-          <div class="form-group"><label class="form-label">Medium M%</label><input id="shooterMediumMP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="1.8" /></div>
-          <div class="form-group"><label class="form-label">Medium NS%</label><input id="shooterMediumNSP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="0.0" /></div>
-          <div class="form-group"><label class="form-label">Medium P%</label><input id="shooterMediumPP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="0.0" /></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="form-group"><label class="form-label">Medium A%</label><input id="shooterMediumAP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="80" /></div>
+          <div class="form-group"><label class="form-label">Medium C%</label><input id="shooterMediumCP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="13" /></div>
+          <div class="form-group"><label class="form-label">Medium D%</label><input id="shooterMediumDP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="7" /></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;">
-          <div class="form-group"><label class="form-label">Long A%</label><input id="shooterLongAP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="75.0" /></div>
-          <div class="form-group"><label class="form-label">Long C%</label><input id="shooterLongCP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="17.0" /></div>
-          <div class="form-group"><label class="form-label">Long D%</label><input id="shooterLongDP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="8.0" /></div>
-          <div class="form-group"><label class="form-label">Long M%</label><input id="shooterLongMP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="0.0" /></div>
-          <div class="form-group"><label class="form-label">Long NS%</label><input id="shooterLongNSP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="0.0" /></div>
-          <div class="form-group"><label class="form-label">Long P%</label><input id="shooterLongPP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="0.0" /></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="form-group"><label class="form-label">Long A%</label><input id="shooterLongAP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="75" /></div>
+          <div class="form-group"><label class="form-label">Long C%</label><input id="shooterLongCP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="17" /></div>
+          <div class="form-group"><label class="form-label">Long D%</label><input id="shooterLongDP" class="form-input" type="number" step="0.1" min="0" max="100" placeholder="8" /></div>
         </div>
         <div class="form-group">
           <label class="form-label">Benchmark-profil</label>
@@ -1383,9 +1376,9 @@
             <td data-label="PF">${escapeHtml(shooter.powerFactor || '—')}</td>
             <td data-label="Draw">${formatNumber(shooter.drawTime, 2)}</td>
             <td data-label="Reload">${formatNumber(shooter.reloadTime, 2)}</td>
-            <td data-label="Short HF"><div>${formatNumber(shooter.shortHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.shortAP != null ? 'A:'+shooter.shortAP : ''}${shooter.shortCP != null ? ' C:'+shooter.shortCP : ''}${shooter.shortDP != null ? ' D:'+shooter.shortDP : ''}${shooter.shortMP != null ? ' M:'+shooter.shortMP : ''}${shooter.shortNSP != null ? ' NS:'+shooter.shortNSP : ''}${shooter.shortPP != null ? ' P:'+shooter.shortPP : ''}</div></td>
-            <td data-label="Medium HF"><div>${formatNumber(shooter.mediumHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.mediumAP != null ? 'A:'+shooter.mediumAP : ''}${shooter.mediumCP != null ? ' C:'+shooter.mediumCP : ''}${shooter.mediumDP != null ? ' D:'+shooter.mediumDP : ''}${shooter.mediumMP != null ? ' M:'+shooter.mediumMP : ''}${shooter.mediumNSP != null ? ' NS:'+shooter.mediumNSP : ''}${shooter.mediumPP != null ? ' P:'+shooter.mediumPP : ''}</div></td>
-            <td data-label="Long HF"><div>${formatNumber(shooter.longHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.longAP != null ? 'A:'+shooter.longAP : ''}${shooter.longCP != null ? ' C:'+shooter.longCP : ''}${shooter.longDP != null ? ' D:'+shooter.longDP : ''}${shooter.longMP != null ? ' M:'+shooter.longMP : ''}${shooter.longNSP != null ? ' NS:'+shooter.longNSP : ''}${shooter.longPP != null ? ' P:'+shooter.longPP : ''}</div></td>
+            <td data-label="Short HF"><div>${formatNumber(shooter.shortHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.shortSplit != null ? 'Split:'+formatNumber(shooter.shortSplit, 3) : ''}${shooter.shortAP != null ? ' · A:'+shooter.shortAP : ''}${shooter.shortCP != null ? ' C:'+shooter.shortCP : ''}${shooter.shortDP != null ? ' D:'+shooter.shortDP : ''}</div></td>
+            <td data-label="Medium HF"><div>${formatNumber(shooter.mediumHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.mediumSplit != null ? 'Split:'+formatNumber(shooter.mediumSplit, 3) : ''}${shooter.mediumAP != null ? ' · A:'+shooter.mediumAP : ''}${shooter.mediumCP != null ? ' C:'+shooter.mediumCP : ''}${shooter.mediumDP != null ? ' D:'+shooter.mediumDP : ''}</div></td>
+            <td data-label="Long HF"><div>${formatNumber(shooter.longHF, 4)}</div><div style="font-size:11px;color:#9ca3af;margin-top:3px;">${shooter.longSplit != null ? 'Split:'+formatNumber(shooter.longSplit, 3) : ''}${shooter.longAP != null ? ' · A:'+shooter.longAP : ''}${shooter.longCP != null ? ' C:'+shooter.longCP : ''}${shooter.longDP != null ? ' D:'+shooter.longDP : ''}</div></td>
             <td data-label="Status"><span class="badge badge-benchmark">${shooter.isBenchmark ? 'Benchmark' : 'Profil'}</span></td>
             <td data-label="Handlinger">
               <div class="action-btns">
@@ -1415,24 +1408,18 @@
       $('shooterShortHF').value = '';
       $('shooterMediumHF').value = '';
       $('shooterLongHF').value = '';
+      $('shooterShortSplit').value = '';
+      $('shooterMediumSplit').value = '';
+      $('shooterLongSplit').value = '';
       $('shooterShortAP').value = '';
       $('shooterShortCP').value = '';
       $('shooterShortDP').value = '';
-      $('shooterShortMP').value = '';
-      $('shooterShortNSP').value = '';
-      $('shooterShortPP').value = '';
       $('shooterMediumAP').value = '';
       $('shooterMediumCP').value = '';
       $('shooterMediumDP').value = '';
-      $('shooterMediumMP').value = '';
-      $('shooterMediumNSP').value = '';
-      $('shooterMediumPP').value = '';
       $('shooterLongAP').value = '';
       $('shooterLongCP').value = '';
       $('shooterLongDP').value = '';
-      $('shooterLongMP').value = '';
-      $('shooterLongNSP').value = '';
-      $('shooterLongPP').value = '';
       $('shooterBenchmark').value = 'true';
       $('shooterModal').classList.add('open');
     };
@@ -1451,24 +1438,18 @@
         shortHF: parseOptionalNumber($('shooterShortHF').value),
         mediumHF: parseOptionalNumber($('shooterMediumHF').value),
         longHF: parseOptionalNumber($('shooterLongHF').value),
+        shortSplit: parseOptionalNumber($('shooterShortSplit').value),
+        mediumSplit: parseOptionalNumber($('shooterMediumSplit').value),
+        longSplit: parseOptionalNumber($('shooterLongSplit').value),
         shortAP: parseOptionalNumber($('shooterShortAP').value),
         shortCP: parseOptionalNumber($('shooterShortCP').value),
         shortDP: parseOptionalNumber($('shooterShortDP').value),
-        shortMP: parseOptionalNumber($('shooterShortMP').value),
-        shortNSP: parseOptionalNumber($('shooterShortNSP').value),
-        shortPP: parseOptionalNumber($('shooterShortPP').value),
         mediumAP: parseOptionalNumber($('shooterMediumAP').value),
         mediumCP: parseOptionalNumber($('shooterMediumCP').value),
         mediumDP: parseOptionalNumber($('shooterMediumDP').value),
-        mediumMP: parseOptionalNumber($('shooterMediumMP').value),
-        mediumNSP: parseOptionalNumber($('shooterMediumNSP').value),
-        mediumPP: parseOptionalNumber($('shooterMediumPP').value),
         longAP: parseOptionalNumber($('shooterLongAP').value),
         longCP: parseOptionalNumber($('shooterLongCP').value),
         longDP: parseOptionalNumber($('shooterLongDP').value),
-        longMP: parseOptionalNumber($('shooterLongMP').value),
-        longNSP: parseOptionalNumber($('shooterLongNSP').value),
-        longPP: parseOptionalNumber($('shooterLongPP').value),
         isBenchmark: $('shooterBenchmark').value === 'true'
       };
 
@@ -1484,30 +1465,13 @@
         showError($('shooterError'), 'Short HF, Medium HF og Long HF må fylles ut');
         return;
       }
+      if (payload.shortSplit == null || payload.mediumSplit == null || payload.longSplit == null) {
+        showError($('shooterError'), 'Snitt tid pr. skudd for Short, Medium og Long må fylles ut');
+        return;
+      }
       if (payload.drawTime == null || payload.reloadTime == null) {
         showError($('shooterError'), 'Draw time og Reload time må fylles ut');
         return;
-      }
-
-      const hitProfileTotals = [
-        ['Short', payload.shortAP, payload.shortCP, payload.shortDP, payload.shortMP, payload.shortNSP, payload.shortPP],
-        ['Medium', payload.mediumAP, payload.mediumCP, payload.mediumDP, payload.mediumMP, payload.mediumNSP, payload.mediumPP],
-        ['Long', payload.longAP, payload.longCP, payload.longDP, payload.longMP, payload.longNSP, payload.longPP]
-      ];
-
-      for (const [label, a, c, d, m, ns, p] of hitProfileTotals) {
-        const values = [a, c, d, m, ns, p];
-        const hasAny = values.some(v => v != null);
-        if (!hasAny) continue;
-        if (values.some(v => v == null)) {
-          showError($('shooterError'), `${label}: fyll ut alle seks feltene A/C/D/M/NS/P, eller la alle stå tomme.`);
-          return;
-        }
-        const sum = values.reduce((acc, v) => acc + Number(v || 0), 0);
-        if (Math.abs(sum - 100) > 0.2) {
-          showError($('shooterError'), `${label}: A/C/D/M/NS/P må summere til 100%. Nå er summen ${sum.toFixed(1)}%.`);
-          return;
-        }
       }
 
       try {
@@ -1536,24 +1500,18 @@
       $('shooterShortHF').value = shooter.shortHF ?? '';
       $('shooterMediumHF').value = shooter.mediumHF ?? '';
       $('shooterLongHF').value = shooter.longHF ?? '';
+      $('shooterShortSplit').value = shooter.shortSplit ?? '';
+      $('shooterMediumSplit').value = shooter.mediumSplit ?? '';
+      $('shooterLongSplit').value = shooter.longSplit ?? '';
       $('shooterShortAP').value = shooter.shortAP ?? '';
       $('shooterShortCP').value = shooter.shortCP ?? '';
       $('shooterShortDP').value = shooter.shortDP ?? '';
-      $('shooterShortMP').value = shooter.shortMP ?? '';
-      $('shooterShortNSP').value = shooter.shortNSP ?? '';
-      $('shooterShortPP').value = shooter.shortPP ?? '';
       $('shooterMediumAP').value = shooter.mediumAP ?? '';
       $('shooterMediumCP').value = shooter.mediumCP ?? '';
       $('shooterMediumDP').value = shooter.mediumDP ?? '';
-      $('shooterMediumMP').value = shooter.mediumMP ?? '';
-      $('shooterMediumNSP').value = shooter.mediumNSP ?? '';
-      $('shooterMediumPP').value = shooter.mediumPP ?? '';
       $('shooterLongAP').value = shooter.longAP ?? '';
       $('shooterLongCP').value = shooter.longCP ?? '';
       $('shooterLongDP').value = shooter.longDP ?? '';
-      $('shooterLongMP').value = shooter.longMP ?? '';
-      $('shooterLongNSP').value = shooter.longNSP ?? '';
-      $('shooterLongPP').value = shooter.longPP ?? '';
       $('shooterBenchmark').value = String(!!shooter.isBenchmark);
       $('shooterModal').classList.add('open');
     };

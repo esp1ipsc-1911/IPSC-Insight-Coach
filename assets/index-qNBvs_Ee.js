@@ -803,9 +803,6 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-label">${d("planned_stages")}</div>
  <input class="field-input" type="number" id="new-match-stages" value="6">
  </div>
- <div style="margin-top:10px;">
- <button class="btn-primary" onclick="openCreateStageFromNewMatch()" style="width:100%;">Legg til stage</button>
- </div>
  <div class="field-group">
  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
  <input type="checkbox" id="new-match-searchable" checked style="width:18px;height:18px;">

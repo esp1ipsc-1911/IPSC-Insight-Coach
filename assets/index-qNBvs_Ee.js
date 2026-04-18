@@ -809,7 +809,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-group">
  <div class="field-label">Inviter brukere (valgfritt)</div>
  <div style="display:flex;gap:8px;margin-bottom:10px;">
- <input class="field-input" type="text" id="new-match-user-search" placeholder="Søk etter navn eller e-post..." style="flex:1;">
+ <input class="field-input" type="text" id="new-match-user-search" oninput="searchUsersNewMatch()" placeholder="Søk etter navn eller e-post..." style="flex:1;">
  <button onclick="searchUsersNewMatch()" style="width:80px;padding:12px;background:#e8b84b;color:#1a202c;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Søk</button>
  </div>
  <div id="new-match-search-results"></div>
@@ -881,7 +881,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-group">
  <div class="field-label">Inviter brukere (valgfritt)</div>
  <div style="display:flex;gap:8px;margin-bottom:10px;">
- <input class="field-input" type="text" id="edit-match-user-search" placeholder="Søk etter navn eller e-post..." style="flex:1;">
+ <input class="field-input" type="text" id="edit-match-user-search" oninput="searchUsersEditMatch()" placeholder="Søk etter navn eller e-post..." style="flex:1;">
  <button onclick="searchUsersEditMatch()" style="width:80px;padding:12px;background:#e8b84b;color:#1a202c;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Søk</button>
  </div>
  <div id="edit-match-search-results"></div>
@@ -1224,7 +1224,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-group">
  <div class="field-label">Søk etter navn eller e-post</div>
  <div style="display:flex;gap:8px;">
- <input class="field-input" type="text" id="user-search-input" placeholder="Søk..." style="flex:1;">
+ <input class="field-input" type="text" id="user-search-input" placeholder="Søk..." style="flex:1;" oninput="searchUsers()">
  <button onclick="searchUsers()" style="width:80px;padding:12px;background:#e8b84b;color:#1a202c;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Søk</button>
  </div>
  </div>

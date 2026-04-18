@@ -843,7 +843,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </div>
  <div class="field-group">
  <div class="field-label">${d("date")}</div>
- <input class="field-input" type="date" id="edit-match-date">
+ <input class="field-input" type="date" id="edit-match-date" style="width:100%;box-sizing:border-box;">
  </div>
  <div class="field-group">
  <div class="field-label">${d("location")}</div>

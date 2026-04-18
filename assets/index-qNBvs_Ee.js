@@ -849,10 +849,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <div class="field-label">${d("location")}</div>
  <input class="field-input" type="text" id="edit-match-location" placeholder="Bergen">
  </div>
- <div class="field-group">
- <div class="field-label">${d("planned_stages")}</div>
- <input class="field-input" type="number" id="edit-match-stages">
- </div>
+ <input type="hidden" id="edit-match-stages" value="0">
  <div style="margin-top:10px;">
  <button class="btn-primary" onclick="openCreateStageFromEdit()" style="width:100%;">Legg til stage</button>
  </div>

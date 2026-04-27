@@ -1556,12 +1556,12 @@ body {
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid var(--border);
-  border-left: 3px solid transparent;
+  border-left: 6px solid transparent;
   transition: border-color 0.15s;
 }
 
 .match-row.is-active {
-  border-left: 3px solid #4caf7d;
+  border-left: 6px solid #4caf7d;
 }
 
 .match-row:last-child {
@@ -1580,7 +1580,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 0 0 12px 53px;
+  padding: 0 0 12px 0;
 }
 
 .mrb-btn {

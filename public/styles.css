@@ -1571,3 +1571,36 @@ body {
 ::-webkit-scrollbar {
   width: 0;
 }
+
+/* ── Global loading spinner ── */
+#global-spinner {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.55);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+}
+#global-spinner.active {
+  display: flex;
+}
+.spinner-ring {
+  width: 46px;
+  height: 46px;
+  border: 4px solid rgba(232, 184, 75, 0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+.spinner-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

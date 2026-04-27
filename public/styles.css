@@ -1607,3 +1607,7 @@ body {
   background: #ef4444;
   color: white;
 }
+
+.match-row-name.is-active {
+  color: #4caf7d;
+}

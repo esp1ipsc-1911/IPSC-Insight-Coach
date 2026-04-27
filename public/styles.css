@@ -790,18 +790,7 @@ body {
    MATCH ROW
    ════════════════════════════════════════════════════════════════════════════ */
 
-.match-row {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
-
-.match-row:last-child {
-  border-bottom: none;
-}
+/* match-row replaced - see bottom of file */
 
 .match-row-icon {
   width: 40px;
@@ -1562,16 +1551,59 @@ body {
   width: 0;
 }
 
-/* ── Match row actions (knapper for aktiv match) ── */
+/* ── Match row redesign ── */
 .match-row {
-  flex-wrap: wrap;
-  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  transition: border-color 0.15s;
 }
 
-.match-row-actions {
-  width: 100%;
+.match-row.is-active {
+  border-left: 3px solid #4caf7d;
+}
+
+.match-row:last-child {
+  border-bottom: none;
+}
+
+.match-row-top {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 0 10px 0;
+  cursor: pointer;
+}
+
+.match-row-btns {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding-top: 10px;
+  padding: 0 0 12px 53px;
+}
+
+.mrb-btn {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mrb-gold {
+  background: #e8b84b;
+  color: #1a202c;
+}
+
+.mrb-dark {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,.12);
+  color: var(--text);
+}
+
+.mrb-red {
+  background: #ef4444;
+  color: white;
 }

@@ -820,11 +820,14 @@ export async function renderApp(container) {
 <div class="modal-overlay" id="modal-add" onclick="closeModalOutside(event,'modal-add')">
   <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <div class="modal-title">${t('add_result')}</div>
+      <div>
+        <div class="modal-title">${t('add_result')}</div>
+        <div id="modal-add-shooter-name" style="font-size:13px;color:var(--accent);font-weight:600;margin-top:2px;"></div>
+      </div>
       <div class="modal-close" onclick="closeModal('modal-add')">✕</div>
     </div>
     <div class="modal-body">
-      <div class="field-group"><div class="field-label">Skytter</div><select class="field-select" id="new-result-shooter" onchange="updateManualPoints()"></select></div>
+      <div class="field-group"><div class="field-label">Skytter</div><select class="field-select" id="new-result-shooter" onchange="updateManualPoints();updateModalShooterName()"></select></div>
       <div class="field-group"><div class="field-label">Stage</div><select class="field-select" id="new-result-stage"></select></div>
       <div class="field-group"><div class="field-label">Time (s)</div><input class="field-input" type="number" step="0.01" id="new-result-time"></div>
       <div class="field-group"><div class="field-label">A</div><input class="field-input" type="number" id="new-result-a" value="0" oninput="updateManualPoints()"></div>
@@ -961,6 +964,7 @@ function setupApp() {
   window.openAddStage = openAddStageHandler;
   window.saveStage = saveStageHandler;
   window.updateManualPoints = updateManualPoints;
+  window.updateModalShooterName = updateModalShooterName;
   window.handleLogout = handleLogoutHandler;
   window.openEditMatch = openEditMatchHandler;
   window.saveEditMatch = saveEditMatchHandler;
@@ -1440,6 +1444,20 @@ function openAddResultHandler() {
   ['new-result-time','new-result-a','new-result-c','new-result-d','new-result-miss','new-result-ns','new-result-proc'].forEach(id => { const field = el(id); if (field) field.value = field.id === 'new-result-time' ? '' : 0; });
   updateManualPoints();
   openModal('modal-add');
+  updateModalShooterName();
+}
+
+function updateModalShooterName() {
+  const nameEl = document.getElementById('modal-add-shooter-name');
+  if (!nameEl) return;
+  const match = matches.find(m => sameMatchId(m.id, activeMatchId));
+  if (!match) { nameEl.textContent = ''; return; }
+  const shooterId = gv('new-result-shooter');
+  const shooter = shooterId
+    ? match.shooters?.find(s => s.id === shooterId)
+    : getCurrentShooter(match);
+  const name = shooter ? [shooter.firstName||'', shooter.lastName||''].join(' ').trim() : '';
+  nameEl.textContent = name;
 }
 
 function openAddStageHandler() {

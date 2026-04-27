@@ -667,7 +667,6 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="nav-avatar" id="nav-av-results" onclick="switchTab('screen-profile')">${le()}</div>
  </div>
  <div class="scroll-content" id="results-content"></div>
- <button class="fab" onclick="openModal('modal-add-shooter')">+</button>
  <div class="tab-bar">
  <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon">&#127968;</div><span class="lang-home">${d("home")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>

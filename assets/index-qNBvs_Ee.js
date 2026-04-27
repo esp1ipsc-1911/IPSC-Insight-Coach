@@ -571,7 +571,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="tab-item" onclick="switchTab('screen-matches')" style="position:relative;"><div class="tab-icon">&#127942;</div><div id="tab-invitation-badge" style="display:none;position:absolute;top:0;right:0;background:#ef4444;color:white;border-radius:50%;width:18px;height:18px;font-size:11px;font-weight:bold;align-items:center;justify-content:center;"></div><span class="lang-matches">${d("matches")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">&#127936;</div><span>Lag</span></div>
+ <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">👕</div><span>Lag</span></div>
  <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
  </div>
 </div>
@@ -606,7 +606,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="tab-item active" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">&#127936;</div><span>Lag</span></div>
+ <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">👕</div><span>Lag</span></div>
  <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
  </div>
 </div>
@@ -647,7 +647,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
  <div class="tab-item active" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">&#127936;</div><span>Lag</span></div>
+ <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">👕</div><span>Lag</span></div>
  <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
  </div>
 </div>
@@ -673,7 +673,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
  <div class="tab-item active" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">&#127936;</div><span>Lag</span></div>
+ <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">👕</div><span>Lag</span></div>
  <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
  </div>
 </div>
@@ -748,7 +748,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">&#127936;</div><span>Lag</span></div>
+ <div class="tab-item" onclick="switchTab('screen-teams')"><div class="tab-icon">👕</div><span>Lag</span></div>
  <div class="tab-item active" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
  </div>
 </div>
@@ -778,7 +778,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="tab-item" onclick="switchTab('screen-matches')"><div class="tab-icon">&#127942;</div><span class="lang-matches">${d("matches")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-prognose')"><div class="tab-icon">&#128200;</div><span class="lang-prognosis">${d("prognosis")}</span></div>
  <div class="tab-item" onclick="switchTab('screen-results')"><div class="tab-icon">&#127970;</div><span class="lang-results">${d("results")}</span></div>
- <div class="tab-item active" onclick="switchTab('screen-teams')"><div class="tab-icon">&#127936;</div><span>Lag</span></div>
+ <div class="tab-item active" onclick="switchTab('screen-teams')"><div class="tab-icon">👕</div><span>Lag</span></div>
  <div class="tab-item" onclick="switchTab('screen-profile')"><div class="tab-icon">&#128100;</div><span class="lang-profile">${d("profile")}</span></div>
  </div>
 </div>

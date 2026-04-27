@@ -1555,18 +1555,14 @@ body {
 .match-row {
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid var(--border);
-  border-left: none;
-  transition: border-color 0.15s;
+  border-top: 1px solid var(--accent);
+  border-bottom: 1px solid var(--accent);
+  margin-bottom: -1px;
 }
 
-.match-row.is-active {
-  border-left: none;
-}
 
-.match-row:last-child {
-  border-bottom: none;
-}
+
+
 
 .match-row-top {
   display: flex;

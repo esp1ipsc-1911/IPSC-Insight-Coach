@@ -1556,12 +1556,12 @@ body {
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid var(--border);
-  border-left: 10px solid transparent;
+  border-left: none;
   transition: border-color 0.15s;
 }
 
 .match-row.is-active {
-  border-left: 10px solid #4caf7d;
+  border-left: none;
 }
 
 .match-row:last-child {

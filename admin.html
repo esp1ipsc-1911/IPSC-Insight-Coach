@@ -1648,7 +1648,12 @@
     }
 
     function generateMatchId() {
-      return String(Date.now()).slice(-6) + Math.floor(Math.random() * 100);
+      let max = 0;
+      for (const m of allMatchesCache) {
+        const num = parseInt(String(m.id), 10);
+        if (Number.isFinite(num) && num > max) max = num;
+      }
+      return String(max + 1);
     }
 
     // ── Opprett match ──

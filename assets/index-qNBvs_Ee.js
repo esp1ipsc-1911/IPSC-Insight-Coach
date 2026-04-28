@@ -1218,7 +1218,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  </div>
  </div>
  <div class="field-group">
- 
+ </div>
  <button class="btn-primary" onclick="saveStage()">${d("save")}</button>
  </div>
  </div>

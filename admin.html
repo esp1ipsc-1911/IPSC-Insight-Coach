@@ -696,6 +696,7 @@
         </div>
 
         <div class="actions">
+          <button id="createMatchBtn" class="btn btn-primary">+ Opprett match</button>
           <button id="refreshMatchesBtn" class="btn btn-secondary">↻ Oppdater</button>
         </div>
 
@@ -900,6 +901,65 @@
 
       <div class="form-actions">
         <button id="closeMatchModalBtn" class="btn btn-secondary">Lukk</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Opprett match modal -->
+  <div id="createMatchModal" class="modal">
+    <div class="modal-content" style="max-width:680px;">
+      <div class="modal-title">Opprett ny match</div>
+      <div id="createMatchError" class="error" style="display:none;"></div>
+      <div id="createMatchSuccess" class="success" style="display:none;"></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Navn *</label><input id="cmName" class="form-input" type="text" placeholder="Kjevik Open 2026" /></div>
+        <div class="form-group"><label class="form-label">Dato *</label><input id="cmDate" class="form-input" type="text" placeholder="2026-06-15" /></div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="cmStatus" class="form-select">
+            <option value="active">active</option>
+            <option value="draft">draft</option>
+            <option value="finished">finished</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Lokasjon</label><input id="cmLocation" class="form-input" type="text" placeholder="Kjevik skytebane" /></div>
+        <div class="form-group"><label class="form-label">Divisjon</label><input id="cmDivision" class="form-input" type="text" placeholder="Classic / Optics / Open" /></div>
+        <div class="form-group"><label class="form-label">Power Factor</label><input id="cmPowerFactor" class="form-input" type="text" placeholder="Minor / Major" /></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Director emails (komma-separert)</label>
+        <input id="cmDirectorEmails" class="form-input" type="text" placeholder="director@domene.no, annen@domene.no" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Eier *</label>
+        <select id="cmOwner" class="form-select"><option value="">— Velg eier —</option></select>
+      </div>
+      <div class="form-actions">
+        <button id="confirmCreateMatchBtn" class="btn btn-primary">Opprett match</button>
+        <button id="cancelCreateMatchBtn" class="btn btn-secondary">Avbryt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kopier match modal -->
+  <div id="copyMatchModal" class="modal">
+    <div class="modal-content" style="max-width:520px;">
+      <div class="modal-title">Kopier match</div>
+      <div id="copyMatchError" class="error" style="display:none;"></div>
+      <div id="copyMatchSuccess" class="success" style="display:none;"></div>
+      <div id="copyMatchInfo" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:18px;font-size:14px;color:var(--muted);">
+        Kopierer: <span id="copyMatchSourceName" style="color:var(--text);font-weight:700;"></span>
+        <div style="margin-top:6px;font-size:12px;">Stages og grunninfo kopieres. Deltakere og resultater følger ikke med.</div>
+      </div>
+      <div class="form-group"><label class="form-label">Nytt navn *</label><input id="copyMatchName" class="form-input" type="text" /></div>
+      <div class="form-group"><label class="form-label">Dato *</label><input id="copyMatchDate" class="form-input" type="text" placeholder="2026-06-15" /></div>
+      <div class="form-group">
+        <label class="form-label">Eier *</label>
+        <select id="copyMatchOwner" class="form-select"><option value="">— Velg eier —</option></select>
+      </div>
+      <div class="form-actions">
+        <button id="confirmCopyMatchBtn" class="btn btn-primary">Opprett kopi</button>
+        <button id="cancelCopyMatchBtn" class="btn btn-secondary">Avbryt</button>
       </div>
     </div>
   </div>
@@ -1560,7 +1620,7 @@
               <td data-label="Eier">${escapeHtml(ownerName)}</td>
               <td data-label="Deltakere">${(match.participants || []).length}</td>
               <td data-label="Stages">${stageCount}</td>
-              <td data-label="Handlinger"><button class="btn btn-sm btn-secondary" onclick="window.openMatchAdmin('${escapeAttr(match.id)}')">Administrer</button> <button class="btn btn-sm btn-danger" onclick="window.deleteMatch('${escapeAttr(match.id)}', '${escapeAttr(match.name || match.id)}')">Slett</button></td>
+              <td data-label="Handlinger"><button class="btn btn-sm btn-secondary" onclick="window.openMatchAdmin('${escapeAttr(match.id)}')">Administrer</button> <button class="btn btn-sm btn-secondary" onclick="window.openCopyMatchModal('${escapeAttr(match.id)}')">Kopier</button> <button class="btn btn-sm btn-danger" onclick="window.deleteMatch('${escapeAttr(match.id)}', '${escapeAttr(match.name || match.id)}')">Slett</button></td>
             </tr>
           `;
         }).join('');
@@ -1572,6 +1632,151 @@
     $('refreshMatchesBtn').onclick = async () => {
       await Promise.all([loadMatches(), loadAllUsers()]);
     };
+
+    function populateOwnerSelect(selectId, selectedUid) {
+      const sel = $(selectId);
+      const users = allUsersCache.slice().sort((a, b) => {
+        const na = `${a.firstName || ''} ${a.lastName || ''}`.trim() || a.email || '';
+        const nb = `${b.firstName || ''} ${b.lastName || ''}`.trim() || b.email || '';
+        return na.localeCompare(nb, 'no');
+      });
+      sel.innerHTML = '<option value="">— Velg eier —</option>' + users.map(u => {
+        const label = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || u.id;
+        const selected = String(u.id) === String(selectedUid) ? ' selected' : '';
+        return `<option value="${escapeHtml(u.id)}"${selected}>${escapeHtml(label)} (${escapeHtml(u.email || u.id)})</option>`;
+      }).join('');
+    }
+
+    function generateMatchId() {
+      return String(Date.now()).slice(-6) + Math.floor(Math.random() * 100);
+    }
+
+    // ── Opprett match ──
+    $('createMatchBtn').onclick = async () => {
+      if (!allUsersCache.length) await loadAllUsers();
+      $('createMatchError').style.display = 'none';
+      $('createMatchSuccess').style.display = 'none';
+      $('cmName').value = '';
+      $('cmDate').value = new Date().toISOString().slice(0, 10);
+      $('cmStatus').value = 'active';
+      $('cmLocation').value = '';
+      $('cmDivision').value = '';
+      $('cmPowerFactor').value = '';
+      $('cmDirectorEmails').value = '';
+      populateOwnerSelect('cmOwner', currentUser?.uid || '');
+      $('createMatchModal').classList.add('open');
+    };
+
+    $('cancelCreateMatchBtn').onclick = () => $('createMatchModal').classList.remove('open');
+
+    $('confirmCreateMatchBtn').onclick = async () => {
+      $('createMatchError').style.display = 'none';
+      const name = $('cmName').value.trim();
+      const date = $('cmDate').value.trim();
+      const ownerId = $('cmOwner').value;
+      if (!name) { showCreateMatchError('Navn er påkrevd'); return; }
+      if (!date) { showCreateMatchError('Dato er påkrevd'); return; }
+      if (!ownerId) { showCreateMatchError('Eier må velges'); return; }
+
+      const matchId = generateMatchId();
+      const directorEmails = $('cmDirectorEmails').value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+      const payload = {
+        name,
+        date,
+        status: $('cmStatus').value,
+        location: $('cmLocation').value.trim(),
+        division: $('cmDivision').value.trim(),
+        powerFactor: $('cmPowerFactor').value.trim(),
+        directorEmails,
+        ownerId,
+        participants: [ownerId],
+        stages: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        await setDoc(doc(db, 'matches', String(matchId)), payload);
+        $('createMatchModal').classList.remove('open');
+        await loadMatches();
+      } catch (error) {
+        showCreateMatchError('Kunne ikke opprette match: ' + error.message);
+      }
+    };
+
+    function showCreateMatchError(msg) {
+      $('createMatchError').textContent = msg;
+      $('createMatchError').style.display = 'block';
+    }
+
+    // ── Kopier match ──
+    let matchToCopyId = null;
+
+    window.openCopyMatchModal = async (matchId) => {
+      if (!allUsersCache.length) await loadAllUsers();
+      const match = allMatchesCache.find(m => String(m.id) === String(matchId));
+      if (!match) { alert('Fant ikke match'); return; }
+      matchToCopyId = matchId;
+      $('copyMatchError').style.display = 'none';
+      $('copyMatchSuccess').style.display = 'none';
+      $('copyMatchSourceName').textContent = match.name || match.id;
+      $('copyMatchName').value = `${match.name || match.id} (kopi)`;
+      $('copyMatchDate').value = new Date().toISOString().slice(0, 10);
+      populateOwnerSelect('copyMatchOwner', match.ownerId || '');
+      $('copyMatchModal').classList.add('open');
+    };
+
+    $('cancelCopyMatchBtn').onclick = () => { $('copyMatchModal').classList.remove('open'); matchToCopyId = null; };
+
+    $('confirmCopyMatchBtn').onclick = async () => {
+      $('copyMatchError').style.display = 'none';
+      const name = $('copyMatchName').value.trim();
+      const date = $('copyMatchDate').value.trim();
+      const ownerId = $('copyMatchOwner').value;
+      if (!name) { showCopyMatchError('Navn er påkrevd'); return; }
+      if (!date) { showCopyMatchError('Dato er påkrevd'); return; }
+      if (!ownerId) { showCopyMatchError('Eier må velges'); return; }
+
+      const source = allMatchesCache.find(m => String(m.id) === String(matchToCopyId));
+      if (!source) { showCopyMatchError('Kilde-match ikke funnet'); return; }
+
+      const newId = generateMatchId();
+      const payload = {
+        name,
+        date,
+        status: 'active',
+        location: source.location || '',
+        division: source.division || '',
+        powerFactor: source.powerFactor || '',
+        directorEmails: source.directorEmails || [],
+        ownerId,
+        participants: [ownerId],
+        stages: (source.stages || []).map(s => ({ ...s })),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        await setDoc(doc(db, 'matches', String(newId)), payload);
+        $('copyMatchModal').classList.remove('open');
+        matchToCopyId = null;
+        await loadMatches();
+      } catch (error) {
+        showCopyMatchError('Kunne ikke kopiere match: ' + error.message);
+      }
+    };
+
+    function showCopyMatchError(msg) {
+      $('copyMatchError').textContent = msg;
+      $('copyMatchError').style.display = 'block';
+    }
+
+    $('createMatchModal').addEventListener('click', (e) => {
+      if (e.target === $('createMatchModal')) $('createMatchModal').classList.remove('open');
+    });
+    $('copyMatchModal').addEventListener('click', (e) => {
+      if (e.target === $('copyMatchModal')) { $('copyMatchModal').classList.remove('open'); matchToCopyId = null; }
+    });
 
     window.deleteMatch = async (matchId, matchName) => {
       if (!confirm(`Er du sikker på at du vil slette matchen "${matchName}"?\n\nDette kan ikke angres.`)) return;

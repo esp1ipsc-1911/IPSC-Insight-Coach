@@ -921,8 +921,6 @@
           </select>
         </div>
         <div class="form-group"><label class="form-label">Lokasjon</label><input id="cmLocation" class="form-input" type="text" placeholder="Kjevik skytebane" /></div>
-        <div class="form-group"><label class="form-label">Divisjon</label><input id="cmDivision" class="form-input" type="text" placeholder="Classic / Optics / Open" /></div>
-        <div class="form-group"><label class="form-label">Power Factor</label><input id="cmPowerFactor" class="form-input" type="text" placeholder="Minor / Major" /></div>
       </div>
       <div class="form-group">
         <label class="form-label">Director emails (komma-separert)</label>
@@ -1688,8 +1686,6 @@
         date,
         status: $('cmStatus').value,
         location: $('cmLocation').value.trim(),
-        division: $('cmDivision').value.trim(),
-        powerFactor: $('cmPowerFactor').value.trim(),
         directorEmails,
         ownerId,
         participants: [ownerId],
@@ -1957,12 +1953,25 @@
       }
     };
 
+    function calcStageAuto(stage) {
+      const shotsPerPaper = parseInt(stage.shotsPerPaper ?? 2, 10) || 2;
+      const paper = parseInt(stage.paperTargets ?? 0, 10) || 0;
+      const poppers = parseInt(stage.poppers ?? 0, 10) || 0;
+      const plates = parseInt(stage.plates ?? 0, 10) || 0;
+      const minRounds = (paper * shotsPerPaper) + poppers + plates;
+      const maxPoints = (paper * 10) + (poppers * 5) + (plates * 5);
+      return { minRounds, maxPoints };
+    }
+
     function renderStages() {
       if (!currentMatchStages.length) {
         $('stageList').innerHTML = '<div class="empty-state" style="padding:24px 0;"><p>Ingen stages lagt inn ennå</p></div>';
         return;
       }
-      $('stageList').innerHTML = currentMatchStages.map((stage, index) => `
+      $('stageList').innerHTML = currentMatchStages.map((stage, index) => {
+        const auto = calcStageAuto(stage);
+        const shotsPerPaper = parseInt(stage.shotsPerPaper ?? 2, 10) || 2;
+        return `
         <div class="stage-card">
           <div class="stage-card-header">
             <div class="stage-card-title">Stage ${index + 1}</div>
@@ -1981,11 +1990,24 @@
           </div>
 
           <div class="split-2">
-            <div class="form-group"><label class="form-label">Min rounds</label><input class="form-input" type="number" value="${escapeHtml(String(stage.minRounds))}" onchange="window.updateStageField(${index}, 'minRounds', this.value)" /></div>
-            <div class="form-group"><label class="form-label">Max points</label><input class="form-input" type="number" value="${escapeHtml(String(stage.maxPoints))}" onchange="window.updateStageField(${index}, 'maxPoints', this.value)" /></div>
+            <div class="form-group">
+              <label class="form-label">Skudd per paper target <span style="color:var(--accent);font-size:11px;">(standard: 2)</span></label>
+              <input class="form-input" type="number" min="1" max="10" value="${shotsPerPaper}" onchange="window.updateStageField(${index}, 'shotsPerPaper', this.value)" />
+            </div>
+            <div style="display:flex;gap:10px;">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Min rounds <span style="color:var(--green);font-size:11px;">auto</span></label>
+                <input class="form-input" type="number" value="${auto.minRounds}" style="color:var(--green);" onchange="window.updateStageField(${index}, 'minRounds', this.value)" />
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Max points <span style="color:var(--green);font-size:11px;">auto</span></label>
+                <input class="form-input" type="number" value="${auto.maxPoints}" style="color:var(--green);" onchange="window.updateStageField(${index}, 'maxPoints', this.value)" />
+              </div>
+            </div>
           </div>
         </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     $('addStageBtn').onclick = () => {
@@ -1995,10 +2017,14 @@
 
     window.updateStageField = (index, field, value) => {
       if (!currentMatchStages[index]) return;
-      if (['number', 'paperTargets', 'poppers', 'plates', 'minRounds', 'maxPoints'].includes(field)) {
+      if (['number', 'paperTargets', 'poppers', 'plates', 'minRounds', 'maxPoints', 'shotsPerPaper'].includes(field)) {
         currentMatchStages[index][field] = parseInt(String(value || '0'), 10) || 0;
       } else {
         currentMatchStages[index][field] = value;
+      }
+      // Re-render if a calc-affecting field changed
+      if (['paperTargets', 'poppers', 'plates', 'shotsPerPaper'].includes(field)) {
+        renderStages();
       }
     };
 
@@ -2031,15 +2057,18 @@
     };
 
     function normalizeStage(stage, index) {
-      return {
+      const s = {
         number: parseInt(stage?.number ?? (index + 1), 10) || (index + 1),
         name: String(stage?.name ?? `Stage ${index + 1}`),
         paperTargets: parseInt(stage?.paperTargets ?? 0, 10) || 0,
         poppers: parseInt(stage?.poppers ?? 0, 10) || 0,
         plates: parseInt(stage?.plates ?? 0, 10) || 0,
-        minRounds: parseInt(stage?.minRounds ?? 0, 10) || 0,
-        maxPoints: parseInt(stage?.maxPoints ?? 0, 10) || 0
+        shotsPerPaper: parseInt(stage?.shotsPerPaper ?? 2, 10) || 2
       };
+      const auto = calcStageAuto(s);
+      s.minRounds = parseInt(stage?.minRounds ?? auto.minRounds, 10) || auto.minRounds;
+      s.maxPoints = parseInt(stage?.maxPoints ?? auto.maxPoints, 10) || auto.maxPoints;
+      return s;
     }
 
     function resolveUserLabel(uid) {

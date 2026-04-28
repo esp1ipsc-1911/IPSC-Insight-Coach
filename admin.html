@@ -866,8 +866,6 @@
           </select>
         </div>
         <div class="form-group"><label class="form-label">Lokasjon</label><input id="matchLocationInput" class="form-input" type="text" /></div>
-        <div class="form-group"><label class="form-label">Divisjon</label><input id="matchDivisionInput" class="form-input" type="text" placeholder="Classic / Optics / Open" /></div>
-        <div class="form-group"><label class="form-label">Power Factor</label><input id="matchPowerFactorInput" class="form-input" type="text" placeholder="Minor / Major" /></div>
       </div>
 
       <div class="form-group">
@@ -893,11 +891,11 @@
       <div id="matchUserSearchResults" style="margin-top:14px;"></div>
 
       <div class="section-title">Stages / scoring-oppsett</div>
-      <div class="form-actions" style="margin-top:0;">
+      <div id="stageList" class="stage-list"></div>
+      <div class="form-actions" style="margin-top:12px;">
         <button id="addStageBtn" class="btn btn-primary">+ Ny stage</button>
         <button id="saveStagesBtn" class="btn btn-secondary">Lagre stages</button>
       </div>
-      <div id="stageList" class="stage-list"></div>
 
       <div class="form-actions">
         <button id="closeMatchModalBtn" class="btn btn-secondary">Lukk</button>
@@ -1809,8 +1807,6 @@
       $('matchDateInput').value = currentMatch.date || '';
       $('matchStatusInput').value = currentMatch.status || 'active';
       $('matchLocationInput').value = currentMatch.location || '';
-      $('matchDivisionInput').value = currentMatch.division || '';
-      $('matchPowerFactorInput').value = currentMatch.powerFactor || '';
       $('matchDirectorEmailsInput').value = Array.isArray(currentMatch.directorEmails) ? currentMatch.directorEmails.join(', ') : '';
       $('matchUserSearch').value = '';
       $('matchUserSearchResults').innerHTML = '';
@@ -1949,8 +1945,6 @@
           date: $('matchDateInput').value.trim(),
           status: $('matchStatusInput').value.trim(),
           location: $('matchLocationInput').value.trim(),
-          division: $('matchDivisionInput').value.trim(),
-          powerFactor: $('matchPowerFactorInput').value.trim(),
           directorEmails,
           updatedAt: new Date().toISOString()
         };

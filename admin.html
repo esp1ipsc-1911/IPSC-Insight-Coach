@@ -866,6 +866,17 @@
           </select>
         </div>
         <div class="form-group"><label class="form-label">Lokasjon</label><input id="matchLocationInput" class="form-input" type="text" /></div>
+        <div class="form-group">
+          <label class="form-label">Nivå</label>
+          <select id="matchLevelInput" class="form-select">
+            <option value="Trening">Trening</option>
+            <option value="Level 1">Level 1</option>
+            <option value="Level 2">Level 2</option>
+            <option value="Level 3">Level 3</option>
+            <option value="Level 4">Level 4</option>
+            <option value="Level 5">Level 5</option>
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
@@ -1803,6 +1814,7 @@
       $('matchDateInput').value = currentMatch.date || '';
       $('matchStatusInput').value = currentMatch.status || 'active';
       $('matchLocationInput').value = currentMatch.location || '';
+      $('matchLevelInput').value = currentMatch.level || 'Trening';
       $('matchDirectorEmailsInput').value = Array.isArray(currentMatch.directorEmails) ? currentMatch.directorEmails.join(', ') : '';
       $('matchUserSearch').value = '';
       $('matchUserSearchResults').innerHTML = '';
@@ -1941,6 +1953,7 @@
           date: $('matchDateInput').value.trim(),
           status: $('matchStatusInput').value.trim(),
           location: $('matchLocationInput').value.trim(),
+          level: $('matchLevelInput').value,
           directorEmails,
           updatedAt: new Date().toISOString()
         };

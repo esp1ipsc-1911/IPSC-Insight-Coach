@@ -1664,7 +1664,7 @@ html+="</div>";return html;}function icSeasonAnalysis(matches){
     html+='<div style="color:var(--text);">'+tip.b+'</div></div>';
   });
   html+='</div></div>';
-  html+='</div></div></div>';
+  html+='</div></div>';
   return html;
 }
 function icTrainingSeasonAnalysis(matches){

@@ -1038,8 +1038,7 @@
             currentUser = user;
             loginSection.style.display = 'none';
             adminContent.style.display = 'block';
-            await Promise.all([loadRoles(), loadAllUsers()]);
-            await Promise.all([loadCodes(), loadReferenceShooters(), loadMatches()]);
+            Promise.all([loadRoles(), loadAllUsers(), loadCodes(), loadReferenceShooters(), loadMatches()]);
           } else {
             alert('Du har ikke admin-tilgang');
             await signOut(auth);

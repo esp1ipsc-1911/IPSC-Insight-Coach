@@ -1333,102 +1333,83 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
   var stageDefs=icStageDefs(i);
   var shooters=(i.shooters||[]);
   if(!stageDefs.length||!shooters.length)return;
-  // build cumulative data per stage
   var stageNums=stageDefs.map(function(sd){return String(sd.number);});
-  // filter to only stages with at least one result (respect liveShowAll filter)
   var activeNums=liveShowAll?stageNums:icCommonStageNumbers(i);
   if(!activeNums||!activeNums.length)activeNums=stageNums;
-  // only show stages that have been shot by at least one shooter
+  // only stages shot by at least one shooter
   var shotNums=stageNums.filter(function(sn){
     return shooters.some(function(sh){
       return (sh.stages||[]).some(function(sr){return String(sr.num||sr.number)===sn&&sr.time&&sr.pts>=0;});
     });
   });
   if(!shotNums.length)return;
-  // for each shooter build cumulative stage pts up to each shot stage
+
   var colors=['#e8b84b','#4caf7d','#60a5fa','#f87171','#a78bfa','#fb923c','#34d399','#f472b6'];
+
+  // Build per-shooter cumulative STG pts using icStageMetricsForMatch (same as Standings)
   var shooterData=shooters.map(function(sh,si){
     var name=((sh.firstName||'')+(sh.lastName?' '+sh.lastName:'')).trim()||'Skytter';
     var color=colors[si%colors.length];
-    var cumPts=[];
-    var runTotal=0;
-    var winnerTotals=[];
-    shotNums.forEach(function(sn){
-      var sr=(sh.stages||[]).find(function(r){return String(r.num||r.number)===sn&&r.time&&r.pts>=0;});
-      runTotal+=sr?(sr.pts||0):0;
-      cumPts.push({stageNum:sn,cumPts:runTotal,hasResult:!!sr});
+    var cumStg=0;
+    var stagePoints=shotNums.map(function(sn){
+      var stageDef=stageDefs.find(function(sd){return String(sd.number)===sn;});
+      if(!stageDef)return{stageNum:sn,stgPts:0,cumStg:0,hasResult:false};
+      var metrics=icStageMetricsForMatch(i,stageDef);
+      var me=metrics.find(function(m){return String(m.id)===String(sh.id)||(sh.isMe&&m.isMe);});
+      var stgPts=me?me.stagePts:0;
+      var hasResult=!!me;
+      cumStg+=stgPts;
+      return{stageNum:sn,stgPts:stgPts,cumStg:cumStg,hasResult:hasResult};
     });
-    return{id:sh.id,name:name,color:color,isMe:!!sh.isMe,cumPts:cumPts};
+    return{id:sh.id,name:name,color:color,isMe:!!sh.isMe,stagePoints:stagePoints};
   });
-  // compute winner total per stage for match% calc
-  var winnerAtStage=shotNums.map(function(sn,si){
-    var maxCum=0;
-    shooterData.forEach(function(sd){if(sd.cumPts[si]&&sd.cumPts[si].cumPts>maxCum)maxCum=sd.cumPts[si].cumPts;});
-    return maxCum;
+
+  // winner cumulative STG per stage index
+  var winnerCumAtStage=shotNums.map(function(sn,si){
+    var max=0;
+    shooterData.forEach(function(sd){
+      var v=sd.stagePoints[si].cumStg;
+      if(v>max)max=v;
+    });
+    return max;
   });
+
   // compute match% per shooter per stage
   shooterData.forEach(function(sd){
-    sd.cumPct=sd.cumPts.map(function(cp,si){
-      var w=winnerAtStage[si]||0;
-      return w>0?(cp.cumPts/w*100):0;
+    sd.cumPct=sd.stagePoints.map(function(sp,si){
+      var w=winnerCumAtStage[si]||0;
+      return w>0?(sp.cumStg/w*100):0;
     });
   });
 
-  // ── TABLE ──
-  var tbl='<div style="overflow-x:auto;margin-top:10px;">';
-  tbl+='<table style="width:100%;font-size:11px;border-collapse:collapse;min-width:320px;">';
-  tbl+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);">';
-  tbl+='<th style="padding:4px 6px;text-align:left;">SKYTTER</th>';
-  shotNums.forEach(function(sn){tbl+='<th style="padding:4px 4px;text-align:right;">S'+sn+'</th>';});
-  tbl+='</tr>';
-  // sort by last stage pct desc
+  // sort by last cumPct desc
   var sorted=shooterData.slice().sort(function(a,b){
     var ai=a.cumPct[a.cumPct.length-1]||0;
     var bi=b.cumPct[b.cumPct.length-1]||0;
     return bi-ai;
   });
-  sorted.forEach(function(sd,rank){
-    var isLeader=rank===0;
-    var rowStyle=sd.isMe?'background:var(--accent-fade);':'';
-    tbl+='<tr style="border-bottom:1px solid var(--border);'+rowStyle+'">';
-    tbl+='<td style="padding:6px 6px;font-weight:'+(sd.isMe||isLeader?'700':'400')+';">';
-    tbl+='<span style="color:'+sd.color+';margin-right:5px;">●</span>'+sd.name+'</td>';
-    sd.cumPct.forEach(function(pct,si){
-      var isWin=winnerAtStage[si]>0&&sd.cumPts[si].cumPts===winnerAtStage[si];
-      tbl+='<td style="padding:6px 4px;text-align:right;font-weight:'+(isWin?'700':'400')+';color:'+(isWin?'var(--accent)':'var(--text)')+';">';
-      tbl+=sd.cumPts[si].hasResult?pct.toFixed(1)+'%':'—';
-      tbl+='</td>';
-    });
-    tbl+='</tr>';
-  });
-  tbl+='</table></div>';
 
   // ── SVG GRAPH ──
-  var W=320,H=160,PL=36,PR=16,PT=12,PB=28;
+  var W=320,H=170,PL=36,PR=16,PT=12,PB=28;
   var gW=W-PL-PR,gH=H-PT-PB;
   var nStages=shotNums.length;
-  var xStep=nStages>1?gW/(nStages-1):gW;
-  function xPos(si){return nStages>1?PL+si*xStep:PL+gW/2;}
+  function xPos(si){return nStages>1?PL+si*(gW/(nStages-1)):PL+gW/2;}
   function yPos(pct){return PT+gH*(1-pct/100);}
   var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:'+W+'px;display:block;margin:0 auto;">';
-  // grid lines
   [0,25,50,75,100].forEach(function(pct){
     var y=yPos(pct);
     svg+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
     svg+='<text x="'+(PL-3)+'" y="'+(y+4)+'" font-size="8" fill="#7d8598" text-anchor="end">'+pct+'%</text>';
   });
-  // x axis labels
   shotNums.forEach(function(sn,si){
     svg+='<text x="'+xPos(si)+'" y="'+(H-6)+'" font-size="8" fill="#7d8598" text-anchor="middle">S'+sn+'</text>';
   });
-  // lines per shooter
   sorted.forEach(function(sd){
     var pts=[];
-    sd.cumPct.forEach(function(pct,si){if(sd.cumPts[si].hasResult)pts.push([xPos(si),yPos(pct)]);});
+    sd.cumPct.forEach(function(pct,si){if(sd.stagePoints[si].hasResult)pts.push([xPos(si),yPos(pct)]);});
     if(pts.length<1)return;
     var d=pts.map(function(p,i){return(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
     svg+='<path d="'+d+'" fill="none" stroke="'+sd.color+'" stroke-width="'+(sd.isMe?'2.5':'1.5')+'" stroke-linejoin="round" stroke-linecap="round" opacity="'+(sd.isMe?'1':'0.75')+'"/>';
-    // dot at last point
     var lp=pts[pts.length-1];
     svg+='<circle cx="'+lp[0].toFixed(1)+'" cy="'+lp[1].toFixed(1)+'" r="3" fill="'+sd.color+'"/>';
   });
@@ -1443,6 +1424,34 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
     leg+='</div>';
   });
   leg+='</div>';
+
+  // ── TABLE ──
+  var tbl='<div style="overflow-x:auto;margin-top:12px;">';
+  tbl+='<table style="width:100%;font-size:11px;border-collapse:collapse;min-width:300px;">';
+  tbl+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);">';
+  tbl+='<th style="padding:4px 6px;text-align:left;">SKYTTER</th>';
+  shotNums.forEach(function(sn){tbl+='<th style="padding:4px 4px;text-align:right;">S'+sn+'</th>';});
+  tbl+='</tr>';
+  sorted.forEach(function(sd){
+    var rowStyle=sd.isMe?'background:var(--accent-fade);':'';
+    tbl+='<tr style="border-bottom:1px solid var(--border);'+rowStyle+'">';
+    tbl+='<td style="padding:6px 6px;font-weight:'+(sd.isMe?'700':'400')+';">';
+    tbl+='<span style="color:'+sd.color+';margin-right:5px;">●</span>'+sd.name+'</td>';
+    sd.stagePoints.forEach(function(sp,si){
+      var isLeader=winnerCumAtStage[si]>0&&sp.cumStg===winnerCumAtStage[si]&&sp.hasResult;
+      var pct=sd.cumPct[si];
+      tbl+='<td style="padding:6px 4px;text-align:right;">';
+      if(sp.hasResult){
+        tbl+='<div style="font-weight:'+(isLeader?'700':'400')+';color:'+(isLeader?'var(--accent)':'var(--text)')+';">'+pct.toFixed(1)+'%</div>';
+        tbl+='<div style="font-size:10px;color:var(--muted);">'+sp.cumStg.toFixed(1)+'</div>';
+      }else{
+        tbl+='<div style="color:var(--muted);">—</div>';
+      }
+      tbl+='</td>';
+    });
+    tbl+='</tr>';
+  });
+  tbl+='</table></div>';
 
   // ── WRAPPER ──
   s+='<div style="margin-top:16px;">';

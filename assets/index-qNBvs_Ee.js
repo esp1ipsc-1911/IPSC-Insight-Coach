@@ -1575,8 +1575,10 @@ html+="</div>";return html;}function icSeasonAnalysis(matches){
   var bestMatch=matchStats.reduce(function(a,b){return b.avgHF>a.avgHF?b:a},matchStats[0]);
   var worstMatch=matchStats.reduce(function(a,b){return b.avgHF<a.avgHF?b:a},matchStats[0]);
 
-  var html='<div style="margin-bottom:16px;padding:14px;background:var(--card);border-radius:12px;border:1px solid rgba(232,184,75,0.2);">';
-  html+='<div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:12px;">SESONGANALYSE — '+matchStats.length+' MATCHER</div>';
+  var html='<div style="margin-bottom:16px;">';
+  html+='<button onclick="var x=document.getElementById(\'sa-body\');x&&(x.style.display=x.style.display===\'none\'?\'block\':\'none\');this.querySelector(\'.sa-arrow\').textContent=x&&x.style.display===\'block\'?\'\u25bc\':\'\u25b6\';" style="width:100%;padding:12px 14px;background:var(--card);border:1px solid rgba(232,184,75,0.2);border-radius:12px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
+  html+='<span style="color:var(--accent);">SESONGANALYSE — '+matchStats.length+' MATCHER</span><span class="sa-arrow">▶</span></button>';
+  html+='<div id="sa-body" style="display:none;margin-top:4px;padding:14px;background:var(--card);border:1px solid rgba(232,184,75,0.1);border-radius:12px;">';
 
   // HF trend
   html+='<div style="margin-bottom:12px;">';
@@ -1584,9 +1586,9 @@ html+="</div>";return html;}function icSeasonAnalysis(matches){
   html+='<div style="display:grid;grid-template-columns:repeat('+Math.min(matchStats.length,4)+',1fr);gap:6px;">';
   matchStats.slice(-4).forEach(function(m){
     var col=m.avgHF>=avgHFall?'var(--green)':'var(--red)';
-    html+='<div style="background:var(--bg);padding:8px;border-radius:8px;text-align:center;">';
-    html+='<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">'+(m.name||"").substring(0,10)+'</div>';
-    html+='<div style="font-weight:700;color:'+col+';">'+m.avgHF.toFixed(2)+'</div>';
+    html+='<div style="background:var(--bg);padding:8px;border-radius:8px;text-align:center;display:flex;flex-direction:column;justify-content:space-between;">';
+    html+='<div style="font-size:10px;color:var(--muted);height:2.4em;overflow:hidden;">'+(m.name||"").substring(0,10)+'</div>';
+    html+='<div style="font-weight:700;font-size:18px;color:'+col+';">'+m.avgHF.toFixed(2)+'</div>';
     html+='<div style="font-size:10px;color:var(--muted);">'+m.ap+'%A</div>';
     html+='</div>';
   });
@@ -1663,7 +1665,7 @@ html+="</div>";return html;}function icSeasonAnalysis(matches){
     html+='<div style="color:var(--text);">'+tip.b+'</div></div>';
   });
   html+='</div></div>';
-  html+='</div>';
+  html+='</div></div></div>';
   return html;
 }
 function icTrainingSeasonAnalysis(matches){

@@ -1328,7 +1328,132 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="empty-sub">Trykk på match-chip over eller gå til Matcher-fanen</div>
  <button class="btn-primary btn-home-action" onclick="switchTab('screen-matches')">Se matcher</button>
  </div>
- `;return}let t="";t+='<div class="card">',t+='<div class="mhc-name">'+i.name+"</div>",t+='<div class="mhc-meta">'+We(i.date)+" · "+i.type+"</div>",t+='<div class="mhc-stats">',t+='<div><div class="mhc-val">'+(((a=i.stages)==null?void 0:a.length)||0)+'</div><div class="mhc-lbl">Stages</div></div>',t+='<div><div class="mhc-val">'+(((n=i.shooters)==null?void 0:n.length)||0)+'</div><div class="mhc-lbl">Skyttere</div></div>',t+="</div>",t+='<div style="display:flex;gap:10px;margin-top:15px;">',t+='<button class="btn-primary" onclick="openEditMatch()" style="flex:1;">Rediger match</button>',t+='<button class="btn-primary" onclick="openCreateStage()" style="flex:1;">Legg til stage</button>',t+="</div>",t+='<div style="margin-top:10px;">',t+='<button class="btn-primary" onclick="openInviteUser()" style="width:100%;">Inviter bruker</button>',t+="</div>";const s=Pe();s&&i.ownerId===s.uid&&(t+='<div style="margin-top:10px;">',t+='<button onclick="confirmDeleteMatch()" style="width:100%;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Slett match</button>',t+="</div>"),t+="</div>",i.stages&&i.stages.length>0&&(t+='<div class="section-title">Stages</div>',t+='<div class="card">',i.stages.forEach((r,u)=>{t+='<div class="stage-row" style="cursor:pointer;border-bottom:1px solid #2d3748;padding:12px 0;" onclick="openEditStage('+u+')">',t+='<div class="stage-num">S'+(r.number||u+1)+"</div>",t+='<div class="stage-info">',t+='<div class="stage-name">'+(r.name||"Stage "+(r.number||u+1))+' <span style="color:#e8b84b;font-weight:600;">'+(icStageMaxPts(r)<=60?"Short":icStageMaxPts(r)<=120?"Medium":"Long")+"</span></div>",t+='<div class="stage-meta">',r.paperTargets&&(t+="Paper: "+r.paperTargets+" "),r.poppers&&(t+="Poppers: "+r.poppers+" "),r.plates&&(t+="Plates: "+r.plates+" "),r.noShoots&&(t+="NS: "+r.noShoots+" "),r.bonusPaperTargets&&(t+="Bonus: "+r.bonusPaperTargets+(r.bonusIncluded?" (included)":"")),t+="</div>",t+="</div>",t+="</div>"}),t+="</div>"),e.innerHTML=t}function fe(){const e=o("match-list-container");if(!e)return;let i=$.filter(s=>{if(ue==="all")return!0;if(ue==="active")return s.status!=="finished";if(ue==="trening")return s.type==="Trening";if(ue==="stevne")return s.type==="Stevne";const a=s.date?new Date(s.date).getFullYear().toString():"";return ue===a});if(i.length===0){e.innerHTML='<div class="empty-state"><div class="empty-sub">Ingen matcher funnet</div></div>';return}let t="";i.forEach(s=>{var r;const a=s.id!=null&&s.id.toString()===String(R),n=s.id?"Match ID "+s.id+" "+s.name:s.name;const isOwner=(()=>{const _cu=$.find(_m=>_m.id!=null&&_m.id.toString()===s.id.toString());const _pu=Pe();return _cu&&_pu&&_cu.ownerId===_pu.uid;})();t+=`<div class="match-row${a?" is-active":""}">`;t+=`<div class="match-row-top" onclick="selectMatch('${s.id}')">`;t+=`<div class="match-row-info">`;t+=`<div class="match-row-name${a?" is-active":""}">${n}</div>`;t+=`<div class="match-row-meta">${We(s.date)} · ${s.location||s.type}</div>`;t+="</div>";t+='<div class="match-row-right">'+'<div class="match-stg-count">'+(((r=s.stages)==null?void 0:r.length)||0)+"</div>"+'<div class="match-stg-lbl">stages</div></div>';t+="</div>";t+='<div class="match-row-btns">';t+=`<button onclick="selectMatch('${s.id}');openEditMatch();" class="mrb-btn mrb-gold">Rediger</button>`;t+=`<button onclick="selectMatch('${s.id}');openCreateStage();" class="mrb-btn mrb-gold">Legg til stage</button>`;t+=`<button onclick="selectMatch('${s.id}');openInviteUser();" class="mrb-btn mrb-dark">Inviter bruker</button>`;if(isOwner){t+=`<button onclick="selectMatch('${s.id}');confirmDeleteMatch();" class="mrb-btn mrb-red">Slett match</button>`;}t+="</div>";t+="</div>";}),e.innerHTML=t}function _e(){var n;const e=o("results-content");if(!e)return;const i=$.find(r=>r.id!=null&&r.id.toString()===String(R));if(!i){e.innerHTML='<div class="empty-state"><div class="empty-sub">Velg en match først</div></div>';return}if(!i.shooters||i.shooters.length===0){e.innerHTML='<div class="empty-state"><div class="empty-icon"></div><div class="empty-title">Ingen skyttere</div><div class="empty-sub">Trykk + for å legge til skyttere</div></div>';return}const t=icMatchTotals(i,!liveShowAll);if(!t.length){e.innerHTML='<div class="empty-state"><div class="empty-title">Ingen resultater ennå</div><div class="empty-sub">Live vises når stages har resultater</div></div>';return}const commonNums=icCommonStageNumbers(i),toggleLabel=liveShowAll?"Kun felles stages":"Vis alle stages";let s='<div class="card">';s+='<div class="card-header"><div class="card-title">Standings</div><button onclick="toggleLiveFilter()" style="padding:6px 12px;background:var(--accent);color:#1a202c;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">'+toggleLabel+"</button></div>",s+=!liveShowAll&&commonNums.length>0?'<div style="font-size:12px;color:var(--muted);padding:8px 0;">Basert på '+commonNums.length+" felles stage"+(commonNums.length===1?"":"s")+"</div>":"",s+='<div class="standings-table-wrap"><table class="standings-table">',s+='<thead><tr class="standings-header-row">',s+='<th class="standings-th standings-th-rank">#</th>',s+='<th class="standings-th standings-th-shooter">Skytter</th>',s+='<th class="standings-th standings-th-pts">STG PTS</th>',s+='<th class="standings-th standings-th-pct">%</th>',s+="</tr></thead>",s+="<tbody>";const a=((n=t[0])==null?void 0:n.totalStagePts)||0;t.forEach((r,u)=>{const m=a>0?(r.totalStagePts/a*100).toFixed(2):"0.00";s+='<tr class="standings-row">',s+='<td class="standings-td standings-td-rank">'+(u+1)+"</td>",s+='<td class="standings-td standings-td-shooter">',s+='<div class="standings-shooter-name">'+r.name+"</div>",s+='<div class="standings-shooter-meta">'+r.division+" · "+ge(r.pf||"minor")+"</div>",s+="</td>",s+='<td class="standings-td standings-td-pts">'+r.totalStagePts.toFixed(2)+"</td>",s+='<td class="standings-td standings-td-pct">'+m+"%</td>",s+="</tr>"}),s+="</tbody></table></div>",s+="</div>";const myShooter=icCurrentShooter(i),myResults=myShooter&&myShooter.stages?myShooter.stages.slice().sort((ra,rb)=>(ra.num||0)-(rb.num||0)):[];if(myResults.length>0){s+='<div style="margin-top:16px;">';s+='<button onclick="const x=document.getElementById(\'my-results-table\');x&&(x.style.display=x.style.display===\'none\'?\'block\':\'none\');this.textContent=x&&x.style.display===\'block\'?\'Skjul mine resultater\':\'Mine resultater\';" style="width:100%;padding:12px;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;text-align:left;">Mine resultater</button>';s+='<div id="my-results-table" style="display:none;margin-top:10px;">';s+='<div><table style="width:100%;font-size:11px;border-collapse:collapse;">';s+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;">';s+='<th style="padding:4px 3px;text-align:left;">STG</th>';s+='<th style="padding:4px 3px;text-align:right;">TID</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">A</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">C</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">D</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">M</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">NS</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">P</th>';s+='<th style="padding:4px 3px;text-align:right;">HF</th>';s+="</tr>";myResults.forEach(rr=>{const hf=rr.hf&&rr.hf>0?rr.hf:(rr.time>0?(rr.pts||0)/rr.time:0);s+='<tr style="border-bottom:1px solid var(--border);font-size:11px;">';s+='<td style="padding:4px 3px;">'+(rr.num||rr.number)+"</td>";s+='<td style="padding:4px 3px;text-align:right;">'+(rr.time||0).toFixed(2)+"s</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--green);">'+(rr.a||0)+"</td>";s+='<td style="padding:4px 3px;text-align:right;">'+(rr.c||0)+"</td>";s+='<td style="padding:4px 3px;text-align:right;">'+(rr.d||0)+"</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--red);">'+(rr.miss||0)+"</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--red);">'+(rr.ns||0)+"</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--red);">'+(rr.proc||0)+"</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--accent);">'+hf.toFixed(2)+"</td>";s+="</tr>";});
+ `;return}let t="";t+='<div class="card">',t+='<div class="mhc-name">'+i.name+"</div>",t+='<div class="mhc-meta">'+We(i.date)+" · "+i.type+"</div>",t+='<div class="mhc-stats">',t+='<div><div class="mhc-val">'+(((a=i.stages)==null?void 0:a.length)||0)+'</div><div class="mhc-lbl">Stages</div></div>',t+='<div><div class="mhc-val">'+(((n=i.shooters)==null?void 0:n.length)||0)+'</div><div class="mhc-lbl">Skyttere</div></div>',t+="</div>",t+='<div style="display:flex;gap:10px;margin-top:15px;">',t+='<button class="btn-primary" onclick="openEditMatch()" style="flex:1;">Rediger match</button>',t+='<button class="btn-primary" onclick="openCreateStage()" style="flex:1;">Legg til stage</button>',t+="</div>",t+='<div style="margin-top:10px;">',t+='<button class="btn-primary" onclick="openInviteUser()" style="width:100%;">Inviter bruker</button>',t+="</div>";const s=Pe();s&&i.ownerId===s.uid&&(t+='<div style="margin-top:10px;">',t+='<button onclick="confirmDeleteMatch()" style="width:100%;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Slett match</button>',t+="</div>"),t+="</div>",i.stages&&i.stages.length>0&&(t+='<div class="section-title">Stages</div>',t+='<div class="card">',i.stages.forEach((r,u)=>{t+='<div class="stage-row" style="cursor:pointer;border-bottom:1px solid #2d3748;padding:12px 0;" onclick="openEditStage('+u+')">',t+='<div class="stage-num">S'+(r.number||u+1)+"</div>",t+='<div class="stage-info">',t+='<div class="stage-name">'+(r.name||"Stage "+(r.number||u+1))+' <span style="color:#e8b84b;font-weight:600;">'+(icStageMaxPts(r)<=60?"Short":icStageMaxPts(r)<=120?"Medium":"Long")+"</span></div>",t+='<div class="stage-meta">',r.paperTargets&&(t+="Paper: "+r.paperTargets+" "),r.poppers&&(t+="Poppers: "+r.poppers+" "),r.plates&&(t+="Plates: "+r.plates+" "),r.noShoots&&(t+="NS: "+r.noShoots+" "),r.bonusPaperTargets&&(t+="Bonus: "+r.bonusPaperTargets+(r.bonusIncluded?" (included)":"")),t+="</div>",t+="</div>",t+="</div>"}),t+="</div>"),e.innerHTML=t}function fe(){const e=o("match-list-container");if(!e)return;let i=$.filter(s=>{if(ue==="all")return!0;if(ue==="active")return s.status!=="finished";if(ue==="trening")return s.type==="Trening";if(ue==="stevne")return s.type==="Stevne";const a=s.date?new Date(s.date).getFullYear().toString():"";return ue===a});if(i.length===0){e.innerHTML='<div class="empty-state"><div class="empty-sub">Ingen matcher funnet</div></div>';return}let t="";i.forEach(s=>{var r;const a=s.id!=null&&s.id.toString()===String(R),n=s.id?"Match ID "+s.id+" "+s.name:s.name;const isOwner=(()=>{const _cu=$.find(_m=>_m.id!=null&&_m.id.toString()===s.id.toString());const _pu=Pe();return _cu&&_pu&&_cu.ownerId===_pu.uid;})();t+=`<div class="match-row${a?" is-active":""}">`;t+=`<div class="match-row-top" onclick="selectMatch('${s.id}')">`;t+=`<div class="match-row-info">`;t+=`<div class="match-row-name${a?" is-active":""}">${n}</div>`;t+=`<div class="match-row-meta">${We(s.date)} · ${s.location||s.type}</div>`;t+="</div>";t+='<div class="match-row-right">'+'<div class="match-stg-count">'+(((r=s.stages)==null?void 0:r.length)||0)+"</div>"+'<div class="match-stg-lbl">stages</div></div>';t+="</div>";t+='<div class="match-row-btns">';t+=`<button onclick="selectMatch('${s.id}');openEditMatch();" class="mrb-btn mrb-gold">Rediger</button>`;t+=`<button onclick="selectMatch('${s.id}');openCreateStage();" class="mrb-btn mrb-gold">Legg til stage</button>`;t+=`<button onclick="selectMatch('${s.id}');openInviteUser();" class="mrb-btn mrb-dark">Inviter bruker</button>`;if(isOwner){t+=`<button onclick="selectMatch('${s.id}');confirmDeleteMatch();" class="mrb-btn mrb-red">Slett match</button>`;}t+="</div>";t+="</div>";}),e.innerHTML=t}function _e(){var n;const e=o("results-content");if(!e)return;const i=$.find(r=>r.id!=null&&r.id.toString()===String(R));if(!i){e.innerHTML='<div class="empty-state"><div class="empty-sub">Velg en match først</div></div>';return}if(!i.shooters||i.shooters.length===0){e.innerHTML='<div class="empty-state"><div class="empty-icon"></div><div class="empty-title">Ingen skyttere</div><div class="empty-sub">Trykk + for å legge til skyttere</div></div>';return}const t=icMatchTotals(i,!liveShowAll);if(!t.length){e.innerHTML='<div class="empty-state"><div class="empty-title">Ingen resultater ennå</div><div class="empty-sub">Live vises når stages har resultater</div></div>';return}const commonNums=icCommonStageNumbers(i),toggleLabel=liveShowAll?"Kun felles stages":"Vis alle stages";let s='<div class="card">';s+='<div class="card-header"><div class="card-title">Standings</div><button onclick="toggleLiveFilter()" style="padding:6px 12px;background:var(--accent);color:#1a202c;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">'+toggleLabel+"</button></div>",s+=!liveShowAll&&commonNums.length>0?'<div style="font-size:12px;color:var(--muted);padding:8px 0;">Basert på '+commonNums.length+" felles stage"+(commonNums.length===1?"":"s")+"</div>":"",s+='<div class="standings-table-wrap"><table class="standings-table">',s+='<thead><tr class="standings-header-row">',s+='<th class="standings-th standings-th-rank">#</th>',s+='<th class="standings-th standings-th-shooter">Skytter</th>',s+='<th class="standings-th standings-th-pts">STG PTS</th>',s+='<th class="standings-th standings-th-pct">%</th>',s+="</tr></thead>",s+="<tbody>";const a=((n=t[0])==null?void 0:n.totalStagePts)||0;t.forEach((r,u)=>{const m=a>0?(r.totalStagePts/a*100).toFixed(2):"0.00";s+='<tr class="standings-row">',s+='<td class="standings-td standings-td-rank">'+(u+1)+"</td>",s+='<td class="standings-td standings-td-shooter">',s+='<div class="standings-shooter-name">'+r.name+"</div>",s+='<div class="standings-shooter-meta">'+r.division+" · "+ge(r.pf||"minor")+"</div>",s+="</td>",s+='<td class="standings-td standings-td-pts">'+r.totalStagePts.toFixed(2)+"</td>",s+='<td class="standings-td standings-td-pct">'+m+"%</td>",s+="</tr>"}),s+="</tbody></table></div>",s+="</div>";// ── MATCHUTVIKLING ────────────────────────────────────────────────────────
+(function(){
+  var stageDefs=icStageDefs(i);
+  var shooters=(i.shooters||[]);
+  if(!stageDefs.length||!shooters.length)return;
+  // build cumulative data per stage
+  var stageNums=stageDefs.map(function(sd){return String(sd.number);});
+  // filter to only stages with at least one result (respect liveShowAll filter)
+  var activeNums=liveShowAll?stageNums:icCommonStageNumbers(i);
+  if(!activeNums||!activeNums.length)activeNums=stageNums;
+  // only show stages that have been shot by at least one shooter
+  var shotNums=stageNums.filter(function(sn){
+    return shooters.some(function(sh){
+      return (sh.stages||[]).some(function(sr){return String(sr.num||sr.number)===sn&&sr.time&&sr.pts>=0;});
+    });
+  });
+  if(!shotNums.length)return;
+  // for each shooter build cumulative stage pts up to each shot stage
+  var colors=['#e8b84b','#4caf7d','#60a5fa','#f87171','#a78bfa','#fb923c','#34d399','#f472b6'];
+  var shooterData=shooters.map(function(sh,si){
+    var name=((sh.firstName||'')+(sh.lastName?' '+sh.lastName:'')).trim()||'Skytter';
+    var color=colors[si%colors.length];
+    var cumPts=[];
+    var runTotal=0;
+    var winnerTotals=[];
+    shotNums.forEach(function(sn){
+      var sr=(sh.stages||[]).find(function(r){return String(r.num||r.number)===sn&&r.time&&r.pts>=0;});
+      runTotal+=sr?(sr.pts||0):0;
+      cumPts.push({stageNum:sn,cumPts:runTotal,hasResult:!!sr});
+    });
+    return{id:sh.id,name:name,color:color,isMe:!!sh.isMe,cumPts:cumPts};
+  });
+  // compute winner total per stage for match% calc
+  var winnerAtStage=shotNums.map(function(sn,si){
+    var maxCum=0;
+    shooterData.forEach(function(sd){if(sd.cumPts[si]&&sd.cumPts[si].cumPts>maxCum)maxCum=sd.cumPts[si].cumPts;});
+    return maxCum;
+  });
+  // compute match% per shooter per stage
+  shooterData.forEach(function(sd){
+    sd.cumPct=sd.cumPts.map(function(cp,si){
+      var w=winnerAtStage[si]||0;
+      return w>0?(cp.cumPts/w*100):0;
+    });
+  });
+
+  // ── TABLE ──
+  var tbl='<div style="overflow-x:auto;margin-top:10px;">';
+  tbl+='<table style="width:100%;font-size:11px;border-collapse:collapse;min-width:320px;">';
+  tbl+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);">';
+  tbl+='<th style="padding:4px 6px;text-align:left;">SKYTTER</th>';
+  shotNums.forEach(function(sn){tbl+='<th style="padding:4px 4px;text-align:right;">S'+sn+'</th>';});
+  tbl+='</tr>';
+  // sort by last stage pct desc
+  var sorted=shooterData.slice().sort(function(a,b){
+    var ai=a.cumPct[a.cumPct.length-1]||0;
+    var bi=b.cumPct[b.cumPct.length-1]||0;
+    return bi-ai;
+  });
+  sorted.forEach(function(sd,rank){
+    var isLeader=rank===0;
+    var rowStyle=sd.isMe?'background:var(--accent-fade);':'';
+    tbl+='<tr style="border-bottom:1px solid var(--border);'+rowStyle+'">';
+    tbl+='<td style="padding:6px 6px;font-weight:'+(sd.isMe||isLeader?'700':'400')+';">';
+    tbl+='<span style="color:'+sd.color+';margin-right:5px;">●</span>'+sd.name+'</td>';
+    sd.cumPct.forEach(function(pct,si){
+      var isWin=winnerAtStage[si]>0&&sd.cumPts[si].cumPts===winnerAtStage[si];
+      tbl+='<td style="padding:6px 4px;text-align:right;font-weight:'+(isWin?'700':'400')+';color:'+(isWin?'var(--accent)':'var(--text)')+';">';
+      tbl+=sd.cumPts[si].hasResult?pct.toFixed(1)+'%':'—';
+      tbl+='</td>';
+    });
+    tbl+='</tr>';
+  });
+  tbl+='</table></div>';
+
+  // ── SVG GRAPH ──
+  var W=320,H=160,PL=36,PR=16,PT=12,PB=28;
+  var gW=W-PL-PR,gH=H-PT-PB;
+  var nStages=shotNums.length;
+  var xStep=nStages>1?gW/(nStages-1):gW;
+  function xPos(si){return nStages>1?PL+si*xStep:PL+gW/2;}
+  function yPos(pct){return PT+gH*(1-pct/100);}
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:'+W+'px;display:block;margin:0 auto;">';
+  // grid lines
+  [0,25,50,75,100].forEach(function(pct){
+    var y=yPos(pct);
+    svg+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+    svg+='<text x="'+(PL-3)+'" y="'+(y+4)+'" font-size="8" fill="#7d8598" text-anchor="end">'+pct+'%</text>';
+  });
+  // x axis labels
+  shotNums.forEach(function(sn,si){
+    svg+='<text x="'+xPos(si)+'" y="'+(H-6)+'" font-size="8" fill="#7d8598" text-anchor="middle">S'+sn+'</text>';
+  });
+  // lines per shooter
+  sorted.forEach(function(sd){
+    var pts=[];
+    sd.cumPct.forEach(function(pct,si){if(sd.cumPts[si].hasResult)pts.push([xPos(si),yPos(pct)]);});
+    if(pts.length<1)return;
+    var d=pts.map(function(p,i){return(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
+    svg+='<path d="'+d+'" fill="none" stroke="'+sd.color+'" stroke-width="'+(sd.isMe?'2.5':'1.5')+'" stroke-linejoin="round" stroke-linecap="round" opacity="'+(sd.isMe?'1':'0.75')+'"/>';
+    // dot at last point
+    var lp=pts[pts.length-1];
+    svg+='<circle cx="'+lp[0].toFixed(1)+'" cy="'+lp[1].toFixed(1)+'" r="3" fill="'+sd.color+'"/>';
+  });
+  svg+='</svg>';
+
+  // ── LEGEND ──
+  var leg='<div style="display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;">';
+  sorted.forEach(function(sd){
+    leg+='<div style="display:flex;align-items:center;gap:4px;font-size:11px;">';
+    leg+='<span style="display:inline-block;width:12px;height:3px;background:'+sd.color+';border-radius:2px;"></span>';
+    leg+='<span style="color:'+(sd.isMe?'var(--accent)':'var(--text)')+';">'+sd.name+'</span>';
+    leg+='</div>';
+  });
+  leg+='</div>';
+
+  // ── WRAPPER ──
+  s+='<div style="margin-top:16px;">';
+  s+='<button onclick="var x=document.getElementById(\'mu-body\');x&&(x.style.display=x.style.display===\'none\'?\'block\':\'none\');this.querySelector(\'.mu-arrow\').textContent=x&&x.style.display===\'block\'?\'▼\':\'▶\';" style="width:100%;padding:12px;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text);font-size:14px;font-weight:700;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
+  s+='<span>Matchutvikling</span><span class="mu-arrow">▶</span></button>';
+  s+='<div id="mu-body" style="display:none;margin-top:4px;padding:12px;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:12px;">';
+  s+=svg+leg+tbl;
+  s+='</div></div>';
+})();
+// ── END MATCHUTVIKLING ────────────────────────────────────────────────────
+const myShooter=icCurrentShooter(i),myResults=myShooter&&myShooter.stages?myShooter.stages.slice().sort((ra,rb)=>(ra.num||0)-(rb.num||0)):[];if(myResults.length>0){s+='<div style="margin-top:16px;">';s+='<button onclick="const x=document.getElementById(\'my-results-table\');x&&(x.style.display=x.style.display===\'none\'?\'block\':\'none\');this.textContent=x&&x.style.display===\'block\'?\'Skjul mine resultater\':\'Mine resultater\';" style="width:100%;padding:12px;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;text-align:left;">Mine resultater</button>';s+='<div id="my-results-table" style="display:none;margin-top:10px;">';s+='<div><table style="width:100%;font-size:11px;border-collapse:collapse;">';s+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;">';s+='<th style="padding:4px 3px;text-align:left;">STG</th>';s+='<th style="padding:4px 3px;text-align:right;">TID</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">A</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">C</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">D</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">M</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">NS</th>';s+='<th style="padding:4px 3px;text-align:right;width:32px;">P</th>';s+='<th style="padding:4px 3px;text-align:right;">HF</th>';s+="</tr>";myResults.forEach(rr=>{const hf=rr.hf&&rr.hf>0?rr.hf:(rr.time>0?(rr.pts||0)/rr.time:0);s+='<tr style="border-bottom:1px solid var(--border);font-size:11px;">';s+='<td style="padding:4px 3px;">'+(rr.num||rr.number)+"</td>";s+='<td style="padding:4px 3px;text-align:right;">'+(rr.time||0).toFixed(2)+"s</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--green);">'+(rr.a||0)+"</td>";s+='<td style="padding:4px 3px;text-align:right;">'+(rr.c||0)+"</td>";s+='<td style="padding:4px 3px;text-align:right;">'+(rr.d||0)+"</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--red);">'+(rr.miss||0)+"</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--red);">'+(rr.ns||0)+"</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--red);">'+(rr.proc||0)+"</td>";s+='<td style="padding:8px 6px;text-align:right;color:var(--accent);">'+hf.toFixed(2)+"</td>";s+="</tr>";});
 // Summeringsrad
 const sumTime=myResults.reduce((acc,rr)=>acc+(rr.time||0),0);
 const sumA=myResults.reduce((acc,rr)=>acc+(rr.a||0),0);

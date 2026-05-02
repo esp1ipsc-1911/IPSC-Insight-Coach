@@ -1334,9 +1334,6 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
   var shooters=(i.shooters||[]);
   if(!stageDefs.length||!shooters.length)return;
   var stageNums=stageDefs.map(function(sd){return String(sd.number);});
-  var activeNums=liveShowAll?stageNums:icCommonStageNumbers(i);
-  if(!activeNums||!activeNums.length)activeNums=stageNums;
-  // only stages shot by at least one shooter
   var shotNums=stageNums.filter(function(sn){
     return shooters.some(function(sh){
       return (sh.stages||[]).some(function(sr){return String(sr.num||sr.number)===sn&&sr.time&&sr.pts>=0;});
@@ -1346,7 +1343,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
 
   var colors=['#e8b84b','#4caf7d','#60a5fa','#f87171','#a78bfa','#fb923c','#34d399','#f472b6'];
 
-  // Build per-shooter cumulative STG pts using icStageMetricsForMatch (same as Standings)
+  // Build per-shooter cumulative STG pts using icStageMetricsForMatch
   var shooterData=shooters.map(function(sh,si){
     var name=((sh.firstName||'')+(sh.lastName?' '+sh.lastName:'')).trim()||'Skytter';
     var color=colors[si%colors.length];
@@ -1367,10 +1364,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
   // winner cumulative STG per stage index
   var winnerCumAtStage=shotNums.map(function(sn,si){
     var max=0;
-    shooterData.forEach(function(sd){
-      var v=sd.stagePoints[si].cumStg;
-      if(v>max)max=v;
-    });
+    shooterData.forEach(function(sd){var v=sd.stagePoints[si].cumStg;if(v>max)max=v;});
     return max;
   });
 
@@ -1389,21 +1383,39 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
     return bi-ai;
   });
 
+  // ── DYNAMIC Y-AXIS BOUNDS ──
+  var allPcts=[];
+  sorted.forEach(function(sd){
+    sd.cumPct.forEach(function(pct,si){if(sd.stagePoints[si].hasResult)allPcts.push(pct);});
+  });
+  var minPct=allPcts.length?Math.min.apply(null,allPcts):0;
+  var maxPct=100;
+  var pad=Math.max(3,(maxPct-minPct)*0.15);
+  var yMin=Math.max(0,minPct-pad);
+  var yMax=Math.min(100,maxPct+1);
+
   // ── SVG GRAPH ──
-  var W=320,H=170,PL=36,PR=16,PT=12,PB=28;
+  var W=320,H=170,PL=38,PR=16,PT=12,PB=28;
   var gW=W-PL-PR,gH=H-PT-PB;
   var nStages=shotNums.length;
   function xPos(si){return nStages>1?PL+si*(gW/(nStages-1)):PL+gW/2;}
-  function yPos(pct){return PT+gH*(1-pct/100);}
+  function yPos(pct){return PT+gH*(1-(pct-yMin)/(yMax-yMin));}
+
   var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:'+W+'px;display:block;margin:0 auto;">';
-  [0,25,50,75,100].forEach(function(pct){
-    var y=yPos(pct);
-    svg+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
-    svg+='<text x="'+(PL-3)+'" y="'+(y+4)+'" font-size="8" fill="#7d8598" text-anchor="end">'+pct+'%</text>';
-  });
+
+  // dynamic grid lines — 4 evenly spaced between yMin and yMax
+  var gridSteps=4;
+  for(var gi=0;gi<=gridSteps;gi++){
+    var gPct=yMin+(yMax-yMin)*gi/gridSteps;
+    var gy=yPos(gPct);
+    svg+='<line x1="'+PL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+    svg+='<text x="'+(PL-3)+'" y="'+(gy+4)+'" font-size="8" fill="#7d8598" text-anchor="end">'+gPct.toFixed(0)+'%</text>';
+  }
+  // x labels
   shotNums.forEach(function(sn,si){
     svg+='<text x="'+xPos(si)+'" y="'+(H-6)+'" font-size="8" fill="#7d8598" text-anchor="middle">S'+sn+'</text>';
   });
+  // lines
   sorted.forEach(function(sd){
     var pts=[];
     sd.cumPct.forEach(function(pct,si){if(sd.stagePoints[si].hasResult)pts.push([xPos(si),yPos(pct)]);});
@@ -1428,17 +1440,19 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
   // ── TABLE ──
   var tbl='<div style="overflow-x:auto;margin-top:12px;">';
   tbl+='<table style="width:100%;font-size:11px;border-collapse:collapse;min-width:300px;">';
+  // header
   tbl+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);">';
   tbl+='<th style="padding:4px 6px;text-align:left;">SKYTTER</th>';
   shotNums.forEach(function(sn){tbl+='<th style="padding:4px 4px;text-align:right;">S'+sn+'</th>';});
   tbl+='</tr>';
+  // shooter rows
   sorted.forEach(function(sd){
     var rowStyle=sd.isMe?'background:var(--accent-fade);':'';
-    tbl+='<tr style="border-bottom:1px solid var(--border);'+rowStyle+'">';
+    tbl+='<tr style="border-bottom:1px solid rgba(255,255,255,0.04);'+rowStyle+'">';
     tbl+='<td style="padding:6px 6px;font-weight:'+(sd.isMe?'700':'400')+';">';
     tbl+='<span style="color:'+sd.color+';margin-right:5px;">●</span>'+sd.name+'</td>';
     sd.stagePoints.forEach(function(sp,si){
-      var isLeader=winnerCumAtStage[si]>0&&sp.cumStg===winnerCumAtStage[si]&&sp.hasResult;
+      var isLeader=winnerCumAtStage[si]>0&&Math.abs(sp.cumStg-winnerCumAtStage[si])<0.01&&sp.hasResult;
       var pct=sd.cumPct[si];
       tbl+='<td style="padding:6px 4px;text-align:right;">';
       if(sp.hasResult){
@@ -1451,6 +1465,25 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
     });
     tbl+='</tr>';
   });
+  // delta row — gap to leader per stage
+  tbl+='<tr style="border-top:1px solid var(--border);background:rgba(255,255,255,0.02);">';
+  tbl+='<td style="padding:6px 6px;font-size:10px;color:var(--muted);font-weight:700;">Δ til leder</td>';
+  shotNums.forEach(function(sn,si){
+    var w=winnerCumAtStage[si]||0;
+    tbl+='<td style="padding:6px 4px;text-align:right;">';
+    sorted.forEach(function(sd,rank){
+      var sp=sd.stagePoints[si];
+      if(!sp.hasResult){tbl+='<div style="font-size:10px;color:var(--muted);">—</div>';return;}
+      var delta=sp.cumStg-w;
+      var isLeader=Math.abs(delta)<0.01;
+      var col=isLeader?'var(--accent)':delta>-5?'var(--text)':'var(--red)';
+      tbl+='<div style="font-size:10px;font-weight:'+(isLeader?'700':'400')+';color:'+col+';">';
+      tbl+=isLeader?'●':(delta>0?'+':'')+delta.toFixed(1);
+      tbl+='</div>';
+    });
+    tbl+='</td>';
+  });
+  tbl+='</tr>';
   tbl+='</table></div>';
 
   // ── WRAPPER ──

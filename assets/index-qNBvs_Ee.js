@@ -1832,8 +1832,7 @@ function essParseVerifyText(text,stageNum){
     var pf=pfMatch?pfMatch[1].toLowerCase():"minor";
     var stageStr="Stage "+String(stageNum).padStart(2,"0");
     var stageStr2="Stage "+stageNum;
-    var lines=text.split("
-");
+    var lines=text.split("\n");
     var stageLine=null;
     for(var li=0;li<lines.length;li++){
       if(lines[li].includes(stageStr)||lines[li].includes(stageStr2)){stageLine=lines[li];break;}
@@ -1856,8 +1855,7 @@ function essParseVerifyText(text,stageNum){
 
 function essDetectSSI(text){
   if(!text)return false;
-  var lines=text.trim().split("
-").filter(function(l){return l.trim();});
+  var lines=text.trim().split("\n").filter(function(l){return l.trim();});
   var dataLines=lines.filter(function(l){
     var t=l.trim();
     return t&&!t.toLowerCase().startsWith("total")&&/^[\d\.]/.test(t);
@@ -1869,8 +1867,7 @@ function essDetectSSI(text){
 
 function essParseSSIAll(text){
   if(!text)return[];
-  var lines=text.trim().split("
-");
+  var lines=text.trim().split("\n");
   var rows=[];
   for(var li=0;li<lines.length;li++){
     var t=lines[li].trim();
@@ -1920,8 +1917,7 @@ function portalParseAllStages(text){
     var lastName=parts[0]?parts[0].trim():"";
     var firstName=parts[1]?parts[1].trim():"";
     var stages=[];
-    var lines=text.split("
-");
+    var lines=text.split("\n");
     for(var li=0;li<lines.length;li++){
       var m=lines[li].trim().match(/^Stage\s+(\d+)\s+([\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*([\d.]+)$/);
       if(m){

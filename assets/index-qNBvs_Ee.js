@@ -1533,15 +1533,13 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
   s+='<div style="margin-top:16px;">';
   s+='<button onclick="var x=this.nextElementSibling;x.style.display=x.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.mu-arrow\').textContent=x.style.display===\'block\'?\'\u25bc\':\'\u25b6\';" style="width:100%;padding:12px;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text);font-size:14px;font-weight:700;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
   s+='<span>Matchutvikling</span><span class="mu-arrow">\u25b6</span></button>';
-  s+='<div style="display:none;margin-top:4px;padding:12px;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:12px;">';
+  s+='<div class="mu-wrap" style="display:none;margin-top:4px;padding:12px;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:12px;">';
   s+='<div style="display:flex;gap:6px;margin-bottom:12px;">';
-  s+='<button class="mu-btn-cum mu-active" onclick="var w=this.closest(\'.mu-wrap\');w.querySelector(\'.mu-cum\').style.display=\'block\';w.querySelector(\'.mu-stg\').style.display=\'none\';w.querySelectorAll(\'.mu-tab\').forEach(function(b){b.classList.remove(\'mu-active\');});this.classList.add(\'mu-active\');" style="flex:1;padding:7px 0;font-size:12px;font-weight:600;border-radius:8px;border:none;cursor:pointer;background:var(--accent);color:#000;">Matchutvikling</button>';
-  s+='<button class="mu-btn-stg mu-tab" onclick="var w=this.closest(\'.mu-wrap\');w.querySelector(\'.mu-cum\').style.display=\'none\';w.querySelector(\'.mu-stg\').style.display=\'block\';w.querySelectorAll(\'.mu-tab\').forEach(function(b){b.classList.remove(\'mu-active\');});this.classList.add(\'mu-active\');" style="flex:1;padding:7px 0;font-size:12px;font-weight:600;border-radius:8px;border:none;cursor:pointer;background:var(--bg3);color:var(--muted);">Stage-seier</button>';
+  s+='<button onclick="var w=this.closest(\'.mu-wrap\');w.querySelector(\'.mu-cum\').style.display=\'block\';w.querySelector(\'.mu-stg\').style.display=\'none\';w.querySelectorAll(\'.mu-tab\').forEach(function(b){b.style.background=\'var(--bg3)\';b.style.color=\'var(--muted)\';});this.style.background=\'var(--accent)\';this.style.color=\'#000\';" class="mu-tab" style="flex:1;padding:7px 0;font-size:12px;font-weight:600;border-radius:8px;border:none;cursor:pointer;background:var(--accent);color:#000;">Matchutvikling</button>';
+  s+='<button onclick="var w=this.closest(\'.mu-wrap\');w.querySelector(\'.mu-cum\').style.display=\'none\';w.querySelector(\'.mu-stg\').style.display=\'block\';w.querySelectorAll(\'.mu-tab\').forEach(function(b){b.style.background=\'var(--bg3)\';b.style.color=\'var(--muted)\';});this.style.background=\'var(--accent)\';this.style.color=\'#000\';" class="mu-tab" style="flex:1;padding:7px 0;font-size:12px;font-weight:600;border-radius:8px;border:none;cursor:pointer;background:var(--bg3);color:var(--muted);">Stage-seier</button>';
   s+='</div>';
-  s+='<div class="mu-wrap">';
   s+='<div class="mu-cum">'+svgCum+legCum+tblCum+'</div>';
   s+='<div class="mu-stg" style="display:none;">'+svgStg+legStg+tblStg+'</div>';
-  s+='</div>';
   s+='</div></div>';
 })();
 // ── END MATCHUTVIKLING ────────────────────────────────────────────────────

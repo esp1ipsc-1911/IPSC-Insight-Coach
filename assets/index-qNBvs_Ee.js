@@ -1904,8 +1904,7 @@ function openPortalImportModal(){
 function portalParseAllStages(text){
   if(!text||!text.trim())return null;
   try{
-    const nameMatch=text.match(/#\d+\s+([^
-]+)/);
+    const nameMatch=text.match(/#\d+\s+([^\n]+)/);
     const shooterName=nameMatch?nameMatch[1].trim():"Ukjent";
     const divMatch=text.match(/Division[:\s]+([A-Za-z ]+?)(?:\s+Class|\s+Factor|$)/im);
     const pfMatch=text.match(/Factor[:\s]+(Minor|Major)/i);

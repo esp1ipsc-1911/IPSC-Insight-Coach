@@ -1809,8 +1809,7 @@ function essParseVerifyText(text,stageNum){
     // Finn riktig stage-rad: "Stage 01" eller "Stage 1"
     const stageStr="Stage "+String(stageNum).padStart(2,"0");
     const stageStr2="Stage "+stageNum;
-    const lines=text.split("
-");
+    const lines=text.split("\n");
     let stageLine=null;
     for(const line of lines){
       if(line.includes(stageStr)||line.includes(stageStr2)){
@@ -1916,8 +1915,7 @@ function portalParseAllStages(text){
     const lastName=parts[0]?parts[0].trim():"";
     const firstName=parts[1]?parts[1].trim():"";
     const stages=[];
-    const lines=text.split("
-");
+    const lines=text.split("\n");
     for(const line of lines){
       const m=line.trim().match(/^Stage\s+(\d+)\s+([\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*([\d.]+)$/);
       if(m){

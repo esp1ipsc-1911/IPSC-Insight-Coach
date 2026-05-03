@@ -903,7 +903,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="field-group">
  <div class="field-label">Ekstra skyttere i matchen</div>
  <button class="btn-secondary" onclick="openModal(\'modal-add-shooter\')" style="width:100%;margin-bottom:10px;">+ Legg til skytter</button>
- <button class="btn-secondary" onclick="openPortalImportModal()" style="width:100%;margin-bottom:10px;border-color:var(--accent);color:var(--accent);">📥 Importer rival fra portal</button>
+
  <div id="edit-match-shooters-list"></div>
  </div>
  <button class="btn-primary" onclick="saveEditMatch()">${d("save")}</button>
@@ -1759,112 +1759,106 @@ async function importESSVerify(e){
   if(!stageNum){alert("Velg en stage først");return;}
   const stageDef=icStageDefs(match).find(s=>Number(s.number)===stageNum);
   if(!stageDef){alert("Stage ikke funnet i matchen");return;}
-  // Åpne paste-modal for ESS verify tekst
+
+  // Bygg skytter-options fra match
+  const shooters=match.shooters||[];
+  let shooterOptions="";
+  shooters.forEach(function(sh){
+    const name=(sh.isMe?"Meg ("+(sh.firstName||"")+" "+(sh.lastName||"")+")":(sh.firstName||"")+" "+(sh.lastName||"")).trim();
+    shooterOptions+=`<option value="${sh.id}">${name}</option>`;
+  });
+
   let existing=o("ess-paste-modal");
-  if(!existing){
-    const overlay=document.createElement("div");
-    overlay.id="ess-paste-modal";
-    overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;";
-    overlay.innerHTML=`
-      <div style="background:var(--card);border-radius:16px;padding:20px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto;">
-        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Importer ESS verify</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">1. Gå til verify-siden • 2. Søk opp skytter-ID • 3. Trykk Cmd+A, Cmd+C • 4. Lim inn under</div>
-        <textarea id="ess-paste-input" style="width:100%;height:140px;background:var(--bg);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--text);padding:10px;font-size:12px;resize:vertical;" placeholder="Lim inn tekst fra verify-siden her..."></textarea>
-        <div id="ess-paste-preview" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
-          <button onclick="document.getElementById(\'ess-paste-modal\').remove();" style="padding:12px;background:var(--bg3);border:none;border-radius:8px;color:var(--text);font-weight:600;cursor:pointer;">Avbryt</button>
-          <button id="ess-paste-confirm-btn" onclick="essConfirmPasteResult()" style="padding:12px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer;">Bekreft</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    // Parse ved input
-    o("ess-paste-input").addEventListener("input",function(){
-      const parsed=essParseVerifyText(this.value,stageNum);
-      const prev=o("ess-paste-preview");
-      if(parsed&&prev){
-        prev.style.display="block";
-        prev.innerHTML="<strong>"+parsed.shooterName+"</strong> · Stage "+stageNum+"<br>HF: <span style='color:var(--accent)'>"+(parsed.hf||0).toFixed(4)+"</span> · Tid: "+parsed.time+"s · A:"+parsed.a+" C:"+parsed.c+" D:"+parsed.d+" M:"+parsed.miss+" NS:"+parsed.ns+" PE:"+parsed.proc;
-      }else if(prev){
-        prev.style.display="none";
-      }
-    });
-  }
-  // Store stageNum for confirm
+  if(existing)existing.remove();
+  const overlay=document.createElement("div");
+  overlay.id="ess-paste-modal";
+  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;";
+  overlay.innerHTML=`
+    <div style="background:var(--card);border-radius:16px;padding:20px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Importer ESS verify</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">1. Gå til verify-siden • 2. Søk opp skytter-ID • 3. Trykk Cmd+A, Cmd+C • 4. Lim inn under</div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Velg skytter</div>
+        <select id="ess-paste-shooter-select" style="width:100%;padding:10px;background:var(--bg);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--text);font-size:14px;">${shooterOptions}</select>
+      </div>
+      <textarea id="ess-paste-input" style="width:100%;height:140px;background:var(--bg);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--text);padding:10px;font-size:12px;resize:vertical;" placeholder="Lim inn tekst fra verify-siden her..."></textarea>
+      <div id="ess-paste-preview" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;">
+        <button onclick="document.getElementById(\'ess-paste-modal\').remove();" style="padding:10px;background:var(--bg3);border:none;border-radius:8px;color:var(--text);font-weight:600;cursor:pointer;font-size:12px;">Avbryt</button>
+        <button onclick="essConfirmPasteResult(\'single\')" style="padding:10px;background:var(--bg3);border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-weight:700;cursor:pointer;font-size:12px;">Stage ${stageNum}</button>
+        <button onclick="essConfirmPasteResult(\'all\')" style="padding:10px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer;font-size:12px;">Alle stages</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  o("ess-paste-input").addEventListener("input",function(){
+    const text=this.value;
+    const allParsed=portalParseAllStages(text);
+    const singleParsed=essParseVerifyText(text,stageNum);
+    const prev=o("ess-paste-preview");
+    if(allParsed&&prev){
+      prev.style.display="block";
+      const hfForStage=singleParsed?singleParsed.hf.toFixed(4):"—";
+      prev.innerHTML="<strong>"+allParsed.shooterName+"</strong> · "+allParsed.division+" · "+allParsed.pf.toUpperCase()
+        +"<br><span style='color:var(--accent)'>"+allParsed.stages.length+" stages funnet</span>"
+        +(singleParsed?" · Stage "+stageNum+": HF <span style='color:var(--accent)'>"+hfForStage+"</span>":"");
+    }else if(prev){
+      prev.style.display="none";
+    }
+  });
+
   window._essPasteStageNum=stageNum;
   window._essPasteMatch=match;
   window._essPaseStageDef=stageDef;
 }
 
-function essParseVerifyText(text,stageNum){
-  if(!text||!text.trim())return null;
-  try{
-    // Navn: "#179 Fiskebeck, Espen" eller "Fiskebeck, Espen"
-    const nameMatch=text.match(/#?\d*\s*([A-ZÀ-ÿa-zÀ-ÿ\-]+,\s*[A-ZÀ-ÿa-zÀ-ÿ\-]+)/);
-    const shooterName=nameMatch?nameMatch[1].trim():"Ukjent";
-    // Divisjon og PF
-    const divMatch=text.match(/Division[:\s]+([A-Za-z\s]+?)(?:Class|Factor|$)/i);
-    const pfMatch=text.match(/Factor[:\s]+(Minor|Major)/i);
-    const division=divMatch?divMatch[1].trim():"";
-    const pf=pfMatch?pfMatch[1].toLowerCase():"minor";
-    // Finn riktig stage-rad: "Stage 01" eller "Stage 1"
-    const stageStr="Stage "+String(stageNum).padStart(2,"0");
-    const stageStr2="Stage "+stageNum;
-    const lines=text.split("\n");
-    let stageLine=null;
-    for(const line of lines){
-      if(line.includes(stageStr)||line.includes(stageStr2)){
-        stageLine=line;break;
-      }
+async function essConfirmPasteResult(mode){
+  const stageNum=window._essPasteStageNum;
+  const match=window._essPasteMatch;
+  const text=o("ess-paste-input")?o("ess-paste-input").value:"";
+  const shooterSelectEl=o("ess-paste-shooter-select");
+  const selectedShooterId=shooterSelectEl?shooterSelectEl.value:"";
+
+  if(mode==="all"){
+    // Importer alle stages direkte på valgt skytter
+    const allParsed=portalParseAllStages(text);
+    if(!allParsed||!allParsed.stages.length){alert("Kunne ikke lese data. Sjekk at teksten er limt inn riktig.");return;}
+    const shooter=match.shooters.find(s=>s.id===selectedShooterId||(selectedShooterId==="me"&&s.isMe));
+    if(!shooter){alert("Skytter ikke funnet");return;}
+    shooter.stages||(shooter.stages=[]);
+    for(const sr of allParsed.stages){
+      icUpsertStageResult(shooter,{num:sr.num,name:"Stage "+sr.num,hf:sr.hf,time:sr.time,pts:sr.pts,pf:shooter.pf||"minor",a:sr.a,c:sr.c,d:sr.d,miss:sr.miss,ns:sr.ns,proc:sr.proc});
     }
-    if(!stageLine)return null;
-    // Parse kolonner: Stage XX  HF  PTS  A  C  D  MI  NS  PE  [blank]  TIME
-    const cols=stageLine.trim().split(/\s+/);
-    // cols[0]="Stage", cols[1]="01", cols[2]=HF, cols[3]=PTS, cols[4]=A...
-    if(cols.length<10)return null;
-    const hf=parseFloat(cols[2])||0;
-    const pts=parseInt(cols[3])||0;
-    const a=parseInt(cols[4])||0;
-    const c=parseInt(cols[5])||0;
-    const d=parseInt(cols[6])||0;
-    const miss=parseInt(cols[7])||0;
-    const ns=parseInt(cols[8])||0;
-    const proc=parseInt(cols[9])||0;
-    const time=hf>0?pts/hf:0;
-    return{shooterName,division,pf,hf,pts,a,c,d,miss,ns,proc,time:parseFloat(time.toFixed(2))};
-  }catch(err){
-    console.error("ESS parse error:",err);
-    return null;
+    await Ee(match.id,{shooters:match.shooters});
+    const modal=o("ess-paste-modal");
+    if(modal)modal.remove();
+    te();_e();De();
+    alert(allParsed.shooterName+" • "+allParsed.stages.length+" stage"+(allParsed.stages.length!==1?"r":"")+" importert");
+  } else {
+    // Importer kun valgt stage — gå til bekreftelsesdialog
+    const parsed=essParseVerifyText(text,stageNum);
+    if(!parsed){alert("Kunne ikke lese data for stage "+stageNum+". Sjekk at teksten er limt inn riktig.");return;}
+    o("ocr-time").value=parsed.time;
+    o("ocr-a").value=parsed.a;
+    o("ocr-c").value=parsed.c;
+    o("ocr-d").value=parsed.d;
+    o("ocr-miss").value=parsed.miss;
+    o("ocr-ns").value=parsed.ns;
+    o("ocr-proc").value=parsed.proc;
+    icRecalcPoints("ocr");
+    Me=stageNum;
+    icUploadShooterSel=selectedShooterId||icCurrentShooterId();
+    const ct=o("ocr-confirm-title");
+    if(ct)ct.textContent="Bekreft ESS verify - Stage "+stageNum;
+    const cd=o("ocr-confirm-desc");
+    if(cd)cd.textContent="Skytter: "+parsed.shooterName+" · "+parsed.division+" · "+parsed.pf.toUpperCase()+" · HF: "+parsed.hf.toFixed(4);
+    const modal=o("ess-paste-modal");
+    if(modal)modal.remove();
+    G("modal-upload-result");
+    ie("modal-ocr-confirm");
   }
 }
 
-async function essConfirmPasteResult(){
-  const stageNum=window._essPasteStageNum;
-  const match=window._essPasteMatch;
-  const stageDef=window._essPaseStageDef;
-  const text=o("ess-paste-input")?o("ess-paste-input").value:"";
-  const parsed=essParseVerifyText(text,stageNum);
-  if(!parsed){alert("Kunne ikke lese data. Sjekk at teksten er limt inn riktig.");return;}
-  // Fyll ut ocr-confirm feltene
-  o("ocr-time").value=parsed.time;
-  o("ocr-a").value=parsed.a;
-  o("ocr-c").value=parsed.c;
-  o("ocr-d").value=parsed.d;
-  o("ocr-miss").value=parsed.miss;
-  o("ocr-ns").value=parsed.ns;
-  o("ocr-proc").value=parsed.proc;
-  icRecalcPoints("ocr");
-  Me=stageNum;
-  icUploadShooterSel=icCurrentShooterId();
-  const ct=o("ocr-confirm-title");
-  if(ct)ct.textContent="Bekreft ESS verify - Stage "+stageNum;
-  const cd=o("ocr-confirm-desc");
-  if(cd)cd.textContent="Skytter: "+parsed.shooterName+" · "+parsed.division+" · "+parsed.pf.toUpperCase()+" · HF: "+parsed.hf.toFixed(4);
-  // Lukk paste-modal, vis ocr-confirm
-  const modal=o("ess-paste-modal");
-  if(modal)modal.remove();
-  G("modal-upload-result");
-  ie("modal-ocr-confirm");
-}
 
 function openPortalImportModal(){
   let existing=o("portal-import-modal");

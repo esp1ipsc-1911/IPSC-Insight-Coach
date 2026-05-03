@@ -1824,7 +1824,7 @@ function essParseVerifyText(text,stageNum){
   if(!text||!text.trim())return null;
   if(essDetectSSI(text))return essParseSSISingle(text,stageNum);
   try{
-    var nameMatch=text.match(/#?\d*\s*([A-ZÀ-ÿ\-]+,\s*[A-ZÀ-ÿ\-]+)/i);
+    var nameMatch=text.match(/[#]?\d*\s*([\w\-]+,\s*[\w\-]+)/i);
     var shooterName=nameMatch?nameMatch[1].trim():"Ukjent";
     var divMatch=text.match(/Division[\s:]+([A-Za-z\s]+?)(?:Class|Factor|$)/i);
     var pfMatch=text.match(/Factor[\s:]+(Minor|Major)/i);
@@ -1906,8 +1906,7 @@ function portalParseAllStages(text){
     return{shooterName:"SSI import",firstName:"",lastName:"SSI",division:"",pf:"minor",stages:stages};
   }
   try{
-    var nameMatch=text.match(/#\d+\s+([^
-]+)/);
+    var nameMatch=text.match(/#\d+\s+([^\n]+)/);
     var shooterName=nameMatch?nameMatch[1].trim():"Ukjent";
     var divMatch=text.match(/Division[\s:]+([A-Za-z ]+?)(?:\s+Class|\s+Factor|$)/im);
     var pfMatch=text.match(/Factor[\s:]+(Minor|Major)/i);

@@ -1306,14 +1306,17 @@ window.icOpenEditStageResult=icOpenEditStageResult,window.deleteCurrentStage=del
   const shooter=match.shooters.find(s=>String(s.id)===String(shooterId)||(shooterId==="me"&&s.isMe));
   if(!shooter){alert("Skytter ikke funnet");return;}
   const res=(shooter.stages||[]).find(s=>Number(s.num||s.number)===Number(stageNum))||{};
-  // Prefill manual result dialog
+  // Set edit mode BEFORE opening modal
+  window._icEditMode={stageNum:Number(stageNum),shooterId:shooterId,shooterName:(shooter.firstName||"")+" "+(shooter.lastName||""),stageName:stageDef.name||("Stage "+stageNum)};
+  icUploadShooterSel=shooterId;
+  Me=Number(stageNum);
+  // Open modal first (icInitManualResult runs inside ie())
+  ie("modal-add");
+  // Set hit values AFTER modal opens (overrides icInitManualResult)
   const stageEl=document.getElementById("new-result-stage");
   if(stageEl){stageEl.value=stageNum;}
   const shooterEl=document.getElementById("new-result-shooter-select");
   if(shooterEl){shooterEl.value=shooterId;}
-  icUploadShooterSel=shooterId;
-  Me=Number(stageNum);
-  // Set hit values
   const timeEl=document.getElementById("new-result-time");if(timeEl)timeEl.value=res.time||"";
   const aEl=document.getElementById("new-result-a-val");if(aEl)aEl.value=res.a||0;
   const cEl=document.getElementById("new-result-c-val");if(cEl)cEl.value=res.c||0;
@@ -1322,9 +1325,7 @@ window.icOpenEditStageResult=icOpenEditStageResult,window.deleteCurrentStage=del
   const nsEl=document.getElementById("new-result-ns-val");if(nsEl)nsEl.value=res.ns||0;
   const procEl=document.getElementById("new-result-proc-val");if(procEl)procEl.value=res.proc||0;
   icRecalcPoints("new-result");
-  // Mark as edit mode with confirmation
-  window._icEditMode={stageNum:Number(stageNum),shooterId:shooterId,shooterName:(shooter.firstName||"")+" "+(shooter.lastName||""),stageName:stageDef.name||("Stage "+stageNum)};
-  ie("modal-add");
+  icUpdateManualStageInfo();
 }
 function deleteCurrentStage(){const e=$.find(n=>n.id!=null&&n.id.toString()===String(R));if(!e||Ce===null||Ce===undefined){alert("Ingen stage valgt");return;}const t=e.stages||[];const st=t[Ce];const stName=st?(st.name||"Stage "+(st.number||"")):"denne stagen";if(!confirm("Er du sikker på at du vil slette "+stName+"? Dette kan ikke angres.")){return;}showSpinner("Sletter stage…");t.splice(Ce,1);Ee(e.id,{stages:t}).then(function(s){hideSpinner();if(s.success){G("modal-create-stage");}else alert("Kunne ikke slette stage: "+s.error);});}
 let ee=[],Q=[],ve=[],me=[];function ks(){if(!R){alert("Ingen match valgt");return}Q=[],o("user-search-input").value="",o("user-search-results").innerHTML="",o("send-invitations-btn").style.display="none",ie("modal-invite-user")}async function xs(){const e=F("user-search-input").trim();if(e.length===0){o("user-search-results").innerHTML='<p style="color:#9ca3af;text-align:center;">Skriv inn et søk</p>';return}const i=await Ke(e),t=o("user-search-results");if(!t)return;if(i.length===0){t.innerHTML='<p style="color:#9ca3af;text-align:center;">Ingen brukere funnet</p>';return}let s='<div style="margin-bottom:10px;font-weight:600;">RESULTATER ('+i.length+"):</div>";i.forEach(a=>{const n=a.displayName||a.email,r=Q.some(m=>m.uid===a.uid),u=n.replace(/'/g,"\\'");s+=`

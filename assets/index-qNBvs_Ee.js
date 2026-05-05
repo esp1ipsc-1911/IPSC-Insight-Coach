@@ -1757,7 +1757,8 @@ async function importESSVerify(e){
   if(!stageNum){alert("Velg en stage først");return;}
   const stageDef=icStageDefs(match).find(s=>Number(s.number)===stageNum);
   if(!stageDef){alert("Stage ikke funnet i matchen");return;}
-  const shooters=match.shooters||[];
+  var shooters=(match.shooters||[]).slice();
+  if(!shooters.some(function(s){return s.isMe;})){shooters.unshift({id:icCurrentShooterId(),isMe:true,firstName:g.firstName||"Meg",lastName:g.lastName||"",division:g.division||"Classic",pf:g.powerFactor||"minor"});}
   let shooterOptions="";
   shooters.forEach(function(sh){
     const name=(sh.isMe?"Meg ("+(sh.firstName||"")+" "+(sh.lastName||"")+")":(sh.firstName||"")+" "+(sh.lastName||"")).trim();

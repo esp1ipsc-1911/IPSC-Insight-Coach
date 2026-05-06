@@ -1847,7 +1847,8 @@ async function essConfirmPaste(mode){
   if(mode==="all"){
     var allParsed=isSSI?{shooterName:"SSI import",stages:essParseSSIAll(text).map(function(r,i){return Object.assign({num:i+1},r);})}:portalParseAllStages(text);
     if(!allParsed||!allParsed.stages||!allParsed.stages.length){alert("Kunne ikke lese data. Sjekk at teksten er limt inn riktig.");return;}
-    var shooter=match.shooters.find(function(s){return s.id===selectedShooterId||(selectedShooterId==="me"&&s.isMe);});
+    var shooter=match.shooters?match.shooters.find(function(s){return s.id===selectedShooterId||(selectedShooterId==="me"&&s.isMe);}):null;
+    if(!shooter){shooter=await icEnsureShooter(match,selectedShooterId||icCurrentShooterId());}
     if(!shooter){alert("Skytter ikke funnet");return;}
     shooter.stages||(shooter.stages=[]);
     var stageDefs=icStageDefs(match);

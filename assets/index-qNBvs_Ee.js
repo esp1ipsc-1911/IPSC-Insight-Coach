@@ -1868,6 +1868,7 @@ async function essConfirmPaste(mode){
     var shooter=match.shooters?match.shooters.find(function(s){return s.id===selectedShooterId||(selectedShooterId==="me"&&s.isMe);}):null;
     if(!shooter){shooter=await icEnsureShooter(match,selectedShooterId||icCurrentShooterId());}
     if(!shooter){alert("Skytter ikke funnet");return;}
+    if(selectedShooterId===icCurrentShooterId()||selectedShooterId==="me"){shooter.isMe=true;shooter.id=icCurrentShooterId();}
     shooter.stages||(shooter.stages=[]);
     var stageDefs=icStageDefs(match);
     for(var si=0;si<allParsed.stages.length;si++){

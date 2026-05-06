@@ -535,6 +535,8 @@ body {
 
 .tab-item.active {
   color: var(--accent);
+  background: rgba(76, 175, 125, 0.15);
+  border-radius: 10px;
 }
 
 .tab-icon {

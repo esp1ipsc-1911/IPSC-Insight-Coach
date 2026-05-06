@@ -1874,7 +1874,7 @@ async function essConfirmPaste(mode){
     for(var si=0;si<allParsed.stages.length;si++){
       var sr=allParsed.stages[si];
       var sname=(stageDefs[sr.num-1]&&stageDefs[sr.num-1].name)||("Stage "+sr.num);
-      icUpsertStageResult(shooter,{num:sr.num,name:sname,hf:sr.hf,time:sr.time,pts:sr.pts,pf:shooter.pf||"minor",a:sr.a,c:sr.c,d:sr.d,miss:sr.miss,ns:sr.ns,proc:sr.proc});
+      var _sd=(stageDefs[sr.num-1]||stageDefs.find(function(x){return x.number===sr.num;})||{});icUpsertStageResult(shooter,{num:sr.num,name:sname,hf:sr.hf,time:sr.time,pts:sr.pts,pf:shooter.pf||"minor",a:sr.a,c:sr.c,d:sr.d,miss:sr.miss,ns:sr.ns,proc:sr.proc,paperTargets:_sd.paperTargets||0,poppers:_sd.poppers||0,plates:_sd.plates||0});
     }
     await Ee(match.id,{shooters:match.shooters});
     var modal=o("ess-paste-modal");if(modal)modal.remove();

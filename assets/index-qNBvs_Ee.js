@@ -2015,7 +2015,7 @@ function portalParseAllStages(text){
     return{shooterName:shooterName,firstName:firstName,lastName:lastName,division:division,pf:pf,stages:stages};
   }catch(err){return null;}
 }
-function setAppLang(lang){
+window.setAppLang=function setAppLang(lang){
   dt=lang;
   localStorage.setItem("appLang",lang);
   // Update profile buttons

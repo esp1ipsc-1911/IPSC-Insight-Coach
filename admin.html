@@ -1069,6 +1069,8 @@
     };
 
     $('logoutBtn').onclick = async () => { await signOut(auth); };
+    $('refreshBtn').onclick = async () => { await loadCodes(); };
+    $('refreshRolesBtn').onclick = async () => { await loadRoles(); };
 
     tabCodesBtn.onclick = () => setTab('codes');
     tabUsersBtn.onclick = () => setTab('users');
@@ -1671,8 +1673,6 @@
       $('cmDate').value = new Date().toISOString().slice(0, 10);
       $('cmStatus').value = 'active';
       $('cmLocation').value = '';
-      $('cmDivision').value = '';
-      $('cmPowerFactor').value = '';
       $('cmDirectorEmails').value = '';
       populateOwnerSelect('cmOwner', currentUser?.uid || '');
       $('createMatchModal').classList.add('open');

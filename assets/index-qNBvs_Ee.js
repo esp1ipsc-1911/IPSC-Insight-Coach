@@ -2018,11 +2018,12 @@ function portalParseAllStages(text){
 window.setAppLang=function setAppLang(lang){
   dt=lang;
   localStorage.setItem("appLang",lang);
-  // Update profile buttons
+  var no=lang==="no";
+  // Profile language buttons
   var btnNo=document.getElementById("prof-lang-no");
   var btnEn=document.getElementById("prof-lang-en");
   if(btnNo&&btnEn){
-    if(lang==="no"){
+    if(no){
       btnNo.style.borderColor="#e8b84b";btnNo.style.background="rgba(232,184,75,0.15)";btnNo.style.color="#e8b84b";
       btnEn.style.borderColor="rgba(255,255,255,0.15)";btnEn.style.background="transparent";btnEn.style.color="var(--muted)";
     }else{
@@ -2030,7 +2031,69 @@ window.setAppLang=function setAppLang(lang){
       btnNo.style.borderColor="rgba(255,255,255,0.15)";btnNo.style.background="transparent";btnNo.style.color="var(--muted)";
     }
   }
-  // Re-render dynamic content
+  // Tab bar labels (all screens have copies)
+  document.querySelectorAll(".lang-home").forEach(function(el){el.textContent=no?"Hjem":"Home";});
+  document.querySelectorAll(".lang-matches").forEach(function(el){el.textContent=no?"Matcher":"Matches";});
+  document.querySelectorAll(".lang-prognosis").forEach(function(el){el.textContent=no?"Prognose":"Prognosis";});
+  document.querySelectorAll(".lang-results").forEach(function(el){el.textContent=no?"Live":"Live";});
+  document.querySelectorAll(".lang-profile").forEach(function(el){el.textContent=no?"Profil":"Profile";});
+  // Profile static labels
+  var _si=document.getElementById("prof-lang-title");if(_si)_si.textContent=no?"Språk":"Language";
+  document.querySelectorAll(".info-key").forEach(function(el,i){
+    var keys_no=["Fornavn","Etternavn","Divisjon","Kategori","Power Factor","Region","Klubb"];
+    var keys_en=["First name","Last name","Division","Category","Power Factor","Region","Club"];
+    if(keys_no.indexOf(el.textContent)>=0||keys_en.indexOf(el.textContent)>=0){
+      var idx=keys_no.indexOf(el.textContent)>=0?keys_no.indexOf(el.textContent):keys_en.indexOf(el.textContent);
+      el.textContent=no?keys_no[idx]:keys_en[idx];
+    }
+  });
+  // Card titles
+  document.querySelectorAll(".card-title").forEach(function(el){
+    var map={
+      "Personlig informasjon":"Personal information","Personal information":"Personlig informasjon",
+      "Sesongstatistikk":"Season statistics","Season statistics":"Sesongstatistikk",
+      "Skytterdata (snitt)":"Shooter data (avg)","Shooter data (avg)":"Skytterdata (snitt)"
+    };
+    if(map[el.textContent]){
+      if(no&&["Personal information","Season statistics","Shooter data (avg)"].indexOf(el.textContent)>=0)el.textContent=map[el.textContent];
+      if(!no&&["Personlig informasjon","Sesongstatistikk","Skytterdata (snitt)"].indexOf(el.textContent)>=0)el.textContent=map[el.textContent];
+    }
+  });
+  // Logout button
+  document.querySelectorAll(".btn-logout").forEach(function(el){el.textContent=(no?" Logg ut":" Log out");});
+  // Update all static text nodes using a translation map
+  var _map={
+    "Fornavn":"First name","Etternavn":"Last name","Divisjon":"Division",
+    "Kategori":"Category","Region":"Region","Klubb":"Club",
+    "Velg stage":"Select stage","Velg skytter":"Select shooter",
+    "Velg divisjon":"Select division","Ingen rival valgt":"No rival selected",
+    "Personlig informasjon":"Personal information","Sesongstatistikk":"Season statistics",
+    "Skytterdata (snitt)":"Shooter data (avg)",
+    "Slett match":"Delete match","Slett stage":"Delete stage",
+    "Treffbilde":"Hit pattern","Straffer":"Penalties",
+    "Lagre resultat":"Save result","Bekreft resultat":"Confirm result",
+    "Last opp resultat":"Upload result","Opprett lag":"Create team",
+    "Lagre lag":"Save team","Lagnavn":"Team name","Land":"Country",
+    "Ekstra skyttere i matchen":"Extra shooters in match",
+    "Marker som ferdig":"Mark as finished","Bruk referanseskyttere":"Use reference shooters",
+    "Alle":"All","Aktiv":"Active","Trening":"Training","Stevne":"Match",
+    "Logg inn":"Log in","Registrer ny bruker":"Register new user",
+    "Opprett bruker":"Create user","Bekreft passord":"Confirm password",
+    "Invitasjonskode":"Invitation code","Passord":"Password",
+    "Forventet tid":"Expected time","Stage krav":"Stage requirements",
+    "Legg til stage":"Add stage","Registrer manuelt":"Register manually",
+    "Lag":"Team","Søk":"Search","Draw":"Draw","Reload":"Reload","Reloads":"Reloads",
+    "Minor":"Minor","Major":"Major","Avbryt":"Cancel","Slett":"Delete",
+    "Points":"Points","Miss":"Miss","Auto":"Auto"
+  };
+  var _rmap={};Object.keys(_map).forEach(function(k){_rmap[_map[k]]=k;});
+  document.querySelectorAll("div,span,label,button,option,th,td,p,h2,h3").forEach(function(el){
+    if(el.children.length>0)return;
+    var t=(el.textContent||"").trim();
+    if(no&&_rmap[t])el.textContent=_rmap[t];
+    else if(!no&&_map[t])el.textContent=_map[t];
+  });
+  // Re-render all dynamic content
   try{te();}catch(e){}
   try{_e();}catch(e){}
   try{De();}catch(e){}

@@ -1517,7 +1517,7 @@ let ee=[],Q=[],ve=[],me=[];function ks(){if(!R){alert("Ingen match valgt");retur
     return leg;
   }
 
-  // '+d('matchutvikling')+' tabell
+  // Matchutvikling tabell
   var allCumPcts=[];
   sorted.forEach(function(sd){sd.cumPct.forEach(function(pct,si){if(sd.stagePoints[si].hasResult)allCumPcts.push(pct);});});
   var minCum=allCumPcts.length?Math.min.apply(null,allCumPcts):0;

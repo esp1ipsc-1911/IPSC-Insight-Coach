@@ -2174,7 +2174,7 @@ window.setAppLang=function setAppLang(lang){
     "Velg divisjon":"Select division","Ingen rival valgt":"No rival selected",
     "Personlig informasjon":"Personal information","Sesongstatistikk":"Season statistics",
     "Skytterdata (snitt)":"Shooter data (avg)",
-    d('delete_match'):"Delete match","Slett stage":"Delete stage",
+    "Slett match":"Delete match","Slett stage":"Delete stage",
     "Treffbilde":"Hit pattern","Straffer":"Penalties",
     "Lagre resultat":"Save result","Bekreft resultat":"Confirm result",
     "Last opp resultat":"Upload result","Opprett lag":"Create team",
@@ -2186,7 +2186,7 @@ window.setAppLang=function setAppLang(lang){
     "Opprett bruker":"Create user","Bekreft passord":"Confirm password",
     "Invitasjonskode":"Invitation code","Passord":"Password",
     "Forventet tid":"Expected time","Stage krav":"Stage requirements",
-    d('add_stage'):"Add stage","Registrer manuelt":"Register manually",
+    "Legg til stage":"Add stage","Registrer manuelt":"Register manually",
     "Lag":"Team","Søk":"Search","Draw":"Draw","Reload":"Reload","Reloads":"Reloads",
     "Minor":"Minor","Major":"Major","Avbryt":"Cancel","Slett":"Delete",
     "Points":"Points","Miss":"Miss","Auto":"Auto"

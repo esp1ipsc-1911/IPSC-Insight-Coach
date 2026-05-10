@@ -741,7 +741,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div id="profile-match-tips"></div>
  
  <div class="card" style="margin-bottom:12px;">
-  <div class="card-header"><div class="card-title" id="prof-lang-title">"+(dt==="no"?"Språk / Language":"Language / Språk")+"</div></div>
+  <div class="card-header"><div class="card-title" id="prof-lang-title">${dt==="no"?"Språk / Language":"Language / Språk"}</div></div>
   <div style="display:flex;gap:10px;padding:4px 0;">
    <button id="prof-lang-no" onclick="setAppLang(\'no\')" style="flex:1;padding:10px;border-radius:10px;border:2px solid #e8b84b;background:rgba(232,184,75,0.15);color:#e8b84b;font-weight:700;font-size:15px;cursor:pointer;">🇳🇴 Norsk</button>
    <button id="prof-lang-en" onclick="setAppLang(\'en\')" style="flex:1;padding:10px;border-radius:10px;border:2px solid rgba(255,255,255,0.15);background:transparent;color:var(--muted);font-weight:700;font-size:15px;cursor:pointer;">🇺🇸 English</button>
@@ -776,7 +776,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="scroll-content">
  <div id="teams-standings-container"></div>
  <div style="margin-top:16px;">
- <button class="btn-primary" onclick="openCreateTeam()" style="width:100%;">"+(dt==="no"?"+ Opprett nytt lag":"+ Create new team")+"</button>
+ <button class="btn-primary" onclick="openCreateTeam()" style="width:100%;">${dt==="no"?"+ Opprett nytt lag":"+ Create new team"}</button>
  </div>
  <div style="margin-top:16px;" id="teams-list-container"></div>
  </div>
@@ -873,7 +873,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  </div>
  <input type="hidden" id="edit-match-stages" value="0">
  <div style="margin-top:10px;">
- <button class="btn-primary" onclick="openCreateStageFromEdit()" style="width:100%;">+ Stage</button>
+ <button class="btn-primary" onclick="openCreateStageFromEdit()" style="width:100%;>+ Stage</button>
  </div>
  <div class="field-group">
  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
@@ -914,7 +914,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div id="edit-match-shooters-list"></div>
  </div>
  <button class="btn-primary" onclick="saveEditMatch()">${d("save")}</button>
- <button id="delete-match-btn" onclick="confirmDeleteMatch()" style="width:100%;margin-top:10px;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;display:none;">+(dt==="no"?"Slett match":"Delete match")+"</button>
+ <button id="delete-match-btn" onclick="confirmDeleteMatch()" style="width:100%;margin-top:10px;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;display:none;">${dt==="no"?"Slett match":"Delete match"}</button>
  </div>
  </div>
 </div>
@@ -1023,7 +1023,7 @@ return{success:!0}}catch(t){return console.error("[Jt] Uventet feil:",t),{succes
  <div class="field-group">
  <div class="field-label">Velg stage</div>
  <select class="field-select" id="upload-stage-select"></select>
- <button class="btn-secondary" style="margin-top:10px;" onclick="openCreateStageFromUpload()">+ Stage</button>
+ <button class="btn-secondary" style="margin-top:10px;" onclick="openCreateStageFromUpload()>+ Stage</button>
  </div>
  <div class="field-group">
  <div class="field-label">Velg skytter</div>

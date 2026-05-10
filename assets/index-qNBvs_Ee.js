@@ -2091,7 +2091,7 @@ function essParseSSIAll(text){
     var miss=parseInt(cols[6])||0;
     var proc=parseInt(cols[7])||0;
     var ns=cols.length>8?parseInt(cols[8])||0:0;
-    if(hf>0&&time>0)rows.push({hf:hf,time:time,pts:pts,a:a,c:cc,d:d,miss:miss,ns:ns,proc:proc});
+    if(time>0)rows.push({hf:hf,time:time,pts:pts,a:a,c:cc,d:d,miss:miss,ns:ns,proc:proc});
   }
   return rows;
 }

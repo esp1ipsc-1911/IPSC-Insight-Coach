@@ -630,17 +630,6 @@ const _missCap=Math.max(0,s-Math.min(s,_excess));const _excessAfterMiss=i+t+s-e-
  <div class="scroll-content">
  <div id="prog-match-context"></div>
  <div id="snapshot-container"></div>
- <div class="card">
- <div class="card-header"><div class="card-title">Skytterdata (snitt)</div><span class="badge badge-blue">Auto</span></div>
- <div class="stats-grid">
- <div class="stat-block"><div class="stat-value">${g.draw||"—"}s</div><div class="stat-label">Draw</div></div>
- <div class="stat-block"><div class="stat-value">${g.reloadTime||"—"}s</div><div class="stat-label">Reload</div></div>
- <div class="stat-block"><div class="stat-value" id="prog-a-rate">—</div><div class="stat-label">A-RATE</div></div>
- </div>
- <div id="prog-data-status" style="margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;color:var(--muted);text-align:center;display:none;">
-  No results yet. Data will appear after you add results.
- </div>
- </div>
  <div class="card" style="margin-bottom:12px;padding:14px 16px;">
 <button onclick="var _sp=document.getElementById('stageplan-body');var _arr=document.getElementById('stageplan-arrow');if(_sp){_sp.style.display=_sp.style.display==='none'?'block':'none';_arr.textContent=_sp.style.display==='block'?'▼':'▶';}" style="width:100%;padding:0;background:transparent;border:none;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--muted);">STAGE PLANNING</div><span id="stageplan-arrow" style="font-size:12px;color:var(--muted);">▶</span></button><div id="stageplan-body" style="display:none;margin-top:12px;"><ol style="margin:0;padding:0 0 0 18px;font-size:13px;line-height:1.9;color:var(--text);"><li style="margin-bottom:6px;">Map all targets — paper targets, poppers, plates, and swingers — before deciding your shooting sequence</li><li style="margin-bottom:6px;">Think hit factor in every decision — assess time, points, and risk simultaneously. Don’t choose the fastest or safest solution in isolation — choose the one that gives the best expected total score</li><li style="margin-bottom:6px;">Identify risk zones: where is no-shoot exposure greatest, and where is the probability of a miss highest?</li><li style="margin-bottom:6px;">Break the stage into segments — aggressive zones where you can push, and control zones where you must protect your points</li><li style="margin-bottom:6px;">Activate swingers and mechanical targets as early as possible — don’t build waiting into your plan</li><li style="margin-bottom:6px;">Synchronize movement, target acquisition, and timing — work while mechanics happen, avoid passive stops in front of activators and swingers</li><li style="margin-bottom:6px;">Plan reloads into movement, not as separate stops</li><li style="margin-bottom:6px;">Think exit: plan how you leave the position after the last shot, not just your arrival</li><li>Choose a plan you can actually execute consistently — a simple plan run clean beats a hero plan with mistakes</li></ol></div></div>
  <div id="prog-stages-container"></div>

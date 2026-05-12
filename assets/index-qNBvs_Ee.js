@@ -1317,7 +1317,7 @@ window.icOpenEditStageResult=icOpenEditStageResult;function icPopulateTeamCountr
     el.appendChild(opt);
   });
 }
-window.icPopulateTeamCountry=icPopulateTeamCountry,window.deleteCurrentStage=deleteCurrentStage,window.openInviteUser=ks,window.openInvitationsModal=Is,window.acceptInvitation=Cs,window.declineInvitation=_s,window.searchUsers=xs,window.toggleUserSelection=Ss,window.sendMultipleInvitations=Ls,window.searchUsersNewMatch=Ps,window.toggleUserNewMatch=Es,window.searchUsersEditMatch=Ts,window.toggleUserEditMatch=Ms,window.confirmDeleteMatch=gs,window.deleteMatchConfirmed=vs,window.uploadAndScanResult=Hs,window.saveOCRResult=Gs,window.icOpenManualResult=icOpenManualResult,window.importESSVerify=importESSVerify,window.essConfirmPaste=essConfirmPaste;window.essSelectAllStages=essSelectAllStages,window.openCreateStageFromUpload=Us,window.toggleMatchDropdown=ds,window.selectMatchFromDropdown=cs,window.toggleReferenceShootersEnabled=toggleReferenceShootersEnabled,window.toggleReferenceShooterChoice=toggleReferenceShooterChoice,window.updateReferenceShooterOverride=updateReferenceShooterOverride,window.toggleLiveFilter=toggleLiveFilter,window.toggleTips=toggleTips,window.deleteRun=deleteRun,window.openCreateTeam=openCreateTeam,window.editTeam=editTeam,window.deleteTeam=deleteTeam,window.saveTeam=saveTeam,window.renderTeamsScreen=renderTeamsScreen}function toggleDQ(matchId,shooterId){
+window.icPopulateTeamCountry=icPopulateTeamCountry,window.deleteCurrentStage=deleteCurrentStage,window.openInviteUser=ks,window.openInvitationsModal=Is,window.acceptInvitation=Cs,window.declineInvitation=_s,window.searchUsers=xs,window.toggleUserSelection=Ss,window.sendMultipleInvitations=Ls,window.searchUsersNewMatch=Ps,window.toggleUserNewMatch=Es,window.searchUsersEditMatch=Ts,window.toggleUserEditMatch=Ms,window.confirmDeleteMatch=gs,window.deleteMatchConfirmed=vs,window.uploadAndScanResult=Hs,window.saveOCRResult=Gs,window.icOpenManualResult=icOpenManualResult,window.importESSVerify=importESSVerify,window.essConfirmPaste=essConfirmPaste,window.openCreateStageFromUpload=Us,window.toggleMatchDropdown=ds,window.selectMatchFromDropdown=cs,window.toggleReferenceShootersEnabled=toggleReferenceShootersEnabled,window.toggleReferenceShooterChoice=toggleReferenceShooterChoice,window.updateReferenceShooterOverride=updateReferenceShooterOverride,window.toggleLiveFilter=toggleLiveFilter,window.toggleTips=toggleTips,window.deleteRun=deleteRun,window.openCreateTeam=openCreateTeam,window.editTeam=editTeam,window.deleteTeam=deleteTeam,window.saveTeam=saveTeam,window.renderTeamsScreen=renderTeamsScreen}function toggleDQ(matchId,shooterId){
   const match=$.find(e=>e.id!=null&&e.id.toString()===String(matchId));
   if(!match)return;
   const shooter=(match.shooters||[]).find(s=>String(s.id)===String(shooterId));
@@ -1327,10 +1327,6 @@ window.icPopulateTeamCountry=icPopulateTeamCountry,window.deleteCurrentStage=del
     if(res.success){renderTeamsScreen();}
     else{shooter.dq=!shooter.dq;alert("Could not update DQ status: "+res.error);}
   });
-}
-function essSelectAllStages(checked){
-  var boxes=document.querySelectorAll("#ess-stage-checkboxes input[type=checkbox]");
-  boxes.forEach(function(b){b.checked=checked;});
 }
 function toggleLiveFilter(){liveShowAll=!liveShowAll,_e()}function toggleTips(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==="none"?"block":"none"}async function deleteRun(stageNum,runIdx){const match=$.find(e=>e.id!=null&&e.id.toString()===String(R));if(!match)return;const shooter=icCurrentShooter(match);if(!shooter)return;const stageIdx=shooter.stages.findIndex(s=>(s.num||s.number)==stageNum);if(stageIdx<0)return;const stage=shooter.stages[stageIdx];if(!stage.runs||stage.runs.length<=1){alert("Cannot delete the last run. Delete the entire result instead.");return;}if(!confirm("Delete Run "+(runIdx+1)+"?"))return;stage.runs.splice(runIdx,1);stage.runs.forEach((r,i)=>{r.runNum=i+1});const best=stage.runs.reduce((a,b)=>(b.hf||0)>(a.hf||0)?b:a,stage.runs[0]);Object.assign(stage,best,{num:stage.num,name:stage.name,runs:stage.runs});const res=await Ee(match.id,{shooters:match.shooters});if(res.success){te(),_e(),De()}else alert("Could not delete run: "+res.error);}function icTeamStandings(e){if(!e||!e.teams||!e.teams.length)return[];const stages=icStageDefs(e);
 // Build DQ set
@@ -2267,12 +2263,14 @@ const Ft_en=`
   if(existing)existing.remove();
   const overlay=document.createElement("div");
   overlay.id="ess-paste-modal";
-  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-i
-      <div id="ess-stage-select" style="display:none;margin-top:12px;"><div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.05em;">SELECT STAGES TO IMPORT</div><div id="ess-stage-checkboxes" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;margin-bottom:4px;"></div><div style="display:flex;gap:8px;margin-top:4px;"><button onclick="essSelectAllStages(true)" style="font-size:11px;padding:3px 8px;background:var(--bg3);border:none;border-radius:6px;color:var(--muted);cursor:pointer;">Select all</button><button onclick="essSelectAllStages(false)" style="font-size:11px;padding:3px 8px;background:var(--bg3);border:none;border-radius:6px;color:var(--muted);cursor:pointer;">Deselect all</button></div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
-        
-        <button id="ess-import-btn" onclick="essConfirmPaste('selected')" style="padding:10px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer;font-size:12px;display:none;">Import selected</button>
-      </div>d rgba(255,255,255,.15);border-radius:8px;color:var(--text);font-size:14px;">${shooterOptions}</select>
+  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;";
+  overlay.innerHTML=`
+    <div style="background:var(--card);border-radius:16px;padding:20px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px;">ESS/SSI Import</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">1. Go to verify page • 2. Find your shooter ID • 3. Press Cmd+A, Cmd+C • 4. Paste below</div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Velg skytter</div>
+        <select id="ess-paste-shooter-select" style="width:100%;padding:10px;background:var(--bg);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--text);font-size:14px;">${shooterOptions}</select>
       </div>
       <textarea id="ess-paste-input" style="width:100%;height:140px;background:var(--bg);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--text);padding:10px;font-size:12px;resize:vertical;" placeholder="Lim inn tekst fra verify-siden her..."></textarea>
       <div id="ess-paste-preview" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;"></div>
@@ -2293,32 +2291,10 @@ const Ft_en=`
       prev.style.display="block";
       var hfStr=singleParsed?singleParsed.hf.toFixed(4):"—";
       prev.innerHTML="<strong>"+(isSSI?"SSI-format":allParsed.shooterName)+"</strong>"
-        +(isSSI?"":(" · "+allParsed.division+" · "+(allParsed.pf||"").toUpperCase()))
-        +"<br><span style=\'color:var(--accent)\'>"+(allParsed.stages.length)+" stages found</span>"
-        +(singleParsed?" · Stage "+stageNum+": HF <span style=\'color:var(--accent)\'>"+hfStr+"</span>":"");
-      // Populate stage checkboxes
-      var stageSelDiv=o("ess-stage-select");
-      var stageChkDiv=o("ess-stage-checkboxes");
-      var importBtn=o("ess-import-btn");
-      if(stageSelDiv&&stageChkDiv){
-        var stageDefs2=icStageDefs(match);
-        stageChkDiv.innerHTML=allParsed.stages.map(function(sr){
-          var sdef=stageDefs2[sr.num-1]||stageDefs2.find(function(x){return x.number===sr.num;})||{};
-          var sname=sdef.name||("Stage "+sr.num);
-          return '<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;font-size:13px;">'
-            +'<input type="checkbox" value="'+sr.num+'" checked style="width:16px;height:16px;accent-color:var(--accent);">'
-            +'<span>S'+sr.num+' — '+sname
-            +(sr.hf>0?' <span style="color:var(--accent);font-size:11px;">HF '+sr.hf.toFixed(2)+'</span>':'')+"</span>"
-            +'</label>';
-        }).join("");
-        stageSelDiv.style.display="block";
-        if(importBtn)importBtn.style.display="block";
-      }
-    }else if(prev){
-      prev.style.display="none";
-      var sd2=o("ess-stage-select");if(sd2)sd2.style.display="none";
-      var ib=o("ess-import-btn");if(ib)ib.style.display="none";
-    }
+        +(isSSI?"":" · "+allParsed.division+" · "+(allParsed.pf||"").toUpperCase())
+        +"<br><span style='color:var(--accent)'>"+allParsed.stages.length+" stages funnet</span>"
+        +(singleParsed?" · Stage "+stageNum+": HF <span style='color:var(--accent)'>"+hfStr+"</span>":"");
+    }else if(prev){prev.style.display="none";}
   });
   window._essPasteStageNum=stageNum;
   window._essPasteMatch=match;
@@ -2332,16 +2308,9 @@ async function essConfirmPaste(mode){
   var shooterSelectEl=o("ess-paste-shooter-select");
   var selectedShooterId=shooterSelectEl?shooterSelectEl.value:"";
   var isSSI=essDetectSSI(text);
-  if(mode==="all"||mode==="selected"){
+  if(mode==="all"){
     var allParsed=isSSI?{shooterName:"SSI import",stages:essParseSSIAll(text).map(function(r,i){return Object.assign({num:i+1},r);})}:portalParseAllStages(text);
     if(!allParsed||!allParsed.stages||!allParsed.stages.length){alert("Could not read data. Check that the text was pasted correctly.");return;}
-    // Filter to selected stages if mode==="selected"
-    if(mode==="selected"){
-      var chkBoxes=document.querySelectorAll("#ess-stage-checkboxes input[type=checkbox]:checked");
-      var selectedNums=Array.from(chkBoxes).map(function(cb){return parseInt(cb.value);});
-      if(!selectedNums.length){alert("No stages selected.");return;}
-      allParsed={shooterName:allParsed.shooterName,stages:allParsed.stages.filter(function(sr){return selectedNums.includes(sr.num);})};
-    }
     var shooter=match.shooters?match.shooters.find(function(s){return s.id===selectedShooterId||(selectedShooterId==="me"&&s.isMe);}):null;
     if(!shooter){shooter=await icEnsureShooter(match,selectedShooterId||icCurrentShooterId());}
     if(!shooter){alert("Shooter not found");return;}

@@ -1477,66 +1477,85 @@ let ee=[],Q=[],ve=[],me=[];function ks(){if(!R){alert("No match selected");retur
     return bi-ai;
   });
 
-    // Prognose: compute form profile from actual results using res.time, res.a/c/d
+    // Prognose: leave-one-out per stage
+  // For each shot stage N: build form profile from ALL OTHER shot stages, then estimate N
+  // For unshot stages: use form profile from all shot stages
+
+  // Helper: build form profile from a set of metrics
+  function buildFormProfile(metrics){
+    if(!metrics||metrics.length===0)return null;
+    var totTime=metrics.reduce(function(a,m){return a+m.time;},0);
+    var totShots=metrics.reduce(function(a,m){return a+m.shots;},0);
+    return{
+      avgSplit:totShots>0?totTime/totShots:0.6,
+      aPercent:metrics.reduce(function(a,m){return a+m.aP;},0)/metrics.length,
+      cPercent:metrics.reduce(function(a,m){return a+m.cP;},0)/metrics.length,
+      dPercent:metrics.reduce(function(a,m){return a+m.dP;},0)/metrics.length,
+      draw:1.3,reloadTime:1.5,
+      division:metrics[0].div,pf:metrics[0].pf
+    };
+  }
+
   shooterData.forEach(function(sd){
-    var allMetrics=[];
-    sd.stagePoints.forEach(function(sp){
-      if(!sp.hasResult||sp.hf<=0)return;
+    // Collect raw metrics per stage from icStageMetricsForMatch
+    var stageMetrics=[];
+    sd.stagePoints.forEach(function(sp,si){
+      if(!sp.hasResult||sp.hf<=0){stageMetrics.push(null);return;}
       var stageDef=stageDefs.find(function(s){return String(s.number)===String(sp.stageNum);});
-      if(!stageDef)return;
+      if(!stageDef){stageMetrics.push(null);return;}
       var mets=icStageMetricsForMatch(i,stageDef);
       var me=mets.find(function(m){return String(m.id)===String(sd.id)||(sd.isMe&&m.isMe);});
-      if(!me||!me.res)return;
+      if(!me||!me.res){stageMetrics.push(null);return;}
       var res=me.res;
       var shots=icStageShots(stageDef)||1;
       var time=res.time||0;
       var a=res.a||0,c=res.c||0,d=res.d||0,miss=res.miss||0;
       var total=a+c+d+miss||1;
       if(time>0){
-        allMetrics.push({time:time,shots:shots,
+        stageMetrics.push({time:time,shots:shots,
           aP:a/total,cP:c/total,dP:d/total,
-          div:me.division||'Classic',pf:me.pf||'minor'});
+          div:me.division||'Classic',pf:me.pf||'minor',
+          stageNum:sp.stageNum});
+      } else {
+        stageMetrics.push(null);
       }
     });
 
-    var formProfile=null;
-    if(allMetrics.length>0){
-      var totTime=allMetrics.reduce(function(a,m){return a+m.time;},0);
-      var totShots=allMetrics.reduce(function(a,m){return a+m.shots;},0);
-      var avgSplit=totShots>0?totTime/totShots:0.6;
-      var aForm=allMetrics.reduce(function(a,m){return a+m.aP;},0)/allMetrics.length;
-      var cForm=allMetrics.reduce(function(a,m){return a+m.cP;},0)/allMetrics.length;
-      var dForm=allMetrics.reduce(function(a,m){return a+m.dP;},0)/allMetrics.length;
-      formProfile={
-        avgSplit:avgSplit,
-        aPercent:aForm,
-        cPercent:cForm,
-        dPercent:dForm,
-        draw:1.3,
-        reloadTime:1.5,
-        division:allMetrics[0].div,
-        pf:allMetrics[0].pf
-      };
-    }
+    // All valid metrics (for unshot stages and fallback)
+    var allValidMetrics=stageMetrics.filter(function(m){return m!==null;});
 
-    sd.prgHF=sd.stagePoints.map(function(sp){
-      if(sp.hasResult&&sp.hf>0)return sp.hf;
-      if(!formProfile)return null;
+    // Build prgHF using leave-one-out for shot stages
+    sd.prgHF=sd.stagePoints.map(function(sp,si){
       var stageDef=stageDefs.find(function(s){return String(s.number)===String(sp.stageNum);});
       if(!stageDef)return null;
-      var proj=icProjectNext(formProfile,stageDef);
-      return proj?proj.estHF:null;
+
+      if(sp.hasResult&&sp.hf>0){
+        // Leave-one-out: use all OTHER shot stages to build form profile
+        var leaveOutMetrics=stageMetrics.filter(function(m,mi){return mi!==si&&m!==null;});
+        var profile=leaveOutMetrics.length>0
+          ?buildFormProfile(leaveOutMetrics)
+          :buildFormProfile(allValidMetrics); // fallback: only 1 shot stage
+        if(!profile)return sp.hf;
+        var proj=icProjectNext(profile,stageDef);
+        return proj?proj.estHF:sp.hf;
+      } else {
+        // Unshot: use all shot stages for form estimate
+        var profile=buildFormProfile(allValidMetrics);
+        if(!profile)return null;
+        var proj=icProjectNext(profile,stageDef);
+        return proj?proj.estHF:null;
+      }
     });
 
+    // avgHF = actual avg from shot stages
     var hfVals=sd.stagePoints.filter(function(sp){return sp.hasResult&&sp.hf>0;}).map(function(sp){return sp.hf;});
     sd.avgHF=hfVals.length>0?(hfVals.reduce(function(a,b){return a+b;},0)/hfVals.length):0;
 
-    if(formProfile){
-      var formVals=stageDefs.map(function(sdef){var p=icProjectNext(formProfile,sdef);return p?p.estHF:0;}).filter(function(v){return v>0;});
-      sd.formHF=formVals.length>0?(formVals.reduce(function(a,b){return a+b;},0)/formVals.length):0;
-    } else {
-      sd.formHF=0;
-    }
+    // formHF = avg of leave-one-out estimates for shot stages
+    var formVals=sd.stagePoints.map(function(sp,si){
+      return(sp.hasResult&&sp.hf>0&&sd.prgHF[si]!=null)?sd.prgHF[si]:null;
+    }).filter(function(v){return v!==null;});
+    sd.formHF=formVals.length>0?(formVals.reduce(function(a,b){return a+b;},0)/formVals.length):0;
   });
   // Normalize: find max prgHF across all shooters and stages
   var allPrgVals=[];

@@ -1529,9 +1529,16 @@ let ee=[],Q=[],ve=[],me=[];function ks(){if(!R){alert("No match selected");retur
       var proj=icProjectNext(formProfile,stageDef);
       return proj?proj.estHF:null;
     });
-    // avgHF for table display = avg of shot stages
+    // avgHF = actual avg HF from shot stages
     var hfVals=sd.stagePoints.filter(function(sp){return sp.hasResult&&sp.hf>0;}).map(function(sp){return sp.hf;});
     sd.avgHF=hfVals.length>0?(hfVals.reduce(function(a,b){return a+b;},0)/hfVals.length):0;
+    // formHF = estimated HF from dagsform (icProjectNext avg across all stage defs)
+    if(formProfile&&stageDefs.length>0){
+      var formVals=stageDefs.map(function(sdef){var p=icProjectNext(formProfile,sdef);return p?p.estHF:0;}).filter(function(v){return v>0;});
+      sd.formHF=formVals.length>0?(formVals.reduce(function(a,b){return a+b;},0)/formVals.length):0;
+    } else {
+      sd.formHF=0;
+    }
   });
   // Normalize: find max prgHF across all shooters and stages
   var allPrgVals=[];
@@ -1656,55 +1663,110 @@ let ee=[],Q=[],ve=[],me=[];function ks(){if(!R){alert("No match selected");retur
   tblStg+='</table></div>';
 
   // Prognose SVG - stiplet linje per skytter: faktisk HF for skutte stages, estimert for uskutte
+  // Prognose SVG: Y-axis = raw HF, dashed=form estimate, solid=actual
+  // Find Y axis range across all prgHF and actual HF values
+  var allHFVals=[];
+  shooterData.forEach(function(sd){
+    sd.prgHF.forEach(function(v){if(v!=null&&v>0)allHFVals.push(v);});
+    sd.stagePoints.forEach(function(sp){if(sp.hasResult&&sp.hf>0)allHFVals.push(sp.hf);});
+  });
+  var maxHF=allHFVals.length>0?Math.max.apply(null,allHFVals):8;
+  var minHF=allHFVals.length>0?Math.max(0,Math.min.apply(null,allHFVals)-0.5):0;
+  var hfRange=maxHF-minHF||1;
+
+  function hfToY(hf){return PT+gH*(1-(hf-minHF)/hfRange);}
+
   var svgPrg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:'+W+'px;display:block;margin:0 auto;">';
+  // Grid lines (4 lines)
   for(var gi2=0;gi2<=4;gi2++){
-    var gPct2=gi2*25;
-    var gy2=PT+gH*(1-gPct2/100);
+    var hfGrid=minHF+(hfRange*gi2/4);
+    var gy2=hfToY(hfGrid);
     svgPrg+='<line x1="'+PL+'" y1="'+gy2.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+gy2.toFixed(1)+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
-    svgPrg+='<text x="'+(PL-3)+'" y="'+(gy2+4)+'" font-size="8" fill="#7d8598" text-anchor="end">'+gPct2.toFixed(0)+'%</text>';
+    svgPrg+='<text x="'+(PL-3)+'" y="'+(gy2+3)+'" font-size="8" fill="#7d8598" text-anchor="end">'+hfGrid.toFixed(1)+'</text>';
   }
+  // X axis labels
   shotNums.forEach(function(sn,si){
     svgPrg+='<text x="'+xPos(si)+'" y="'+(H-6)+'" font-size="8" fill="#7d8598" text-anchor="middle">S'+sn+'</text>';
   });
+
   sortedByPrg.forEach(function(sd){
-    // Build points array from prgHF
-    var pts=[];
-    sd.prgHF.forEach(function(hfVal,si){
-      if(hfVal==null||hfVal<=0)return;
-      var pct=bestPrgHF>0?(hfVal/bestPrgHF*100):0;
-      var x=xPos(si);
-      var y=PT+gH*(1-pct/100);
-      pts.push({x:x,y:y,hf:hfVal,hasResult:sd.stagePoints[si].hasResult});
-    });
-    if(pts.length===0)return;
     var sw=sd.isMe?'2.5':'1.5';
     var op=sd.isMe?'1':'0.75';
-    // Draw dashed line segments between consecutive points
-    for(var pi=0;pi<pts.length-1;pi++){
-      var p1=pts[pi],p2=pts[pi+1];
+
+    // -- DASHED LINE: form estimate (prgHF) --
+    var dPts=[];
+    sd.prgHF.forEach(function(hfVal,si){
+      if(hfVal==null||hfVal<=0)return;
+      dPts.push({x:xPos(si),y:hfToY(hfVal),hf:hfVal,si:si});
+    });
+    for(var pi=0;pi<dPts.length-1;pi++){
+      var p1=dPts[pi],p2=dPts[pi+1];
       svgPrg+='<line x1="'+p1.x.toFixed(1)+'" y1="'+p1.y.toFixed(1)+'" x2="'+p2.x.toFixed(1)+'" y2="'+p2.y.toFixed(1)+'" stroke="'+sd.color+'" stroke-width="'+sw+'" stroke-dasharray="5,3" opacity="'+op+'"/>';
     }
-    // Dots at each point
-    pts.forEach(function(p){
-      var r=sd.isMe?(p.hasResult?'3':'2.5'):(p.hasResult?'2.5':'2');
-      svgPrg+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+r+'" fill="'+sd.color+'" opacity="'+op+'"/>';
+    dPts.forEach(function(p){
+      svgPrg+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2" fill="'+sd.color+'" opacity="'+(op*0.7)+'" stroke="none"/>';
     });
-    // HF label at last point
-    var lp=pts[pts.length-1];
-    svgPrg+='<text x="'+(lp.x+4)+'" y="'+(lp.y-3)+'" font-size="7" fill="'+sd.color+'" text-anchor="start" opacity="0.9">'+lp.hf.toFixed(2)+'</text>';
+
+    // -- SOLID LINE: actual HF (shot stages only) --
+    var aPts=[];
+    sd.stagePoints.forEach(function(sp,si){
+      if(!sp.hasResult||sp.hf<=0)return;
+      aPts.push({x:xPos(si),y:hfToY(sp.hf),hf:sp.hf,si:si});
+    });
+    for(var pi=0;pi<aPts.length-1;pi++){
+      var p1=aPts[pi],p2=aPts[pi+1];
+      svgPrg+='<line x1="'+p1.x.toFixed(1)+'" y1="'+p1.y.toFixed(1)+'" x2="'+p2.x.toFixed(1)+'" y2="'+p2.y.toFixed(1)+'" stroke="'+sd.color+'" stroke-width="'+sw+'" opacity="'+op+'"/>';
+    }
+    aPts.forEach(function(p){
+      svgPrg+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(sd.isMe?'3':'2.5')+'" fill="'+sd.color+'" opacity="'+op+'"/>';
+    });
+    // HF label at last actual point
+    if(aPts.length>0){
+      var lp=aPts[aPts.length-1];
+      svgPrg+='<text x="'+(lp.x+4)+'" y="'+(lp.y-3)+'" font-size="7" fill="'+sd.color+'" text-anchor="start" opacity="0.9">'+lp.hf.toFixed(2)+'</text>';
+    }
   });
   svgPrg+='</svg>';
   var legPrg=buildLegend(sortedByPrg);
+
+  // Table: clickable rows expand to show per-stage delta
+  var prgTableId='prg-tbl-'+Math.random().toString(36).substr(2,5);
   var tblPrg='<div style="margin-top:12px;">';
-  tblPrg+='<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">'+d('avg_hf')+' (form)</div>';
-  tblPrg+='<table style="width:100%;font-size:12px;border-collapse:collapse;">';
-  tblPrg+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);"><th style="padding:4px 6px;text-align:left;">SHOOTERS</th><th style="padding:4px 6px;text-align:right;">Avg HF</th><th style="padding:4px 6px;text-align:right;">%</th></tr>';
-  sortedByPrg.forEach(function(sd){
+  tblPrg+='<div style="font-size:10px;color:var(--muted);margin-bottom:6px;">— — dashed = form estimate &nbsp; ——&nbsp; solid = actual HF</div>';
+  tblPrg+='<table style="width:100%;font-size:12px;border-collapse:collapse;" id="'+prgTableId+'">';
+  tblPrg+='<tr style="border-bottom:1px solid var(--border);color:var(--muted);"><th style="padding:4px 6px;text-align:left;">SHOOTERS</th><th style="padding:4px 6px;text-align:right;">Form HF</th><th style="padding:4px 6px;text-align:right;">Actual HF</th><th style="padding:4px 6px;text-align:right;">%</th></tr>';
+  sortedByPrg.forEach(function(sd,rowIdx){
     var rowStyle=sd.isMe?'background:var(--accent-fade);':'';
-    tblPrg+='<tr style="border-bottom:1px solid rgba(255,255,255,0.04);'+rowStyle+'"><td style="padding:6px 6px;font-weight:'+(sd.isMe?'700':'400')+';">'+'<span style="color:'+sd.color+';margin-right:5px;">●</span>'+sd.name+'</td>';
-    tblPrg+='<td style="padding:6px 4px;text-align:right;font-weight:'+(sd.isMe?'700':'400')+';">'+(sd.avgHF>0?sd.avgHF.toFixed(2):'—')+'</td>';
-    tblPrg+='<td style="padding:6px 4px;text-align:right;color:'+(sd.prognPct>=90?'var(--green)':sd.prognPct>=70?'var(--accent)':'var(--text)')+';">'+(sd.avgHF>0?sd.prognPct.toFixed(1)+'%':'—')+'</td>';
+    var pctOfForm=sd.formHF>0&&sd.avgHF>0?(sd.avgHF/sd.formHF*100):0;
+    var pctColor=pctOfForm>=100?'var(--green)':pctOfForm>=85?'var(--accent)':'var(--text)';
+    var detailId=prgTableId+'-d'+rowIdx;
+    // Main row - clickable
+    tblPrg+='<tr style="border-bottom:1px solid rgba(255,255,255,0.06);'+rowStyle+';cursor:pointer;" onclick="var d=document.getElementById(\''+detailId+'\');d.style.display=d.style.display===\'none\'?\'table-row-group\':\'none\';">';
+    tblPrg+='<td style="padding:6px 6px;font-weight:'+(sd.isMe?'700':'400')+';"><span style="color:'+sd.color+';margin-right:5px;">●</span>'+sd.name+' <span style="font-size:10px;color:var(--muted);">▸</span></td>';
+    tblPrg+='<td style="padding:6px 4px;text-align:right;color:var(--muted);">'+(sd.formHF>0?sd.formHF.toFixed(2):'—')+'</td>';
+    tblPrg+='<td style="padding:6px 4px;text-align:right;font-weight:'+(sd.isMe?'700':'400')+';color:var(--text);">'+(sd.avgHF>0?sd.avgHF.toFixed(2):'—')+'</td>';
+    tblPrg+='<td style="padding:6px 4px;text-align:right;color:'+pctColor+';font-weight:600;">'+(pctOfForm>0?pctOfForm.toFixed(0)+'%':'—')+'</td>';
     tblPrg+='</tr>';
+    // Detail rows (hidden by default) - per stage delta
+    tblPrg+='<tbody id="'+detailId+'" style="display:none;">';
+    tblPrg+='<tr style="background:rgba(255,255,255,0.03);"><td colspan="4" style="padding:0;">';
+    tblPrg+='<table style="width:100%;font-size:11px;border-collapse:collapse;">';
+    tblPrg+='<tr style="color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.06);"><th style="padding:3px 6px 3px 18px;text-align:left;">Stage</th><th style="padding:3px 4px;text-align:right;">Form</th><th style="padding:3px 4px;text-align:right;">Actual</th><th style="padding:3px 4px;text-align:right;">Δ</th></tr>';
+    sd.stagePoints.forEach(function(sp,si){
+      var formHFStage=sd.prgHF[si]||0;
+      if(!sp.hasResult&&!formHFStage)return;
+      var actualHF=sp.hasResult?sp.hf:null;
+      var delta=actualHF&&formHFStage?(actualHF-formHFStage):null;
+      var dColor=delta==null?'var(--muted)':delta>=0?'var(--green)':'#e05c5c';
+      var dStr=delta==null?'—':(delta>=0?'+':'')+delta.toFixed(2);
+      tblPrg+='<tr style="border-bottom:1px solid rgba(255,255,255,0.03);">';
+      tblPrg+='<td style="padding:3px 6px 3px 18px;color:var(--muted);">S'+sd.stagePoints[si].stageNum+'</td>';
+      tblPrg+='<td style="padding:3px 4px;text-align:right;color:var(--muted);">'+(formHFStage>0?formHFStage.toFixed(2):'—')+'</td>';
+      tblPrg+='<td style="padding:3px 4px;text-align:right;">'+(actualHF?actualHF.toFixed(2):'—')+'</td>';
+      tblPrg+='<td style="padding:3px 4px;text-align:right;font-weight:600;color:'+dColor+';">'+dStr+'</td>';
+      tblPrg+='</tr>';
+    });
+    tblPrg+='</table></td></tr></tbody>';
   });
   tblPrg+='</table></div>';
 

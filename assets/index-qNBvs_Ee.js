@@ -136,8 +136,8 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  html, body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; min-height: 100vh; }
  .login-page {
   min-height: 100vh; width: 100%;
-  background: var(--bg);
-  background-image: radial-gradient(ellipse at 20% 10%, rgba(224,182,73,0.05) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(224,182,73,0.03) 0%, transparent 50%), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 42.7 L30 60 L0 42.7 L0 17.3Z' fill='none' stroke='rgba(224,182,73,0.035)' stroke-width='0.5'/%3E%3C/svg%3E");
+  background: #0d0f12;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 42.7 L30 60 L0 42.7 L0 17.3Z' fill='none' stroke='rgba(224,182,73,0.04)' stroke-width='0.5'/%3E%3C/svg%3E");
   display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px;
  }
  .login-shell { width: 100%; max-width: 400px; }
@@ -212,7 +212,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
 
   <div class="login-topbar">
    <div class="login-logo">
-    <img src="https://firebasestorage.googleapis.com/v0/b/ipscapp-3a0a5.appspot.com/o/app-assets%2Flogo.png?alt=media" style="width:36px;height:36px;object-fit:contain;" onerror="this.style.display='none';this.parentNode.innerHTML='🎯';" />
+    <img src="/Logo_IPSC-insight.png" alt="Insight Dynamics" style="width:38px;height:38px;object-fit:contain;" />
    </div>
    <div class="login-lang">
     <button class="lang-btn" id="langNo" onclick="">🇳🇴</button>
@@ -233,14 +233,14 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
   <div class="login-card">
 
    <!-- LOGIN SECTION -->
-   <div id="loginSection" class="login-section active">
+   <form id="loginSection" class="login-section active" onsubmit="return false;" autocomplete="on">
     <div class="field-group">
      <div class="field-lbl" id="loginEmailLabel">
       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>Email
      </div>
      <div class="field-wrap">
       <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg></div>
-      <input id="loginEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
+      <input id="loginEmail" class="field" type="email" placeholder="name@email.com" autocomplete="username" />
      </div>
     </div>
     <div class="field-group">
@@ -249,14 +249,14 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
      </div>
      <div class="field-wrap">
       <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <input id="loginPassword" class="field" type="password" placeholder="Password" autocomplete="current-password" />
+      <input id="loginPassword" class="field" type="password" placeholder="Password" autocomplete="current-password" name="password" />
       <button class="pw-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
      </div>
     </div>
     <button class="btn-primary" id="loginBtn">Sign In</button>
     <div class="or-row"><span id="separatorText">or</span></div>
     <button class="btn-secondary" id="showRegisterBtn">Create an Account</button>
-   </div>
+   </form>
 
    <!-- REGISTER SECTION -->
    <div id="registerSection" class="register-section">

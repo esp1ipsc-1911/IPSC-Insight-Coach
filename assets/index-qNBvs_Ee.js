@@ -1398,91 +1398,87 @@ function toggleLiveFilter(){liveShowAll=!liveShowAll,_e()}function toggleTips(id
   }).sort((a,b)=>b.totalPts-a.totalPts);
 }function renderTeamsScreen(){
   const match=$.find(e=>e.id!=null&&e.id.toString()===String(R));
-  const sc=o("teams-standings-container");const lc=o("teams-list-container");
+  const sc=o("teams-standings-container");
+  const lc=o("teams-list-container");
   if(!sc||!lc)return;
-  if(!match){sc.innerHTML='<div class="empty-state"><div class="empty-sub">'+d('select_match_first')+'</div></div>';lc.innerHTML="";return;}
+  if(!match){
+    sc.innerHTML="<div class='empty-state'><div class='empty-sub'>"+d("select_match_first")+"</div></div>";
+    lc.innerHTML="";return;
+  }
   const teams=match.teams||[];
-  if(!teams.length){sc.innerHTML='<div class="empty-state"><div class="empty-title">'+d('no_teams')+'</div><div class="empty-sub">'+d('create_team_hint')+'</div></div>';lc.innerHTML="";return;}
+  if(!teams.length){
+    sc.innerHTML="<div class='empty-state'><div class='empty-title'>"+d("no_teams")+"</div><div class='empty-sub'>"+d("create_team_hint")+"</div></div>";
+    lc.innerHTML="";return;
+  }
   const standings=icTeamStandings(match);
   const topPts=standings.length?standings[0].totalPts:0;
 
-  // ── Standings table ──
-  let sh='<div class="card"><div class="card-header"><div class="card-title">'+d('team_standings')+'</div></div>';
-  sh+='<div class="standings-table-wrap"><table class="standings-table">';
-  sh+='<thead><tr class="standings-header-row"><th class="standings-th">#</th><th class="standings-th">'+d('team_col')+'</th><th class="standings-th standings-th-pts">STG PTS</th><th class="standings-th standings-th-pct">%</th></tr></thead><tbody>';
-  standings.forEach((t,i)=>{
-    const pct=topPts>0?(t.totalPts/topPts*100).toFixed(2):"0.00";
-    const detId='team-detail-'+t.id;
-    sh+='<tr class="standings-row" onclick="toggleTeamDetail(this)" data-tid="'+detId+'" style="cursor:pointer;">';
-    sh+='<td class="standings-td">'+(i+1)+'</td>';
-    sh+='<td class="standings-td">'+t.name+'</td>';
-    sh+='<td class="standings-td standings-td-pts">'+t.totalPts.toFixed(2)+'</td>';
-    sh+='<td class="standings-td standings-td-pct">'+pct+'%</td>';
-    sh+='</tr>';
-    // Expandable: per-stage breakdown with STG PTS per shooter
-    sh+='<tr id="'+detId+'" style="display:none;"><td colspan="4" style="padding:0;">';
-    sh+='<table style="width:100%;font-size:11px;border-collapse:collapse;background:rgba(255,255,255,0.03);">';
-    sh+='<tr style="color:var(--muted);border-bottom:1px solid var(--border);">';
-    sh+='<th style="padding:4px 8px;text-align:left;">Stage</th>';
-    sh+='<th style="padding:4px 4px;text-align:right;">STG PTS</th>';
-    sh+='<th style="padding:4px 8px;text-align:left;">Top 3 (pts)</th></tr>';
+  // Build standings table
+  var sh="<div class='card'><div class='card-header'><div class='card-title'>"+d("team_standings")+"</div></div>";
+  sh+="<div class='standings-table-wrap'><table class='standings-table'>";
+  sh+="<thead><tr class='standings-header-row'><th class='standings-th'>#</th><th class='standings-th'>"+d("team_col")+"</th><th class='standings-th standings-th-pts'>STG PTS</th><th class='standings-th standings-th-pct'>%</th></tr></thead><tbody>";
+  standings.forEach(function(t,i){
+    var pct=topPts>0?(t.totalPts/topPts*100).toFixed(2):"0.00";
+    var detId="team-detail-"+t.id;
+    sh+="<tr class='standings-row' onclick='toggleTeamDetail(this)' data-tid='"+detId+"' style='cursor:pointer;'>";
+    sh+="<td class='standings-td'>"+(i+1)+"</td>";
+    sh+="<td class='standings-td'>"+t.name+"</td>";
+    sh+="<td class='standings-td standings-td-pts'>"+t.totalPts.toFixed(2)+"</td>";
+    sh+="<td class='standings-td standings-td-pct'>"+pct+"%</td>";
+    sh+="</tr>";
+    // Expandable detail row
+    sh+="<tr id='"+detId+"' style='display:none;'><td colspan='4' style='padding:0;'>";
+    sh+="<table style='width:100%;font-size:11px;border-collapse:collapse;background:rgba(255,255,255,0.03);'>";
+    sh+="<tr style='color:var(--muted);border-bottom:1px solid var(--border);'><th style='padding:4px 8px;text-align:left;'>Stage</th><th style='padding:4px 4px;text-align:right;'>STG PTS</th><th style='padding:4px 8px;text-align:left;'>Top 3 (pts)</th></tr>";
     (t.stageBreakdown||[]).forEach(function(sb){
-      const shooterList=sb.top3.map(function(m){
-        const col=m.dq?'#ef4444':'var(--accent)';
-        return '<span style="margin-right:8px;">'+m.name.split(' ')[0]
-          +' <span style="color:'+col+';">'+m.stagePts.toFixed(1)+'</span>'
-          +(m.dq?' <span style="color:#ef4444;">[DQ]</span>':'')
-          +'</span>';
-      }).join('');
-      sh+='<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">';
-      sh+='<td style="padding:4px 8px;color:var(--muted);">S'+sb.stageNum+'</td>';
-      sh+='<td style="padding:4px 4px;text-align:right;font-weight:600;">'+sb.stagePts.toFixed(2)+'</td>';
-      sh+='<td style="padding:4px 8px;">'+shooterList+'</td>';
-      sh+='</tr>';
+      var shooterList=sb.top3.map(function(m){
+        var col=m.dq?"#ef4444":"var(--accent)";
+        return "<span style='margin-right:8px;'>"+m.name.split(" ")[0]+" <span style='color:"+col+";'>"+m.stagePts.toFixed(1)+"</span>"+(m.dq?" <span style='color:#ef4444;'>[DQ]</span>":"")+"</span>";
+      }).join("");
+      sh+="<tr style='border-bottom:1px solid rgba(255,255,255,0.04);'>";
+      sh+="<td style='padding:4px 8px;color:var(--muted);'>S"+sb.stageNum+"</td>";
+      sh+="<td style='padding:4px 4px;text-align:right;font-weight:600;'>"+sb.stagePts.toFixed(2)+"</td>";
+      sh+="<td style='padding:4px 8px;'>"+shooterList+"</td>";
+      sh+="</tr>";
     });
-    sh+='</table></td></tr>';
+    sh+="</table></td></tr>";
   });
-  sh+='</tbody></table></div></div>';
+  sh+="</tbody></table></div></div>";
   sc.innerHTML=sh;
 
-  // ── Team cards ──
-  let lh='';
-  standings.forEach((t,tidx)=>{
-    // Find original team index for edit/delete
-    const origIdx=(match.teams||[]).findIndex(tm=>tm.id===t.id);
-    // Division warning
-    const divs=[...new Set((t.shooters||[]).map(s=>s.division||'').filter(Boolean))];
-    const divWarning=divs.length>1?'<div style="font-size:11px;color:#ef4444;margin-top:6px;">⚠ '+d('mixed_divisions')+': '+divs.join(', ')+'</div>':'';
-
-    lh+='<div class="card" style="margin-bottom:10px;">';
-    lh+='<div class="card-header"><div class="card-title">'+(t.country?t.country+' ':'')+t.name+'</div>';
-    lh+='<div style="display:flex;gap:8px;">';
-    lh+='<button onclick="editTeam('+origIdx+')" style="padding:6px 12px;background:var(--accent);color:#1a202c;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">'+d('edit_btn')+'</button>';
-    lh+='<button onclick="deleteTeam('+origIdx+')" style="padding:6px 12px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">'+d('delete_btn')+'</button>';
-    lh+='</div></div>';
+  // Build team cards
+  var lh="";
+  standings.forEach(function(t){
+    var origIdx=(match.teams||[]).findIndex(function(tm){return tm.id===t.id;});
+    var divs=[...new Set((t.shooters||[]).map(function(s){return s.division||"";}).filter(Boolean))];
+    var divWarning=divs.length>1?"<div style='font-size:11px;color:#ef4444;margin-top:6px;'>&#9888; "+d("mixed_divisions")+": "+divs.join(", ")+"</div>":"";
+    lh+="<div class='card' style='margin-bottom:10px;'>";
+    lh+="<div class='card-header'><div class='card-title'>"+(t.country?t.country+" ":"")+t.name+"</div>";
+    lh+="<div style='display:flex;gap:8px;'>";
+    lh+="<button onclick='editTeam("+origIdx+")' style='padding:6px 12px;background:var(--accent);color:#1a202c;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;'>"+d("edit_btn")+"</button>";
+    lh+="<button onclick='deleteTeam("+origIdx+")' style='padding:6px 12px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;'>"+d("delete_btn")+"</button>";
+    lh+="</div></div>";
     lh+=divWarning;
-
-    // Shooter list: counting (top 3) vs bench
-    lh+='<div style="margin-top:10px;">';
+    lh+="<div style='margin-top:10px;'>";
     (t.shooterSummary||[]).forEach(function(s){
-      const isDQ=s.dq;
-      const counting=s.counting&&!isDQ;
-      const bg=counting?'rgba(76,175,125,0.08)':'rgba(255,255,255,0.02)';
-      const badge=isDQ
-        ?'<span style="font-size:10px;padding:2px 6px;background:rgba(239,68,68,0.2);color:#ef4444;border-radius:4px;margin-left:6px;">DQ</span>'
+      var isDQ=s.dq;
+      var counting=s.counting&&!isDQ;
+      var bg=counting?"rgba(76,175,125,0.08)":"rgba(255,255,255,0.02)";
+      var badge=isDQ
+        ?"<span style='font-size:10px;padding:2px 6px;background:rgba(239,68,68,0.2);color:#ef4444;border-radius:4px;margin-left:6px;'>DQ</span>"
         :counting
-          ?'<span style="font-size:10px;padding:2px 6px;background:rgba(76,175,125,0.2);color:var(--green);border-radius:4px;margin-left:6px;">●</span>'
-          :'<span style="font-size:10px;padding:2px 6px;background:rgba(255,255,255,0.08);color:var(--muted);border-radius:4px;margin-left:6px;">bench</span>';
-      lh+='<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;background:'+bg+';margin-bottom:3px;">';
-      lh+='<span style="font-size:13px;'+(isDQ?'color:#ef4444;text-decoration:line-through;':counting?'':'color:var(--muted);')+'">'
-        +s.name+badge+'</span>';
-      lh+='<div style="display:flex;align-items:center;gap:8px;">';
-      lh+='<span style="font-size:12px;color:'+(counting?'var(--accent)':'var(--muted)')+';">'+s.total.toFixed(1)+' pts</span>';
-      lh+='<button onclick="toggleDQ('+JSON.stringify(match.id)+','+JSON.stringify(s.id)+')" style="padding:3px 8px;font-size:11px;border:none;border-radius:6px;cursor:pointer;background:'+(isDQ?'rgba(239,68,68,0.2)':'rgba(255,255,255,0.08)')+';color:'+(isDQ?'#ef4444':'var(--muted)')+';">'+(isDQ?d('undo_dq'):d('mark_dq'))+'</button>';
-      lh+='</div></div>';
+          ?"<span style='font-size:10px;padding:2px 6px;background:rgba(76,175,125,0.2);color:var(--green);border-radius:4px;margin-left:6px;'>&#9679;</span>"
+          :"<span style='font-size:10px;padding:2px 6px;background:rgba(255,255,255,0.08);color:var(--muted);border-radius:4px;margin-left:6px;'>bench</span>";
+      var nameStyle=isDQ?"color:#ef4444;text-decoration:line-through;":counting?"":"color:var(--muted);";
+      lh+="<div style='display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;background:"+bg+";margin-bottom:3px;'>";
+      lh+="<span style='font-size:13px;"+nameStyle+"'>"+s.name+badge+"</span>";
+      lh+="<div style='display:flex;align-items:center;gap:8px;'>";
+      lh+="<span style='font-size:12px;color:"+(counting?"var(--accent)":"var(--muted)")+";'>"+s.total.toFixed(1)+" pts</span>";
+      lh+="<button onclick='toggleDQ("+JSON.stringify(match.id)+","+JSON.stringify(s.id)+")' style='padding:3px 8px;font-size:11px;border:none;border-radius:6px;cursor:pointer;background:"+(isDQ?"rgba(239,68,68,0.2)":"rgba(255,255,255,0.08)")+";color:"+(isDQ?"#ef4444":"var(--muted)")+";'>"+(isDQ?d("undo_dq"):d("mark_dq"))+"</button>";
+      lh+="</div></div>";
     });
-    lh+='</div>';
-    lh+='</div>';
+    lh+="</div>";
+    lh+="</div>";
   });
   lc.innerHTML=lh;
 }let currentEditTeamIdx=null;function openCreateTeam(){const match=$.find(e=>e.id!=null&&e.id.toString()===String(R));if(!match){alert("Select a match first");return;}currentEditTeamIdx=null;o("team-modal-title").textContent="Create team";o("team-name-input").value="";icPopulateTeamCountry("");renderTeamShooterList(match,null);ie("modal-create-team")}function editTeam(idx){const match=$.find(e=>e.id!=null&&e.id.toString()===String(R));if(!match||!match.teams||!match.teams[idx])return;currentEditTeamIdx=idx;const team=match.teams[idx];o("team-modal-title").textContent="Rediger lag";o("team-name-input").value=team.name||"";icPopulateTeamCountry(team.country||"");renderTeamShooterList(match,team.shooterIds||[]);ie("modal-create-team")}function renderTeamShooterList(match,selectedIds){const container=o("team-shooter-list");if(!container)return;const allShooters=(match.shooters||[]);const usedIds=new Set();(match.teams||[]).forEach((t,i)=>{if(i===currentEditTeamIdx)return;(t.shooterIds||[]).forEach(id=>usedIds.add(id))});let html="";allShooters.forEach(s=>{const name=((s.firstName||"")+" "+(s.lastName||"")).trim()||"Skytter";const checked=selectedIds&&selectedIds.includes(s.id);const disabled=!checked&&usedIds.has(s.id);html+='<label style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:8px;margin-bottom:8px;cursor:'+(disabled?"not-allowed":"pointer")+';">';html+='<input type="checkbox" value="'+s.id+'" '+(checked?"checked":"")+(disabled?" disabled":"")+(disabled?"":' onchange="enforceTeamLimit(this)"')+ ' style="width:18px;height:18px;">';html+='<div><div style="font-weight:600;"'+(disabled?' style="color:var(--muted);"':'')+">"+ name+"</div>";if(disabled)html+='<div style="font-size:11px;color:var(--muted);">Allerede på et lag</div>';html+="</div></label>"});if(!allShooters.length)html='<div style="color:var(--muted);font-size:13px;">'+d('no_shooters_in_match')+'</div>';container.innerHTML=html}function enforceTeamLimit(el){const checked=o("team-shooter-list").querySelectorAll("input:checked");if(checked.length>4){el.checked=false;alert("Maximum 4 shooters per team")}}async function saveTeam(){const match=$.find(e=>e.id!=null&&e.id.toString()===String(R));if(!match)return;const name=(o("team-name-input").value||"").trim();if(!name){alert("Team name cannot be empty");return;}const country=(o("team-country-input")&&o("team-country-input").value)||"";const checkboxes=o("team-shooter-list").querySelectorAll("input[type=checkbox]:checked");const shooterIds=Array.from(checkboxes).map(c=>c.value);if(shooterIds.length>4){alert("Maximum 4 shooters per team");return;}

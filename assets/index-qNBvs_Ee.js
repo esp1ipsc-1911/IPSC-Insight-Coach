@@ -2191,7 +2191,7 @@ async function importESSVerify(e){
   shooters.forEach(function(sh){
     const name=(sh.isMe?"Meg ("+(sh.firstName||"")+" "+(sh.lastName||"")+")":(sh.firstName||"")+" "+(sh.lastName||"")).trim();
     shooterOptions+=`<option value="${sh.id}">${name}</option>`;
-
+  });
 const Ft_en=`
 <div class="gdpr-content">
  <h2>Privacy Policy and Consent</h2>
@@ -2296,7 +2296,6 @@ const Ft_en=`
  <p class="gdpr-version">Version 1.0 - Last updated: ${new Date().toLocaleDateString("en-US")}</p>
 </div>
 `;
-  });
   let existing=o("ess-paste-modal");
   if(existing)existing.remove();
   const overlay=document.createElement("div");

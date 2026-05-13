@@ -125,800 +125,773 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </span>
  </label>
  `,setTimeout(()=>{const i=e.querySelector("#gdpr-open-modal");i&&i.addEventListener("click",t=>{t.preventDefault(),At(()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!0)},()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!1)})})},0),e}function Dt(){const e=document.getElementById("gdpr-consent-checkbox");return!e||!e.checked?{valid:!1,error:dt==="no"?"You must accept the Privacy Policy to create an account":"You must accept the Privacy Policy to create an account"}:{valid:!0}}function Bt(e,i){e.innerHTML=`
- <style>
- * {
- box-sizing: border-box;
+<style>
+ *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+ :root {
+  --accent: #e0b649;
+  --accent2: #c49a30;
+  --bg: #0d0f12;
+  --bg2: #111418;
+  --card: #141820;
+  --border: rgba(255,255,255,0.07);
+  --border-gold: rgba(224,182,73,0.25);
+  --text: #f0f2f5;
+  --muted: rgba(255,255,255,0.38);
+  --red: #ef4444;
  }
 
  html, body {
- margin: 0;
- padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  min-height: 100vh;
  }
 
- .ipsc-login-page {
- min-height: 100vh;
- width: 100%;
- background: #0a0c0f;
- display: flex;
- justify-content: center;
- align-items: flex-start;
- padding: 0;
- font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
- color: #f5f7fb;
- overflow-x: hidden;
+ .login-page {
+  min-height: 100vh;
+  width: 100%;
+  background: var(--bg);
+  background-image:
+   radial-gradient(ellipse at 20% 10%, rgba(224,182,73,0.06) 0%, transparent 50%),
+   radial-gradient(ellipse at 80% 80%, rgba(224,182,73,0.04) 0%, transparent 50%),
+   url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 42.7 L30 60 L0 42.7 L0 17.3Z' fill='none' stroke='rgba(224,182,73,0.04)' stroke-width='0.5'/%3E%3C/svg%3E");
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
  }
 
- .ipsc-login-shell {
- width: 100%;
- max-width: 420px;
- position: relative;
- min-height: 100vh;
- display: flex;
- flex-direction: column;
- background:
-  radial-gradient(ellipse at 80% 0%, rgba(224,182,73,0.13) 0%, transparent 55%),
-  radial-gradient(ellipse at 20% 100%, rgba(224,182,73,0.07) 0%, transparent 50%),
-  linear-gradient(180deg, #0d0f12 0%, #0a0c0f 100%);
+ .login-shell {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
  }
 
- /* Hex grid background */
- .ipsc-login-shell::before {
- content: '';
- position: absolute;
- inset: 0;
- background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52' viewBox='0 0 60 52'%3E%3Cpath d='M30 2 L58 17 L58 35 L30 50 L2 35 L2 17Z' fill='none' stroke='rgba(224,182,73,0.06)' stroke-width='1'/%3E%3C/svg%3E");
- background-size: 60px 52px;
- opacity: 0.6;
- pointer-events: none;
- z-index: 0;
+ /* TOP BAR */
+ .login-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
  }
 
- .login-top {
- position: relative;
- z-index: 1;
- padding: 20px 24px 0;
+ .login-logo-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1a1e26 0%, #0d0f12 100%);
+  border: 1px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 1px rgba(224,182,73,0.15), 0 0 20px rgba(224,182,73,0.1);
+  font-size: 28px;
  }
 
- .ipsc-header {
- width: 100%;
- display: flex;
- align-items: center;
- justify-content: space-between;
- margin-bottom: 0;
- }
-
- .brand-icon {
- width: 62px;
- height: 62px;
- border-radius: 16px;
- overflow: hidden;
- box-shadow: 0 0 0 2px rgba(224,182,73,0.5), 0 8px 24px rgba(224,182,73,0.18);
- flex-shrink: 0;
- background: #1a1a10;
- }
-
- .brand-icon img {
- width: 100%;
- height: 100%;
- object-fit: cover;
- }
-
- .lang-flags {
- display: flex;
- gap: 0;
- background: rgba(255,255,255,0.04);
- border: 1px solid rgba(255,255,255,0.1);
- border-radius: 8px;
- overflow: hidden;
+ .login-lang-wrap {
+  display: flex;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
  }
 
  .lang-btn {
- width: 52px;
- height: 36px;
- border: none;
- background: transparent;
- display: flex;
- align-items: center;
- justify-content: center;
- font-size: 19px;
- line-height: 1;
- cursor: pointer;
- transition: background 0.15s;
- position: relative;
- color: rgba(255,255,255,0.45);
+  background: transparent;
+  border: none;
+  padding: 8px 14px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.15s;
+  line-height: 1;
+ }
+ .lang-btn.active { background: rgba(224,182,73,0.15); }
+ .lang-btn:first-child { border-right: 1px solid var(--border); }
+
+ /* HERO */
+ .login-hero {
+  margin-bottom: 28px;
  }
 
- .lang-btn.active {
- background: rgba(224,182,73,0.15);
- color: #e0b649;
+ .login-title {
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 4px;
+ }
+ .login-title .white { color: var(--text); }
+ .login-title .gold { color: var(--accent); }
+
+ .login-tagline {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 10px;
  }
 
- .lang-btn:first-child {
- border-right: 1px solid rgba(255,255,255,0.1);
+ /* STATUS */
+ .login-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-left: 2px solid #22c55e;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
  }
-
- .brand-hero {
- position: relative;
- z-index: 1;
- padding: 32px 24px 0;
- }
-
- .brand-title {
- font-family: "Rajdhani", "Impact", "Arial Black", sans-serif;
- line-height: 0.88;
- margin-bottom: 10px;
- }
-
- .brand-title .top {
- display: block;
- font-size: 56px;
- font-weight: 800;
- color: #ffffff;
- letter-spacing: 0.02em;
- }
-
- .brand-title .bottom {
- display: block;
- font-size: 56px;
- font-weight: 800;
- color: #e0b649;
- letter-spacing: 0.02em;
- }
-
- .brand-subtitle {
- font-size: 11px;
- letter-spacing: 0.22em;
- color: rgba(255,255,255,0.45);
- text-transform: uppercase;
- margin-bottom: 0;
- font-weight: 500;
- }
-
- /* Status bar */
- .status-bar {
- position: relative;
- z-index: 1;
- margin: 24px 24px 0;
- display: flex;
- align-items: center;
- justify-content: space-between;
- background: rgba(255,255,255,0.04);
- border: 1px solid rgba(255,255,255,0.08);
- border-radius: 10px;
- padding: 10px 14px;
- }
-
- .status-item {
- display: flex;
- align-items: center;
- gap: 6px;
- font-size: 10px;
- font-weight: 700;
- letter-spacing: 0.08em;
- color: rgba(255,255,255,0.5);
- text-transform: uppercase;
- }
-
  .status-dot {
- width: 7px;
- height: 7px;
- border-radius: 50%;
- background: #4caf50;
- box-shadow: 0 0 6px rgba(76,175,80,0.7);
- flex-shrink: 0;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+  flex-shrink: 0;
+ }
+ .status-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
  }
 
- .status-divider {
- width: 1px;
- height: 16px;
- background: rgba(255,255,255,0.1);
- }
-
- /* Form card */
+ /* CARD */
  .login-card {
- position: relative;
- z-index: 1;
- margin: 20px 16px 0;
- background: rgba(255,255,255,0.035);
- border: 1px solid rgba(255,255,255,0.09);
- border-radius: 16px;
- padding: 22px 20px;
- /* Clipped corners like the design */
- clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 24px;
  }
+
+ /* FORM */
+ .field-group { margin-bottom: 16px; }
 
  .field-label {
- font-size: 10px;
- font-weight: 700;
- letter-spacing: 0.14em;
- color: rgba(255,255,255,0.45);
- text-transform: uppercase;
- margin-bottom: 7px;
- margin-top: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+ }
+
+ .field-label svg {
+  width: 12px; height: 12px;
+  stroke: var(--muted);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
  }
 
  .field-wrap {
- position: relative;
- margin-bottom: 16px;
+  position: relative;
+  display: flex;
+  align-items: center;
  }
 
  .field-icon {
- position: absolute;
- left: 14px;
- top: 50%;
- transform: translateY(-50%);
- color: rgba(255,255,255,0.3);
- font-size: 15px;
- pointer-events: none;
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
  }
-
- .field-eye {
- position: absolute;
- right: 14px;
- top: 50%;
- transform: translateY(-50%);
- color: rgba(255,255,255,0.3);
- background: none;
- border: none;
- cursor: pointer;
- font-size: 15px;
- padding: 0;
- line-height: 1;
+ .field-icon svg {
+  width: 15px; height: 15px;
+  stroke: var(--muted);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
  }
 
  .field {
- width: 100%;
- background: rgba(255,255,255,0.055);
- border: 1px solid rgba(255,255,255,0.1);
- border-radius: 10px;
- padding: 13px 14px 13px 42px;
- color: #f5f7fb;
- font-size: 14px;
- outline: none;
- transition: border-color 0.15s, background 0.15s;
- box-sizing: border-box;
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 15px;
+  padding: 13px 14px 13px 40px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-appearance: none;
  }
-
  .field:focus {
- border-color: rgba(224,182,73,0.5);
- background: rgba(255,255,255,0.07);
+  border-color: rgba(224,182,73,0.45);
+  background: rgba(255,255,255,0.06);
  }
-
- .field::placeholder {
- color: rgba(255,255,255,0.25);
- }
-
- .field-no-icon {
- padding-left: 14px;
- }
-
- .field-select {
- width: 100%;
- background: rgba(255,255,255,0.055);
- border: 1px solid rgba(255,255,255,0.1);
- border-radius: 10px;
- padding: 13px 14px;
- color: #f5f7fb;
- font-size: 14px;
- outline: none;
- box-sizing: border-box;
- margin-bottom: 16px;
- }
-
-
- .primary-btn {
- width: 100%;
- padding: 15px;
- background: linear-gradient(135deg, #e0b649 0%, #c49a30 100%);
- border: none;
- border-radius: 10px;
- color: #0a0c0f;
- font-size: 13px;
- font-weight: 800;
- letter-spacing: 0.18em;
- text-transform: uppercase;
- cursor: pointer;
- display: flex;
- align-items: center;
- justify-content: center;
- gap: 10px;
- margin-bottom: 0;
- transition: opacity 0.15s;
- clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
- }
-
- .primary-btn:hover { opacity: 0.9; }
- .primary-btn:disabled { opacity: 0.5; cursor: default; }
-
- .btn-chevrons {
- font-size: 16px;
- font-weight: 900;
- letter-spacing: -2px;
- }
-
- .separator {
- display: flex;
- align-items: center;
- gap: 10px;
- font-size: 11px;
- letter-spacing: 0.1em;
- color: rgba(255,255,255,0.3);
- text-transform: uppercase;
- margin: 16px 0;
- }
-
- .separator::before, .separator::after {
- content: '';
- flex: 1;
- height: 1px;
- background: rgba(255,255,255,0.08);
- }
-
- .secondary-btn {
- width: 100%;
- padding: 14px;
- background: transparent;
- border: 1px solid rgba(224,182,73,0.3);
- border-radius: 10px;
- color: #e0b649;
- font-size: 13px;
- font-weight: 700;
- letter-spacing: 0.12em;
- text-transform: uppercase;
- cursor: pointer;
- display: flex;
- align-items: center;
- justify-content: center;
- gap: 10px;
- transition: background 0.15s;
- }
-
- .secondary-btn:hover { background: rgba(224,182,73,0.07); }
-
- .ghost-btn {
- width: 100%;
- padding: 13px;
- background: transparent;
- border: 1px solid rgba(255,255,255,0.08);
- border-radius: 10px;
- color: rgba(255,255,255,0.45);
- font-size: 12px;
- font-weight: 600;
- letter-spacing: 0.1em;
- text-transform: uppercase;
- cursor: pointer;
- margin-top: 10px;
- transition: background 0.15s;
- }
-
- .ghost-btn:hover { background: rgba(255,255,255,0.04); }
-
- .error-text {
- color: #ef4444;
- font-size: 13px;
- text-align: center;
- margin-top: 12px;
- min-height: 18px;
- }
-
- .strength-wrap {
- margin-bottom: 16px;
- }
-
- .strength-bar-bg {
- height: 4px;
- background: rgba(255,255,255,0.08);
- border-radius: 4px;
- overflow: hidden;
- margin-bottom: 5px;
- }
-
- .strength-bar-fill {
- height: 100%;
- width: 0;
- border-radius: 4px;
- transition: width 0.3s, background 0.3s;
- }
-
- .strength-text {
- font-size: 11px;
- color: rgba(255,255,255,0.4);
- }
-
- .pf-selector {
- display: flex;
- gap: 8px;
- margin-bottom: 16px;
- }
-
- .pf-option {
- flex: 1;
- text-align: center;
- padding: 10px;
- border: 1px solid rgba(255,255,255,0.1);
- border-radius: 8px;
- font-size: 12px;
- font-weight: 700;
- letter-spacing: 0.1em;
- text-transform: uppercase;
- cursor: pointer;
- color: rgba(255,255,255,0.4);
- background: rgba(255,255,255,0.03);
- transition: all 0.15s;
- }
-
- .pf-option.selected {
- border-color: #e0b649;
- color: #e0b649;
- background: rgba(224,182,73,0.1);
- }
-
- .section { display: none; }
- .section.active { display: block; }
-
- /* Footer feature strip */
- .login-footer {
- position: relative;
- z-index: 1;
- margin: 20px 16px 28px;
- display: flex;
- align-items: center;
- justify-content: space-between;
- border-top: 1px solid rgba(255,255,255,0.06);
- padding-top: 18px;
- }
-
- .footer-feature {
- display: flex;
- flex-direction: column;
- align-items: center;
- gap: 4px;
- flex: 1;
- }
-
- .footer-feature-icon {
- font-size: 16px;
- color: rgba(224,182,73,0.6);
- }
-
- .footer-feature-title {
- font-size: 9px;
- font-weight: 700;
- letter-spacing: 0.1em;
- color: rgba(255,255,255,0.35);
- text-transform: uppercase;
- text-align: center;
- }
-
- .footer-feature-status {
- font-size: 9px;
- font-weight: 700;
- letter-spacing: 0.08em;
- color: #4caf50;
- text-transform: uppercase;
- }
-
- .footer-divider {
- width: 1px;
- height: 32px;
- background: rgba(255,255,255,0.07);
- }
-
- .login-copyright {
- position: relative;
- z-index: 1;
- text-align: center;
- padding: 0 24px 24px;
- font-size: 10px;
- color: rgba(255,255,255,0.2);
- letter-spacing: 0.06em;
- text-transform: uppercase;
- }
+ .field::placeholder { color: rgba(255,255,255,0.2); }
 
  input:-webkit-autofill,
  input:-webkit-autofill:hover,
- input:-webkit-autofill:focus,
- input:-webkit-autofill:active {
- -webkit-box-shadow: 0 0 0 100px rgba(20,24,32,0.98) inset !important;
- -webkit-text-fill-color: #f5f7fb !important;
- caret-color: #f5f7fb !important;
- border: 1px solid rgba(255,255,255,0.1) !important;
- transition: background-color 9999s ease-in-out 0s !important;
+ input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 100px #141820 inset !important;
+  -webkit-text-fill-color: #f0f2f5 !important;
+  caret-color: #f0f2f5 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  transition: background-color 9999s !important;
  }
 
- @media (min-width: 700px) {
- .ipsc-login-page {
- align-items: center;
- padding: 24px;
+ .pw-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--muted);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
  }
- .ipsc-login-shell {
- max-width: 420px;
- min-height: auto;
- border-radius: 20px;
- overflow: hidden;
- box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+ .pw-toggle svg {
+  width: 17px; height: 17px;
+  stroke: var(--muted);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
  }
+
+ /* BUTTONS */
+ .btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  color: #0a0c0f;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 0.15s;
  }
- </style>
+ .btn-primary:hover { opacity: 0.9; }
+ .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
- <div class="ipsc-login-page">
- <div class="ipsc-login-shell">
+ .btn-secondary {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid rgba(224,182,73,0.3);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+ }
+ .btn-secondary:hover { background: rgba(224,182,73,0.08); border-color: rgba(224,182,73,0.5); }
 
- <!-- Top bar: logo + flags -->
- <div class="login-top">
- <div class="ipsc-header">
- <div class="brand-icon">
- <img src="Logo_IPSC-insight.png" alt="Insight Dynamics Shooting">
+ .btn-ghost {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin-top: 4px;
+ }
+
+ .or-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+ }
+ .or-divider::before, .or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+ }
+ .or-divider span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+ }
+
+ /* ERROR */
+ .error-text {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 10px;
+  min-height: 16px;
+  text-align: center;
+ }
+
+ /* REGISTER FORM */
+ .register-form { display: none; }
+ .register-form.active { display: block; }
+
+ .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+ }
+
+ .field-no-icon { padding-left: 14px !important; }
+
+ select.field {
+  padding-left: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  -webkit-appearance: none;
+  appearance: none;
+ }
+ select.field option { background: #141820; color: var(--text); }
+
+ /* GDPR */
+ .gdpr-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 14px 0;
+ }
+ .gdpr-check-row input[type=checkbox] {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  margin-top: 1px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+ }
+ .gdpr-check-row label {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  cursor: pointer;
+ }
+ .gdpr-check-row label a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+ }
+
+ /* PASSWORD STRENGTH */
+ .pw-strength {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+ }
+ .pw-strength-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+ }
+ .pw-strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s, background 0.3s;
+ }
+ .pw-strength-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  min-width: 60px;
+  text-align: right;
+ }
+
+ /* GDPR MODAL */
+ .gdpr-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+ }
+ .gdpr-modal.open { display: flex; }
+ .gdpr-modal-inner {
+  background: #141820;
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px;
+ }
+ .gdpr-modal-inner h2 {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+ }
+ .gdpr-modal-inner h3 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin: 16px 0 6px;
+ }
+ .gdpr-modal-inner p, .gdpr-modal-inner li {
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+ }
+ .gdpr-modal-inner ul { padding-left: 16px; margin: 6px 0; }
+ .gdpr-close-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  color: #0a0c0f;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+ }
+
+ @media (min-width: 500px) {
+  .login-page { padding: 40px 24px; }
+ }
+</style>
+
+<div class="login-page" id="loginPage">
+ <div class="login-shell">
+
+  <!-- TOP BAR -->
+  <div class="login-topbar">
+   <div class="login-logo-wrap">🎯</div>
+   <div class="login-lang-wrap">
+    <button class="lang-btn" id="langBtnNo" onclick="setLang('no')">🇳🇴</button>
+    <button class="lang-btn" id="langBtnEn" onclick="setLang('en')">🇺🇸</button>
+   </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="login-hero">
+   <div class="login-title">
+    <span class="white">INSIGHT</span><br>
+    <span class="gold">DYNAMICS</span>
+   </div>
+   <div class="login-tagline" id="loginTagline">Performance. Precision. Progress.</div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="login-status">
+   <div class="status-dot"></div>
+   <div class="status-text" id="loginSystemStatus">System Online</div>
+  </div>
+
+  <!-- LOGIN CARD -->
+  <div class="login-card" id="loginCard">
+
+   <!-- LOGIN FORM -->
+   <div id="loginForm">
+    <div class="field-group">
+     <div class="field-label">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>
+      <span id="emailLabel">Email</span>
+     </div>
+     <div class="field-wrap">
+      <div class="field-icon">
+       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>
+      </div>
+      <input id="loginEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
+     </div>
+    </div>
+
+    <div class="field-group">
+     <div class="field-label">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span id="passwordLabel">Password</span>
+     </div>
+     <div class="field-wrap">
+      <div class="field-icon">
+       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <input id="loginPassword" class="field" type="password" placeholder="Password" autocomplete="current-password" />
+      <button class="pw-toggle" type="button" onclick="togglePw('loginPassword',this)">
+       <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+     </div>
+    </div>
+
+    <button class="btn-primary" id="loginBtn" onclick="doLogin()">
+     <span id="loginBtnText">Sign In</span>
+    </button>
+
+    <div class="or-divider"><span id="orLabel">or</span></div>
+
+    <button class="btn-secondary" id="showRegisterBtn" onclick="showRegister()">
+     <span id="createAccountLabel">Create an Account</span>
+    </button>
+   </div>
+
+   <!-- REGISTER FORM -->
+   <div id="registerFormWrap" class="register-form">
+    <div class="form-row">
+     <div class="field-group">
+      <div class="field-label" id="firstNameLabel">First Name</div>
+      <input id="regFirst" class="field field-no-icon" type="text" placeholder="First name" autocomplete="given-name" />
+     </div>
+     <div class="field-group">
+      <div class="field-label" id="lastNameLabel">Last Name</div>
+      <input id="regLast" class="field field-no-icon" type="text" placeholder="Last name" autocomplete="family-name" />
+     </div>
+    </div>
+
+    <div class="field-group">
+     <div class="field-label" id="regEmailLabel">Email</div>
+     <div class="field-wrap">
+      <div class="field-icon">
+       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>
+      </div>
+      <input id="regEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
+     </div>
+    </div>
+
+    <div class="field-group">
+     <div class="field-label" id="regEmailConfirmLabel">Confirm Email Address</div>
+     <div class="field-wrap">
+      <div class="field-icon">
+       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>
+      </div>
+      <input id="regEmailConfirm" class="field" type="email" placeholder="Re-enter email" autocomplete="email" />
+     </div>
+    </div>
+
+    <div class="field-group">
+     <div class="field-label" id="regPasswordLabel">Password</div>
+     <div class="field-wrap">
+      <div class="field-icon">
+       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <input id="regPassword" class="field" type="password" placeholder="Password" autocomplete="new-password" oninput="checkPwStrength(this.value)" />
+      <button class="pw-toggle" type="button" onclick="togglePw('regPassword',this)">
+       <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+     </div>
+     <div class="pw-strength" id="pwStrengthWrap" style="display:none">
+      <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwStrengthFill"></div></div>
+      <div class="pw-strength-label" id="pwStrengthLabel"></div>
+     </div>
+    </div>
+
+    <div class="field-group">
+     <div class="field-label" id="regPasswordConfirmLabel">Re-enter Password</div>
+     <div class="field-wrap">
+      <div class="field-icon">
+       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <input id="regPasswordConfirm" class="field" type="password" placeholder="Repeat password" autocomplete="new-password" />
+      <button class="pw-toggle" type="button" onclick="togglePw('regPasswordConfirm',this)">
+       <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+     </div>
+    </div>
+
+    <div class="field-group">
+     <div class="field-label" id="divisionLabel">Division</div>
+     <select id="regDivision" class="field field-no-icon">
+      <option value="">Select division…</option>
+      <option value="Open">Open</option>
+      <option value="Standard">Standard</option>
+      <option value="Classic">Classic</option>
+      <option value="Production">Production</option>
+      <option value="Production Optics">Production Optics</option>
+      <option value="Revolver">Revolver</option>
+      <option value="Pistol Caliber Carbine">Pistol Caliber Carbine</option>
+      <option value="Pistol Caliber Carbine Optics">Pistol Caliber Carbine Optics</option>
+     </select>
+    </div>
+
+    <div class="form-row">
+     <div class="field-group">
+      <div class="field-label" id="categoryLabel">Category</div>
+      <select id="regCategory" class="field field-no-icon">
+       <option value="">Category (optional)</option>
+       <option value="Lady">Lady</option>
+       <option value="Junior">Junior</option>
+       <option value="Senior">Senior</option>
+       <option value="Super Senior">Super Senior</option>
+      </select>
+     </div>
+     <div class="field-group">
+      <div class="field-label" id="powerFactorLabel">Power Factor</div>
+      <select id="regPowerFactor" class="field field-no-icon">
+       <option value="Minor">Minor</option>
+       <option value="Major">Major</option>
+      </select>
+     </div>
+    </div>
+
+    <div class="field-group">
+     <div class="field-label" id="regionLabel">Region / Nation</div>
+     <select id="regRegion" class="field field-no-icon">
+      <option value="">Select nation (optional)</option>
+      <option value="🇦🇫 Afghanistan">🇦🇫 Afghanistan</option>
+      <option value="🇦🇱 Albania">🇦🇱 Albania</option>
+      <option value="🇩🇿 Algeria">🇩🇿 Algeria</option>
+      <option value="🇦🇷 Argentina">🇦🇷 Argentina</option>
+      <option value="🇦🇲 Armenia">🇦🇲 Armenia</option>
+      <option value="🇦🇺 Australia">🇦🇺 Australia</option>
+      <option value="🇦🇹 Austria">🇦🇹 Austria</option>
+      <option value="🇦🇿 Azerbaijan">🇦🇿 Azerbaijan</option>
+      <option value="🇧🇭 Bahrain">🇧🇭 Bahrain</option>
+      <option value="🇧🇪 Belgium">🇧🇪 Belgium</option>
+      <option value="🇧🇦 Bosnia and Herzegovina">🇧🇦 Bosnia and Herzegovina</option>
+      <option value="🇧🇷 Brazil">🇧🇷 Brazil</option>
+      <option value="🇧🇬 Bulgaria">🇧🇬 Bulgaria</option>
+      <option value="🇨🇦 Canada">🇨🇦 Canada</option>
+      <option value="🇨🇱 Chile">🇨🇱 Chile</option>
+      <option value="🇨🇳 China">🇨🇳 China</option>
+      <option value="🇨🇴 Colombia">🇨🇴 Colombia</option>
+      <option value="🇭🇷 Croatia">🇭🇷 Croatia</option>
+      <option value="🇨🇾 Cyprus">🇨🇾 Cyprus</option>
+      <option value="🇨🇿 Czech Republic">🇨🇿 Czech Republic</option>
+      <option value="🇩🇰 Denmark">🇩🇰 Denmark</option>
+      <option value="🇪🇨 Ecuador">🇪🇨 Ecuador</option>
+      <option value="🇪🇬 Egypt">🇪🇬 Egypt</option>
+      <option value="🇪🇪 Estonia">🇪🇪 Estonia</option>
+      <option value="🇫🇮 Finland">🇫🇮 Finland</option>
+      <option value="🇫🇷 France">🇫🇷 France</option>
+      <option value="🇬🇪 Georgia">🇬🇪 Georgia</option>
+      <option value="🇩🇪 Germany">🇩🇪 Germany</option>
+      <option value="🇬🇷 Greece">🇬🇷 Greece</option>
+      <option value="🇭🇺 Hungary">🇭🇺 Hungary</option>
+      <option value="🇮🇸 Iceland">🇮🇸 Iceland</option>
+      <option value="🇮🇳 India">🇮🇳 India</option>
+      <option value="🇮🇩 Indonesia">🇮🇩 Indonesia</option>
+      <option value="🇮🇷 Iran">🇮🇷 Iran</option>
+      <option value="🇮🇶 Iraq">🇮🇶 Iraq</option>
+      <option value="🇮🇪 Ireland">🇮🇪 Ireland</option>
+      <option value="🇮🇱 Israel">🇮🇱 Israel</option>
+      <option value="🇮🇹 Italy">🇮🇹 Italy</option>
+      <option value="🇯🇵 Japan">🇯🇵 Japan</option>
+      <option value="🇯🇴 Jordan">🇯🇴 Jordan</option>
+      <option value="🇰🇿 Kazakhstan">🇰🇿 Kazakhstan</option>
+      <option value="🇰🇷 South Korea">🇰🇷 South Korea</option>
+      <option value="🇰🇼 Kuwait">🇰🇼 Kuwait</option>
+      <option value="🇱🇻 Latvia">🇱🇻 Latvia</option>
+      <option value="🇱🇧 Lebanon">🇱🇧 Lebanon</option>
+      <option value="🇱🇾 Libya">🇱🇾 Libya</option>
+      <option value="🇱🇹 Lithuania">🇱🇹 Lithuania</option>
+      <option value="🇱🇺 Luxembourg">🇱🇺 Luxembourg</option>
+      <option value="🇲🇰 North Macedonia">🇲🇰 North Macedonia</option>
+      <option value="🇲🇾 Malaysia">🇲🇾 Malaysia</option>
+      <option value="🇲🇹 Malta">🇲🇹 Malta</option>
+      <option value="🇲🇽 Mexico">🇲🇽 Mexico</option>
+      <option value="🇲🇩 Moldova">🇲🇩 Moldova</option>
+      <option value="🇲🇪 Montenegro">🇲🇪 Montenegro</option>
+      <option value="🇲🇦 Morocco">🇲🇦 Morocco</option>
+      <option value="🇳🇱 Netherlands">🇳🇱 Netherlands</option>
+      <option value="🇳🇿 New Zealand">🇳🇿 New Zealand</option>
+      <option value="🇳🇴 Norway">🇳🇴 Norway</option>
+      <option value="🇴🇲 Oman">🇴🇲 Oman</option>
+      <option value="🇵🇰 Pakistan">🇵🇰 Pakistan</option>
+      <option value="🇵🇦 Panama">🇵🇦 Panama</option>
+      <option value="🇵🇾 Paraguay">🇵🇾 Paraguay</option>
+      <option value="🇵🇪 Peru">🇵🇪 Peru</option>
+      <option value="🇵🇭 Philippines">🇵🇭 Philippines</option>
+      <option value="🇵🇱 Poland">🇵🇱 Poland</option>
+      <option value="🇵🇹 Portugal">🇵🇹 Portugal</option>
+      <option value="🇶🇦 Qatar">🇶🇦 Qatar</option>
+      <option value="🇷🇴 Romania">🇷🇴 Romania</option>
+      <option value="🇷🇺 Russia">🇷🇺 Russia</option>
+      <option value="🇸🇦 Saudi Arabia">🇸🇦 Saudi Arabia</option>
+      <option value="🇷🇸 Serbia">🇷🇸 Serbia</option>
+      <option value="🇸🇬 Singapore">🇸🇬 Singapore</option>
+      <option value="🇸🇰 Slovakia">🇸🇰 Slovakia</option>
+      <option value="🇸🇮 Slovenia">🇸🇮 Slovenia</option>
+      <option value="🇿🇦 South Africa">🇿🇦 South Africa</option>
+      <option value="🇪🇸 Spain">🇪🇸 Spain</option>
+      <option value="🇸🇪 Sweden">🇸🇪 Sweden</option>
+      <option value="🇨🇭 Switzerland">🇨🇭 Switzerland</option>
+      <option value="🇸🇾 Syria">🇸🇾 Syria</option>
+      <option value="🇹🇼 Taiwan">🇹🇼 Taiwan</option>
+      <option value="🇹🇭 Thailand">🇹🇭 Thailand</option>
+      <option value="🇹🇳 Tunisia">🇹🇳 Tunisia</option>
+      <option value="🇹🇷 Turkey">🇹🇷 Turkey</option>
+      <option value="🇦🇪 UAE">🇦🇪 UAE</option>
+      <option value="🇺🇦 Ukraine">🇺🇦 Ukraine</option>
+      <option value="🇬🇧 United Kingdom">🇬🇧 United Kingdom</option>
+      <option value="🇺🇸 United States">🇺🇸 United States</option>
+      <option value="🇺🇾 Uruguay">🇺🇾 Uruguay</option>
+      <option value="🇻🇪 Venezuela">🇻🇪 Venezuela</option>
+      <option value="🇻🇳 Vietnam">🇻🇳 Vietnam</option>
+     </select>
+    </div>
+
+    <div class="field-group">
+     <div class="field-label" id="inviteCodeLabel">Invitation Code</div>
+     <div class="field-wrap">
+      <div class="field-icon">
+       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <input id="regInvite" class="field" type="text" placeholder="Invitation code (required)" />
+     </div>
+    </div>
+
+    <div class="gdpr-check-row">
+     <input type="checkbox" id="gdprCheck" />
+     <label for="gdprCheck" id="gdprLabel">
+      I have read and accepted the <a href="#" onclick="openGdpr();return false;" id="gdprLink">Privacy Policy</a>
+     </label>
+    </div>
+
+    <button class="btn-primary" id="registerBtn" onclick="doRegister()">
+     <span id="registerBtnText">Create an Account</span>
+    </button>
+    <button class="btn-ghost" id="cancelRegisterBtn" onclick="hideRegister()">Cancel</button>
+   </div>
+
+   <div id="error" class="error-text"></div>
+  </div>
+
  </div>
- <div class="lang-flags">
- <button id="langNo" class="lang-btn active" type="button" aria-label="Norsk">🇳🇴</button>
- <button id="langEn" class="lang-btn" type="button" aria-label="English">🇺🇸</button>
- </div>
- </div>
- </div>
+</div>
 
- <!-- Hero title -->
- <div class="brand-hero">
- <div class="brand-title">
- <span class="top">INSIGHT</span>
- <span class="bottom">DYNAMICS</span>
- </div>
- <div id="brandSubtitle" class="brand-subtitle">Performance · Precision · Analysis</div>
- </div>
-
- <!-- Status bar -->
- <div class="status-bar">
- <div class="status-item">
- <span class="status-dot"></span>
- <span>SYSTEM ONLINE</span>
- </div>
- </div>
-
- <!-- Login card -->
- <div class="login-card">
- <div id="loginSection" class="section active">
- <div class="field-label" id="loginEmailLabel">Email</div>
- <div class="field-wrap">
- <span class="field-icon">✉</span>
- <input id="loginEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
- </div>
-
- <div class="field-label" id="loginPasswordLabel">Password</div>
- <div class="field-wrap">
- <span class="field-icon">🔒</span>
- <input id="loginPassword" class="field" type="password" placeholder="Password" autocomplete="current-password" />
- <button class="field-eye" type="button" onclick="(function(){var i=document.getElementById('loginPassword');i.type=i.type==='password'?'text':'password'})()">👁</button>
- </div>
-
-
- <button id="loginBtn" class="primary-btn">
- <span class="btn-chevrons">&raquo;</span>
- ACCESS SYSTEM
- </button>
-
- <div class="separator"><span id="separatorText">or</span></div>
-
- <button id="showRegisterBtn" class="secondary-btn">
- ＋ CREATE AN OPERATOR PROFILE
- </button>
- </div>
-
- <div id="registerSection" class="section">
- <div id="registerFirstNameLabel" class="field-label">First name</div>
- <input id="registerFirstName" class="field field-no-icon" type="text" placeholder="First name" />
-
- <div id="registerLastNameLabel" class="field-label">Last name</div>
- <input id="registerLastName" class="field field-no-icon" type="text" placeholder="Last name" />
-
- <div id="registerEmailLabel" class="field-label">Email</div>
- <div class="field-wrap">
- <span class="field-icon">✉</span>
- <input id="registerEmail" class="field" type="email" placeholder="name@email.com" />
- </div>
-
- <div id="registerEmailConfirmLabel" class="field-label">Confirm Email Address</div>
- <div class="field-wrap">
- <span class="field-icon">✉</span>
- <input id="registerEmailConfirm" class="field" type="email" placeholder="Re-enter Email Address" />
- </div>
-
- <div id="registerPasswordLabel" class="field-label">Password</div>
- <div class="field-wrap">
- <span class="field-icon">🔒</span>
- <input id="registerPassword" class="field" type="password" placeholder="Password" />
- </div>
-
- <div class="strength-wrap">
- <div class="strength-bar-bg">
- <div id="passwordStrengthBar" class="strength-bar-fill"></div>
- </div>
- <div id="passwordStrengthText" class="strength-text"></div>
- </div>
-
- <div id="registerPasswordConfirmLabel" class="field-label">Confirm Password</div>
- <div class="field-wrap">
- <span class="field-icon">🔒</span>
- <input id="registerPasswordConfirm" class="field" type="password" placeholder="Re-enter Password" />
- </div>
-
- <div id="registerDivisionLabel" class="field-label">Division</div>
- <select id="registerDivision" class="field-select">
- <option value="">Select division</option>
- <option value="Standard">Standard</option>
- <option value="Open">Open</option>
- <option value="Production">Production</option>
- <option value="Production Optics">Production Optics</option>
- <option value="Classic">Classic</option>
- <option value="Revolver">Revolver</option>
- </select>
-
- <div id="registerCategoryLabel" class="field-label">Category</div>
- <select id="registerCategory" class="field-select">
- <option value="">Select category (optional)</option>
- <option value="Junior">Junior</option>
- <option value="Senior">Senior</option>
- <option value="Super Senior">Super Senior</option>
- <option value="Lady">Lady</option>
- <option value="Lady Junior">Lady Junior</option>
- <option value="Lady Senior">Lady Senior</option>
- </select>
-
- <div id="registerPowerFactorLabel" class="field-label">Power Factor</div>
- <div class="pf-selector">
- <div class="pf-option selected" data-pf="minor" id="pfMinor">Minor</div>
- <div class="pf-option" data-pf="major" id="pfMajor">Major</div>
- </div>
-
- <div id="registerRegionLabel" class="field-label">Region</div>
- <select id="registerRegion" class="field-select">
- <option value="">Select nation (optional)</option>
- <option value="Afghanistan">🇦🇫 Afghanistan</option>
- <option value="Albania">🇦🇱 Albania</option>
- <option value="Algeria">🇩🇿 Algeria</option>
- <option value="Argentina">🇦🇷 Argentina</option>
- <option value="Armenia">🇦🇲 Armenia</option>
- <option value="Australia">🇦🇺 Australia</option>
- <option value="Austria">🇦🇹 Austria</option>
- <option value="Azerbaijan">🇦🇿 Azerbaijan</option>
- <option value="Bahrain">🇧🇭 Bahrain</option>
- <option value="Belarus">🇧🇾 Belarus</option>
- <option value="Belgium">🇧🇪 Belgium</option>
- <option value="Bolivia">🇧🇴 Bolivia</option>
- <option value="Bosnia and Herzegovina">🇧🇦 Bosnia and Herzegovina</option>
- <option value="Brazil">🇧🇷 Brazil</option>
- <option value="Bulgaria">🇧🇬 Bulgaria</option>
- <option value="Canada">🇨🇦 Canada</option>
- <option value="Chile">🇨🇱 Chile</option>
- <option value="China">🇨🇳 China</option>
- <option value="Colombia">🇨🇴 Colombia</option>
- <option value="Costa Rica">🇨🇷 Costa Rica</option>
- <option value="Croatia">🇭🇷 Croatia</option>
- <option value="Cyprus">🇨🇾 Cyprus</option>
- <option value="Czech Republic">🇨🇿 Czech Republic</option>
- <option value="Denmark">🇩🇰 Denmark</option>
- <option value="Dominican Republic">🇩🇴 Dominican Republic</option>
- <option value="Ecuador">🇪🇨 Ecuador</option>
- <option value="Egypt">🇪🇬 Egypt</option>
- <option value="El Salvador">🇸🇻 El Salvador</option>
- <option value="Estonia">🇪🇪 Estonia</option>
- <option value="Finland">🇫🇮 Finland</option>
- <option value="France">🇫🇷 France</option>
- <option value="Georgia">🇬🇪 Georgia</option>
- <option value="Germany">🇩🇪 Germany</option>
- <option value="Greece">🇬🇷 Greece</option>
- <option value="Guatemala">🇬🇹 Guatemala</option>
- <option value="Honduras">🇭🇳 Honduras</option>
- <option value="Hong Kong">🇭🇰 Hong Kong</option>
- <option value="Hungary">🇭🇺 Hungary</option>
- <option value="Iceland">🇮🇸 Iceland</option>
- <option value="India">🇮🇳 India</option>
- <option value="Indonesia">🇮🇩 Indonesia</option>
- <option value="Ireland">🇮🇪 Ireland</option>
- <option value="Israel">🇮🇱 Israel</option>
- <option value="Italy">🇮🇹 Italy</option>
- <option value="Japan">🇯🇵 Japan</option>
- <option value="Jordan">🇯🇴 Jordan</option>
- <option value="Kazakhstan">🇰🇿 Kazakhstan</option>
- <option value="Kuwait">🇰🇼 Kuwait</option>
- <option value="Latvia">🇱🇻 Latvia</option>
- <option value="Lebanon">🇱🇧 Lebanon</option>
- <option value="Lithuania">🇱🇹 Lithuania</option>
- <option value="Luxembourg">🇱🇺 Luxembourg</option>
- <option value="Macau">🇲🇴 Macau</option>
- <option value="Malaysia">🇲🇾 Malaysia</option>
- <option value="Malta">🇲🇹 Malta</option>
- <option value="Mexico">🇲🇽 Mexico</option>
- <option value="Moldova">🇲🇩 Moldova</option>
- <option value="Montenegro">🇲🇪 Montenegro</option>
- <option value="Morocco">🇲🇦 Morocco</option>
- <option value="Netherlands">🇳🇱 Netherlands</option>
- <option value="New Zealand">🇳🇿 New Zealand</option>
- <option value="Nicaragua">🇳🇮 Nicaragua</option>
- <option value="Nigeria">🇳🇬 Nigeria</option>
- <option value="North Macedonia">🇲🇰 North Macedonia</option>
- <option value="Norway">🇳🇴 Norway</option>
- <option value="Oman">🇴🇲 Oman</option>
- <option value="Pakistan">🇵🇰 Pakistan</option>
- <option value="Panama">🇵🇦 Panama</option>
- <option value="Paraguay">🇵🇾 Paraguay</option>
- <option value="Peru">🇵🇪 Peru</option>
- <option value="Philippines">🇵🇭 Philippines</option>
- <option value="Poland">🇵🇱 Poland</option>
- <option value="Portugal">🇵🇹 Portugal</option>
- <option value="Qatar">🇶🇦 Qatar</option>
- <option value="Romania">🇷🇴 Romania</option>
- <option value="Russia">🇷🇺 Russia</option>
- <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
- <option value="Serbia">🇷🇸 Serbia</option>
- <option value="Singapore">🇸🇬 Singapore</option>
- <option value="Slovakia">🇸🇰 Slovakia</option>
- <option value="Slovenia">🇸🇮 Slovenia</option>
- <option value="South Africa">🇿🇦 South Africa</option>
- <option value="South Korea">🇰🇷 South Korea</option>
- <option value="Spain">🇪🇸 Spain</option>
- <option value="Sweden">🇸🇪 Sweden</option>
- <option value="Switzerland">🇨🇭 Switzerland</option>
- <option value="Taiwan">🇹🇼 Taiwan</option>
- <option value="Thailand">🇹🇭 Thailand</option>
- <option value="Trinidad and Tobago">🇹🇹 Trinidad and Tobago</option>
- <option value="Tunisia">🇹🇳 Tunisia</option>
- <option value="Turkey">🇹🇷 Turkey</option>
- <option value="UAE">🇦🇪 UAE</option>
- <option value="Ukraine">🇺🇦 Ukraine</option>
- <option value="United Kingdom">🇬🇧 United Kingdom</option>
- <option value="Uruguay">🇺🇾 Uruguay</option>
- <option value="USA">🇺🇸 USA</option>
- <option value="Venezuela">🇻🇪 Venezuela</option>
- <option value="Vietnam">🇻🇳 Vietnam</option>
- <option value="Other">🌍 Other</option>
- </select>
-
- <div id="registerClubLabel" class="field-label">Club</div>
- <input id="registerClub" class="field field-no-icon" type="text" placeholder="Club name (optional)" />
-
- <div id="registerCodeLabel" class="field-label">Invite code</div>
- <input id="registerCode" class="field field-no-icon" type="text" placeholder="Invite code" />
-
- <div id="gdprCheckboxContainer"></div>
-
- <button id="registerBtn" class="primary-btn" style="margin-top:8px;">
- <span class="btn-chevrons">&raquo;</span>
- CREATE AN ACCOUNT
- </button>
- <button id="cancelRegisterBtn" class="ghost-btn">Cancel</button>
- </div>
-
- <div id="error" class="error-text"></div>
- </div>
-
- <!-- Footer feature strip -->
- <div class="login-footer">
- <div class="footer-feature">
- <div class="footer-feature-icon">⊙</div>
- <div class="footer-feature-title">AI Match Analysis</div>
- <div class="footer-feature-status">Enabled</div>
- </div>
- <div class="footer-divider"></div>
- <div class="footer-feature">
- <div class="footer-feature-icon">▐</div>
- <div class="footer-feature-title">Live HF Prediction</div>
- <div class="footer-feature-status">Active</div>
- </div>
- <div class="footer-divider"></div>
- <div class="footer-feature">
- <div class="footer-feature-icon">◈</div>
- <div class="footer-feature-title">Stage Intelligence</div>
- <div class="footer-feature-status">Synchronized</div>
- </div>
- </div>
-
- <div class="login-copyright">
- © 2026 Insight Dynamics
- </div>
-
- </div>
- </div>
- `;const _langInit=localStorage.getItem("appLang")||"en";const t={no:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"E-post",loginEmailPlaceholder:"navn@epost.no",loginPasswordLabel:"Passord",loginPasswordPlaceholder:"Passord",login:"Sign In",loginSpinner:"Signing in…",or:"or",showRegister:"Create an Account",registerFirstNameLabel:"Fornavn",registerFirstNamePlaceholder:"Fornavn",registerLastNameLabel:"Etternavn",registerLastNamePlaceholder:"Etternavn",registerEmailLabel:"E-post",registerEmailPlaceholder:"navn@epost.no",registerEmailConfirmLabel:"Confirm Email Address",registerEmailConfirmPlaceholder:"Re-enter Email Address",registerPasswordLabel:"Passord",registerPasswordPlaceholder:"Passord",registerPasswordConfirmLabel:"Bekreft passord",registerPasswordConfirmPlaceholder:"Re-enter Password",registerDivisionLabel:"Divisjon",registerCategoryLabel:"Kategori",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Klubb",registerCodeLabel:"Invitation Code",registerCodePlaceholder:"Invitation Code",register:"Create Account",cancel:"Cancel",emailMismatch:"E-postadressene er ikke like",passwordMismatch:"Passordene er ikke like",missingFields:"Please complete all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"Passordet er for svakt",strengthEmpty:"",strengthVeryWeak:"Password Strength: Very Weak",strengthWeak:"Password Strength: Weak",strengthMedium:"Password Strength: Fair",strengthStrong:"Password Strength: Strong",strengthVeryStrong:"Password Strength: Very Strong",gdprRequired:dt==="no"?"You must accept the Privacy Policy to create an account":"You must accept the Privacy Policy to create an account"},en:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"Email",loginEmailPlaceholder:"name@email.com",loginPasswordLabel:"Password",loginPasswordPlaceholder:"Password",login:"Sign In",loginSpinner:"Signing in…",or:"or",showRegister:"Create an Account",registerFirstNameLabel:"First Name",registerFirstNamePlaceholder:"First name",registerLastNameLabel:"Last Name",registerLastNamePlaceholder:"Last name",registerEmailLabel:"Email",registerEmailPlaceholder:"name@email.com",registerEmailConfirmLabel:"Confirm Email Address",registerEmailConfirmPlaceholder:"Re-enter Email Address",registerPasswordLabel:"Password",registerPasswordPlaceholder:"Password",registerPasswordConfirmLabel:"Confirm Password",registerPasswordConfirmPlaceholder:"Re-enter Password",registerDivisionLabel:"Division",registerCategoryLabel:"Category",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Club",registerCodeLabel:"Invite code",registerCodePlaceholder:"Invite code",register:"Create an Account",cancel:"Cancel",emailMismatch:"The email addresses you entered do not match",passwordMismatch:"The passwords you entered do not match",missingFields:"Please complete all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"Your password is too weak",strengthEmpty:"",strengthVeryWeak:"Password Strength: Very Weak",strengthWeak:"Password Strength: Weak",strengthMedium:"Password strength: Medium",strengthStrong:"Password Strength: Strong",strengthVeryStrong:"Password Strength: Very Strong",gdprRequired:"You must accept the Privacy Policy to create an account"}};let s=localStorage.getItem("appLang")||"en",a="minor";const n=document.getElementById("error"),r=document.getElementById("loginSection"),u=document.getElementById("registerSection"),m=document.getElementById("showRegisterBtn"),b=document.getElementById("cancelRegisterBtn"),f=document.getElementById("loginBtn"),p=document.getElementById("registerBtn"),h=document.getElementById("langNo"),E=document.getElementById("langEn"),k=document.getElementById("registerPassword"),P=document.getElementById("passwordStrengthBar"),C=document.getElementById("passwordStrengthText"),L=document.getElementById("pfMinor"),M=document.getElementById("pfMajor");L.onclick=()=>{a="minor",L.classList.add("selected"),M.classList.remove("selected")},M.onclick=()=>{a="major",M.classList.add("selected"),L.classList.remove("selected")};function D(w){let y=0;return w?(w.length>=8&&(y+=1),w.length>=12&&(y+=1),/[a-z]/.test(w)&&/[A-Z]/.test(w)&&(y+=1),/\d/.test(w)&&(y+=1),/[^A-Za-z0-9]/.test(w)&&(y+=1),y<=1?{score:y,width:"20%",labelKey:"strengthVeryWeak",color:"#ff6b6b"}:y===2?{score:y,width:"40%",labelKey:"strengthWeak",color:"#ff9f43"}:y===3?{score:y,width:"60%",labelKey:"strengthMedium",color:"#feca57"}:y===4?{score:y,width:"80%",labelKey:"strengthStrong",color:"#1dd1a1"}:{score:y,width:"100%",labelKey:"strengthVeryStrong",color:"#10ac84"}):{score:0,width:"0%",labelKey:"strengthEmpty",color:"#ff6b6b"}}function B(){const w=t[s],y=k.value,H=D(y);P.style.width=H.width,P.style.background=H.color,C.innerText=w[H.labelKey]}function _(w){s=w;const y=t[w];document.getElementById("brandSubtitle").innerText=y.subtitle,document.getElementById("loginEmailLabel").innerText=y.loginEmailLabel,document.getElementById("loginEmail").placeholder=y.loginEmailPlaceholder,document.getElementById("loginPasswordLabel").innerText=y.loginPasswordLabel,document.getElementById("loginPassword").placeholder=y.loginPasswordPlaceholder,document.getElementById("loginBtn").innerText=y.login,document.getElementById("separatorText").innerText=y.or,document.getElementById("showRegisterBtn").innerText=y.showRegister,document.getElementById("registerFirstNameLabel").innerText=y.registerFirstNameLabel,document.getElementById("registerFirstName").placeholder=y.registerFirstNamePlaceholder,document.getElementById("registerLastNameLabel").innerText=y.registerLastNameLabel,document.getElementById("registerLastName").placeholder=y.registerLastNamePlaceholder,document.getElementById("registerEmailLabel").innerText=y.registerEmailLabel,document.getElementById("registerEmail").placeholder=y.registerEmailPlaceholder,document.getElementById("registerEmailConfirmLabel").innerText=y.registerEmailConfirmLabel,document.getElementById("registerEmailConfirm").placeholder=y.registerEmailConfirmPlaceholder,document.getElementById("registerPasswordLabel").innerText=y.registerPasswordLabel,document.getElementById("registerPassword").placeholder=y.registerPasswordPlaceholder,document.getElementById("registerPasswordConfirmLabel").innerText=y.registerPasswordConfirmLabel,document.getElementById("registerPasswordConfirm").placeholder=y.registerPasswordConfirmPlaceholder,document.getElementById("registerDivisionLabel").innerText=y.registerDivisionLabel,document.getElementById("registerCategoryLabel").innerText=y.registerCategoryLabel,document.getElementById("registerPowerFactorLabel").innerText=y.registerPowerFactorLabel,document.getElementById("registerRegionLabel").innerText=y.registerRegionLabel,document.getElementById("registerClubLabel").innerText=y.registerClubLabel,document.getElementById("registerCodeLabel").innerText=y.registerCodeLabel,document.getElementById("registerCode").placeholder=y.registerCodePlaceholder,document.getElementById("registerBtn").innerText=y.register,document.getElementById("cancelRegisterBtn").innerText=y.cancel,h.classList.toggle("active",w==="no"),E.classList.toggle("active",w==="en"),localStorage.setItem("appLang",w);try{if(typeof setAppLang==="function")setAppLang(w);}catch(e){}B()}function K(){r.classList.remove("active"),u.classList.add("active"),n.innerText="";const w=document.getElementById("gdprCheckboxContainer");if(w&&!w.hasChildNodes()){const y=Rt();w.appendChild(y)}}function j(){u.classList.remove("active"),r.classList.add("active"),n.innerText=""}h.onclick=()=>_("no"),E.onclick=()=>_("en");_(_langInit);m.onclick=K,b.onclick=j,k.oninput=B,f.onclick=async()=>{n.innerText="";f.disabled=true;f.textContent=t[s].loginSpinner||"Signing in…";const w=document.getElementById("loginEmail").value.trim(),y=document.getElementById("loginPassword").value,H=await _t(w,y);H.success?i():(n.innerText=H.error,f.disabled=false,f.textContent=t[s].login)},p.onclick=async()=>{n.innerText="";const w=t[s],y=document.getElementById("registerFirstName").value.trim(),H=document.getElementById("registerLastName").value.trim(),Y=document.getElementById("registerEmail").value.trim(),ce=document.getElementById("registerEmailConfirm").value.trim(),X=document.getElementById("registerPassword").value,pe=document.getElementById("registerPasswordConfirm").value,se=document.getElementById("registerDivision").value,ae=document.getElementById("registerCategory").value,T=document.getElementById("registerRegion").value,I=document.getElementById("registerClub").value.trim(),c=document.getElementById("registerCode").value.trim();if(!y||!H){n.innerText=w.missingName;return}if(!Y||!ce||!X||!pe||!c){n.innerText=w.missingFields;return}if(!se){n.innerText=w.missingDivision;return}if(Y!==ce){n.innerText=w.emailMismatch;return}if(X!==pe){n.innerText=w.passwordMismatch;return}if(D(X).score<=1){n.innerText=w.weakPassword;return}if(!Dt().valid){n.innerText=w.gdprRequired;return}const v=await Nt(Y,X,c,y,H,se,ae,a,T,I);v.success?i():n.innerText=v.error},_(_langInit),B()}async function Ot(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{return await de(U(O,"users",i.uid),{...e,updatedAt:Ie()}),{success:!0}}catch(t){return console.error("Save profile error:",t),{success:!1,error:t.message}}}async function jt(){const e=W();if(!e)return null;try{const i=await be(U(O,"users",e.uid));return i.exists()?{uid:e.uid,...i.data()}:null}catch(i){return console.error("Get profile error:",i),null}}async function Ut(e){try{const i=await be(U(O,"users",e));return i.exists()?{uid:e,...i.data()}:null}catch(i){return console.error("Get user by ID error:",i),null}}async function Ht(){const e=U(O,"counters","matchId");try{const i=await be(e);if(!i.exists())return await Ne(e,{value:1}),1;const s=i.data().value+1;return await de(e,{value:s}),s}catch(i){throw console.error("Error retrieving next match ID:",i),i}}async function zt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=await Ht(),s={id:t,...e,searchable:e.searchable!==!1,ownerId:i.uid,participants:[i.uid],createdAt:Ie(),updatedAt:Ie()};return await Ne(U(O,"matches",t.toString()),s),{success:!0,matchId:t}}catch(t){return console.error("Create match error:",t),{success:!1,error:t.message}}}async function Ee(e,i){if(!W())return{success:!1,error:"Authentication required"};try{return await de(U(O,"matches",e.toString()),{...i,updatedAt:Ie()}),{success:!0}}catch(s){return console.error("Error updating match:",s),{success:!1,error:s.message}}}async function Gt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=await be(U(O,"matches",e.toString()));return t.exists()?t.data().ownerId!==i.uid?{success:!1,error:"Only the match creator can delete this match"}:(await Pt(U(O,"matches",e.toString())),{success:!0}):{success:!1,error:"Match could not be found"}}catch(t){return console.error("Error deleting match:",t),{success:!1,error:t.message}}}async function Kt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=e.toString().trim(),s=await Vt(),a=s.find(n=>n.id&&n.id.toString()===t);return a?{success:!0,match:a}:{success:!1,error:"You do not have access to this match. You must be invited to view it."}}catch(t){return console.error("Error searching for match:",t),{success:!1,error:t.message}}}async function Vt(){const e=W();if(!e)return[];try{const i=$e(Le(O,"matches"),Fe("participants","array-contains",e.uid)),t=await He(i),s=[];return t.forEach(a=>{s.push({id:a.id,...a.data()})}),s.sort((a,n)=>{var m,b;const r=a.date||((m=a.createdAt)==null?void 0:m.toDate())||new Date(0);return(n.date||((b=n.createdAt)==null?void 0:b.toDate())||new Date(0))-r}),s}catch(i){return console.error("Error retrieving user matches:",i),[]}}function qt(e){const i=W();if(!i)return()=>{};const t=$e(Le(O,"matches"),Fe("participants","array-contains",i.uid));return ze(t,a=>{const n=[];a.forEach(r=>{n.push({id:r.id,...r.data()})}),n.sort((r,u)=>{var f,p;const m=r.date||((f=r.createdAt)==null?void 0:f.toDate())||new Date(0);return(u.date||((p=u.createdAt)==null?void 0:p.toDate())||new Date(0))-m}),e(n)},a=>{console.error("Error listening for match updates:",a)})}function Wt(e,i){return ze(U(O,"matches",e.toString()),s=>{s.exists()?i({id:s.id,...s.data()}):i(null)},s=>{console.error("Error listening for match updates:",s)})}async function Ge(e,i){const t=W();if(!t)return{success:!1,error:"Authentication required"};try{console.log(" Searching for user with email:",e);const s=$e(Le(O,"users"),Fe("email","==",e)),a=await He(s);if(a.empty)return console.error(" Bruker ikke funnet:",e),{success:!1,error:"Bruker ikke funnet"};const n=a.docs[0],r=n.id;return console.log(" Bruker funnet:",r,n.data()),console.log(" Sender invitasjon..."),await Ne(U(O,"users",r,"invitations",i.matchId.toString()),{matchId:i.matchId,matchName:i.matchName,invitedBy:(t.displayName||t.email||""),invitedByUid:t.uid,timestamp:new Date().toISOString(),status:"pending"}),console.log(" Invitasjon sendt!"),{success:!0}}catch(s){return console.error(" Send invitation error:",s),{success:!1,error:s.message}}}async function Ke(e){const i=W();if(!i)return[];try{const t=e.toLowerCase().trim();if(t.length===0)return[];console.log(" Searching for users:",t);const s=await He(Le(O,"users")),a=[];return s.forEach(n=>{const r=n.data(),u=`${r.firstName||""} ${r.lastName||""}`.toLowerCase(),m=(r.email||"").toLowerCase();n.id!==i.uid&&(u.includes(t)||m.includes(t))&&a.push({uid:n.id,email:r.email,firstName:r.firstName||"",lastName:r.lastName||"",displayName:`${r.firstName||""} ${r.lastName||""}`.trim()})}),console.log(`Found ${a.length} users`),a}catch(t){return console.error(" Search users error:",t),[]}}async function Jt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{
+<!-- GDPR MODAL -->
+<div class="gdpr-modal" id="gdprModal">
+ <div class="gdpr-modal-inner" id="gdprContent"></div>
+</div>
+`;const _langInit=localStorage.getItem("appLang")||"en";const t={no:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"E-post",loginEmailPlaceholder:"navn@epost.no",loginPasswordLabel:"Passord",loginPasswordPlaceholder:"Passord",login:"Sign In",loginSpinner:"Signing in…",or:"or",showRegister:"Create an Account",registerFirstNameLabel:"Fornavn",registerFirstNamePlaceholder:"Fornavn",registerLastNameLabel:"Etternavn",registerLastNamePlaceholder:"Etternavn",registerEmailLabel:"E-post",registerEmailPlaceholder:"navn@epost.no",registerEmailConfirmLabel:"Confirm Email Address",registerEmailConfirmPlaceholder:"Re-enter Email Address",registerPasswordLabel:"Passord",registerPasswordPlaceholder:"Passord",registerPasswordConfirmLabel:"Bekreft passord",registerPasswordConfirmPlaceholder:"Re-enter Password",registerDivisionLabel:"Divisjon",registerCategoryLabel:"Kategori",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Klubb",registerCodeLabel:"Invitation Code",registerCodePlaceholder:"Invitation Code",register:"Create Account",cancel:"Cancel",emailMismatch:"E-postadressene er ikke like",passwordMismatch:"Passordene er ikke like",missingFields:"Please complete all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"Passordet er for svakt",strengthEmpty:"",strengthVeryWeak:"Password Strength: Very Weak",strengthWeak:"Password Strength: Weak",strengthMedium:"Password Strength: Fair",strengthStrong:"Password Strength: Strong",strengthVeryStrong:"Password Strength: Very Strong",gdprRequired:dt==="no"?"You must accept the Privacy Policy to create an account":"You must accept the Privacy Policy to create an account"},en:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"Email",loginEmailPlaceholder:"name@email.com",loginPasswordLabel:"Password",loginPasswordPlaceholder:"Password",login:"Sign In",loginSpinner:"Signing in…",or:"or",showRegister:"Create an Account",registerFirstNameLabel:"First Name",registerFirstNamePlaceholder:"First name",registerLastNameLabel:"Last Name",registerLastNamePlaceholder:"Last name",registerEmailLabel:"Email",registerEmailPlaceholder:"name@email.com",registerEmailConfirmLabel:"Confirm Email Address",registerEmailConfirmPlaceholder:"Re-enter Email Address",registerPasswordLabel:"Password",registerPasswordPlaceholder:"Password",registerPasswordConfirmLabel:"Confirm Password",registerPasswordConfirmPlaceholder:"Re-enter Password",registerDivisionLabel:"Division",registerCategoryLabel:"Category",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Club",registerCodeLabel:"Invite code",registerCodePlaceholder:"Invite code",register:"Create an Account",cancel:"Cancel",emailMismatch:"The email addresses you entered do not match",passwordMismatch:"The passwords you entered do not match",missingFields:"Please complete all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"Your password is too weak",strengthEmpty:"",strengthVeryWeak:"Password Strength: Very Weak",strengthWeak:"Password Strength: Weak",strengthMedium:"Password strength: Medium",strengthStrong:"Password Strength: Strong",strengthVeryStrong:"Password Strength: Very Strong",gdprRequired:"You must accept the Privacy Policy to create an account"}};let s=localStorage.getItem("appLang")||"en",a="minor";const n=document.getElementById("error"),r=document.getElementById("loginSection"),u=document.getElementById("registerSection"),m=document.getElementById("showRegisterBtn"),b=document.getElementById("cancelRegisterBtn"),f=document.getElementById("loginBtn"),p=document.getElementById("registerBtn"),h=document.getElementById("langNo"),E=document.getElementById("langEn"),k=document.getElementById("registerPassword"),P=document.getElementById("passwordStrengthBar"),C=document.getElementById("passwordStrengthText"),L=document.getElementById("pfMinor"),M=document.getElementById("pfMajor");L.onclick=()=>{a="minor",L.classList.add("selected"),M.classList.remove("selected")},M.onclick=()=>{a="major",M.classList.add("selected"),L.classList.remove("selected")};function D(w){let y=0;return w?(w.length>=8&&(y+=1),w.length>=12&&(y+=1),/[a-z]/.test(w)&&/[A-Z]/.test(w)&&(y+=1),/\d/.test(w)&&(y+=1),/[^A-Za-z0-9]/.test(w)&&(y+=1),y<=1?{score:y,width:"20%",labelKey:"strengthVeryWeak",color:"#ff6b6b"}:y===2?{score:y,width:"40%",labelKey:"strengthWeak",color:"#ff9f43"}:y===3?{score:y,width:"60%",labelKey:"strengthMedium",color:"#feca57"}:y===4?{score:y,width:"80%",labelKey:"strengthStrong",color:"#1dd1a1"}:{score:y,width:"100%",labelKey:"strengthVeryStrong",color:"#10ac84"}):{score:0,width:"0%",labelKey:"strengthEmpty",color:"#ff6b6b"}}function B(){const w=t[s],y=k.value,H=D(y);P.style.width=H.width,P.style.background=H.color,C.innerText=w[H.labelKey]}function _(w){s=w;const y=t[w];document.getElementById("brandSubtitle").innerText=y.subtitle,document.getElementById("loginEmailLabel").innerText=y.loginEmailLabel,document.getElementById("loginEmail").placeholder=y.loginEmailPlaceholder,document.getElementById("loginPasswordLabel").innerText=y.loginPasswordLabel,document.getElementById("loginPassword").placeholder=y.loginPasswordPlaceholder,document.getElementById("loginBtn").innerText=y.login,document.getElementById("separatorText").innerText=y.or,document.getElementById("showRegisterBtn").innerText=y.showRegister,document.getElementById("registerFirstNameLabel").innerText=y.registerFirstNameLabel,document.getElementById("registerFirstName").placeholder=y.registerFirstNamePlaceholder,document.getElementById("registerLastNameLabel").innerText=y.registerLastNameLabel,document.getElementById("registerLastName").placeholder=y.registerLastNamePlaceholder,document.getElementById("registerEmailLabel").innerText=y.registerEmailLabel,document.getElementById("registerEmail").placeholder=y.registerEmailPlaceholder,document.getElementById("registerEmailConfirmLabel").innerText=y.registerEmailConfirmLabel,document.getElementById("registerEmailConfirm").placeholder=y.registerEmailConfirmPlaceholder,document.getElementById("registerPasswordLabel").innerText=y.registerPasswordLabel,document.getElementById("registerPassword").placeholder=y.registerPasswordPlaceholder,document.getElementById("registerPasswordConfirmLabel").innerText=y.registerPasswordConfirmLabel,document.getElementById("registerPasswordConfirm").placeholder=y.registerPasswordConfirmPlaceholder,document.getElementById("registerDivisionLabel").innerText=y.registerDivisionLabel,document.getElementById("registerCategoryLabel").innerText=y.registerCategoryLabel,document.getElementById("registerPowerFactorLabel").innerText=y.registerPowerFactorLabel,document.getElementById("registerRegionLabel").innerText=y.registerRegionLabel,document.getElementById("registerClubLabel").innerText=y.registerClubLabel,document.getElementById("registerCodeLabel").innerText=y.registerCodeLabel,document.getElementById("registerCode").placeholder=y.registerCodePlaceholder,document.getElementById("registerBtn").innerText=y.register,document.getElementById("cancelRegisterBtn").innerText=y.cancel,h.classList.toggle("active",w==="no"),E.classList.toggle("active",w==="en"),localStorage.setItem("appLang",w);try{if(typeof setAppLang==="function")setAppLang(w);}catch(e){}B()}function K(){r.classList.remove("active"),u.classList.add("active"),n.innerText="";const w=document.getElementById("gdprCheckboxContainer");if(w&&!w.hasChildNodes()){const y=Rt();w.appendChild(y)}}function j(){u.classList.remove("active"),r.classList.add("active"),n.innerText=""}h.onclick=()=>_("no"),E.onclick=()=>_("en");_(_langInit);m.onclick=K,b.onclick=j,k.oninput=B,f.onclick=async()=>{n.innerText="";f.disabled=true;f.textContent=t[s].loginSpinner||"Signing in…";const w=document.getElementById("loginEmail").value.trim(),y=document.getElementById("loginPassword").value,H=await _t(w,y);H.success?i():(n.innerText=H.error,f.disabled=false,f.textContent=t[s].login)},p.onclick=async()=>{n.innerText="";const w=t[s],y=document.getElementById("registerFirstName").value.trim(),H=document.getElementById("registerLastName").value.trim(),Y=document.getElementById("registerEmail").value.trim(),ce=document.getElementById("registerEmailConfirm").value.trim(),X=document.getElementById("registerPassword").value,pe=document.getElementById("registerPasswordConfirm").value,se=document.getElementById("registerDivision").value,ae=document.getElementById("registerCategory").value,T=document.getElementById("registerRegion").value,I=document.getElementById("registerClub").value.trim(),c=document.getElementById("registerCode").value.trim();if(!y||!H){n.innerText=w.missingName;return}if(!Y||!ce||!X||!pe||!c){n.innerText=w.missingFields;return}if(!se){n.innerText=w.missingDivision;return}if(Y!==ce){n.innerText=w.emailMismatch;return}if(X!==pe){n.innerText=w.passwordMismatch;return}if(D(X).score<=1){n.innerText=w.weakPassword;return}if(!Dt().valid){n.innerText=w.gdprRequired;return}const v=await Nt(Y,X,c,y,H,se,ae,a,T,I);v.success?i():n.innerText=v.error},_(_langInit),B()}async function Ot(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{return await de(U(O,"users",i.uid),{...e,updatedAt:Ie()}),{success:!0}}catch(t){return console.error("Save profile error:",t),{success:!1,error:t.message}}}async function jt(){const e=W();if(!e)return null;try{const i=await be(U(O,"users",e.uid));return i.exists()?{uid:e.uid,...i.data()}:null}catch(i){return console.error("Get profile error:",i),null}}async function Ut(e){try{const i=await be(U(O,"users",e));return i.exists()?{uid:e,...i.data()}:null}catch(i){return console.error("Get user by ID error:",i),null}}async function Ht(){const e=U(O,"counters","matchId");try{const i=await be(e);if(!i.exists())return await Ne(e,{value:1}),1;const s=i.data().value+1;return await de(e,{value:s}),s}catch(i){throw console.error("Error retrieving next match ID:",i),i}}async function zt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=await Ht(),s={id:t,...e,searchable:e.searchable!==!1,ownerId:i.uid,participants:[i.uid],createdAt:Ie(),updatedAt:Ie()};return await Ne(U(O,"matches",t.toString()),s),{success:!0,matchId:t}}catch(t){return console.error("Create match error:",t),{success:!1,error:t.message}}}async function Ee(e,i){if(!W())return{success:!1,error:"Authentication required"};try{return await de(U(O,"matches",e.toString()),{...i,updatedAt:Ie()}),{success:!0}}catch(s){return console.error("Error updating match:",s),{success:!1,error:s.message}}}async function Gt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=await be(U(O,"matches",e.toString()));return t.exists()?t.data().ownerId!==i.uid?{success:!1,error:"Only the match creator can delete this match"}:(await Pt(U(O,"matches",e.toString())),{success:!0}):{success:!1,error:"Match could not be found"}}catch(t){return console.error("Error deleting match:",t),{success:!1,error:t.message}}}async function Kt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=e.toString().trim(),s=await Vt(),a=s.find(n=>n.id&&n.id.toString()===t);return a?{success:!0,match:a}:{success:!1,error:"You do not have access to this match. You must be invited to view it."}}catch(t){return console.error("Error searching for match:",t),{success:!1,error:t.message}}}async function Vt(){const e=W();if(!e)return[];try{const i=$e(Le(O,"matches"),Fe("participants","array-contains",e.uid)),t=await He(i),s=[];return t.forEach(a=>{s.push({id:a.id,...a.data()})}),s.sort((a,n)=>{var m,b;const r=a.date||((m=a.createdAt)==null?void 0:m.toDate())||new Date(0);return(n.date||((b=n.createdAt)==null?void 0:b.toDate())||new Date(0))-r}),s}catch(i){return console.error("Error retrieving user matches:",i),[]}}function qt(e){const i=W();if(!i)return()=>{};const t=$e(Le(O,"matches"),Fe("participants","array-contains",i.uid));return ze(t,a=>{const n=[];a.forEach(r=>{n.push({id:r.id,...r.data()})}),n.sort((r,u)=>{var f,p;const m=r.date||((f=r.createdAt)==null?void 0:f.toDate())||new Date(0);return(u.date||((p=u.createdAt)==null?void 0:p.toDate())||new Date(0))-m}),e(n)},a=>{console.error("Error listening for match updates:",a)})}function Wt(e,i){return ze(U(O,"matches",e.toString()),s=>{s.exists()?i({id:s.id,...s.data()}):i(null)},s=>{console.error("Error listening for match updates:",s)})}async function Ge(e,i){const t=W();if(!t)return{success:!1,error:"Authentication required"};try{console.log(" Searching for user with email:",e);const s=$e(Le(O,"users"),Fe("email","==",e)),a=await He(s);if(a.empty)return console.error(" Bruker ikke funnet:",e),{success:!1,error:"Bruker ikke funnet"};const n=a.docs[0],r=n.id;return console.log(" Bruker funnet:",r,n.data()),console.log(" Sender invitasjon..."),await Ne(U(O,"users",r,"invitations",i.matchId.toString()),{matchId:i.matchId,matchName:i.matchName,invitedBy:(t.displayName||t.email||""),invitedByUid:t.uid,timestamp:new Date().toISOString(),status:"pending"}),console.log(" Invitasjon sendt!"),{success:!0}}catch(s){return console.error(" Send invitation error:",s),{success:!1,error:s.message}}}async function Ke(e){const i=W();if(!i)return[];try{const t=e.toLowerCase().trim();if(t.length===0)return[];console.log(" Searching for users:",t);const s=await He(Le(O,"users")),a=[];return s.forEach(n=>{const r=n.data(),u=`${r.firstName||""} ${r.lastName||""}`.toLowerCase(),m=(r.email||"").toLowerCase();n.id!==i.uid&&(u.includes(t)||m.includes(t))&&a.push({uid:n.id,email:r.email,firstName:r.firstName||"",lastName:r.lastName||"",displayName:`${r.firstName||""} ${r.lastName||""}`.trim()})}),console.log(`Found ${a.length} users`),a}catch(t){return console.error(" Search users error:",t),[]}}async function Jt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{
 console.log("[Jt] Start - matchId:",e,"uid:",i.uid);
 // Steg 1: Les match-dokumentet
 let matchDoc;
@@ -938,44 +911,79 @@ const _missCap=Math.max(0,s-Math.min(s,_excess));const _excessAfterMiss=i+t+s-e-
 var _st=document.createElement("style");
 _st.textContent="\
 :root{--accent:#e0b649;--accent2:#c49a30;--accent-fade:rgba(224,182,73,0.12);--accent-glow:rgba(224,182,73,0.25);--bg:#0d0f12;--bg2:#111418;--bg3:#161a1f;--card:#141820;--card2:#181d24;--border:rgba(255,255,255,0.07);--border-gold:rgba(224,182,73,0.25);--text:#f0f2f5;--muted:rgba(255,255,255,0.38);--green:#4caf7d;--red:#ef4444;--radius:12px;--radius-sm:8px;}\
-html,body{background:var(--bg)!important;color:var(--text)!important;}\
-.screen{background:var(--bg)!important;}\
-.card{background:var(--card)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;margin-bottom:12px!important;overflow:hidden;position:relative;}\
+html,body{background:var(--bg)!important;color:var(--text)!important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif!important;}\
+.screen{background:var(--bg)!important;min-height:100vh;}\
+/* === TABULAR NUMS on all data === */\
+.hf-val,.pct-val,.time-val,[class*='hf'],[class*='pct'],[class*='pts'],td,th{font-variant-numeric:tabular-nums!important;}\
+/* === CARDS === */\
+.card{background:var(--card)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;margin-bottom:10px!important;overflow:hidden;position:relative;}\
 .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);border-radius:3px 0 0 3px;}\
-.card-header{padding:14px 16px 10px!important;background:transparent!important;border-bottom:1px solid var(--border)!important;}\
-.card-title{font-size:11px!important;font-weight:700!important;letter-spacing:0.1em!important;color:var(--accent)!important;text-transform:uppercase!important;}\
-.nav-avatar{width:40px!important;height:40px!important;border-radius:50%!important;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;font-weight:800!important;font-size:14px!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;box-shadow:0 0 0 2px rgba(224,182,73,0.3),0 0 12px rgba(224,182,73,0.2)!important;}\
+.card-header{padding:12px 16px 10px!important;background:rgba(255,255,255,0.02)!important;border-bottom:1px solid var(--border)!important;display:flex!important;align-items:center!important;justify-content:space-between!important;}\
+.card-title{font-size:10px!important;font-weight:700!important;letter-spacing:0.12em!important;color:var(--accent)!important;text-transform:uppercase!important;display:flex!important;align-items:center!important;gap:6px!important;}\
+.card-title svg{width:13px;height:13px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}\
+/* === NAV AVATAR === */\
+.nav-avatar{width:38px!important;height:38px!important;border-radius:50%!important;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;font-weight:800!important;font-size:13px!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;box-shadow:0 0 0 2px rgba(224,182,73,0.3),0 0 12px rgba(224,182,73,0.15)!important;letter-spacing:0.03em;flex-shrink:0;}\
+/* === TAB BAR === */\
 .tab-bar{background:var(--bg2)!important;border-top:1px solid var(--border)!important;padding:4px 0 2px!important;}\
-.tab-item{color:var(--muted)!important;font-size:8.5px!important;font-weight:700!important;letter-spacing:0.04em!important;text-transform:uppercase!important;transition:color 0.15s!important;position:relative!important;}\
+.tab-item{color:var(--muted)!important;font-size:8.5px!important;font-weight:700!important;letter-spacing:0.05em!important;text-transform:uppercase!important;transition:color 0.15s!important;position:relative!important;}\
 .tab-item.active{color:var(--accent)!important;background:none!important;border-radius:0!important;}\
-.tab-item.active::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--accent);border-radius:2px;}\
+.tab-item.active::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--accent);border-radius:2px;}\
 .tab-icon svg{stroke:currentColor!important;fill:none!important;}\
-.filter-chip{background:rgba(255,255,255,0.05)!important;border:1px solid rgba(255,255,255,0.1)!important;border-radius:20px!important;color:var(--muted)!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.08em!important;text-transform:uppercase!important;padding:6px 14px!important;transition:all 0.15s!important;}\
+/* === FILTER CHIPS === */\
+.filter-chip{background:rgba(255,255,255,0.04)!important;border:1px solid rgba(255,255,255,0.08)!important;border-radius:20px!important;color:var(--muted)!important;font-size:10px!important;font-weight:700!important;letter-spacing:0.08em!important;text-transform:uppercase!important;padding:5px 13px!important;transition:all 0.15s!important;}\
 .filter-chip.active{background:var(--accent-fade)!important;border-color:var(--accent)!important;color:var(--accent)!important;}\
-.btn-primary,.primary-btn{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;border:none!important;border-radius:var(--radius-sm)!important;font-weight:800!important;font-size:12px!important;letter-spacing:0.12em!important;text-transform:uppercase!important;padding:12px 18px!important;cursor:pointer!important;}\
-.btn-secondary,.secondary-btn{background:transparent!important;border:1px solid rgba(224,182,73,0.3)!important;border-radius:var(--radius-sm)!important;color:var(--accent)!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.08em!important;text-transform:uppercase!important;padding:8px 12px!important;cursor:pointer!important;}\
-.btn-home-action{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;border:none!important;border-radius:var(--radius-sm)!important;font-weight:800!important;font-size:13px!important;letter-spacing:0.12em!important;text-transform:uppercase!important;padding:14px 24px!important;cursor:pointer!important;}\
-.fab{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;border:none!important;border-radius:50%!important;width:56px!important;height:56px!important;font-size:24px!important;cursor:pointer!important;box-shadow:0 4px 20px rgba(224,182,73,0.4)!important;display:flex!important;align-items:center!important;justify-content:center!important;position:fixed!important;bottom:80px!important;right:20px!important;z-index:100!important;}\
+/* === BUTTONS === */\
+.btn-primary,.primary-btn{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;border:none!important;border-radius:var(--radius-sm)!important;font-weight:800!important;font-size:12px!important;letter-spacing:0.12em!important;text-transform:uppercase!important;padding:12px 18px!important;cursor:pointer!important;transition:opacity 0.15s!important;}\
+.btn-primary:hover,.primary-btn:hover{opacity:0.88!important;}\
+.btn-secondary,.secondary-btn{background:transparent!important;border:1px solid rgba(224,182,73,0.28)!important;border-radius:var(--radius-sm)!important;color:var(--accent)!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.08em!important;text-transform:uppercase!important;padding:8px 12px!important;cursor:pointer!important;transition:background 0.15s,border-color 0.15s!important;}\
+.btn-secondary:hover{background:var(--accent-fade)!important;border-color:rgba(224,182,73,0.5)!important;}\
+/* === FAB === */\
+.fab{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;border:none!important;border-radius:50%!important;width:54px!important;height:54px!important;font-size:22px!important;cursor:pointer!important;box-shadow:0 4px 20px rgba(224,182,73,0.35)!important;display:flex!important;align-items:center!important;justify-content:center!important;position:fixed!important;bottom:78px!important;right:18px!important;z-index:100!important;transition:transform 0.15s!important;}\
+.fab:hover{transform:scale(1.06)!important;}\
+/* === MODALS === */\
+.modal{background:rgba(0,0,0,0.75)!important;backdrop-filter:blur(6px)!important;}\
 .modal-content,.modal-inner{background:var(--card2)!important;border:1px solid var(--border)!important;border-radius:18px!important;border-top:2px solid var(--accent)!important;}\
-.modal-title{color:var(--text)!important;font-weight:800!important;font-size:16px!important;}\
-.field-input,input[type=text],input[type=email],input[type=number],input[type=password],textarea,select{background:rgba(255,255,255,0.05)!important;border:1px solid rgba(255,255,255,0.1)!important;border-radius:var(--radius-sm)!important;color:var(--text)!important;padding:11px 14px!important;font-size:14px!important;outline:none!important;width:100%!important;box-sizing:border-box!important;}\
-.field-input:focus,input:focus,textarea:focus,select:focus{border-color:rgba(224,182,73,0.5)!important;background:rgba(255,255,255,0.07)!important;}\
-.match-chip,.chip{background:rgba(255,255,255,0.05)!important;border:1px solid var(--border-gold)!important;border-radius:20px!important;color:var(--text)!important;font-size:12px!important;padding:6px 14px!important;}\
-.match-dropdown{background:var(--card2)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;box-shadow:0 8px 32px rgba(0,0,0,0.5)!important;}\
-.match-dropdown-item{border-bottom:1px solid var(--border)!important;padding:12px 14px!important;}\
-.match-dropdown-item.active{background:var(--accent-fade)!important;}\
-.match-dropdown-dot{width:8px!important;height:8px!important;border-radius:50%!important;background:var(--accent)!important;flex-shrink:0!important;}\
-.stage-card{background:var(--card)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;margin-bottom:10px!important;overflow:hidden!important;}\
-.stage-card-header{padding:14px 16px!important;background:var(--bg3)!important;cursor:pointer!important;display:flex!important;align-items:center!important;justify-content:space-between!important;}\
+.modal-title{color:var(--text)!important;font-weight:800!important;font-size:15px!important;letter-spacing:0.04em!important;}\
+/* === FORM FIELDS === */\
+.field-input,input[type=text],input[type=email],input[type=number],input[type=password],textarea,select{background:rgba(255,255,255,0.04)!important;border:1px solid rgba(255,255,255,0.08)!important;border-radius:var(--radius-sm)!important;color:var(--text)!important;padding:11px 14px!important;font-size:14px!important;outline:none!important;width:100%!important;box-sizing:border-box!important;transition:border-color 0.15s,background 0.15s!important;}\
+.field-input:focus,input:focus,textarea:focus,select:focus{border-color:rgba(224,182,73,0.45)!important;background:rgba(255,255,255,0.06)!important;}\
+/* === STANDINGS TABLE === */\
+.standings-table td,.standings-table th{font-variant-numeric:tabular-nums;}\
+.rank-1{color:#e0b649!important;font-weight:800!important;}\
+.rank-2{color:#c0c0c0!important;font-weight:700!important;}\
+.rank-3{color:#cd7f32!important;font-weight:700!important;}\
+/* === MATCH CARDS === */\
+.match-card,[class*='match-item']{background:var(--card)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;border-left:3px solid var(--accent)!important;margin-bottom:10px!important;padding:14px 16px!important;position:relative;}\
+/* === STAGE CARDS === */\
+.stage-card{background:var(--card)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;margin-bottom:8px!important;overflow:hidden!important;}\
+.stage-card-header{padding:12px 14px!important;background:var(--bg3)!important;cursor:pointer!important;display:flex!important;align-items:center!important;justify-content:space-between!important;}\
 .stage-card-title{font-weight:700!important;font-size:14px!important;color:var(--text)!important;}\
+/* === BADGES === */\
 .badge-shot{background:rgba(76,175,125,0.15)!important;color:var(--green)!important;border:1px solid rgba(76,175,125,0.3)!important;border-radius:6px!important;font-size:10px!important;font-weight:700!important;padding:3px 8px!important;letter-spacing:0.06em!important;}\
 .badge-next{background:var(--accent-fade)!important;color:var(--accent)!important;border:1px solid var(--border-gold)!important;border-radius:6px!important;font-size:10px!important;font-weight:700!important;padding:3px 8px!important;}\
-.badge-pending{background:rgba(255,255,255,0.05)!important;color:var(--muted)!important;border:1px solid var(--border)!important;border-radius:6px!important;font-size:10px!important;font-weight:700!important;padding:3px 8px!important;}\
-#prof-avatar{width:80px!important;height:80px!important;border-radius:50%!important;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;font-weight:900!important;font-size:26px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 0 0 3px var(--bg2),0 0 0 5px rgba(224,182,73,0.4),0 0 24px rgba(224,182,73,0.25)!important;}\
-#global-spinner{background:rgba(0,0,0,0.75)!important;backdrop-filter:blur(4px)!important;}\
-::-webkit-scrollbar{width:4px;height:4px;}\
+.badge-pending{background:rgba(255,255,255,0.04)!important;color:var(--muted)!important;border:1px solid var(--border)!important;border-radius:6px!important;font-size:10px!important;font-weight:700!important;padding:3px 8px!important;}\
+/* === PROFILE AVATAR === */\
+#prof-avatar{width:78px!important;height:78px!important;border-radius:50%!important;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;font-weight:900!important;font-size:26px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 0 0 3px var(--bg2),0 0 0 5px rgba(224,182,73,0.35),0 0 20px rgba(224,182,73,0.2)!important;}\
+/* === DROPDOWN === */\
+.match-dropdown{background:var(--card2)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;box-shadow:0 8px 32px rgba(0,0,0,0.5)!important;}\
+.match-dropdown-item{border-bottom:1px solid var(--border)!important;padding:11px 14px!important;}\
+.match-dropdown-item.active{background:var(--accent-fade)!important;}\
+.match-dropdown-dot{width:7px!important;height:7px!important;border-radius:50%!important;background:var(--accent)!important;flex-shrink:0!important;}\
+/* === SPINNERS === */\
+#global-spinner{background:rgba(0,0,0,0.78)!important;backdrop-filter:blur(6px)!important;}\
+/* === SCROLLBARS === */\
+::-webkit-scrollbar{width:3px;height:3px;}\
 ::-webkit-scrollbar-track{background:transparent;}\
-::-webkit-scrollbar-thumb{background:rgba(224,182,73,0.3);border-radius:4px;}\
+::-webkit-scrollbar-thumb{background:rgba(224,182,73,0.25);border-radius:3px;}\
+/* === SECTION HEADERS WITH ICON === */\
+.section-icon-header{display:flex;align-items:center;gap:7px;}\
+.section-icon-header svg{width:13px;height:13px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}\
+/* === PROGRESS BAR for standings % === */\
+.pct-bar-wrap{display:inline-flex;align-items:center;gap:8px;width:100%;}\
+.pct-bar{flex:1;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;min-width:40px;max-width:60px;}\
+.pct-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent2) 100%);}\
+/* === AUTOFILL FIX === */\
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 100px rgba(20,24,32,0.98) inset!important;-webkit-text-fill-color:#f5f7fb!important;caret-color:#f5f7fb!important;border:1px solid rgba(255,255,255,0.1)!important;transition:background-color 9999s ease-in-out 0s!important;}\
 ";
 document.head.appendChild(_st);
 })();const t=Pe();const[i,_refs,_matches]=await Promise.all([jt(),loadReferenceShooters(),Vt(),Promise.resolve()]);i?g=i:g={firstName:t.name||((s=t.email)==null?void 0:s.split("@")[0])||"",lastName:"",division:"",category:"",powerFactor:"",region:"",club:"",draw:null,reloadTime:null};refShooters=_refs;$=_matches;if($&&$.length>0){const a=new Date,n=$.filter(r=>r.status!=="finished"&&r.date);if(n.length>0){let r=n[0],u=Math.abs(new Date(n[0].date)-a);for(const m of n){const b=new Date(m.date),f=Math.abs(b-a);f<u&&(u=f,r=m)}R=r.id}}ke&&ke(),ke=qt(a=>{$=a,fe(),te()}),Zt(a=>{ee=a,Ye()}),e.innerHTML=`

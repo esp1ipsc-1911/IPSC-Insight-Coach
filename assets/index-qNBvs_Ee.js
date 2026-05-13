@@ -456,8 +456,8 @@ html,body{background:var(--bg)!important;color:var(--text)!important;font-family
 /* === NAV AVATAR === */\
 .nav-avatar{width:38px!important;height:38px!important;border-radius:50%!important;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;font-weight:800!important;font-size:13px!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;box-shadow:0 0 0 2px rgba(224,182,73,0.3),0 0 12px rgba(224,182,73,0.15)!important;letter-spacing:0.03em;flex-shrink:0;}\
 /* === TAB BAR === */\
-.tab-bar{background:var(--bg2)!important;border-top:1px solid var(--border)!important;padding:8px 0 6px!important;}\
-.tab-item{color:var(--muted)!important;font-size:9px!important;font-weight:700!important;letter-spacing:0.05em!important;text-transform:uppercase!important;transition:color 0.15s!important;position:relative!important;padding:4px 0 2px!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;}\
+.tab-bar{background:var(--bg2)!important;border-top:1px solid var(--border)!important;padding:10px 0 0!important;padding-bottom:calc(env(safe-area-inset-bottom) + 6px)!important;}\
+.tab-item{color:var(--muted)!important;font-size:7.5px!important;font-weight:700!important;letter-spacing:0.05em!important;text-transform:uppercase!important;transition:color 0.15s!important;position:relative!important;padding:2px 0!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;}\
 .tab-item.active{color:var(--accent)!important;background:none!important;border-radius:0!important;}\
 .tab-item.active::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--accent);border-radius:2px;}\
 .tab-icon svg{stroke:currentColor!important;fill:none!important;}\

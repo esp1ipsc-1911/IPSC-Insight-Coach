@@ -127,608 +127,190 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  `,setTimeout(()=>{const i=e.querySelector("#gdpr-open-modal");i&&i.addEventListener("click",t=>{t.preventDefault(),At(()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!0)},()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!1)})})},0),e}function Dt(){const e=document.getElementById("gdpr-consent-checkbox");return!e||!e.checked?{valid:!1,error:dt==="no"?"You must accept the Privacy Policy to create an account":"You must accept the Privacy Policy to create an account"}:{valid:!0}}function Bt(e,i){e.innerHTML=`
 <style>
  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
  :root {
-  --accent: #e0b649;
-  --accent2: #c49a30;
-  --bg: #0d0f12;
-  --bg2: #111418;
-  --card: #141820;
-  --border: rgba(255,255,255,0.07);
-  --border-gold: rgba(224,182,73,0.25);
-  --text: #f0f2f5;
-  --muted: rgba(255,255,255,0.38);
-  --red: #ef4444;
+  --accent: #e0b649; --accent2: #c49a30;
+  --bg: #0d0f12; --card: #141820;
+  --border: rgba(255,255,255,0.07); --border-gold: rgba(224,182,73,0.25);
+  --text: #f0f2f5; --muted: rgba(255,255,255,0.38);
  }
-
- html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  min-height: 100vh;
- }
-
+ html, body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; min-height: 100vh; }
  .login-page {
-  min-height: 100vh;
-  width: 100%;
+  min-height: 100vh; width: 100%;
   background: var(--bg);
-  background-image:
-   radial-gradient(ellipse at 20% 10%, rgba(224,182,73,0.06) 0%, transparent 50%),
-   radial-gradient(ellipse at 80% 80%, rgba(224,182,73,0.04) 0%, transparent 50%),
-   url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 42.7 L30 60 L0 42.7 L0 17.3Z' fill='none' stroke='rgba(224,182,73,0.04)' stroke-width='0.5'/%3E%3C/svg%3E");
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
+  background-image: radial-gradient(ellipse at 20% 10%, rgba(224,182,73,0.05) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(224,182,73,0.03) 0%, transparent 50%), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 42.7 L30 60 L0 42.7 L0 17.3Z' fill='none' stroke='rgba(224,182,73,0.035)' stroke-width='0.5'/%3E%3C/svg%3E");
+  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px;
  }
-
- .login-shell {
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
- }
-
- /* TOP BAR */
- .login-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 32px;
- }
-
- .login-logo-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #1a1e26 0%, #0d0f12 100%);
-  border: 1px solid var(--border-gold);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 0 1px rgba(224,182,73,0.15), 0 0 20px rgba(224,182,73,0.1);
-  font-size: 28px;
- }
-
- .login-lang-wrap {
-  display: flex;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
- }
-
- .lang-btn {
-  background: transparent;
-  border: none;
-  padding: 8px 14px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background 0.15s;
-  line-height: 1;
- }
+ .login-shell { width: 100%; max-width: 400px; }
+ .login-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+ .login-logo { width: 54px; height: 54px; border-radius: 14px; background: linear-gradient(135deg,#1a1e26,#0d0f12); border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 0 0 1px rgba(224,182,73,0.12), 0 0 16px rgba(224,182,73,0.08); }
+ .login-lang { display: flex; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+ .lang-btn { background: transparent; border: none; padding: 8px 14px; font-size: 17px; cursor: pointer; line-height: 1; transition: background 0.15s; }
  .lang-btn.active { background: rgba(224,182,73,0.15); }
  .lang-btn:first-child { border-right: 1px solid var(--border); }
-
- /* HERO */
- .login-hero {
-  margin-bottom: 28px;
- }
-
- .login-title {
-  font-size: 48px;
-  font-weight: 900;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  margin-bottom: 4px;
- }
+ .login-hero { margin-bottom: 24px; }
+ .login-title { font-size: 44px; font-weight: 900; letter-spacing: -0.01em; line-height: 1; }
  .login-title .white { color: var(--text); }
  .login-title .gold { color: var(--accent); }
-
- .login-tagline {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-top: 10px;
- }
-
- /* STATUS */
- .login-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border);
-  border-left: 2px solid #22c55e;
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 20px;
- }
- .status-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 6px #22c55e;
-  flex-shrink: 0;
- }
- .status-text {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.6);
-  text-transform: uppercase;
- }
-
- /* CARD */
- .login-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-top: 2px solid var(--accent);
-  border-radius: 16px;
-  padding: 24px;
- }
-
- /* FORM */
- .field-group { margin-bottom: 16px; }
-
- .field-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
- }
-
- .field-label svg {
-  width: 12px; height: 12px;
-  stroke: var(--muted);
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
- }
-
- .field-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
- }
-
- .field-icon {
-  position: absolute;
-  left: 12px;
-  display: flex;
-  align-items: center;
-  pointer-events: none;
- }
- .field-icon svg {
-  width: 15px; height: 15px;
-  stroke: var(--muted);
-  fill: none;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
- }
-
- .field {
-  width: 100%;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  color: var(--text);
-  font-size: 15px;
-  padding: 13px 14px 13px 40px;
-  outline: none;
-  transition: border-color 0.15s, background 0.15s;
-  -webkit-appearance: none;
- }
- .field:focus {
-  border-color: rgba(224,182,73,0.45);
-  background: rgba(255,255,255,0.06);
- }
- .field::placeholder { color: rgba(255,255,255,0.2); }
-
- input:-webkit-autofill,
- input:-webkit-autofill:hover,
- input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 100px #141820 inset !important;
-  -webkit-text-fill-color: #f0f2f5 !important;
-  caret-color: #f0f2f5 !important;
-  border-color: rgba(255,255,255,0.08) !important;
-  transition: background-color 9999s !important;
- }
-
- .pw-toggle {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: var(--muted);
-  font-size: 16px;
-  display: flex;
-  align-items: center;
- }
- .pw-toggle svg {
-  width: 17px; height: 17px;
-  stroke: var(--muted);
-  fill: none;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
- }
-
- /* BUTTONS */
- .btn-primary {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-  color: #0a0c0f;
-  border: none;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: opacity 0.15s;
- }
- .btn-primary:hover { opacity: 0.9; }
- .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
- .btn-secondary {
-  width: 100%;
-  padding: 13px;
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid rgba(224,182,73,0.3);
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
- }
- .btn-secondary:hover { background: rgba(224,182,73,0.08); border-color: rgba(224,182,73,0.5); }
-
- .btn-ghost {
-  width: 100%;
-  padding: 10px;
-  background: transparent;
-  color: var(--muted);
-  border: none;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  text-transform: uppercase;
-  margin-top: 4px;
- }
-
- .or-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 16px 0;
- }
- .or-divider::before, .or-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
- }
- .or-divider span {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  text-transform: uppercase;
- }
-
- /* ERROR */
- .error-text {
-  color: #ef4444;
-  font-size: 12px;
-  font-weight: 500;
-  margin-top: 10px;
-  min-height: 16px;
-  text-align: center;
- }
-
- /* REGISTER FORM */
- .register-form { display: none; }
- .register-form.active { display: block; }
-
- .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
- }
-
- .field-no-icon { padding-left: 14px !important; }
-
- select.field {
-  padding-left: 14px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  -webkit-appearance: none;
-  appearance: none;
- }
+ .login-tagline { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; margin-top: 10px; }
+ .login-status { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-left: 2px solid #22c55e; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; }
+ .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
+ .status-text { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: rgba(255,255,255,0.55); text-transform: uppercase; }
+ .login-card { background: var(--card); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: 16px; padding: 22px; }
+ .field-group { margin-bottom: 14px; }
+ .field-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; display: flex; align-items: center; gap: 6px; }
+ .field-lbl svg { width: 11px; height: 11px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+ .field-wrap { position: relative; }
+ .field-ico { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); display: flex; pointer-events: none; }
+ .field-ico svg { width: 14px; height: 14px; stroke: rgba(255,255,255,0.25); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+ .field { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: var(--text); font-size: 15px; padding: 12px 14px 12px 40px; outline: none; transition: border-color 0.15s, background 0.15s; -webkit-appearance: none; }
+ .field.no-ico { padding-left: 14px; }
+ .field:focus { border-color: rgba(224,182,73,0.45); background: rgba(255,255,255,0.06); }
+ .field::placeholder { color: rgba(255,255,255,0.18); }
+ select.field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
  select.field option { background: #141820; color: var(--text); }
-
- /* GDPR */
- .gdpr-check-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 14px 0;
- }
- .gdpr-check-row input[type=checkbox] {
-  width: 18px; height: 18px;
-  flex-shrink: 0;
-  accent-color: var(--accent);
-  margin-top: 1px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  cursor: pointer;
- }
- .gdpr-check-row label {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.5;
-  cursor: pointer;
- }
- .gdpr-check-row label a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
- }
-
- /* PASSWORD STRENGTH */
- .pw-strength {
-  margin-top: 6px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
- }
- .pw-strength-bar {
-  flex: 1;
-  height: 3px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 2px;
-  overflow: hidden;
- }
- .pw-strength-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.3s, background 0.3s;
- }
- .pw-strength-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  min-width: 60px;
-  text-align: right;
- }
-
- /* GDPR MODAL */
- .gdpr-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
- }
+ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0 100px #141820 inset !important; -webkit-text-fill-color: #f0f2f5 !important; caret-color: #f0f2f5 !important; transition: background-color 9999s !important; }
+ .pw-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+ .pw-toggle svg { width: 16px; height: 16px; stroke: rgba(255,255,255,0.3); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+ .pw-strength-wrap { margin-top: 6px; display: flex; align-items: center; gap: 8px; }
+ .pw-strength-track { flex: 1; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+ #passwordStrengthBar { height: 100%; width: 0; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+ #passwordStrengthText { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; min-width: 70px; text-align: right; color: var(--muted); }
+ .btn-primary { width: 100%; padding: 13px; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: #0a0c0f; border: none; border-radius: 10px; font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; margin-top: 6px; transition: opacity 0.15s; }
+ .btn-primary:hover { opacity: 0.88; }
+ .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+ .btn-secondary { width: 100%; padding: 12px; background: transparent; color: var(--accent); border: 1px solid rgba(224,182,73,0.28); border-radius: 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+ .btn-secondary:hover { background: rgba(224,182,73,0.08); }
+ .btn-ghost { width: 100%; padding: 10px; background: transparent; color: var(--muted); border: none; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; text-transform: uppercase; margin-top: 4px; }
+ .or-row { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
+ .or-row::before, .or-row::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+ #separatorText { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+ .error-text { color: #ef4444; font-size: 12px; font-weight: 500; margin-top: 10px; min-height: 16px; text-align: center; }
+ .login-section { display: block; }
+ .register-section { display: none; }
+ .login-section.active { display: block; }
+ .register-section.active { display: block; }
+ .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+ .pf-row { display: flex; gap: 8px; margin-top: 4px; }
+ .pf-btn { flex: 1; padding: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; text-align: center; }
+ .pf-btn.selected { background: var(--accent-fade,rgba(224,182,73,0.12)); border-color: var(--accent); color: var(--accent); }
+ .gdpr-row { display: flex; align-items: flex-start; gap: 10px; margin: 12px 0; }
+ .gdpr-row input[type=checkbox] { width: 17px; height: 17px; flex-shrink: 0; accent-color: var(--accent); margin-top: 2px; cursor: pointer; }
+ .gdpr-row label { font-size: 12px; color: var(--muted); line-height: 1.5; cursor: pointer; }
+ .gdpr-row label a { color: var(--accent); text-decoration: none; font-weight: 600; }
+ .gdpr-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px; }
  .gdpr-modal.open { display: flex; }
- .gdpr-modal-inner {
-  background: #141820;
-  border: 1px solid var(--border);
-  border-top: 2px solid var(--accent);
-  border-radius: 16px;
-  max-width: 500px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 24px;
- }
- .gdpr-modal-inner h2 {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--text);
-  margin-bottom: 16px;
-  text-transform: uppercase;
- }
- .gdpr-modal-inner h3 {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin: 16px 0 6px;
- }
- .gdpr-modal-inner p, .gdpr-modal-inner li {
-  font-size: 13px;
-  color: rgba(255,255,255,0.65);
-  line-height: 1.6;
- }
- .gdpr-modal-inner ul { padding-left: 16px; margin: 6px 0; }
- .gdpr-close-btn {
-  width: 100%;
-  margin-top: 20px;
-  padding: 12px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-  color: #0a0c0f;
-  border: none;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
- }
-
- @media (min-width: 500px) {
-  .login-page { padding: 40px 24px; }
- }
+ .gdpr-modal-inner { background: #141820; border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: 16px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 22px; }
+ .gdpr-modal-inner h2 { font-size: 15px; font-weight: 800; letter-spacing: 0.06em; color: var(--text); margin-bottom: 14px; text-transform: uppercase; }
+ .gdpr-modal-inner h3 { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; margin: 14px 0 5px; }
+ .gdpr-modal-inner p, .gdpr-modal-inner li { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+ .gdpr-modal-inner ul { padding-left: 16px; margin: 4px 0; }
+ .gdpr-close { width: 100%; margin-top: 18px; padding: 12px; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: #0a0c0f; border: none; border-radius: 10px; font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
 </style>
 
 <div class="login-page" id="loginPage">
  <div class="login-shell">
 
-  <!-- TOP BAR -->
   <div class="login-topbar">
-   <div class="login-logo-wrap">🎯</div>
-   <div class="login-lang-wrap">
-    <button class="lang-btn" id="langBtnNo" onclick="setLang('no')">🇳🇴</button>
-    <button class="lang-btn" id="langBtnEn" onclick="setLang('en')">🇺🇸</button>
+   <div class="login-logo">
+    <img src="https://firebasestorage.googleapis.com/v0/b/ipscapp-3a0a5.appspot.com/o/app-assets%2Flogo.png?alt=media" style="width:36px;height:36px;object-fit:contain;" onerror="this.style.display='none';this.parentNode.innerHTML='🎯';" />
+   </div>
+   <div class="login-lang">
+    <button class="lang-btn" id="langNo" onclick="">🇳🇴</button>
+    <button class="lang-btn" id="langEn" onclick="">🇺🇸</button>
    </div>
   </div>
 
-  <!-- HERO -->
   <div class="login-hero">
-   <div class="login-title">
-    <span class="white">INSIGHT</span><br>
-    <span class="gold">DYNAMICS</span>
-   </div>
-   <div class="login-tagline" id="loginTagline">Performance. Precision. Progress.</div>
+   <div class="login-title"><span class="white">INSIGHT</span><br><span class="gold">DYNAMICS</span></div>
+   <div class="login-tagline" id="brandSubtitle">Performance. Precision. Progress.</div>
   </div>
 
-  <!-- STATUS -->
   <div class="login-status">
    <div class="status-dot"></div>
-   <div class="status-text" id="loginSystemStatus">System Online</div>
+   <div class="status-text">System Online</div>
   </div>
 
-  <!-- LOGIN CARD -->
-  <div class="login-card" id="loginCard">
+  <div class="login-card">
 
-   <!-- LOGIN FORM -->
-   <div id="loginForm">
+   <!-- LOGIN SECTION -->
+   <div id="loginSection" class="login-section active">
     <div class="field-group">
-     <div class="field-label">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>
-      <span id="emailLabel">Email</span>
+     <div class="field-lbl" id="loginEmailLabel">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>Email
      </div>
      <div class="field-wrap">
-      <div class="field-icon">
-       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>
-      </div>
+      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg></div>
       <input id="loginEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
      </div>
     </div>
-
     <div class="field-group">
-     <div class="field-label">
-      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span id="passwordLabel">Password</span>
+     <div class="field-lbl" id="loginPasswordLabel">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Password
      </div>
      <div class="field-wrap">
-      <div class="field-icon">
-       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      </div>
+      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
       <input id="loginPassword" class="field" type="password" placeholder="Password" autocomplete="current-password" />
-      <button class="pw-toggle" type="button" onclick="togglePw('loginPassword',this)">
-       <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <button class="pw-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
      </div>
     </div>
-
-    <button class="btn-primary" id="loginBtn" onclick="doLogin()">
-     <span id="loginBtnText">Sign In</span>
-    </button>
-
-    <div class="or-divider"><span id="orLabel">or</span></div>
-
-    <button class="btn-secondary" id="showRegisterBtn" onclick="showRegister()">
-     <span id="createAccountLabel">Create an Account</span>
-    </button>
+    <button class="btn-primary" id="loginBtn">Sign In</button>
+    <div class="or-row"><span id="separatorText">or</span></div>
+    <button class="btn-secondary" id="showRegisterBtn">Create an Account</button>
    </div>
 
-   <!-- REGISTER FORM -->
-   <div id="registerFormWrap" class="register-form">
+   <!-- REGISTER SECTION -->
+   <div id="registerSection" class="register-section">
     <div class="form-row">
      <div class="field-group">
-      <div class="field-label" id="firstNameLabel">First Name</div>
-      <input id="regFirst" class="field field-no-icon" type="text" placeholder="First name" autocomplete="given-name" />
+      <div class="field-lbl" id="registerFirstNameLabel">First Name</div>
+      <input id="registerFirstName" class="field no-ico" type="text" placeholder="First name" autocomplete="given-name" />
      </div>
      <div class="field-group">
-      <div class="field-label" id="lastNameLabel">Last Name</div>
-      <input id="regLast" class="field field-no-icon" type="text" placeholder="Last name" autocomplete="family-name" />
+      <div class="field-lbl" id="registerLastNameLabel">Last Name</div>
+      <input id="registerLastName" class="field no-ico" type="text" placeholder="Last name" autocomplete="family-name" />
      </div>
     </div>
-
     <div class="field-group">
-     <div class="field-label" id="regEmailLabel">Email</div>
+     <div class="field-lbl" id="registerEmailLabel">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>Email
+     </div>
      <div class="field-wrap">
-      <div class="field-icon">
-       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>
-      </div>
-      <input id="regEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
+      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg></div>
+      <input id="registerEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
      </div>
     </div>
-
     <div class="field-group">
-     <div class="field-label" id="regEmailConfirmLabel">Confirm Email Address</div>
+     <div class="field-lbl" id="registerEmailConfirmLabel">Confirm Email Address</div>
      <div class="field-wrap">
-      <div class="field-icon">
-       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>
-      </div>
-      <input id="regEmailConfirm" class="field" type="email" placeholder="Re-enter email" autocomplete="email" />
+      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg></div>
+      <input id="registerEmailConfirm" class="field" type="email" placeholder="Re-enter email" autocomplete="email" />
      </div>
     </div>
-
     <div class="field-group">
-     <div class="field-label" id="regPasswordLabel">Password</div>
+     <div class="field-lbl" id="registerPasswordLabel">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Password
+     </div>
      <div class="field-wrap">
-      <div class="field-icon">
-       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      </div>
-      <input id="regPassword" class="field" type="password" placeholder="Password" autocomplete="new-password" oninput="checkPwStrength(this.value)" />
-      <button class="pw-toggle" type="button" onclick="togglePw('regPassword',this)">
-       <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <input id="registerPassword" class="field" type="password" placeholder="Password" autocomplete="new-password" />
+      <button class="pw-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
      </div>
-     <div class="pw-strength" id="pwStrengthWrap" style="display:none">
-      <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwStrengthFill"></div></div>
-      <div class="pw-strength-label" id="pwStrengthLabel"></div>
+     <div class="pw-strength-wrap">
+      <div class="pw-strength-track"><div id="passwordStrengthBar"></div></div>
+      <div id="passwordStrengthText"></div>
      </div>
     </div>
-
     <div class="field-group">
-     <div class="field-label" id="regPasswordConfirmLabel">Re-enter Password</div>
+     <div class="field-lbl" id="registerPasswordConfirmLabel">Re-enter Password</div>
      <div class="field-wrap">
-      <div class="field-icon">
-       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      </div>
-      <input id="regPasswordConfirm" class="field" type="password" placeholder="Repeat password" autocomplete="new-password" />
-      <button class="pw-toggle" type="button" onclick="togglePw('regPasswordConfirm',this)">
-       <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <input id="registerPasswordConfirm" class="field" type="password" placeholder="Re-enter password" autocomplete="new-password" />
+      <button class="pw-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
      </div>
     </div>
-
     <div class="field-group">
-     <div class="field-label" id="divisionLabel">Division</div>
-     <select id="regDivision" class="field field-no-icon">
+     <div class="field-lbl" id="registerDivisionLabel">Division</div>
+     <select id="registerDivision" class="field no-ico">
       <option value="">Select division…</option>
       <option value="Open">Open</option>
       <option value="Standard">Standard</option>
@@ -740,12 +322,11 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
       <option value="Pistol Caliber Carbine Optics">Pistol Caliber Carbine Optics</option>
      </select>
     </div>
-
     <div class="form-row">
      <div class="field-group">
-      <div class="field-label" id="categoryLabel">Category</div>
-      <select id="regCategory" class="field field-no-icon">
-       <option value="">Category (optional)</option>
+      <div class="field-lbl" id="registerCategoryLabel">Category</div>
+      <select id="registerCategory" class="field no-ico">
+       <option value="">Optional</option>
        <option value="Lady">Lady</option>
        <option value="Junior">Junior</option>
        <option value="Senior">Senior</option>
@@ -753,132 +334,83 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
       </select>
      </div>
      <div class="field-group">
-      <div class="field-label" id="powerFactorLabel">Power Factor</div>
-      <select id="regPowerFactor" class="field field-no-icon">
-       <option value="Minor">Minor</option>
-       <option value="Major">Major</option>
-      </select>
+      <div class="field-lbl" id="registerClubLabel">Club</div>
+      <input id="registerClub" class="field no-ico" type="text" placeholder="Club (optional)" />
      </div>
     </div>
-
     <div class="field-group">
-     <div class="field-label" id="regionLabel">Region / Nation</div>
-     <select id="regRegion" class="field field-no-icon">
+     <div class="field-lbl" id="registerRegionLabel">Region / Nation</div>
+     <select id="registerRegion" class="field no-ico">
       <option value="">Select nation (optional)</option>
-      <option value="🇦🇫 Afghanistan">🇦🇫 Afghanistan</option>
-      <option value="🇦🇱 Albania">🇦🇱 Albania</option>
-      <option value="🇩🇿 Algeria">🇩🇿 Algeria</option>
-      <option value="🇦🇷 Argentina">🇦🇷 Argentina</option>
-      <option value="🇦🇲 Armenia">🇦🇲 Armenia</option>
       <option value="🇦🇺 Australia">🇦🇺 Australia</option>
       <option value="🇦🇹 Austria">🇦🇹 Austria</option>
-      <option value="🇦🇿 Azerbaijan">🇦🇿 Azerbaijan</option>
-      <option value="🇧🇭 Bahrain">🇧🇭 Bahrain</option>
       <option value="🇧🇪 Belgium">🇧🇪 Belgium</option>
-      <option value="🇧🇦 Bosnia and Herzegovina">🇧🇦 Bosnia and Herzegovina</option>
       <option value="🇧🇷 Brazil">🇧🇷 Brazil</option>
-      <option value="🇧🇬 Bulgaria">🇧🇬 Bulgaria</option>
       <option value="🇨🇦 Canada">🇨🇦 Canada</option>
-      <option value="🇨🇱 Chile">🇨🇱 Chile</option>
       <option value="🇨🇳 China">🇨🇳 China</option>
-      <option value="🇨🇴 Colombia">🇨🇴 Colombia</option>
       <option value="🇭🇷 Croatia">🇭🇷 Croatia</option>
-      <option value="🇨🇾 Cyprus">🇨🇾 Cyprus</option>
       <option value="🇨🇿 Czech Republic">🇨🇿 Czech Republic</option>
       <option value="🇩🇰 Denmark">🇩🇰 Denmark</option>
-      <option value="🇪🇨 Ecuador">🇪🇨 Ecuador</option>
-      <option value="🇪🇬 Egypt">🇪🇬 Egypt</option>
-      <option value="🇪🇪 Estonia">🇪🇪 Estonia</option>
       <option value="🇫🇮 Finland">🇫🇮 Finland</option>
       <option value="🇫🇷 France">🇫🇷 France</option>
-      <option value="🇬🇪 Georgia">🇬🇪 Georgia</option>
       <option value="🇩🇪 Germany">🇩🇪 Germany</option>
       <option value="🇬🇷 Greece">🇬🇷 Greece</option>
       <option value="🇭🇺 Hungary">🇭🇺 Hungary</option>
       <option value="🇮🇸 Iceland">🇮🇸 Iceland</option>
       <option value="🇮🇳 India">🇮🇳 India</option>
-      <option value="🇮🇩 Indonesia">🇮🇩 Indonesia</option>
-      <option value="🇮🇷 Iran">🇮🇷 Iran</option>
-      <option value="🇮🇶 Iraq">🇮🇶 Iraq</option>
       <option value="🇮🇪 Ireland">🇮🇪 Ireland</option>
       <option value="🇮🇱 Israel">🇮🇱 Israel</option>
       <option value="🇮🇹 Italy">🇮🇹 Italy</option>
       <option value="🇯🇵 Japan">🇯🇵 Japan</option>
-      <option value="🇯🇴 Jordan">🇯🇴 Jordan</option>
-      <option value="🇰🇿 Kazakhstan">🇰🇿 Kazakhstan</option>
-      <option value="🇰🇷 South Korea">🇰🇷 South Korea</option>
-      <option value="🇰🇼 Kuwait">🇰🇼 Kuwait</option>
       <option value="🇱🇻 Latvia">🇱🇻 Latvia</option>
-      <option value="🇱🇧 Lebanon">🇱🇧 Lebanon</option>
-      <option value="🇱🇾 Libya">🇱🇾 Libya</option>
       <option value="🇱🇹 Lithuania">🇱🇹 Lithuania</option>
-      <option value="🇱🇺 Luxembourg">🇱🇺 Luxembourg</option>
-      <option value="🇲🇰 North Macedonia">🇲🇰 North Macedonia</option>
-      <option value="🇲🇾 Malaysia">🇲🇾 Malaysia</option>
-      <option value="🇲🇹 Malta">🇲🇹 Malta</option>
       <option value="🇲🇽 Mexico">🇲🇽 Mexico</option>
-      <option value="🇲🇩 Moldova">🇲🇩 Moldova</option>
-      <option value="🇲🇪 Montenegro">🇲🇪 Montenegro</option>
-      <option value="🇲🇦 Morocco">🇲🇦 Morocco</option>
       <option value="🇳🇱 Netherlands">🇳🇱 Netherlands</option>
       <option value="🇳🇿 New Zealand">🇳🇿 New Zealand</option>
       <option value="🇳🇴 Norway">🇳🇴 Norway</option>
-      <option value="🇴🇲 Oman">🇴🇲 Oman</option>
-      <option value="🇵🇰 Pakistan">🇵🇰 Pakistan</option>
-      <option value="🇵🇦 Panama">🇵🇦 Panama</option>
-      <option value="🇵🇾 Paraguay">🇵🇾 Paraguay</option>
-      <option value="🇵🇪 Peru">🇵🇪 Peru</option>
-      <option value="🇵🇭 Philippines">🇵🇭 Philippines</option>
       <option value="🇵🇱 Poland">🇵🇱 Poland</option>
       <option value="🇵🇹 Portugal">🇵🇹 Portugal</option>
-      <option value="🇶🇦 Qatar">🇶🇦 Qatar</option>
       <option value="🇷🇴 Romania">🇷🇴 Romania</option>
       <option value="🇷🇺 Russia">🇷🇺 Russia</option>
       <option value="🇸🇦 Saudi Arabia">🇸🇦 Saudi Arabia</option>
       <option value="🇷🇸 Serbia">🇷🇸 Serbia</option>
-      <option value="🇸🇬 Singapore">🇸🇬 Singapore</option>
       <option value="🇸🇰 Slovakia">🇸🇰 Slovakia</option>
       <option value="🇸🇮 Slovenia">🇸🇮 Slovenia</option>
       <option value="🇿🇦 South Africa">🇿🇦 South Africa</option>
       <option value="🇪🇸 Spain">🇪🇸 Spain</option>
       <option value="🇸🇪 Sweden">🇸🇪 Sweden</option>
       <option value="🇨🇭 Switzerland">🇨🇭 Switzerland</option>
-      <option value="🇸🇾 Syria">🇸🇾 Syria</option>
-      <option value="🇹🇼 Taiwan">🇹🇼 Taiwan</option>
-      <option value="🇹🇭 Thailand">🇹🇭 Thailand</option>
-      <option value="🇹🇳 Tunisia">🇹🇳 Tunisia</option>
       <option value="🇹🇷 Turkey">🇹🇷 Turkey</option>
-      <option value="🇦🇪 UAE">🇦🇪 UAE</option>
       <option value="🇺🇦 Ukraine">🇺🇦 Ukraine</option>
       <option value="🇬🇧 United Kingdom">🇬🇧 United Kingdom</option>
       <option value="🇺🇸 United States">🇺🇸 United States</option>
-      <option value="🇺🇾 Uruguay">🇺🇾 Uruguay</option>
-      <option value="🇻🇪 Venezuela">🇻🇪 Venezuela</option>
-      <option value="🇻🇳 Vietnam">🇻🇳 Vietnam</option>
      </select>
     </div>
-
     <div class="field-group">
-     <div class="field-label" id="inviteCodeLabel">Invitation Code</div>
-     <div class="field-wrap">
-      <div class="field-icon">
-       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
-      <input id="regInvite" class="field" type="text" placeholder="Invitation code (required)" />
+     <div class="field-lbl" id="registerPowerFactorLabel">Power Factor</div>
+     <div class="pf-row">
+      <div class="pf-btn selected" id="pfMinor">Minor</div>
+      <div class="pf-btn" id="pfMajor">Major</div>
      </div>
     </div>
-
-    <div class="gdpr-check-row">
-     <input type="checkbox" id="gdprCheck" />
-     <label for="gdprCheck" id="gdprLabel">
-      I have read and accepted the <a href="#" onclick="openGdpr();return false;" id="gdprLink">Privacy Policy</a>
+    <div class="field-group">
+     <div class="field-lbl" id="registerCodeLabel">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Invitation Code
+     </div>
+     <div class="field-wrap">
+      <div class="field-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <input id="registerCode" class="field" type="text" placeholder="Invitation code (required)" />
+     </div>
+    </div>
+    <div class="gdpr-row">
+     <input type="checkbox" id="gdprCheckbox" />
+     <label for="gdprCheckbox">
+      I have read and accepted the <a href="#" onclick="document.getElementById('gdprModal').classList.add('open');return false;">Privacy Policy</a>
      </label>
     </div>
-
-    <button class="btn-primary" id="registerBtn" onclick="doRegister()">
-     <span id="registerBtnText">Create an Account</span>
-    </button>
-    <button class="btn-ghost" id="cancelRegisterBtn" onclick="hideRegister()">Cancel</button>
+    <div id="gdprCheckboxContainer"></div>
+    <button class="btn-primary" id="registerBtn">Create an Account</button>
+    <button class="btn-ghost" id="cancelRegisterBtn">Cancel</button>
    </div>
 
    <div id="error" class="error-text"></div>
@@ -887,11 +419,11 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </div>
 </div>
 
-<!-- GDPR MODAL -->
 <div class="gdpr-modal" id="gdprModal">
- <div class="gdpr-modal-inner" id="gdprContent"></div>
-</div>
-`;const _langInit=localStorage.getItem("appLang")||"en";const t={no:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"E-post",loginEmailPlaceholder:"navn@epost.no",loginPasswordLabel:"Passord",loginPasswordPlaceholder:"Passord",login:"Sign In",loginSpinner:"Signing in…",or:"or",showRegister:"Create an Account",registerFirstNameLabel:"Fornavn",registerFirstNamePlaceholder:"Fornavn",registerLastNameLabel:"Etternavn",registerLastNamePlaceholder:"Etternavn",registerEmailLabel:"E-post",registerEmailPlaceholder:"navn@epost.no",registerEmailConfirmLabel:"Confirm Email Address",registerEmailConfirmPlaceholder:"Re-enter Email Address",registerPasswordLabel:"Passord",registerPasswordPlaceholder:"Passord",registerPasswordConfirmLabel:"Bekreft passord",registerPasswordConfirmPlaceholder:"Re-enter Password",registerDivisionLabel:"Divisjon",registerCategoryLabel:"Kategori",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Klubb",registerCodeLabel:"Invitation Code",registerCodePlaceholder:"Invitation Code",register:"Create Account",cancel:"Cancel",emailMismatch:"E-postadressene er ikke like",passwordMismatch:"Passordene er ikke like",missingFields:"Please complete all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"Passordet er for svakt",strengthEmpty:"",strengthVeryWeak:"Password Strength: Very Weak",strengthWeak:"Password Strength: Weak",strengthMedium:"Password Strength: Fair",strengthStrong:"Password Strength: Strong",strengthVeryStrong:"Password Strength: Very Strong",gdprRequired:dt==="no"?"You must accept the Privacy Policy to create an account":"You must accept the Privacy Policy to create an account"},en:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"Email",loginEmailPlaceholder:"name@email.com",loginPasswordLabel:"Password",loginPasswordPlaceholder:"Password",login:"Sign In",loginSpinner:"Signing in…",or:"or",showRegister:"Create an Account",registerFirstNameLabel:"First Name",registerFirstNamePlaceholder:"First name",registerLastNameLabel:"Last Name",registerLastNamePlaceholder:"Last name",registerEmailLabel:"Email",registerEmailPlaceholder:"name@email.com",registerEmailConfirmLabel:"Confirm Email Address",registerEmailConfirmPlaceholder:"Re-enter Email Address",registerPasswordLabel:"Password",registerPasswordPlaceholder:"Password",registerPasswordConfirmLabel:"Confirm Password",registerPasswordConfirmPlaceholder:"Re-enter Password",registerDivisionLabel:"Division",registerCategoryLabel:"Category",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Club",registerCodeLabel:"Invite code",registerCodePlaceholder:"Invite code",register:"Create an Account",cancel:"Cancel",emailMismatch:"The email addresses you entered do not match",passwordMismatch:"The passwords you entered do not match",missingFields:"Please complete all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"Your password is too weak",strengthEmpty:"",strengthVeryWeak:"Password Strength: Very Weak",strengthWeak:"Password Strength: Weak",strengthMedium:"Password strength: Medium",strengthStrong:"Password Strength: Strong",strengthVeryStrong:"Password Strength: Very Strong",gdprRequired:"You must accept the Privacy Policy to create an account"}};let s=localStorage.getItem("appLang")||"en",a="minor";const n=document.getElementById("error"),r=document.getElementById("loginSection"),u=document.getElementById("registerSection"),m=document.getElementById("showRegisterBtn"),b=document.getElementById("cancelRegisterBtn"),f=document.getElementById("loginBtn"),p=document.getElementById("registerBtn"),h=document.getElementById("langNo"),E=document.getElementById("langEn"),k=document.getElementById("registerPassword"),P=document.getElementById("passwordStrengthBar"),C=document.getElementById("passwordStrengthText"),L=document.getElementById("pfMinor"),M=document.getElementById("pfMajor");L.onclick=()=>{a="minor",L.classList.add("selected"),M.classList.remove("selected")},M.onclick=()=>{a="major",M.classList.add("selected"),L.classList.remove("selected")};function D(w){let y=0;return w?(w.length>=8&&(y+=1),w.length>=12&&(y+=1),/[a-z]/.test(w)&&/[A-Z]/.test(w)&&(y+=1),/\d/.test(w)&&(y+=1),/[^A-Za-z0-9]/.test(w)&&(y+=1),y<=1?{score:y,width:"20%",labelKey:"strengthVeryWeak",color:"#ff6b6b"}:y===2?{score:y,width:"40%",labelKey:"strengthWeak",color:"#ff9f43"}:y===3?{score:y,width:"60%",labelKey:"strengthMedium",color:"#feca57"}:y===4?{score:y,width:"80%",labelKey:"strengthStrong",color:"#1dd1a1"}:{score:y,width:"100%",labelKey:"strengthVeryStrong",color:"#10ac84"}):{score:0,width:"0%",labelKey:"strengthEmpty",color:"#ff6b6b"}}function B(){const w=t[s],y=k.value,H=D(y);P.style.width=H.width,P.style.background=H.color,C.innerText=w[H.labelKey]}function _(w){s=w;const y=t[w];document.getElementById("brandSubtitle").innerText=y.subtitle,document.getElementById("loginEmailLabel").innerText=y.loginEmailLabel,document.getElementById("loginEmail").placeholder=y.loginEmailPlaceholder,document.getElementById("loginPasswordLabel").innerText=y.loginPasswordLabel,document.getElementById("loginPassword").placeholder=y.loginPasswordPlaceholder,document.getElementById("loginBtn").innerText=y.login,document.getElementById("separatorText").innerText=y.or,document.getElementById("showRegisterBtn").innerText=y.showRegister,document.getElementById("registerFirstNameLabel").innerText=y.registerFirstNameLabel,document.getElementById("registerFirstName").placeholder=y.registerFirstNamePlaceholder,document.getElementById("registerLastNameLabel").innerText=y.registerLastNameLabel,document.getElementById("registerLastName").placeholder=y.registerLastNamePlaceholder,document.getElementById("registerEmailLabel").innerText=y.registerEmailLabel,document.getElementById("registerEmail").placeholder=y.registerEmailPlaceholder,document.getElementById("registerEmailConfirmLabel").innerText=y.registerEmailConfirmLabel,document.getElementById("registerEmailConfirm").placeholder=y.registerEmailConfirmPlaceholder,document.getElementById("registerPasswordLabel").innerText=y.registerPasswordLabel,document.getElementById("registerPassword").placeholder=y.registerPasswordPlaceholder,document.getElementById("registerPasswordConfirmLabel").innerText=y.registerPasswordConfirmLabel,document.getElementById("registerPasswordConfirm").placeholder=y.registerPasswordConfirmPlaceholder,document.getElementById("registerDivisionLabel").innerText=y.registerDivisionLabel,document.getElementById("registerCategoryLabel").innerText=y.registerCategoryLabel,document.getElementById("registerPowerFactorLabel").innerText=y.registerPowerFactorLabel,document.getElementById("registerRegionLabel").innerText=y.registerRegionLabel,document.getElementById("registerClubLabel").innerText=y.registerClubLabel,document.getElementById("registerCodeLabel").innerText=y.registerCodeLabel,document.getElementById("registerCode").placeholder=y.registerCodePlaceholder,document.getElementById("registerBtn").innerText=y.register,document.getElementById("cancelRegisterBtn").innerText=y.cancel,h.classList.toggle("active",w==="no"),E.classList.toggle("active",w==="en"),localStorage.setItem("appLang",w);try{if(typeof setAppLang==="function")setAppLang(w);}catch(e){}B()}function K(){r.classList.remove("active"),u.classList.add("active"),n.innerText="";const w=document.getElementById("gdprCheckboxContainer");if(w&&!w.hasChildNodes()){const y=Rt();w.appendChild(y)}}function j(){u.classList.remove("active"),r.classList.add("active"),n.innerText=""}h.onclick=()=>_("no"),E.onclick=()=>_("en");_(_langInit);m.onclick=K,b.onclick=j,k.oninput=B,f.onclick=async()=>{n.innerText="";f.disabled=true;f.textContent=t[s].loginSpinner||"Signing in…";const w=document.getElementById("loginEmail").value.trim(),y=document.getElementById("loginPassword").value,H=await _t(w,y);H.success?i():(n.innerText=H.error,f.disabled=false,f.textContent=t[s].login)},p.onclick=async()=>{n.innerText="";const w=t[s],y=document.getElementById("registerFirstName").value.trim(),H=document.getElementById("registerLastName").value.trim(),Y=document.getElementById("registerEmail").value.trim(),ce=document.getElementById("registerEmailConfirm").value.trim(),X=document.getElementById("registerPassword").value,pe=document.getElementById("registerPasswordConfirm").value,se=document.getElementById("registerDivision").value,ae=document.getElementById("registerCategory").value,T=document.getElementById("registerRegion").value,I=document.getElementById("registerClub").value.trim(),c=document.getElementById("registerCode").value.trim();if(!y||!H){n.innerText=w.missingName;return}if(!Y||!ce||!X||!pe||!c){n.innerText=w.missingFields;return}if(!se){n.innerText=w.missingDivision;return}if(Y!==ce){n.innerText=w.emailMismatch;return}if(X!==pe){n.innerText=w.passwordMismatch;return}if(D(X).score<=1){n.innerText=w.weakPassword;return}if(!Dt().valid){n.innerText=w.gdprRequired;return}const v=await Nt(Y,X,c,y,H,se,ae,a,T,I);v.success?i():n.innerText=v.error},_(_langInit),B()}async function Ot(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{return await de(U(O,"users",i.uid),{...e,updatedAt:Ie()}),{success:!0}}catch(t){return console.error("Save profile error:",t),{success:!1,error:t.message}}}async function jt(){const e=W();if(!e)return null;try{const i=await be(U(O,"users",e.uid));return i.exists()?{uid:e.uid,...i.data()}:null}catch(i){return console.error("Get profile error:",i),null}}async function Ut(e){try{const i=await be(U(O,"users",e));return i.exists()?{uid:e,...i.data()}:null}catch(i){return console.error("Get user by ID error:",i),null}}async function Ht(){const e=U(O,"counters","matchId");try{const i=await be(e);if(!i.exists())return await Ne(e,{value:1}),1;const s=i.data().value+1;return await de(e,{value:s}),s}catch(i){throw console.error("Error retrieving next match ID:",i),i}}async function zt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=await Ht(),s={id:t,...e,searchable:e.searchable!==!1,ownerId:i.uid,participants:[i.uid],createdAt:Ie(),updatedAt:Ie()};return await Ne(U(O,"matches",t.toString()),s),{success:!0,matchId:t}}catch(t){return console.error("Create match error:",t),{success:!1,error:t.message}}}async function Ee(e,i){if(!W())return{success:!1,error:"Authentication required"};try{return await de(U(O,"matches",e.toString()),{...i,updatedAt:Ie()}),{success:!0}}catch(s){return console.error("Error updating match:",s),{success:!1,error:s.message}}}async function Gt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=await be(U(O,"matches",e.toString()));return t.exists()?t.data().ownerId!==i.uid?{success:!1,error:"Only the match creator can delete this match"}:(await Pt(U(O,"matches",e.toString())),{success:!0}):{success:!1,error:"Match could not be found"}}catch(t){return console.error("Error deleting match:",t),{success:!1,error:t.message}}}async function Kt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=e.toString().trim(),s=await Vt(),a=s.find(n=>n.id&&n.id.toString()===t);return a?{success:!0,match:a}:{success:!1,error:"You do not have access to this match. You must be invited to view it."}}catch(t){return console.error("Error searching for match:",t),{success:!1,error:t.message}}}async function Vt(){const e=W();if(!e)return[];try{const i=$e(Le(O,"matches"),Fe("participants","array-contains",e.uid)),t=await He(i),s=[];return t.forEach(a=>{s.push({id:a.id,...a.data()})}),s.sort((a,n)=>{var m,b;const r=a.date||((m=a.createdAt)==null?void 0:m.toDate())||new Date(0);return(n.date||((b=n.createdAt)==null?void 0:b.toDate())||new Date(0))-r}),s}catch(i){return console.error("Error retrieving user matches:",i),[]}}function qt(e){const i=W();if(!i)return()=>{};const t=$e(Le(O,"matches"),Fe("participants","array-contains",i.uid));return ze(t,a=>{const n=[];a.forEach(r=>{n.push({id:r.id,...r.data()})}),n.sort((r,u)=>{var f,p;const m=r.date||((f=r.createdAt)==null?void 0:f.toDate())||new Date(0);return(u.date||((p=u.createdAt)==null?void 0:p.toDate())||new Date(0))-m}),e(n)},a=>{console.error("Error listening for match updates:",a)})}function Wt(e,i){return ze(U(O,"matches",e.toString()),s=>{s.exists()?i({id:s.id,...s.data()}):i(null)},s=>{console.error("Error listening for match updates:",s)})}async function Ge(e,i){const t=W();if(!t)return{success:!1,error:"Authentication required"};try{console.log(" Searching for user with email:",e);const s=$e(Le(O,"users"),Fe("email","==",e)),a=await He(s);if(a.empty)return console.error(" Bruker ikke funnet:",e),{success:!1,error:"Bruker ikke funnet"};const n=a.docs[0],r=n.id;return console.log(" Bruker funnet:",r,n.data()),console.log(" Sender invitasjon..."),await Ne(U(O,"users",r,"invitations",i.matchId.toString()),{matchId:i.matchId,matchName:i.matchName,invitedBy:(t.displayName||t.email||""),invitedByUid:t.uid,timestamp:new Date().toISOString(),status:"pending"}),console.log(" Invitasjon sendt!"),{success:!0}}catch(s){return console.error(" Send invitation error:",s),{success:!1,error:s.message}}}async function Ke(e){const i=W();if(!i)return[];try{const t=e.toLowerCase().trim();if(t.length===0)return[];console.log(" Searching for users:",t);const s=await He(Le(O,"users")),a=[];return s.forEach(n=>{const r=n.data(),u=`${r.firstName||""} ${r.lastName||""}`.toLowerCase(),m=(r.email||"").toLowerCase();n.id!==i.uid&&(u.includes(t)||m.includes(t))&&a.push({uid:n.id,email:r.email,firstName:r.firstName||"",lastName:r.lastName||"",displayName:`${r.firstName||""} ${r.lastName||""}`.trim()})}),console.log(`Found ${a.length} users`),a}catch(t){return console.error(" Search users error:",t),[]}}async function Jt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{
+ <div class="gdpr-modal-inner" id="gdprContent">
+  <button class="gdpr-close" onclick="document.getElementById('gdprModal').classList.remove('open')">Close</button>
+ </div>
+</div>`;const _langInit=localStorage.getItem("appLang")||"en";const t={no:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"E-post",loginEmailPlaceholder:"navn@epost.no",loginPasswordLabel:"Passord",loginPasswordPlaceholder:"Passord",login:"Sign In",loginSpinner:"Signing in…",or:"or",showRegister:"Create an Account",registerFirstNameLabel:"Fornavn",registerFirstNamePlaceholder:"Fornavn",registerLastNameLabel:"Etternavn",registerLastNamePlaceholder:"Etternavn",registerEmailLabel:"E-post",registerEmailPlaceholder:"navn@epost.no",registerEmailConfirmLabel:"Confirm Email Address",registerEmailConfirmPlaceholder:"Re-enter Email Address",registerPasswordLabel:"Passord",registerPasswordPlaceholder:"Passord",registerPasswordConfirmLabel:"Bekreft passord",registerPasswordConfirmPlaceholder:"Re-enter Password",registerDivisionLabel:"Divisjon",registerCategoryLabel:"Kategori",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Klubb",registerCodeLabel:"Invitation Code",registerCodePlaceholder:"Invitation Code",register:"Create Account",cancel:"Cancel",emailMismatch:"E-postadressene er ikke like",passwordMismatch:"Passordene er ikke like",missingFields:"Please complete all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"Passordet er for svakt",strengthEmpty:"",strengthVeryWeak:"Password Strength: Very Weak",strengthWeak:"Password Strength: Weak",strengthMedium:"Password Strength: Fair",strengthStrong:"Password Strength: Strong",strengthVeryStrong:"Password Strength: Very Strong",gdprRequired:dt==="no"?"You must accept the Privacy Policy to create an account":"You must accept the Privacy Policy to create an account"},en:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"Email",loginEmailPlaceholder:"name@email.com",loginPasswordLabel:"Password",loginPasswordPlaceholder:"Password",login:"Sign In",loginSpinner:"Signing in…",or:"or",showRegister:"Create an Account",registerFirstNameLabel:"First Name",registerFirstNamePlaceholder:"First name",registerLastNameLabel:"Last Name",registerLastNamePlaceholder:"Last name",registerEmailLabel:"Email",registerEmailPlaceholder:"name@email.com",registerEmailConfirmLabel:"Confirm Email Address",registerEmailConfirmPlaceholder:"Re-enter Email Address",registerPasswordLabel:"Password",registerPasswordPlaceholder:"Password",registerPasswordConfirmLabel:"Confirm Password",registerPasswordConfirmPlaceholder:"Re-enter Password",registerDivisionLabel:"Division",registerCategoryLabel:"Category",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Club",registerCodeLabel:"Invite code",registerCodePlaceholder:"Invite code",register:"Create an Account",cancel:"Cancel",emailMismatch:"The email addresses you entered do not match",passwordMismatch:"The passwords you entered do not match",missingFields:"Please complete all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"Your password is too weak",strengthEmpty:"",strengthVeryWeak:"Password Strength: Very Weak",strengthWeak:"Password Strength: Weak",strengthMedium:"Password strength: Medium",strengthStrong:"Password Strength: Strong",strengthVeryStrong:"Password Strength: Very Strong",gdprRequired:"You must accept the Privacy Policy to create an account"}};let s=localStorage.getItem("appLang")||"en",a="minor";const n=document.getElementById("error"),r=document.getElementById("loginSection"),u=document.getElementById("registerSection"),m=document.getElementById("showRegisterBtn"),b=document.getElementById("cancelRegisterBtn"),f=document.getElementById("loginBtn"),p=document.getElementById("registerBtn"),h=document.getElementById("langNo"),E=document.getElementById("langEn"),k=document.getElementById("registerPassword"),P=document.getElementById("passwordStrengthBar"),C=document.getElementById("passwordStrengthText"),L=document.getElementById("pfMinor"),M=document.getElementById("pfMajor");L.onclick=()=>{a="minor",L.classList.add("selected"),M.classList.remove("selected")},M.onclick=()=>{a="major",M.classList.add("selected"),L.classList.remove("selected")};function D(w){let y=0;return w?(w.length>=8&&(y+=1),w.length>=12&&(y+=1),/[a-z]/.test(w)&&/[A-Z]/.test(w)&&(y+=1),/\d/.test(w)&&(y+=1),/[^A-Za-z0-9]/.test(w)&&(y+=1),y<=1?{score:y,width:"20%",labelKey:"strengthVeryWeak",color:"#ff6b6b"}:y===2?{score:y,width:"40%",labelKey:"strengthWeak",color:"#ff9f43"}:y===3?{score:y,width:"60%",labelKey:"strengthMedium",color:"#feca57"}:y===4?{score:y,width:"80%",labelKey:"strengthStrong",color:"#1dd1a1"}:{score:y,width:"100%",labelKey:"strengthVeryStrong",color:"#10ac84"}):{score:0,width:"0%",labelKey:"strengthEmpty",color:"#ff6b6b"}}function B(){const w=t[s],y=k.value,H=D(y);P.style.width=H.width,P.style.background=H.color,C.innerText=w[H.labelKey]}function _(w){s=w;const y=t[w];document.getElementById("brandSubtitle").innerText=y.subtitle,document.getElementById("loginEmailLabel").innerText=y.loginEmailLabel,document.getElementById("loginEmail").placeholder=y.loginEmailPlaceholder,document.getElementById("loginPasswordLabel").innerText=y.loginPasswordLabel,document.getElementById("loginPassword").placeholder=y.loginPasswordPlaceholder,document.getElementById("loginBtn").innerText=y.login,document.getElementById("separatorText").innerText=y.or,document.getElementById("showRegisterBtn").innerText=y.showRegister,document.getElementById("registerFirstNameLabel").innerText=y.registerFirstNameLabel,document.getElementById("registerFirstName").placeholder=y.registerFirstNamePlaceholder,document.getElementById("registerLastNameLabel").innerText=y.registerLastNameLabel,document.getElementById("registerLastName").placeholder=y.registerLastNamePlaceholder,document.getElementById("registerEmailLabel").innerText=y.registerEmailLabel,document.getElementById("registerEmail").placeholder=y.registerEmailPlaceholder,document.getElementById("registerEmailConfirmLabel").innerText=y.registerEmailConfirmLabel,document.getElementById("registerEmailConfirm").placeholder=y.registerEmailConfirmPlaceholder,document.getElementById("registerPasswordLabel").innerText=y.registerPasswordLabel,document.getElementById("registerPassword").placeholder=y.registerPasswordPlaceholder,document.getElementById("registerPasswordConfirmLabel").innerText=y.registerPasswordConfirmLabel,document.getElementById("registerPasswordConfirm").placeholder=y.registerPasswordConfirmPlaceholder,document.getElementById("registerDivisionLabel").innerText=y.registerDivisionLabel,document.getElementById("registerCategoryLabel").innerText=y.registerCategoryLabel,document.getElementById("registerPowerFactorLabel").innerText=y.registerPowerFactorLabel,document.getElementById("registerRegionLabel").innerText=y.registerRegionLabel,document.getElementById("registerClubLabel").innerText=y.registerClubLabel,document.getElementById("registerCodeLabel").innerText=y.registerCodeLabel,document.getElementById("registerCode").placeholder=y.registerCodePlaceholder,document.getElementById("registerBtn").innerText=y.register,document.getElementById("cancelRegisterBtn").innerText=y.cancel,h.classList.toggle("active",w==="no"),E.classList.toggle("active",w==="en"),localStorage.setItem("appLang",w);try{if(typeof setAppLang==="function")setAppLang(w);}catch(e){}B()}function K(){r.classList.remove("active"),u.classList.add("active"),n.innerText="";const w=document.getElementById("gdprCheckboxContainer");if(w&&!w.hasChildNodes()){const y=Rt();w.appendChild(y)}}function j(){u.classList.remove("active"),r.classList.add("active"),n.innerText=""}h.onclick=()=>_("no"),E.onclick=()=>_("en");_(_langInit);m.onclick=K,b.onclick=j,k.oninput=B,f.onclick=async()=>{n.innerText="";f.disabled=true;f.textContent=t[s].loginSpinner||"Signing in…";const w=document.getElementById("loginEmail").value.trim(),y=document.getElementById("loginPassword").value,H=await _t(w,y);H.success?i():(n.innerText=H.error,f.disabled=false,f.textContent=t[s].login)},p.onclick=async()=>{n.innerText="";const w=t[s],y=document.getElementById("registerFirstName").value.trim(),H=document.getElementById("registerLastName").value.trim(),Y=document.getElementById("registerEmail").value.trim(),ce=document.getElementById("registerEmailConfirm").value.trim(),X=document.getElementById("registerPassword").value,pe=document.getElementById("registerPasswordConfirm").value,se=document.getElementById("registerDivision").value,ae=document.getElementById("registerCategory").value,T=document.getElementById("registerRegion").value,I=document.getElementById("registerClub").value.trim(),c=document.getElementById("registerCode").value.trim();if(!y||!H){n.innerText=w.missingName;return}if(!Y||!ce||!X||!pe||!c){n.innerText=w.missingFields;return}if(!se){n.innerText=w.missingDivision;return}if(Y!==ce){n.innerText=w.emailMismatch;return}if(X!==pe){n.innerText=w.passwordMismatch;return}if(D(X).score<=1){n.innerText=w.weakPassword;return}if(!Dt().valid){n.innerText=w.gdprRequired;return}const v=await Nt(Y,X,c,y,H,se,ae,a,T,I);v.success?i():n.innerText=v.error},_(_langInit),B()}async function Ot(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{return await de(U(O,"users",i.uid),{...e,updatedAt:Ie()}),{success:!0}}catch(t){return console.error("Save profile error:",t),{success:!1,error:t.message}}}async function jt(){const e=W();if(!e)return null;try{const i=await be(U(O,"users",e.uid));return i.exists()?{uid:e.uid,...i.data()}:null}catch(i){return console.error("Get profile error:",i),null}}async function Ut(e){try{const i=await be(U(O,"users",e));return i.exists()?{uid:e,...i.data()}:null}catch(i){return console.error("Get user by ID error:",i),null}}async function Ht(){const e=U(O,"counters","matchId");try{const i=await be(e);if(!i.exists())return await Ne(e,{value:1}),1;const s=i.data().value+1;return await de(e,{value:s}),s}catch(i){throw console.error("Error retrieving next match ID:",i),i}}async function zt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=await Ht(),s={id:t,...e,searchable:e.searchable!==!1,ownerId:i.uid,participants:[i.uid],createdAt:Ie(),updatedAt:Ie()};return await Ne(U(O,"matches",t.toString()),s),{success:!0,matchId:t}}catch(t){return console.error("Create match error:",t),{success:!1,error:t.message}}}async function Ee(e,i){if(!W())return{success:!1,error:"Authentication required"};try{return await de(U(O,"matches",e.toString()),{...i,updatedAt:Ie()}),{success:!0}}catch(s){return console.error("Error updating match:",s),{success:!1,error:s.message}}}async function Gt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=await be(U(O,"matches",e.toString()));return t.exists()?t.data().ownerId!==i.uid?{success:!1,error:"Only the match creator can delete this match"}:(await Pt(U(O,"matches",e.toString())),{success:!0}):{success:!1,error:"Match could not be found"}}catch(t){return console.error("Error deleting match:",t),{success:!1,error:t.message}}}async function Kt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{const t=e.toString().trim(),s=await Vt(),a=s.find(n=>n.id&&n.id.toString()===t);return a?{success:!0,match:a}:{success:!1,error:"You do not have access to this match. You must be invited to view it."}}catch(t){return console.error("Error searching for match:",t),{success:!1,error:t.message}}}async function Vt(){const e=W();if(!e)return[];try{const i=$e(Le(O,"matches"),Fe("participants","array-contains",e.uid)),t=await He(i),s=[];return t.forEach(a=>{s.push({id:a.id,...a.data()})}),s.sort((a,n)=>{var m,b;const r=a.date||((m=a.createdAt)==null?void 0:m.toDate())||new Date(0);return(n.date||((b=n.createdAt)==null?void 0:b.toDate())||new Date(0))-r}),s}catch(i){return console.error("Error retrieving user matches:",i),[]}}function qt(e){const i=W();if(!i)return()=>{};const t=$e(Le(O,"matches"),Fe("participants","array-contains",i.uid));return ze(t,a=>{const n=[];a.forEach(r=>{n.push({id:r.id,...r.data()})}),n.sort((r,u)=>{var f,p;const m=r.date||((f=r.createdAt)==null?void 0:f.toDate())||new Date(0);return(u.date||((p=u.createdAt)==null?void 0:p.toDate())||new Date(0))-m}),e(n)},a=>{console.error("Error listening for match updates:",a)})}function Wt(e,i){return ze(U(O,"matches",e.toString()),s=>{s.exists()?i({id:s.id,...s.data()}):i(null)},s=>{console.error("Error listening for match updates:",s)})}async function Ge(e,i){const t=W();if(!t)return{success:!1,error:"Authentication required"};try{console.log(" Searching for user with email:",e);const s=$e(Le(O,"users"),Fe("email","==",e)),a=await He(s);if(a.empty)return console.error(" Bruker ikke funnet:",e),{success:!1,error:"Bruker ikke funnet"};const n=a.docs[0],r=n.id;return console.log(" Bruker funnet:",r,n.data()),console.log(" Sender invitasjon..."),await Ne(U(O,"users",r,"invitations",i.matchId.toString()),{matchId:i.matchId,matchName:i.matchName,invitedBy:(t.displayName||t.email||""),invitedByUid:t.uid,timestamp:new Date().toISOString(),status:"pending"}),console.log(" Invitasjon sendt!"),{success:!0}}catch(s){return console.error(" Send invitation error:",s),{success:!1,error:s.message}}}async function Ke(e){const i=W();if(!i)return[];try{const t=e.toLowerCase().trim();if(t.length===0)return[];console.log(" Searching for users:",t);const s=await He(Le(O,"users")),a=[];return s.forEach(n=>{const r=n.data(),u=`${r.firstName||""} ${r.lastName||""}`.toLowerCase(),m=(r.email||"").toLowerCase();n.id!==i.uid&&(u.includes(t)||m.includes(t))&&a.push({uid:n.id,email:r.email,firstName:r.firstName||"",lastName:r.lastName||"",displayName:`${r.firstName||""} ${r.lastName||""}`.trim()})}),console.log(`Found ${a.length} users`),a}catch(t){return console.error(" Search users error:",t),[]}}async function Jt(e){const i=W();if(!i)return{success:!1,error:"Authentication required"};try{
 console.log("[Jt] Start - matchId:",e,"uid:",i.uid);
 // Steg 1: Les match-dokumentet
 let matchDoc;

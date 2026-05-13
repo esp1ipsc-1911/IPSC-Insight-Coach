@@ -138,22 +138,45 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  .ipsc-login-page {
  min-height: 100vh;
  width: 100%;
- background:
- radial-gradient(circle at top right, rgba(224, 182, 73, 0.10), transparent 34%),
- radial-gradient(circle at bottom left, rgba(9, 35, 89, 0.16), transparent 34%),
- linear-gradient(135deg, #04070d 0%, #101010 56%, #16120e 100%);
+ background: #0a0c0f;
  display: flex;
  justify-content: center;
  align-items: flex-start;
- padding: 14px 14px 24px;
+ padding: 0;
  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
  color: #f5f7fb;
+ overflow-x: hidden;
  }
 
  .ipsc-login-shell {
  width: 100%;
- max-width: 360px;
+ max-width: 420px;
  position: relative;
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ background:
+  radial-gradient(ellipse at 80% 0%, rgba(224,182,73,0.13) 0%, transparent 55%),
+  radial-gradient(ellipse at 20% 100%, rgba(224,182,73,0.07) 0%, transparent 50%),
+  linear-gradient(180deg, #0d0f12 0%, #0a0c0f 100%);
+ }
+
+ /* Hex grid background */
+ .ipsc-login-shell::before {
+ content: '';
+ position: absolute;
+ inset: 0;
+ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52' viewBox='0 0 60 52'%3E%3Cpath d='M30 2 L58 17 L58 35 L30 50 L2 35 L2 17Z' fill='none' stroke='rgba(224,182,73,0.06)' stroke-width='1'/%3E%3C/svg%3E");
+ background-size: 60px 52px;
+ opacity: 0.6;
+ pointer-events: none;
+ z-index: 0;
+ }
+
+ .login-top {
+ position: relative;
+ z-index: 1;
+ padding: 20px 24px 0;
  }
 
  .ipsc-header {
@@ -161,16 +184,17 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  display: flex;
  align-items: center;
  justify-content: space-between;
- margin-bottom: 18px;
+ margin-bottom: 0;
  }
 
  .brand-icon {
- width: 58px;
- height: 58px;
+ width: 62px;
+ height: 62px;
  border-radius: 16px;
  overflow: hidden;
- box-shadow: 0 8px 24px rgba(224, 182, 73, 0.14);
+ box-shadow: 0 0 0 2px rgba(224,182,73,0.5), 0 8px 24px rgba(224,182,73,0.18);
  flex-shrink: 0;
+ background: #1a1a10;
  }
 
  .brand-icon img {
@@ -181,228 +205,426 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
 
  .lang-flags {
  display: flex;
- gap: 8px;
+ gap: 0;
+ background: rgba(255,255,255,0.04);
+ border: 1px solid rgba(255,255,255,0.1);
+ border-radius: 8px;
+ overflow: hidden;
  }
 
  .lang-btn {
- width: 46px;
+ width: 52px;
  height: 36px;
- border-radius: 10px;
- border: 1px solid rgba(255,255,255,0.08);
- background: rgba(19, 25, 40, 0.72);
+ border: none;
+ background: transparent;
  display: flex;
  align-items: center;
  justify-content: center;
- font-size: 20px;
+ font-size: 19px;
  line-height: 1;
  cursor: pointer;
- opacity: 0.72;
+ transition: background 0.15s;
+ position: relative;
+ color: rgba(255,255,255,0.45);
  }
 
  .lang-btn.active {
- opacity: 1;
- border: 2px solid #e0b649;
- box-shadow: 0 0 0 1px rgba(224, 182, 73, 0.15);
- }
-
- .brand-title {
- line-height: 0.92;
- letter-spacing: -1px;
- margin-bottom: 12px;
- }
-
- .brand-title .top,
- .brand-title .bottom {
- display: block;
- font-size: clamp(34px, 8.2vw, 42px);
- font-weight: 900;
- }
-
- .brand-title .top {
- color: #f5f7fb;
- }
-
- .brand-title .bottom {
+ background: rgba(224,182,73,0.15);
  color: #e0b649;
  }
 
+ .lang-btn:first-child {
+ border-right: 1px solid rgba(255,255,255,0.1);
+ }
+
+ .brand-hero {
+ position: relative;
+ z-index: 1;
+ padding: 32px 24px 0;
+ }
+
+ .brand-title {
+ font-family: "Rajdhani", "Impact", "Arial Black", sans-serif;
+ line-height: 0.88;
+ margin-bottom: 10px;
+ }
+
+ .brand-title .top {
+ display: block;
+ font-size: 56px;
+ font-weight: 800;
+ color: #ffffff;
+ letter-spacing: 0.02em;
+ }
+
+ .brand-title .bottom {
+ display: block;
+ font-size: 56px;
+ font-weight: 800;
+ color: #e0b649;
+ letter-spacing: 0.02em;
+ }
+
  .brand-subtitle {
- font-size: clamp(13px, 3.7vw, 16px);
- color: #7d8598;
+ font-size: 11px;
+ letter-spacing: 0.22em;
+ color: rgba(255,255,255,0.45);
+ text-transform: uppercase;
+ margin-bottom: 0;
  font-weight: 500;
- margin-bottom: 26px;
+ }
+
+ /* Status bar */
+ .status-bar {
+ position: relative;
+ z-index: 1;
+ margin: 24px 24px 0;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ background: rgba(255,255,255,0.04);
+ border: 1px solid rgba(255,255,255,0.08);
+ border-radius: 10px;
+ padding: 10px 14px;
+ }
+
+ .status-item {
+ display: flex;
+ align-items: center;
+ gap: 6px;
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.08em;
+ color: rgba(255,255,255,0.5);
+ text-transform: uppercase;
+ }
+
+ .status-dot {
+ width: 7px;
+ height: 7px;
+ border-radius: 50%;
+ background: #4caf50;
+ box-shadow: 0 0 6px rgba(76,175,80,0.7);
+ flex-shrink: 0;
+ }
+
+ .status-divider {
+ width: 1px;
+ height: 16px;
+ background: rgba(255,255,255,0.1);
+ }
+
+ /* Form card */
+ .login-card {
+ position: relative;
+ z-index: 1;
+ margin: 20px 16px 0;
+ background: rgba(255,255,255,0.035);
+ border: 1px solid rgba(255,255,255,0.09);
+ border-radius: 16px;
+ padding: 22px 20px;
+ /* Clipped corners like the design */
+ clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
  }
 
  .field-label {
- font-size: clamp(12px, 3.5vw, 15px);
- color: #7d8598;
- margin-bottom: 6px;
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.14em;
+ color: rgba(255,255,255,0.45);
  text-transform: uppercase;
- letter-spacing: 0.7px;
+ margin-bottom: 7px;
+ margin-top: 0;
+ }
+
+ .field-wrap {
+ position: relative;
+ margin-bottom: 16px;
+ }
+
+ .field-icon {
+ position: absolute;
+ left: 14px;
+ top: 50%;
+ transform: translateY(-50%);
+ color: rgba(255,255,255,0.3);
+ font-size: 15px;
+ pointer-events: none;
+ }
+
+ .field-eye {
+ position: absolute;
+ right: 14px;
+ top: 50%;
+ transform: translateY(-50%);
+ color: rgba(255,255,255,0.3);
+ background: none;
+ border: none;
+ cursor: pointer;
+ font-size: 15px;
+ padding: 0;
+ line-height: 1;
  }
 
  .field {
  width: 100%;
- height: 50px;
- border-radius: 14px;
- border: 1px solid #27314a;
- background: rgba(18, 26, 50, 0.88);
+ background: rgba(255,255,255,0.055);
+ border: 1px solid rgba(255,255,255,0.1);
+ border-radius: 10px;
+ padding: 13px 14px 13px 42px;
  color: #f5f7fb;
- font-size: clamp(15px, 4vw, 17px);
- padding: 0 16px;
+ font-size: 14px;
  outline: none;
- margin-bottom: 14px;
- box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+ transition: border-color 0.15s, background 0.15s;
+ box-sizing: border-box;
+ }
+
+ .field:focus {
+ border-color: rgba(224,182,73,0.5);
+ background: rgba(255,255,255,0.07);
  }
 
  .field::placeholder {
- color: #8b91a1;
+ color: rgba(255,255,255,0.25);
+ }
+
+ .field-no-icon {
+ padding-left: 14px;
  }
 
  .field-select {
  width: 100%;
- height: 50px;
- border-radius: 14px;
- border: 1px solid #27314a;
- background: rgba(18, 26, 50, 0.88);
+ background: rgba(255,255,255,0.055);
+ border: 1px solid rgba(255,255,255,0.1);
+ border-radius: 10px;
+ padding: 13px 14px;
  color: #f5f7fb;
- font-size: clamp(15px, 4vw, 17px);
- padding: 0 16px;
+ font-size: 14px;
  outline: none;
- margin-bottom: 14px;
- box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
- -webkit-appearance: none;
- appearance: none;
- background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238b91a1' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
- background-repeat: no-repeat;
- background-position: right 16px center;
- padding-right: 40px;
+ box-sizing: border-box;
+ margin-bottom: 16px;
  }
 
- .pf-selector {
- display: flex;
- gap: 10px;
- margin-bottom: 14px;
+ .forgot-link {
+ text-align: right;
+ margin-top: -8px;
+ margin-bottom: 18px;
  }
 
- .pf-option {
- flex: 1;
- height: 50px;
- border-radius: 14px;
- border: 1px solid #27314a;
- background: rgba(18, 26, 50, 0.88);
- color: #8b91a1;
- display: flex;
- align-items: center;
- justify-content: center;
- cursor: pointer;
- font-weight: 600;
- transition: all 0.2s;
- }
-
- .pf-option.selected {
- border-color: #e0b649;
- background: rgba(224, 182, 73, 0.1);
+ .forgot-link a {
+ font-size: 12px;
  color: #e0b649;
+ text-decoration: none;
+ font-style: italic;
  }
 
  .primary-btn {
  width: 100%;
- height: 54px;
+ padding: 15px;
+ background: linear-gradient(135deg, #e0b649 0%, #c49a30 100%);
  border: none;
- border-radius: 16px;
- background: #e0b649;
- color: #111111;
- font-size: clamp(17px, 4vw, 20px);
+ border-radius: 10px;
+ color: #0a0c0f;
+ font-size: 13px;
  font-weight: 800;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
  cursor: pointer;
- margin-top: 4px;
- box-shadow: 0 10px 24px rgba(224, 182, 73, 0.14);
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 10px;
+ margin-bottom: 0;
+ transition: opacity 0.15s;
+ clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+ }
+
+ .primary-btn:hover { opacity: 0.9; }
+ .primary-btn:disabled { opacity: 0.5; cursor: default; }
+
+ .btn-chevrons {
+ font-size: 16px;
+ font-weight: 900;
+ letter-spacing: -2px;
  }
 
  .separator {
  display: flex;
  align-items: center;
- gap: 12px;
- color: #7d8598;
- font-size: 14px;
+ gap: 10px;
+ font-size: 11px;
+ letter-spacing: 0.1em;
+ color: rgba(255,255,255,0.3);
+ text-transform: uppercase;
  margin: 16px 0;
  }
 
- .separator::before,
- .separator::after {
- content: "";
+ .separator::before, .separator::after {
+ content: '';
  flex: 1;
  height: 1px;
- background: rgba(255,255,255,0.12);
+ background: rgba(255,255,255,0.08);
  }
 
  .secondary-btn {
  width: 100%;
- height: 50px;
- border-radius: 14px;
- border: 1px solid #2c3446;
- background: rgba(19, 25, 40, 0.74);
- color: #f3f5fb;
- font-size: clamp(15px, 4vw, 17px);
+ padding: 14px;
+ background: transparent;
+ border: 1px solid rgba(224,182,73,0.3);
+ border-radius: 10px;
+ color: #e0b649;
+ font-size: 13px;
  font-weight: 700;
+ letter-spacing: 0.12em;
+ text-transform: uppercase;
  cursor: pointer;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 10px;
+ transition: background 0.15s;
  }
+
+ .secondary-btn:hover { background: rgba(224,182,73,0.07); }
 
  .ghost-btn {
  width: 100%;
- height: 48px;
- border-radius: 14px;
- border: 1px solid #2c3446;
+ padding: 13px;
  background: transparent;
- color: #d7dbe4;
- font-size: 16px;
- font-weight: 700;
+ border: 1px solid rgba(255,255,255,0.08);
+ border-radius: 10px;
+ color: rgba(255,255,255,0.45);
+ font-size: 12px;
+ font-weight: 600;
+ letter-spacing: 0.1em;
+ text-transform: uppercase;
  cursor: pointer;
  margin-top: 10px;
+ transition: background 0.15s;
  }
 
- .section {
- display: none;
- }
+ .ghost-btn:hover { background: rgba(255,255,255,0.04); }
 
- .section.active {
- display: block;
+ .error-text {
+ color: #ef4444;
+ font-size: 13px;
+ text-align: center;
+ margin-top: 12px;
+ min-height: 18px;
  }
 
  .strength-wrap {
- margin-top: -6px;
- margin-bottom: 12px;
+ margin-bottom: 16px;
  }
 
  .strength-bar-bg {
- width: 100%;
- height: 8px;
- border-radius: 999px;
- background: rgba(255,255,255,0.10);
+ height: 4px;
+ background: rgba(255,255,255,0.08);
+ border-radius: 4px;
  overflow: hidden;
+ margin-bottom: 5px;
  }
 
  .strength-bar-fill {
  height: 100%;
- width: 0%;
- border-radius: 999px;
- transition: width 0.2s ease;
- background: #ff6b6b;
+ width: 0;
+ border-radius: 4px;
+ transition: width 0.3s, background 0.3s;
  }
 
  .strength-text {
- font-size: 13px;
- color: #9aa3b2;
- margin-top: 6px;
- min-height: 18px;
+ font-size: 11px;
+ color: rgba(255,255,255,0.4);
  }
 
- .error-text {
- color: #ff8a8a;
- font-size: 14px;
- margin-top: 12px;
- min-height: 20px;
+ .pf-selector {
+ display: flex;
+ gap: 8px;
+ margin-bottom: 16px;
+ }
+
+ .pf-option {
+ flex: 1;
+ text-align: center;
+ padding: 10px;
+ border: 1px solid rgba(255,255,255,0.1);
+ border-radius: 8px;
+ font-size: 12px;
+ font-weight: 700;
+ letter-spacing: 0.1em;
+ text-transform: uppercase;
+ cursor: pointer;
+ color: rgba(255,255,255,0.4);
+ background: rgba(255,255,255,0.03);
+ transition: all 0.15s;
+ }
+
+ .pf-option.selected {
+ border-color: #e0b649;
+ color: #e0b649;
+ background: rgba(224,182,73,0.1);
+ }
+
+ .section { display: none; }
+ .section.active { display: block; }
+
+ /* Footer feature strip */
+ .login-footer {
+ position: relative;
+ z-index: 1;
+ margin: 20px 16px 28px;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ border-top: 1px solid rgba(255,255,255,0.06);
+ padding-top: 18px;
+ }
+
+ .footer-feature {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap: 4px;
+ flex: 1;
+ }
+
+ .footer-feature-icon {
+ font-size: 16px;
+ color: rgba(224,182,73,0.6);
+ }
+
+ .footer-feature-title {
+ font-size: 9px;
+ font-weight: 700;
+ letter-spacing: 0.1em;
+ color: rgba(255,255,255,0.35);
+ text-transform: uppercase;
+ text-align: center;
+ }
+
+ .footer-feature-status {
+ font-size: 9px;
+ font-weight: 700;
+ letter-spacing: 0.08em;
+ color: #4caf50;
+ text-transform: uppercase;
+ }
+
+ .footer-divider {
+ width: 1px;
+ height: 32px;
+ background: rgba(255,255,255,0.07);
+ }
+
+ .login-copyright {
+ position: relative;
+ z-index: 1;
+ text-align: center;
+ padding: 0 24px 24px;
+ font-size: 10px;
+ color: rgba(255,255,255,0.2);
+ letter-spacing: 0.06em;
+ text-transform: uppercase;
  }
 
  @media (min-width: 700px) {
@@ -410,15 +632,21 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  align-items: center;
  padding: 24px;
  }
-
  .ipsc-login-shell {
- max-width: 380px;
+ max-width: 420px;
+ min-height: auto;
+ border-radius: 20px;
+ overflow: hidden;
+ box-shadow: 0 32px 80px rgba(0,0,0,0.6);
  }
  }
  </style>
 
  <div class="ipsc-login-page">
  <div class="ipsc-login-shell">
+
+ <!-- Top bar: logo + flags -->
+ <div class="login-top">
  <div class="ipsc-header">
  <div class="brand-icon">
  <img src="Logo_IPSC-insight.png" alt="Insight Dynamics Shooting">
@@ -428,43 +656,83 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <button id="langEn" class="lang-btn" type="button" aria-label="English">🇺🇸</button>
  </div>
  </div>
+ </div>
 
+ <!-- Hero title -->
+ <div class="brand-hero">
  <div class="brand-title">
  <span class="top">INSIGHT</span>
  <span class="bottom">DYNAMICS</span>
  </div>
+ <div id="brandSubtitle" class="brand-subtitle">Performance · Precision · Analysis</div>
+ </div>
 
- <div id="brandSubtitle" class="brand-subtitle">Performance. Precision. Progress.</div>
+ <!-- Status bar -->
+ <div class="status-bar">
+ <div class="status-item">
+ <span class="status-dot"></span>
+ <span>SYSTEM ONLINE</span>
+ </div>
+ <div class="status-divider"></div>
+ <div class="status-item">⟳&nbsp;SYNC ACTIVE</div>
+ <div class="status-divider"></div>
+ <div class="status-item" id="utcClock">⏱ UTC --:--</div>
+ </div>
 
+ <!-- Login card -->
+ <div class="login-card">
  <div id="loginSection" class="section active">
- <div id="loginEmailLabel" class="field-label">Email</div>
- <input id="loginEmail" class="field" type="email" placeholder="name@email.com" />
+ <div class="field-label" id="loginEmailLabel">Email</div>
+ <div class="field-wrap">
+ <span class="field-icon">✉</span>
+ <input id="loginEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
+ </div>
 
- <div id="loginPasswordLabel" class="field-label">Password</div>
- <input id="loginPassword" class="field" type="password" placeholder="Password" />
+ <div class="field-label" id="loginPasswordLabel">Password</div>
+ <div class="field-wrap">
+ <span class="field-icon">🔒</span>
+ <input id="loginPassword" class="field" type="password" placeholder="Password" autocomplete="current-password" />
+ <button class="field-eye" type="button" onclick="(function(){var i=document.getElementById('loginPassword');i.type=i.type==='password'?'text':'password'})()">👁</button>
+ </div>
 
- <button id="loginBtn" class="primary-btn">Log in</button>
+ <div class="forgot-link"><a href="#">Forgot password?</a></div>
 
- <div id="separatorText" class="separator">or</div>
+ <button id="loginBtn" class="primary-btn">
+ <span class="btn-chevrons">&raquo;</span>
+ ACCESS SYSTEM
+ </button>
 
- <button id="showRegisterBtn" class="secondary-btn">Register new user</button>
+ <div class="separator"><span id="separatorText">or</span></div>
+
+ <button id="showRegisterBtn" class="secondary-btn">
+ ＋ CREATE OPERATOR PROFILE
+ </button>
  </div>
 
  <div id="registerSection" class="section">
  <div id="registerFirstNameLabel" class="field-label">First name</div>
- <input id="registerFirstName" class="field" type="text" placeholder="First name" />
+ <input id="registerFirstName" class="field field-no-icon" type="text" placeholder="First name" />
 
  <div id="registerLastNameLabel" class="field-label">Last name</div>
- <input id="registerLastName" class="field" type="text" placeholder="Last name" />
+ <input id="registerLastName" class="field field-no-icon" type="text" placeholder="Last name" />
 
  <div id="registerEmailLabel" class="field-label">Email</div>
+ <div class="field-wrap">
+ <span class="field-icon">✉</span>
  <input id="registerEmail" class="field" type="email" placeholder="name@email.com" />
+ </div>
 
  <div id="registerEmailConfirmLabel" class="field-label">Confirm email</div>
+ <div class="field-wrap">
+ <span class="field-icon">✉</span>
  <input id="registerEmailConfirm" class="field" type="email" placeholder="Repeat email" />
+ </div>
 
  <div id="registerPasswordLabel" class="field-label">Password</div>
+ <div class="field-wrap">
+ <span class="field-icon">🔒</span>
  <input id="registerPassword" class="field" type="password" placeholder="Password" />
+ </div>
 
  <div class="strength-wrap">
  <div class="strength-bar-bg">
@@ -474,7 +742,10 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </div>
 
  <div id="registerPasswordConfirmLabel" class="field-label">Confirm password</div>
+ <div class="field-wrap">
+ <span class="field-icon">🔒</span>
  <input id="registerPasswordConfirm" class="field" type="password" placeholder="Repeat password" />
+ </div>
 
  <div id="registerDivisionLabel" class="field-label">Division</div>
  <select id="registerDivision" class="field-select">
@@ -518,21 +789,51 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  </select>
 
  <div id="registerClubLabel" class="field-label">Club</div>
- <input id="registerClub" class="field" type="text" placeholder="Club name (optional)" />
+ <input id="registerClub" class="field field-no-icon" type="text" placeholder="Club name (optional)" />
 
  <div id="registerCodeLabel" class="field-label">Invite code</div>
- <input id="registerCode" class="field" type="text" placeholder="Invite code" />
+ <input id="registerCode" class="field field-no-icon" type="text" placeholder="Invite code" />
 
  <div id="gdprCheckboxContainer"></div>
 
- <button id="registerBtn" class="primary-btn">Create account</button>
+ <button id="registerBtn" class="primary-btn" style="margin-top:8px;">
+ <span class="btn-chevrons">&raquo;</span>
+ CREATE ACCOUNT
+ </button>
  <button id="cancelRegisterBtn" class="ghost-btn">Cancel</button>
  </div>
 
  <div id="error" class="error-text"></div>
  </div>
+
+ <!-- Footer feature strip -->
+ <div class="login-footer">
+ <div class="footer-feature">
+ <div class="footer-feature-icon">⊙</div>
+ <div class="footer-feature-title">AI Match Analysis</div>
+ <div class="footer-feature-status">Enabled</div>
  </div>
- `;const _langInit=localStorage.getItem("appLang")||"en";const t={no:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"E-post",loginEmailPlaceholder:"navn@epost.no",loginPasswordLabel:"Passord",loginPasswordPlaceholder:"Passord",login:"Logg inn",loginSpinner:"Logger inn…",or:"eller",showRegister:"Registrer ny bruker",registerFirstNameLabel:"Fornavn",registerFirstNamePlaceholder:"Fornavn",registerLastNameLabel:"Etternavn",registerLastNamePlaceholder:"Etternavn",registerEmailLabel:"E-post",registerEmailPlaceholder:"navn@epost.no",registerEmailConfirmLabel:"Confirm email",registerEmailConfirmPlaceholder:"Repeat email",registerPasswordLabel:"Passord",registerPasswordPlaceholder:"Passord",registerPasswordConfirmLabel:"Bekreft passord",registerPasswordConfirmPlaceholder:"Repeat password",registerDivisionLabel:"Divisjon",registerCategoryLabel:"Kategori",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Klubb",registerCodeLabel:"Invitasjonskode",registerCodePlaceholder:"Invitasjonskode",register:"Opprett bruker",cancel:"Avbryt",emailMismatch:"E-postadressene er ikke like",passwordMismatch:"Passordene er ikke like",missingFields:"Please fill in all required fields",missingName:"First and last name are required",missingDivision:"Please select a division",weakPassword:"Passordet er for svakt",strengthEmpty:"",strengthVeryWeak:"Password strength: Very weak",strengthWeak:"Password strength: Weak",strengthMedium:"Password strength: Fair",strengthStrong:"Password strength: Strong",strengthVeryStrong:"Password strength: Very strong",gdprRequired:dt==="no"?"You must accept the privacy policy to register":"You must accept the privacy policy to register"},en:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"Email",loginEmailPlaceholder:"name@email.com",loginPasswordLabel:"Password",loginPasswordPlaceholder:"Password",login:"Log in",loginSpinner:"Logging in…",or:"or",showRegister:"Create new user",registerFirstNameLabel:"First Name",registerFirstNamePlaceholder:"First name",registerLastNameLabel:"Last Name",registerLastNamePlaceholder:"Last name",registerEmailLabel:"Email",registerEmailPlaceholder:"name@email.com",registerEmailConfirmLabel:"Confirm email",registerEmailConfirmPlaceholder:"Repeat email",registerPasswordLabel:"Password",registerPasswordPlaceholder:"Password",registerPasswordConfirmLabel:"Confirm password",registerPasswordConfirmPlaceholder:"Repeat password",registerDivisionLabel:"Division",registerCategoryLabel:"Category",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Club",registerCodeLabel:"Invite code",registerCodePlaceholder:"Invite code",register:"Create account",cancel:"Cancel",emailMismatch:"The email addresses do not match",passwordMismatch:"Passwords do not match",missingFields:"Please fill in all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"The password is too weak",strengthEmpty:"",strengthVeryWeak:"Password strength: Very weak",strengthWeak:"Password strength: Weak",strengthMedium:"Password strength: Medium",strengthStrong:"Password strength: Strong",strengthVeryStrong:"Password strength: Very strong",gdprRequired:"You must accept the privacy policy to register"}};let s=localStorage.getItem("appLang")||"en",a="minor";const n=document.getElementById("error"),r=document.getElementById("loginSection"),u=document.getElementById("registerSection"),m=document.getElementById("showRegisterBtn"),b=document.getElementById("cancelRegisterBtn"),f=document.getElementById("loginBtn"),p=document.getElementById("registerBtn"),h=document.getElementById("langNo"),E=document.getElementById("langEn"),k=document.getElementById("registerPassword"),P=document.getElementById("passwordStrengthBar"),C=document.getElementById("passwordStrengthText"),L=document.getElementById("pfMinor"),M=document.getElementById("pfMajor");L.onclick=()=>{a="minor",L.classList.add("selected"),M.classList.remove("selected")},M.onclick=()=>{a="major",M.classList.add("selected"),L.classList.remove("selected")};function D(w){let y=0;return w?(w.length>=8&&(y+=1),w.length>=12&&(y+=1),/[a-z]/.test(w)&&/[A-Z]/.test(w)&&(y+=1),/\d/.test(w)&&(y+=1),/[^A-Za-z0-9]/.test(w)&&(y+=1),y<=1?{score:y,width:"20%",labelKey:"strengthVeryWeak",color:"#ff6b6b"}:y===2?{score:y,width:"40%",labelKey:"strengthWeak",color:"#ff9f43"}:y===3?{score:y,width:"60%",labelKey:"strengthMedium",color:"#feca57"}:y===4?{score:y,width:"80%",labelKey:"strengthStrong",color:"#1dd1a1"}:{score:y,width:"100%",labelKey:"strengthVeryStrong",color:"#10ac84"}):{score:0,width:"0%",labelKey:"strengthEmpty",color:"#ff6b6b"}}function B(){const w=t[s],y=k.value,H=D(y);P.style.width=H.width,P.style.background=H.color,C.innerText=w[H.labelKey]}function _(w){s=w;const y=t[w];document.getElementById("brandSubtitle").innerText=y.subtitle,document.getElementById("loginEmailLabel").innerText=y.loginEmailLabel,document.getElementById("loginEmail").placeholder=y.loginEmailPlaceholder,document.getElementById("loginPasswordLabel").innerText=y.loginPasswordLabel,document.getElementById("loginPassword").placeholder=y.loginPasswordPlaceholder,document.getElementById("loginBtn").innerText=y.login,document.getElementById("separatorText").innerText=y.or,document.getElementById("showRegisterBtn").innerText=y.showRegister,document.getElementById("registerFirstNameLabel").innerText=y.registerFirstNameLabel,document.getElementById("registerFirstName").placeholder=y.registerFirstNamePlaceholder,document.getElementById("registerLastNameLabel").innerText=y.registerLastNameLabel,document.getElementById("registerLastName").placeholder=y.registerLastNamePlaceholder,document.getElementById("registerEmailLabel").innerText=y.registerEmailLabel,document.getElementById("registerEmail").placeholder=y.registerEmailPlaceholder,document.getElementById("registerEmailConfirmLabel").innerText=y.registerEmailConfirmLabel,document.getElementById("registerEmailConfirm").placeholder=y.registerEmailConfirmPlaceholder,document.getElementById("registerPasswordLabel").innerText=y.registerPasswordLabel,document.getElementById("registerPassword").placeholder=y.registerPasswordPlaceholder,document.getElementById("registerPasswordConfirmLabel").innerText=y.registerPasswordConfirmLabel,document.getElementById("registerPasswordConfirm").placeholder=y.registerPasswordConfirmPlaceholder,document.getElementById("registerDivisionLabel").innerText=y.registerDivisionLabel,document.getElementById("registerCategoryLabel").innerText=y.registerCategoryLabel,document.getElementById("registerPowerFactorLabel").innerText=y.registerPowerFactorLabel,document.getElementById("registerRegionLabel").innerText=y.registerRegionLabel,document.getElementById("registerClubLabel").innerText=y.registerClubLabel,document.getElementById("registerCodeLabel").innerText=y.registerCodeLabel,document.getElementById("registerCode").placeholder=y.registerCodePlaceholder,document.getElementById("registerBtn").innerText=y.register,document.getElementById("cancelRegisterBtn").innerText=y.cancel,h.classList.toggle("active",w==="no"),E.classList.toggle("active",w==="en"),localStorage.setItem("appLang",w);try{if(typeof setAppLang==="function")setAppLang(w);}catch(e){}B()}function K(){r.classList.remove("active"),u.classList.add("active"),n.innerText="";const w=document.getElementById("gdprCheckboxContainer");if(w&&!w.hasChildNodes()){const y=Rt();w.appendChild(y)}}function j(){u.classList.remove("active"),r.classList.add("active"),n.innerText=""}h.onclick=()=>_("no"),E.onclick=()=>_("en");_(_langInit);m.onclick=K,b.onclick=j,k.oninput=B,f.onclick=async()=>{n.innerText="";f.disabled=true;f.textContent=t[s].loginSpinner||"Logging in…";const w=document.getElementById("loginEmail").value.trim(),y=document.getElementById("loginPassword").value,H=await _t(w,y);H.success?i():(n.innerText=H.error,f.disabled=false,f.textContent=t[s].login)},p.onclick=async()=>{n.innerText="";const w=t[s],y=document.getElementById("registerFirstName").value.trim(),H=document.getElementById("registerLastName").value.trim(),Y=document.getElementById("registerEmail").value.trim(),ce=document.getElementById("registerEmailConfirm").value.trim(),X=document.getElementById("registerPassword").value,pe=document.getElementById("registerPasswordConfirm").value,se=document.getElementById("registerDivision").value,ae=document.getElementById("registerCategory").value,T=document.getElementById("registerRegion").value,I=document.getElementById("registerClub").value.trim(),c=document.getElementById("registerCode").value.trim();if(!y||!H){n.innerText=w.missingName;return}if(!Y||!ce||!X||!pe||!c){n.innerText=w.missingFields;return}if(!se){n.innerText=w.missingDivision;return}if(Y!==ce){n.innerText=w.emailMismatch;return}if(X!==pe){n.innerText=w.passwordMismatch;return}if(D(X).score<=1){n.innerText=w.weakPassword;return}if(!Dt().valid){n.innerText=w.gdprRequired;return}const v=await Nt(Y,X,c,y,H,se,ae,a,T,I);v.success?i():n.innerText=v.error},_(_langInit),B()}async function Ot(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{return await de(U(O,"users",i.uid),{...e,updatedAt:Ie()}),{success:!0}}catch(t){return console.error("Save profile error:",t),{success:!1,error:t.message}}}async function jt(){const e=W();if(!e)return null;try{const i=await be(U(O,"users",e.uid));return i.exists()?{uid:e.uid,...i.data()}:null}catch(i){return console.error("Get profile error:",i),null}}async function Ut(e){try{const i=await be(U(O,"users",e));return i.exists()?{uid:e,...i.data()}:null}catch(i){return console.error("Get user by ID error:",i),null}}async function Ht(){const e=U(O,"counters","matchId");try{const i=await be(e);if(!i.exists())return await Ne(e,{value:1}),1;const s=i.data().value+1;return await de(e,{value:s}),s}catch(i){throw console.error("Error getting next match ID:",i),i}}async function zt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=await Ht(),s={id:t,...e,searchable:e.searchable!==!1,ownerId:i.uid,participants:[i.uid],createdAt:Ie(),updatedAt:Ie()};return await Ne(U(O,"matches",t.toString()),s),{success:!0,matchId:t}}catch(t){return console.error("Create match error:",t),{success:!1,error:t.message}}}async function Ee(e,i){if(!W())return{success:!1,error:"Not authenticated"};try{return await de(U(O,"matches",e.toString()),{...i,updatedAt:Ie()}),{success:!0}}catch(s){return console.error("Update match error:",s),{success:!1,error:s.message}}}async function Gt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=await be(U(O,"matches",e.toString()));return t.exists()?t.data().ownerId!==i.uid?{success:!1,error:"Only the creator can delete this match"}:(await Pt(U(O,"matches",e.toString())),{success:!0}):{success:!1,error:"Match not found"}}catch(t){return console.error("Delete match error:",t),{success:!1,error:t.message}}}async function Kt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=e.toString().trim(),s=await Vt(),a=s.find(n=>n.id&&n.id.toString()===t);return a?{success:!0,match:a}:{success:!1,error:"You do not have access to this match. Use invitations to get access."}}catch(t){return console.error("Search match error:",t),{success:!1,error:t.message}}}async function Vt(){const e=W();if(!e)return[];try{const i=$e(Le(O,"matches"),Fe("participants","array-contains",e.uid)),t=await He(i),s=[];return t.forEach(a=>{s.push({id:a.id,...a.data()})}),s.sort((a,n)=>{var m,b;const r=a.date||((m=a.createdAt)==null?void 0:m.toDate())||new Date(0);return(n.date||((b=n.createdAt)==null?void 0:b.toDate())||new Date(0))-r}),s}catch(i){return console.error("Get user matches error:",i),[]}}function qt(e){const i=W();if(!i)return()=>{};const t=$e(Le(O,"matches"),Fe("participants","array-contains",i.uid));return ze(t,a=>{const n=[];a.forEach(r=>{n.push({id:r.id,...r.data()})}),n.sort((r,u)=>{var f,p;const m=r.date||((f=r.createdAt)==null?void 0:f.toDate())||new Date(0);return(u.date||((p=u.createdAt)==null?void 0:p.toDate())||new Date(0))-m}),e(n)},a=>{console.error("Listen to matches error:",a)})}function Wt(e,i){return ze(U(O,"matches",e.toString()),s=>{s.exists()?i({id:s.id,...s.data()}):i(null)},s=>{console.error("Listen to match error:",s)})}async function Ge(e,i){const t=W();if(!t)return{success:!1,error:"Not authenticated"};try{console.log(" Searching for user with email:",e);const s=$e(Le(O,"users"),Fe("email","==",e)),a=await He(s);if(a.empty)return console.error(" Bruker ikke funnet:",e),{success:!1,error:"Bruker ikke funnet"};const n=a.docs[0],r=n.id;return console.log(" Bruker funnet:",r,n.data()),console.log(" Sender invitasjon..."),await Ne(U(O,"users",r,"invitations",i.matchId.toString()),{matchId:i.matchId,matchName:i.matchName,invitedBy:(t.displayName||t.email||""),invitedByUid:t.uid,timestamp:new Date().toISOString(),status:"pending"}),console.log(" Invitasjon sendt!"),{success:!0}}catch(s){return console.error(" Send invitation error:",s),{success:!1,error:s.message}}}async function Ke(e){const i=W();if(!i)return[];try{const t=e.toLowerCase().trim();if(t.length===0)return[];console.log(" Searching for users:",t);const s=await He(Le(O,"users")),a=[];return s.forEach(n=>{const r=n.data(),u=`${r.firstName||""} ${r.lastName||""}`.toLowerCase(),m=(r.email||"").toLowerCase();n.id!==i.uid&&(u.includes(t)||m.includes(t))&&a.push({uid:n.id,email:r.email,firstName:r.firstName||"",lastName:r.lastName||"",displayName:`${r.firstName||""} ${r.lastName||""}`.trim()})}),console.log(` Fant ${a.length} brukere`),a}catch(t){return console.error(" Search users error:",t),[]}}async function Jt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{
+ <div class="footer-divider"></div>
+ <div class="footer-feature">
+ <div class="footer-feature-icon">▐</div>
+ <div class="footer-feature-title">Live HF Prediction</div>
+ <div class="footer-feature-status">Active</div>
+ </div>
+ <div class="footer-divider"></div>
+ <div class="footer-feature">
+ <div class="footer-feature-icon">◈</div>
+ <div class="footer-feature-title">Stage Intelligence</div>
+ <div class="footer-feature-status">Synchronized</div>
+ </div>
+ </div>
+
+ <div class="login-copyright">
+ © 2026 Insight Dynamics · All rights reserved
+ </div>
+
+ </div>
+ </div>
+ `;const _langInit=localStorage.getItem("appLang")||"en";const t={no:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"E-post",loginEmailPlaceholder:"navn@epost.no",loginPasswordLabel:"Passord",loginPasswordPlaceholder:"Passord",login:"Logg inn",loginSpinner:"Logger inn…",or:"eller",showRegister:"Registrer ny bruker",registerFirstNameLabel:"Fornavn",registerFirstNamePlaceholder:"Fornavn",registerLastNameLabel:"Etternavn",registerLastNamePlaceholder:"Etternavn",registerEmailLabel:"E-post",registerEmailPlaceholder:"navn@epost.no",registerEmailConfirmLabel:"Confirm email",registerEmailConfirmPlaceholder:"Repeat email",registerPasswordLabel:"Passord",registerPasswordPlaceholder:"Passord",registerPasswordConfirmLabel:"Bekreft passord",registerPasswordConfirmPlaceholder:"Repeat password",registerDivisionLabel:"Divisjon",registerCategoryLabel:"Kategori",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Klubb",registerCodeLabel:"Invitasjonskode",registerCodePlaceholder:"Invitasjonskode",register:"Opprett bruker",cancel:"Avbryt",emailMismatch:"E-postadressene er ikke like",passwordMismatch:"Passordene er ikke like",missingFields:"Please fill in all required fields",missingName:"First and last name are required",missingDivision:"Please select a division",weakPassword:"Passordet er for svakt",strengthEmpty:"",strengthVeryWeak:"Password strength: Very weak",strengthWeak:"Password strength: Weak",strengthMedium:"Password strength: Fair",strengthStrong:"Password strength: Strong",strengthVeryStrong:"Password strength: Very strong",gdprRequired:dt==="no"?"You must accept the privacy policy to register":"You must accept the privacy policy to register"},en:{subtitle:"Performance. Precision. Progress.",loginEmailLabel:"Email",loginEmailPlaceholder:"name@email.com",loginPasswordLabel:"Password",loginPasswordPlaceholder:"Password",login:"Log in",loginSpinner:"Logging in…",or:"or",showRegister:"Create new user",registerFirstNameLabel:"First Name",registerFirstNamePlaceholder:"First name",registerLastNameLabel:"Last Name",registerLastNamePlaceholder:"Last name",registerEmailLabel:"Email",registerEmailPlaceholder:"name@email.com",registerEmailConfirmLabel:"Confirm email",registerEmailConfirmPlaceholder:"Repeat email",registerPasswordLabel:"Password",registerPasswordPlaceholder:"Password",registerPasswordConfirmLabel:"Confirm password",registerPasswordConfirmPlaceholder:"Repeat password",registerDivisionLabel:"Division",registerCategoryLabel:"Category",registerPowerFactorLabel:"Power Factor",registerRegionLabel:"Region",registerClubLabel:"Club",registerCodeLabel:"Invite code",registerCodePlaceholder:"Invite code",register:"Create account",cancel:"Cancel",emailMismatch:"The email addresses do not match",passwordMismatch:"Passwords do not match",missingFields:"Please fill in all required fields",missingName:"Please enter your first and last name",missingDivision:"Please select a division",weakPassword:"The password is too weak",strengthEmpty:"",strengthVeryWeak:"Password strength: Very weak",strengthWeak:"Password strength: Weak",strengthMedium:"Password strength: Medium",strengthStrong:"Password strength: Strong",strengthVeryStrong:"Password strength: Very strong",gdprRequired:"You must accept the privacy policy to register"}};let s=localStorage.getItem("appLang")||"en",a="minor";const n=document.getElementById("error"),r=document.getElementById("loginSection"),u=document.getElementById("registerSection"),m=document.getElementById("showRegisterBtn"),b=document.getElementById("cancelRegisterBtn"),f=document.getElementById("loginBtn"),p=document.getElementById("registerBtn"),h=document.getElementById("langNo"),E=document.getElementById("langEn"),k=document.getElementById("registerPassword"),P=document.getElementById("passwordStrengthBar"),C=document.getElementById("passwordStrengthText"),L=document.getElementById("pfMinor"),M=document.getElementById("pfMajor");L.onclick=()=>{a="minor",L.classList.add("selected"),M.classList.remove("selected")},M.onclick=()=>{a="major",M.classList.add("selected"),L.classList.remove("selected")};function D(w){let y=0;return w?(w.length>=8&&(y+=1),w.length>=12&&(y+=1),/[a-z]/.test(w)&&/[A-Z]/.test(w)&&(y+=1),/\d/.test(w)&&(y+=1),/[^A-Za-z0-9]/.test(w)&&(y+=1),y<=1?{score:y,width:"20%",labelKey:"strengthVeryWeak",color:"#ff6b6b"}:y===2?{score:y,width:"40%",labelKey:"strengthWeak",color:"#ff9f43"}:y===3?{score:y,width:"60%",labelKey:"strengthMedium",color:"#feca57"}:y===4?{score:y,width:"80%",labelKey:"strengthStrong",color:"#1dd1a1"}:{score:y,width:"100%",labelKey:"strengthVeryStrong",color:"#10ac84"}):{score:0,width:"0%",labelKey:"strengthEmpty",color:"#ff6b6b"}}function B(){const w=t[s],y=k.value,H=D(y);P.style.width=H.width,P.style.background=H.color,C.innerText=w[H.labelKey]}function _(w){s=w;const y=t[w];document.getElementById("brandSubtitle").innerText=y.subtitle,document.getElementById("loginEmailLabel").innerText=y.loginEmailLabel,document.getElementById("loginEmail").placeholder=y.loginEmailPlaceholder,document.getElementById("loginPasswordLabel").innerText=y.loginPasswordLabel,document.getElementById("loginPassword").placeholder=y.loginPasswordPlaceholder,document.getElementById("loginBtn").innerText=y.login,document.getElementById("separatorText").innerText=y.or,document.getElementById("showRegisterBtn").innerText=y.showRegister,document.getElementById("registerFirstNameLabel").innerText=y.registerFirstNameLabel,document.getElementById("registerFirstName").placeholder=y.registerFirstNamePlaceholder,document.getElementById("registerLastNameLabel").innerText=y.registerLastNameLabel,document.getElementById("registerLastName").placeholder=y.registerLastNamePlaceholder,document.getElementById("registerEmailLabel").innerText=y.registerEmailLabel,document.getElementById("registerEmail").placeholder=y.registerEmailPlaceholder,document.getElementById("registerEmailConfirmLabel").innerText=y.registerEmailConfirmLabel,document.getElementById("registerEmailConfirm").placeholder=y.registerEmailConfirmPlaceholder,document.getElementById("registerPasswordLabel").innerText=y.registerPasswordLabel,document.getElementById("registerPassword").placeholder=y.registerPasswordPlaceholder,document.getElementById("registerPasswordConfirmLabel").innerText=y.registerPasswordConfirmLabel,document.getElementById("registerPasswordConfirm").placeholder=y.registerPasswordConfirmPlaceholder,document.getElementById("registerDivisionLabel").innerText=y.registerDivisionLabel,document.getElementById("registerCategoryLabel").innerText=y.registerCategoryLabel,document.getElementById("registerPowerFactorLabel").innerText=y.registerPowerFactorLabel,document.getElementById("registerRegionLabel").innerText=y.registerRegionLabel,document.getElementById("registerClubLabel").innerText=y.registerClubLabel,document.getElementById("registerCodeLabel").innerText=y.registerCodeLabel,document.getElementById("registerCode").placeholder=y.registerCodePlaceholder,document.getElementById("registerBtn").innerText=y.register,document.getElementById("cancelRegisterBtn").innerText=y.cancel,h.classList.toggle("active",w==="no"),E.classList.toggle("active",w==="en"),localStorage.setItem("appLang",w);try{if(typeof setAppLang==="function")setAppLang(w);}catch(e){}B()}function K(){r.classList.remove("active"),u.classList.add("active"),n.innerText="";const w=document.getElementById("gdprCheckboxContainer");if(w&&!w.hasChildNodes()){const y=Rt();w.appendChild(y)}}function j(){u.classList.remove("active"),r.classList.add("active"),n.innerText=""}h.onclick=()=>_("no"),E.onclick=()=>_("en");_(_langInit);m.onclick=K,b.onclick=j,k.oninput=B,f.onclick=async()=>{n.innerText="";f.disabled=true;f.textContent=t[s].loginSpinner||"Logging in…";const w=document.getElementById("loginEmail").value.trim(),y=document.getElementById("loginPassword").value,H=await _t(w,y);H.success?i():(n.innerText=H.error,f.disabled=false,f.textContent=t[s].login)},p.onclick=async()=>{n.innerText="";const w=t[s],y=document.getElementById("registerFirstName").value.trim(),H=document.getElementById("registerLastName").value.trim(),Y=document.getElementById("registerEmail").value.trim(),ce=document.getElementById("registerEmailConfirm").value.trim(),X=document.getElementById("registerPassword").value,pe=document.getElementById("registerPasswordConfirm").value,se=document.getElementById("registerDivision").value,ae=document.getElementById("registerCategory").value,T=document.getElementById("registerRegion").value,I=document.getElementById("registerClub").value.trim(),c=document.getElementById("registerCode").value.trim();if(!y||!H){n.innerText=w.missingName;return}if(!Y||!ce||!X||!pe||!c){n.innerText=w.missingFields;return}if(!se){n.innerText=w.missingDivision;return}if(Y!==ce){n.innerText=w.emailMismatch;return}if(X!==pe){n.innerText=w.passwordMismatch;return}if(D(X).score<=1){n.innerText=w.weakPassword;return}if(!Dt().valid){n.innerText=w.gdprRequired;return}const v=await Nt(Y,X,c,y,H,se,ae,a,T,I);v.success?i():n.innerText=v.error},_(_langInit),B();(function(){function updateClock(){const el=document.getElementById('utcClock');if(!el)return;const now=new Date();const h=String(now.getUTCHours()).padStart(2,'0');const m=String(now.getUTCMinutes()).padStart(2,'0');el.textContent='⏱ UTC '+h+':'+m;}updateClock();setInterval(updateClock,30000);})()}async function Ot(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{return await de(U(O,"users",i.uid),{...e,updatedAt:Ie()}),{success:!0}}catch(t){return console.error("Save profile error:",t),{success:!1,error:t.message}}}async function jt(){const e=W();if(!e)return null;try{const i=await be(U(O,"users",e.uid));return i.exists()?{uid:e.uid,...i.data()}:null}catch(i){return console.error("Get profile error:",i),null}}async function Ut(e){try{const i=await be(U(O,"users",e));return i.exists()?{uid:e,...i.data()}:null}catch(i){return console.error("Get user by ID error:",i),null}}async function Ht(){const e=U(O,"counters","matchId");try{const i=await be(e);if(!i.exists())return await Ne(e,{value:1}),1;const s=i.data().value+1;return await de(e,{value:s}),s}catch(i){throw console.error("Error getting next match ID:",i),i}}async function zt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=await Ht(),s={id:t,...e,searchable:e.searchable!==!1,ownerId:i.uid,participants:[i.uid],createdAt:Ie(),updatedAt:Ie()};return await Ne(U(O,"matches",t.toString()),s),{success:!0,matchId:t}}catch(t){return console.error("Create match error:",t),{success:!1,error:t.message}}}async function Ee(e,i){if(!W())return{success:!1,error:"Not authenticated"};try{return await de(U(O,"matches",e.toString()),{...i,updatedAt:Ie()}),{success:!0}}catch(s){return console.error("Update match error:",s),{success:!1,error:s.message}}}async function Gt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=await be(U(O,"matches",e.toString()));return t.exists()?t.data().ownerId!==i.uid?{success:!1,error:"Only the creator can delete this match"}:(await Pt(U(O,"matches",e.toString())),{success:!0}):{success:!1,error:"Match not found"}}catch(t){return console.error("Delete match error:",t),{success:!1,error:t.message}}}async function Kt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{const t=e.toString().trim(),s=await Vt(),a=s.find(n=>n.id&&n.id.toString()===t);return a?{success:!0,match:a}:{success:!1,error:"You do not have access to this match. Use invitations to get access."}}catch(t){return console.error("Search match error:",t),{success:!1,error:t.message}}}async function Vt(){const e=W();if(!e)return[];try{const i=$e(Le(O,"matches"),Fe("participants","array-contains",e.uid)),t=await He(i),s=[];return t.forEach(a=>{s.push({id:a.id,...a.data()})}),s.sort((a,n)=>{var m,b;const r=a.date||((m=a.createdAt)==null?void 0:m.toDate())||new Date(0);return(n.date||((b=n.createdAt)==null?void 0:b.toDate())||new Date(0))-r}),s}catch(i){return console.error("Get user matches error:",i),[]}}function qt(e){const i=W();if(!i)return()=>{};const t=$e(Le(O,"matches"),Fe("participants","array-contains",i.uid));return ze(t,a=>{const n=[];a.forEach(r=>{n.push({id:r.id,...r.data()})}),n.sort((r,u)=>{var f,p;const m=r.date||((f=r.createdAt)==null?void 0:f.toDate())||new Date(0);return(u.date||((p=u.createdAt)==null?void 0:p.toDate())||new Date(0))-m}),e(n)},a=>{console.error("Listen to matches error:",a)})}function Wt(e,i){return ze(U(O,"matches",e.toString()),s=>{s.exists()?i({id:s.id,...s.data()}):i(null)},s=>{console.error("Listen to match error:",s)})}async function Ge(e,i){const t=W();if(!t)return{success:!1,error:"Not authenticated"};try{console.log(" Searching for user with email:",e);const s=$e(Le(O,"users"),Fe("email","==",e)),a=await He(s);if(a.empty)return console.error(" Bruker ikke funnet:",e),{success:!1,error:"Bruker ikke funnet"};const n=a.docs[0],r=n.id;return console.log(" Bruker funnet:",r,n.data()),console.log(" Sender invitasjon..."),await Ne(U(O,"users",r,"invitations",i.matchId.toString()),{matchId:i.matchId,matchName:i.matchName,invitedBy:(t.displayName||t.email||""),invitedByUid:t.uid,timestamp:new Date().toISOString(),status:"pending"}),console.log(" Invitasjon sendt!"),{success:!0}}catch(s){return console.error(" Send invitation error:",s),{success:!1,error:s.message}}}async function Ke(e){const i=W();if(!i)return[];try{const t=e.toLowerCase().trim();if(t.length===0)return[];console.log(" Searching for users:",t);const s=await He(Le(O,"users")),a=[];return s.forEach(n=>{const r=n.data(),u=`${r.firstName||""} ${r.lastName||""}`.toLowerCase(),m=(r.email||"").toLowerCase();n.id!==i.uid&&(u.includes(t)||m.includes(t))&&a.push({uid:n.id,email:r.email,firstName:r.firstName||"",lastName:r.lastName||"",displayName:`${r.firstName||""} ${r.lastName||""}`.trim()})}),console.log(` Fant ${a.length} brukere`),a}catch(t){return console.error(" Search users error:",t),[]}}async function Jt(e){const i=W();if(!i)return{success:!1,error:"Not authenticated"};try{
 console.log("[Jt] Start - matchId:",e,"uid:",i.uid);
 // Steg 1: Les match-dokumentet
 let matchDoc;

@@ -1317,7 +1317,8 @@ window.icOpenEditStageResult=icOpenEditStageResult;function icPopulateTeamCountr
     el.appendChild(opt);
   });
 }
-window.icPopulateTeamCountry=icPopulateTeamCountry,window.deleteCurrentStage=deleteCurrentStage,window.openInviteUser=ks,window.openInvitationsModal=Is,window.acceptInvitation=Cs,window.declineInvitation=_s,window.searchUsers=xs,window.toggleUserSelection=Ss,window.sendMultipleInvitations=Ls,window.searchUsersNewMatch=Ps,window.toggleUserNewMatch=Es,window.searchUsersEditMatch=Ts,window.toggleUserEditMatch=Ms,window.confirmDeleteMatch=gs,window.deleteMatchConfirmed=vs,window.uploadAndScanResult=Hs,window.saveOCRResult=Gs,window.icOpenManualResult=icOpenManualResult,window.importESSVerify=importESSVerify,window.essConfirmPaste=essConfirmPaste;window.essSelectAllStages=essSelectAllStages,window.openCreateStageFromUpload=Us,window.toggleMatchDropdown=ds,window.selectMatchFromDropdown=cs,window.toggleReferenceShootersEnabled=toggleReferenceShootersEnabled,window.toggleReferenceShooterChoice=toggleReferenceShooterChoice,window.updateReferenceShooterOverride=updateReferenceShooterOverride,window.toggleLiveFilter=toggleLiveFilter,window.toggleTips=toggleTips,window.deleteRun=deleteRun,window.openCreateTeam=openCreateTeam,window.editTeam=editTeam,window.deleteTeam=deleteTeam,window.saveTeam=saveTeam,window.renderTeamsScreen=renderTeamsScreen}function toggleDQ(matchId,shooterId){
+window.icPopulateTeamCountry=icPopulateTeamCountry,window.deleteCurrentStage=deleteCurrentStage,window.openInviteUser=ks,window.openInvitationsModal=Is,window.acceptInvitation=Cs,window.declineInvitation=_s,window.searchUsers=xs,window.toggleUserSelection=Ss,window.sendMultipleInvitations=Ls,window.searchUsersNewMatch=Ps,window.toggleUserNewMatch=Es,window.searchUsersEditMatch=Ts,window.toggleUserEditMatch=Ms,window.confirmDeleteMatch=gs,window.deleteMatchConfirmed=vs,window.uploadAndScanResult=Hs,window.saveOCRResult=Gs,window.icOpenManualResult=icOpenManualResult,window.importESSVerify=importESSVerify,window.essConfirmPaste=essConfirmPaste;window.essSelectAllStages=essSelectAllStages,window.openCreateStageFromUpload=Us,window.toggleMatchDropdown=ds,window.selectMatchFromDropdown=cs,window.toggleReferenceShootersEnabled=toggleReferenceShootersEnabled,window.toggleReferenceShooterChoice=toggleReferenceShooterChoice,window.updateReferenceShooterOverride=updateReferenceShooterOverride,window.toggleLiveFilter=toggleLiveFilter,window.toggleTips=toggleTips,window.deleteRun=deleteRun,window.openCreateTeam=openCreateTeam,window.editTeam=editTeam,window.deleteTeam=deleteTeam,window.saveTeam=saveTeam,window.renderTeamsScreen=renderTeamsScreen;window.toggleTeamDetail=toggleTeamDetail}function toggleTeamDetail(id){var el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'table-row':'none';}
+function toggleDQ(matchId,shooterId){
   const match=$.find(e=>e.id!=null&&e.id.toString()===String(matchId));
   if(!match)return;
   const shooter=(match.shooters||[]).find(s=>String(s.id)===String(shooterId));
@@ -1412,7 +1413,7 @@ function toggleLiveFilter(){liveShowAll=!liveShowAll,_e()}function toggleTips(id
   standings.forEach((t,i)=>{
     const pct=topPts>0?(t.totalPts/topPts*100).toFixed(2):"0.00";
     const detId='team-detail-'+t.id;
-    sh+='<tr class="standings-row" onclick="var d=document.getElementById(''+detId+'');d.style.display=d.style.display==='none'?'table-row':'none';" style="cursor:pointer;">';
+    sh+='<tr class="standings-row" onclick="toggleTeamDetail(\''+detId+'\')" style="cursor:pointer;">';
     sh+='<td class="standings-td">'+(i+1)+'</td>';
     sh+='<td class="standings-td">'+t.name+'</td>';
     sh+='<td class="standings-td standings-td-pts">'+t.totalPts.toFixed(2)+'</td>';

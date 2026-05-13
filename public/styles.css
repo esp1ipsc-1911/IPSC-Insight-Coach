@@ -5,20 +5,21 @@
    ════════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --bg: #0a0c10;
-  --bg2: #111318;
-  --bg3: #181c24;
-  --card: #1a1e28;
-  --border: rgba(255, 255, 255, 0.07);
-  --accent: #e8b84b;
+  --bg: #080a0e;
+  --bg2: #0e1016;
+  --bg3: #14171f;
+  --card: #141720;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #D4A843;
   --accent2: #f0d080;
+  --accent-fade: rgba(212, 168, 67, 0.08);
   --red: #e05252;
-  --green: #4caf7d;
+  --green: #22c55e;
   --blue: #4a9eff;
   --text: #f0f2f5;
   --muted: #6b7280;
   --sub: #9ca3af;
-  --radius: 14px;
+  --radius: 16px;
   --radius-sm: 8px;
 }
 
@@ -531,17 +532,39 @@ body {
   cursor: pointer;
   color: var(--muted);
   font-size: 10px;
+  padding-top: 4px;
+  position: relative;
+  transition: color 0.2s;
 }
 
 .tab-item.active {
   color: var(--accent);
-  background: rgba(76, 175, 125, 0.15);
-  border-radius: 10px;
+}
+
+.tab-item.active::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 0 0 2px 2px;
 }
 
 .tab-icon {
   font-size: 20px;
   line-height: 1;
+}
+
+.tab-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -1609,3 +1632,176 @@ body {
 .match-row-name.is-active {
   color: #4caf7d;
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   INSIGHT DYNAMICS – DESIGN SYSTEM ADDITIONS
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* TACTIX HAZARD DIVIDER */
+.tactix-divider {
+  width: 100%;
+  height: 8px;
+  margin: 16px 0;
+  background: repeating-linear-gradient(
+    -55deg,
+    rgba(212, 168, 67, 0.18) 0px,
+    rgba(212, 168, 67, 0.18) 6px,
+    transparent 6px,
+    transparent 14px
+  );
+  border-radius: 2px;
+}
+
+/* STAGE COLLAPSE */
+.stage-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.stage-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  gap: 10px;
+}
+
+.stage-card-header:active {
+  background: rgba(255,255,255,0.03);
+}
+
+.stage-card-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.stage-card-chevron {
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.stage-card.open .stage-card-chevron {
+  transform: rotate(180deg);
+}
+
+.stage-card-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.stage-card.open .stage-card-body {
+  max-height: 2000px;
+}
+
+.stage-card-body-inner {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* STAGE BADGES */
+.badge-shot {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.3);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.badge-next {
+  background: rgba(212,168,67,0.15);
+  color: var(--accent);
+  border: 1px solid rgba(212,168,67,0.4);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.badge-pending {
+  background: rgba(107,114,128,0.15);
+  color: var(--muted);
+  border: 1px solid rgba(107,114,128,0.25);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* STAGE LEFT BORDER ACCENT */
+.stage-card.shot {
+  border-left: 3px solid var(--green);
+}
+
+.stage-card.next-up {
+  border-left: 3px solid var(--accent);
+}
+
+.stage-card.pending {
+  border-left: 3px solid var(--border);
+}
+
+/* INSIGHT BOX */
+.insight-box {
+  background: var(--accent-fade);
+  border: 1px solid rgba(212,168,67,0.3);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.insight-box-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* COMPETITION PICTURE BOX */
+.competition-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 12px;
+}
+
+/* NEXT STAGE BOX */
+.next-stage-box {
+  background: var(--accent-fade);
+  border: 1px solid rgba(212,168,67,0.2);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 12px;
+}
+
+/* MATCH IS-ACTIVE GREEN FIX */
+.match-row-name.is-active {
+  color: var(--green);
+}
+

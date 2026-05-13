@@ -2282,17 +2282,7 @@ const Ft_en=`
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
         
         <button id="ess-import-btn" onclick="essConfirmPaste('selected')" style="padding:10px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer;font-size:12px;display:none;">Import selected</button>
-      </div>ay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;";
-  overlay.innerHTML=`
-    <div style="background:var(--card);border-radius:16px;padding:20px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;">
-      <div style="font-size:16px;font-weight:700;margin-bottom:8px;">ESS/SSI Import</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">1. Gå til verify-siden • 2. Søk opp skytter-ID • 3. Trykk Cmd+A, Cmd+C • 4. Lim inn under</div>
-      <div style="margin-bottom:12px;">
-        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Velg skytter</div>
-        <select id="ess-paste-shooter-select" style="width:100%;padding:10px;background:var(--bg);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--text);font-size:14px;">${shooterOptions}</select>
       </div>
-      <textarea id="ess-paste-input" style="width:100%;height:140px;background:var(--bg);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--text);padding:10px;font-size:12px;resize:vertical;" placeholder="Lim inn tekst fra verify-siden her..."></textarea>
-      <div id="ess-paste-preview" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;"></div>
     </div>`;
   document.body.appendChild(overlay);
   o("ess-paste-input").addEventListener("input",function(){

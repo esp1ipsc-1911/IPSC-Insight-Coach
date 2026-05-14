@@ -403,8 +403,8 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
      </div>
     </div>
     <div class="gdpr-row">
-     <input type="checkbox" id="gdprCheckbox" />
-     <label for="gdprCheckbox">
+     <input type="checkbox" id="gdpr-consent-checkbox" />
+     <label for="gdpr-consent-checkbox">
       I have read and accepted the <a href="#" onclick="document.getElementById('gdprModal').classList.add('open');return false;">Privacy Policy</a>
      </label>
     </div>

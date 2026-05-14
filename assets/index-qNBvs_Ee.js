@@ -525,7 +525,7 @@ document.head.appendChild(_st);
 <!-- HOME -->
 <div class="screen active" id="screen-home">
  <div class="navbar">
- <div class="nav-title">INSIGHT <span>DYNAMICS</span></div>
+ <div class="nav-title">HO<span>ME</span></div>
  <div class="match-chip-wrapper">
  <div class="match-chip" onclick="toggleMatchDropdown('home')">
  <div class="match-chip-dot"></div>

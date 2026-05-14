@@ -2031,7 +2031,7 @@ html+="</div>";return html;}function icSeasonAnalysis(matches){
   var worstMatch=matchStats.reduce(function(a,b){return b.avgHF<a.avgHF?b:a},matchStats[0]);
 
   var html='<button onclick="var x=document.getElementById(\'sa-body\');x&&(x.style.display=x.style.display===\'none\'?\'block\':\'none\');this.querySelector(\'.sa-arrow\').textContent=x&&x.style.display===\'block\'?\'\u25bc\':\'\u25b6\';" style="width:100%;padding:10px 4px;background:transparent;border:none;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
-  html+='<span style="color:var(--accent);">SEASON ANALYSIS — '+matchStats.length+' MATCHES</span><span class="sa-arrow">▶</span></button>';
+  html+='<span style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--muted);">SEASON &middot; '+matchStats.length+' MATCHES</span><span class="sa-arrow" style="font-size:11px;color:var(--muted);">▶</span></button>';
   html+='<div id="sa-body" style="display:none;padding:12px 0 4px 0;">';
 
   // HF trend

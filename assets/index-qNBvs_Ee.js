@@ -2165,12 +2165,12 @@ function renderProfileMatchTips(){
   // Outer card
   html+='<div class="card" style="margin-bottom:16px;">';
   // Header row — clickable, toggles the collapsible body
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;cursor:pointer;" onclick="var _b=document.getElementById(\'mtp-body\');var _a=document.getElementById(\'mtp-arrow\');if(_b){var _open=_b.style.display!==\'none\';_b.style.display=_open?\'none\':\'block\';if(_a)_a.textContent=_open?\'▶\':\'▼\';}">';
+  html+='<div class="card-header" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="(function(){var b=document.getElementById(\'mtp-body\');var c=document.getElementById(\'mtp-chev\');if(b){var o=b.style.display!==\'none\';b.style.display=o?\'none\':\'block\';c.style.transform=o?\'rotate(0deg)\':\'rotate(180deg)\';}})()">';
   html+='<div style="display:flex;align-items:center;gap:8px;">';
   html+='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
   html+='<div class="card-title">MATCHES &amp; TIPS</div>';
   html+='</div>';
-  html+='<span id="mtp-arrow" style="font-size:12px;color:var(--muted);font-weight:600;">▶</span>';
+  html+='<svg id="mtp-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   html+='</div>';
   // Collapsible body — hidden by default
   html+='<div id="mtp-body" style="display:none;">';

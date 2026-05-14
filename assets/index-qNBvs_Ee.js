@@ -2162,35 +2162,18 @@ function renderProfileMatchTips(){
   const myMatches=$.filter(function(m){const s=icCurrentShooter(m);return s&&s.stages&&s.stages.length>0;});
   if(!myMatches.length){container.innerHTML="";return;}
 
-  // Build the card with ALL matches inside
   let html='<div class="card" style="margin-bottom:16px;">';
 
-  // Card header
-  html+='<div class="card-header" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="(function(){var b=document.getElementById(\'mt-body\');var c=document.getElementById(\'mt-chev\');if(b){var o=b.style.display!==\'none\';b.style.display=o?\'none\':\'block\';c.style.transform=o?\'rotate(0deg)\':\'rotate(180deg)\';}})();">';
-  html+='<div style="display:flex;align-items:center;gap:8px;">';
-  html+='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-  html+='<div class="card-title">MATCHES &amp; TIPS</div>';
-  html+='</div>';
-  html+='<svg id="mt-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
+  // Card header — collapsible
+  html+='<div class="card-header" style="cursor:pointer;" onclick="(function(){var b=document.getElementById(\'mt-body\');var c=document.getElementById(\'mt-chev\');if(b){var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';c.style.transform=open?\'rotate(0deg)\':\'rotate(180deg)\';}})();">';
+  html+='<div class="card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>MATCHES &amp; TIPS</div>';
+  html+='<svg id="mt-chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   html+='</div>';
 
-  // Collapsible body
   html+='<div id="mt-body" style="display:none;">';
 
-  // Season analysis (collapsible sub-section)
-  const seasonHtml=icSeasonAnalysis(myMatches)+icTrainingSeasonAnalysis(myMatches);
-  if(seasonHtml){
-    html+='<div style="border-bottom:1px solid var(--border);margin:0;">';
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;" onclick="(function(){var b=document.getElementById(\'sa-body2\');var c=document.getElementById(\'sa-chev2\');if(b){var o=b.style.display!==\'none\';b.style.display=o?\'none\':\'block\';c.style.transform=o?\'rotate(0deg)\':\'rotate(180deg)\';}})();">';
-    html+='<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;">SEASON ANALYSIS &mdash; '+myMatches.length+' MATCHES</div>';
-    html+='<svg id="sa-chev2" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;flex-shrink:0;transform:rotate(-90deg);"><polyline points="6 9 12 15 18 9"/></svg>';
-    html+='</div>';
-    html+='<div id="sa-body2" style="display:none;padding:0 16px 12px;">'+seasonHtml+'</div>';
-    html+='</div>';
-  }
-
-  // Match list
-  html+='<div style="padding:8px 12px 12px;">';
+  // Match list first
+  html+='<div style="padding:6px 10px 8px;">';
   myMatches.forEach(function(match,mi){
     const myShooter=icCurrentShooter(match);
     const sc=myShooter.stages.length;
@@ -2202,26 +2185,35 @@ function renderProfileMatchTips(){
     const avgHF=(tHF/sc).toFixed(2);
     const apStr=tHits>0?Math.round(tA/tHits*100)+"%":"--";
     const mid="mtips-"+mi;
-    const dateStr=We(match.date);
-    const levelStr=match.type||"";
 
-    // Match card row
-    html+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;">';
+    html+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px;">';
 
-    // Header row — always visible
-    html+='<div style="display:flex;align-items:center;padding:11px 13px;cursor:pointer;gap:10px;" onclick="toggleTips(\''+mid+'\')">';
+    // Always-visible header row
+    html+='<div style="display:flex;align-items:center;padding:11px 12px;cursor:pointer;gap:8px;" onclick="toggleTips(\''+mid+'\')">';
     html+='<div style="flex:1;min-width:0;">';
     html+='<div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);">'+(match.name||"Match")+'</div>';
-    html+='<div style="font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+dateStr+'<span style="color:#e8b84b;font-weight:600;"> · '+levelStr+'</span> · '+sc+' stages · HF '+avgHF+' · '+apStr+'</div>';
+    html+='<div style="font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+We(match.date)+'<span style="color:#e8b84b;font-weight:600;"> · '+(match.type||"")+'</span> · '+sc+' stages · HF '+avgHF+' · '+apStr+'</div>';
     html+='</div>';
     html+='<svg id="chev-'+mid+'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>';
     html+='</div>';
 
-    // Tips body — hidden by default
-    html+='<div id="'+mid+'" style="display:none;border-top:1px solid var(--border);padding:12px 13px;">'+icMatchTips(match)+'</div>';
+    // Collapsible tips
+    html+='<div id="'+mid+'" style="display:none;border-top:1px solid var(--border);padding:12px;">'+icMatchTips(match)+'</div>';
     html+='</div>';
   });
-  html+='</div>'; // end match list
+  html+='</div>';
+
+  // Season Analysis — at bottom, collapsible
+  const seasonHtml=icSeasonAnalysis(myMatches)+icTrainingSeasonAnalysis(myMatches);
+  if(seasonHtml){
+    html+='<div style="border-top:1px solid var(--border);">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;" onclick="(function(){var b=document.getElementById(\'sa-inner\');var c=document.getElementById(\'sa-chev-inner\');if(b){var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';c.style.transform=open?\'rotate(0deg)\':\'rotate(180deg)\';}})();">';
+    html+='<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">Season Analysis &mdash; '+myMatches.length+' matches</div>';
+    html+='<svg id="sa-chev-inner" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform 0.2s;transform:rotate(-90deg);"><polyline points="6 9 12 15 18 9"/></svg>';
+    html+='</div>';
+    html+='<div id="sa-inner" style="display:none;padding:0 14px 14px;">'+seasonHtml+'</div>';
+    html+='</div>';
+  }
 
   html+='</div>'; // end mt-body
   html+='</div>'; // end card

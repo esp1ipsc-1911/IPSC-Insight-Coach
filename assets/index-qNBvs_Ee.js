@@ -531,7 +531,7 @@ document.head.appendChild(_st);
 <div class="screen active" id="screen-home">
  <div class="navbar">
  <div class="nav-title">I<span>D</span></div>
- <button class="nav-refresh-btn" id="rfbtn-home" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox=\"0 0 24 24\"><path d=\"M23 4v6h-6\"/><path d=\"M1 20v-6h6\"/><path d=\"M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15\"/></svg></button>
+ <button class="nav-refresh-btn" id="rfbtn-home" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
  <div class="match-chip-wrapper">
  <div class="match-chip" onclick="toggleMatchDropdown('home')">
  <div class="match-chip-dot"></div>
@@ -558,7 +558,7 @@ document.head.appendChild(_st);
 <div class="screen" id="screen-matches">
  <div class="navbar">
  <div class="nav-title">MATCH<span>ES</span></div>
- <button class="nav-refresh-btn" id="rfbtn-matches" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox=\"0 0 24 24\"><path d=\"M23 4v6h-6\"/><path d=\"M1 20v-6h6\"/><path d=\"M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15\"/></svg></button>
+ <button class="nav-refresh-btn" id="rfbtn-matches" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
  <div style="display:flex;align-items:center;gap:15px;">
  <div style="position:relative;cursor:pointer;" onclick="openInvitationsModal()">
  <div style="font-size:16px;"></div>
@@ -594,7 +594,7 @@ document.head.appendChild(_st);
 <div class="screen" id="screen-prognose">
  <div class="navbar">
  <div class="nav-title">SC<span>ORE</span></div>
- <button class="nav-refresh-btn" id="rfbtn-prog" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox=\"0 0 24 24\"><path d=\"M23 4v6h-6\"/><path d=\"M1 20v-6h6\"/><path d=\"M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15\"/></svg></button>
+ <button class="nav-refresh-btn" id="rfbtn-prog" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
  <div class="match-chip-wrapper">
  <div class="match-chip" onclick="toggleMatchDropdown('prog')">
  <div class="match-chip-dot"></div>
@@ -628,7 +628,7 @@ document.head.appendChild(_st);
 <div class="screen" id="screen-results">
  <div class="navbar">
  <div class="nav-title">LIVE<span></span></div>
- <button class="nav-refresh-btn" id="rfbtn-results" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox=\"0 0 24 24\"><path d=\"M23 4v6h-6\"/><path d=\"M1 20v-6h6\"/><path d=\"M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15\"/></svg></button>
+ <button class="nav-refresh-btn" id="rfbtn-results" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
  <div class="match-chip-wrapper">
  <div class="match-chip" onclick="toggleMatchDropdown('results')">
  <div class="match-chip-dot"></div>
@@ -654,7 +654,7 @@ document.head.appendChild(_st);
 <div class="screen" id="screen-profile">
  <div class="navbar">
   <div class="nav-title">PRO<span>FILE</span></div>
- <button class="nav-refresh-btn" id="rfbtn-profile" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox=\"0 0 24 24\"><path d=\"M23 4v6h-6\"/><path d=\"M1 20v-6h6\"/><path d=\"M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15\"/></svg></button>
+ <button class="nav-refresh-btn" id="rfbtn-profile" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
  </div>
  <div class="scroll-content">
   <div class="profile-header" style="display:flex;flex-direction:column;align-items:flex-start;padding:16px 16px 0;">
@@ -739,7 +739,7 @@ document.head.appendChild(_st);
 <div class="screen" id="screen-teams">
  <div class="navbar">
  <div class="nav-title">TEAM<span>S</span></div>
- <button class="nav-refresh-btn" id="rfbtn-teams" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox=\"0 0 24 24\"><path d=\"M23 4v6h-6\"/><path d=\"M1 20v-6h6\"/><path d=\"M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15\"/></svg></button>
+ <button class="nav-refresh-btn" id="rfbtn-teams" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
  <div class="match-chip-wrapper">
  <div class="match-chip" onclick="toggleMatchDropdown('teams')">
  <div class="match-chip-dot"></div>

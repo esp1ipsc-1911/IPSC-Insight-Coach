@@ -2009,7 +2009,7 @@ s+="</table></div>";s+='<div style="margin-top:10px;">';s+='<button onclick="con
       ctx.drawImage(img,sx,sy,size,size,0,0,200,200);
       canvas.toBlob(async function(blob){
         try{
-          const storageRef=ref(_Fstore,"avatars/"+uid+".jpg");
+          const storageRef=ref(_Fstore,"avatars/"+uid);
           await uploadBytes(storageRef,blob,{contentType:"image/jpeg"});
           const url=await getDownloadURL(storageRef);
           await de(U(O,"users",uid),{photoURL:url});

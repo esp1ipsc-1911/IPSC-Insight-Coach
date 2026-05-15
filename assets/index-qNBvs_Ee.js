@@ -500,11 +500,11 @@ html,body,*{background-color:inherit;font-family:-apple-system,BlinkMacSystemFon
 .badge-next{background:var(--accent-fade)!important;color:var(--accent)!important;border:1px solid var(--border-gold)!important;border-radius:6px!important;font-size:10px!important;font-weight:700!important;padding:3px 8px!important;}\
 .badge-pending{background:rgba(255,255,255,0.04)!important;color:var(--muted)!important;border:1px solid var(--border)!important;border-radius:6px!important;font-size:10px!important;font-weight:700!important;padding:3px 8px!important;}\
 /* === PROFILE AVATAR === */\
-#prof-avatar{width:78px!important;height:78px!important;border-radius:50%!important;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;font-weight:900!important;font-size:26px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 0 0 3px var(--bg2),0 0 0 5px rgba(224,182,73,0.35),0 0 20px rgba(224,182,73,0.2)!important;overflow:hidden!important;cursor:pointer!important;}\\
+#prof-avatar{width:78px!important;height:78px!important;border-radius:50%!important;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%)!important;color:#0a0c0f!important;font-weight:900!important;font-size:26px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 0 0 3px var(--bg2),0 0 0 5px rgba(224,182,73,0.35),0 0 20px rgba(224,182,73,0.2)!important;overflow:hidden!important;cursor:pointer!important;}\
 .prof-avatar-wrap{position:relative;display:inline-block;flex-shrink:0;}\
 .prof-avatar-cam{position:absolute;bottom:0;left:0;right:0;height:26px;background:rgba(0,0,0,0.52);display:flex;align-items:center;justify-content:center;pointer-events:none;border-radius:0 0 50px 50px;}\
-.prof-avatar-cam svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}\\
-/*/* === DROPDOWN === */\
+.prof-avatar-cam svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}\
+/* === DROPDOWN === */\
 .match-dropdown{background:var(--card2)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;box-shadow:0 8px 32px rgba(0,0,0,0.5)!important;}\
 .match-dropdown-item{border-bottom:1px solid var(--border)!important;padding:11px 14px!important;}\
 .match-dropdown-item.active{background:var(--accent-fade)!important;}\

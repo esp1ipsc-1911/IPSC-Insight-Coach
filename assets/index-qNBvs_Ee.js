@@ -2104,6 +2104,44 @@ html+="</div>";return html;}function icSeasonAnalysis(matches){
   }
   html+='</div>';
 
+  // A% graf
+  if(matchStats.length>=2){
+    var W=320,H=140,PL=32,PR=12,PT=10,PB=24;
+    var gW=W-PL-PR,gH=H-PT-PB;
+    var n=matchStats.length;
+    var minAP=Math.max(0,Math.min.apply(null,matchStats.map(function(m){return m.ap;}))-10);
+    var maxAP=Math.min(100,Math.max.apply(null,matchStats.map(function(m){return m.ap;}))+10);
+    var rng=maxAP-minAP||1;
+    function xp(i){return n>1?PL+i*(gW/(n-1)):PL+gW/2;}
+    function yp(v){return PT+gH*(1-(v-minAP)/rng);}
+    var svgAP='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:'+W+'px;display:block;margin:0 auto;">';
+    // Grid lines
+    [minAP,Math.round((minAP+maxAP)/2),maxAP].forEach(function(v){
+      var gy=yp(v);
+      svgAP+='<line x1="'+PL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+      svgAP+='<text x="'+(PL-3)+'" y="'+(gy+4)+'" font-size="8" fill="#7d8598" text-anchor="end">'+v+'%</text>';
+    });
+    // X labels
+    matchStats.forEach(function(m,i){
+      svgAP+='<text x="'+xp(i)+'" y="'+(H-6)+'" font-size="8" fill="#7d8598" text-anchor="middle">'+(m.name||"").substring(0,6)+'</text>';
+    });
+    // Line
+    var pts=matchStats.map(function(m,i){return[xp(i),yp(m.ap)];});
+    var d=pts.map(function(p,i){return(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
+    svgAP+='<path d="'+d+'" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    // Dots
+    pts.forEach(function(p,i){
+      var col=matchStats[i].ap>=avgAP?'var(--green)':'var(--red)';
+      svgAP+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="'+col+'"/>';
+      svgAP+='<text x="'+p[0].toFixed(1)+'" y="'+(p[1]-6)+'" font-size="8" fill="'+col+'" text-anchor="middle">'+matchStats[i].ap+'%</text>';
+    });
+    svgAP+='</svg>';
+    html+='<div style="margin-bottom:12px;">';
+    html+='<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px;">A% DEVELOPMENT</div>';
+    html+=svgAP;
+    html+='</div>';
+  }
+
   // Styrker
   var styrker=[];
   if(avgAP>=88)styrker.push("Consistent high A% ("+avgAP+"%) across matches");

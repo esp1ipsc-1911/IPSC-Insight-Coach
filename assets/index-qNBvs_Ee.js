@@ -2041,8 +2041,8 @@ html+="</div>";return html;}function icSeasonAnalysis(matches){
   var bestMatch=matchStats.reduce(function(a,b){return b.avgHF>a.avgHF?b:a},matchStats[0]);
   var worstMatch=matchStats.reduce(function(a,b){return b.avgHF<a.avgHF?b:a},matchStats[0]);
 
-  var html='<button onclick="var x=document.getElementById(\'sa-body\');x&&(x.style.display=x.style.display===\'none\'?\'block\':\'none\');this.querySelector(\'.sa-arrow\').textContent=x&&x.style.display===\'block\'?\'\u25bc\':\'\u25b6\';" style="width:100%;padding:10px 4px;background:transparent;border:none;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
-  html+='<span style="color:var(--accent);">SEASON ANALYSIS — '+matchStats.length+' MATCHES</span><span class="sa-arrow">▶</span></button>';
+  var html='<button onclick="var x=document.getElementById(\'sa-body\');x&&(x.style.display=x.style.display===\'none\'?\'block\':\'none\');this.querySelector(\'.sa-arrow\').textContent=x&&x.style.display===\'block\'?\'\u25bc\':\'\u25b6\';" style="width:100%;padding:10px 14px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;text-align:left;margin-bottom:8px;">';
+  html+='▶ Season Analysis</button>';
   html+='<div id="sa-body" style="display:none;padding:12px 0 4px 0;">';
 
   // HF trend

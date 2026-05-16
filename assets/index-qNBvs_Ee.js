@@ -548,7 +548,6 @@ document.head.appendChild(_st);
 <div class="phone">
 
 <!-- HOME -->
-<div class=
 <div class="ipad-sidebar" style="display:none;">
   <div class="ipad-logo">IC</div>
   <div class="ipad-nav-item active" id="ipad-nav-home" onclick="switchTab('screen-home')">
@@ -576,7 +575,7 @@ document.head.appendChild(_st);
     <span>Profile</span>
   </div>
 </div>
-"screen active" id="screen-home">
+<div class="screen active" id="screen-home">
  <div class="navbar">
  <div class="nav-title">I<span>D</span></div>
  <button class="nav-refresh-btn" id="rfbtn-home" onclick="refreshFromFirebase()" title="Refresh"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>

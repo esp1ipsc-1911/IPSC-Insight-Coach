@@ -530,7 +530,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .ipad-nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 0;width:100%;cursor:pointer;color:rgba(255,255,255,0.35);font-size:8px;font-weight:800;letter-spacing:0.07em;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);border-left:2px solid transparent;text-transform:uppercase;position:relative;}\
 .ipad-nav-item:hover{color:rgba(224,182,73,0.8);background:rgba(224,182,73,0.05);}\
 .ipad-nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(224,182,73,0.08);}\
-.ipad-nav-item.active::after{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:24px;background:var(--accent);border-radius:2px 0 0 2px;box-shadow:0 0 12px rgba(224,182,73,0.6);}\
+.ipad-nav-item.active::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:24px;background:var(--accent);border-radius:2px 0 0 2px;box-shadow:0 0 12px rgba(224,182,73,0.6);}\
 .ipad-nav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.2s,filter 0.2s;}\
 .ipad-nav-item.active svg{filter:drop-shadow(0 0 6px rgba(224,182,73,0.5));}\
 .ipad-nav-item:hover svg{transform:scale(1.12);}\

@@ -525,29 +525,34 @@ html,body,*{background-color:inherit;font-family:-apple-system,BlinkMacSystemFon
 /* === AUTOFILL FIX === */\
 input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 100px rgba(20,24,32,0.98) inset!important;-webkit-text-fill-color:#f5f7fb!important;caret-color:#f5f7fb!important;border:1px solid rgba(255,255,255,0.1)!important;transition:background-color 9999s ease-in-out 0s!important;}\
 /* === IPAD LANDSCAPE DASHBOARD === */\
+.ipad-sidebar{display:none;position:fixed;left:0;top:0;bottom:0;width:72px;background:linear-gradient(180deg,#0d0f12 0%,#111418 100%);border-right:1px solid rgba(224,182,73,0.12);flex-direction:column;align-items:center;padding:20px 0 16px;gap:2px;z-index:200;box-shadow:4px 0 32px rgba(0,0,0,0.5);}\
+.ipad-logo{font-size:13px;font-weight:900;color:var(--accent);letter-spacing:0.08em;margin-bottom:16px;text-shadow:0 0 20px rgba(224,182,73,0.4);}\
+.ipad-nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 0;width:100%;cursor:pointer;color:var(--muted);font-size:8px;font-weight:700;letter-spacing:0.06em;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);border-left:2px solid transparent;text-transform:uppercase;}\
+.ipad-nav-item:hover{color:rgba(224,182,73,0.7);background:rgba(224,182,73,0.04);}\
+.ipad-nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(224,182,73,0.08);text-shadow:0 0 12px rgba(224,182,73,0.3);}\
+.ipad-nav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.25s;}\
+.ipad-nav-item:hover svg{transform:scale(1.1);}\
+.ipad-panel-label{display:none;font-size:10px;font-weight:800;letter-spacing:0.1em;color:var(--accent);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(224,182,73,0.15);text-transform:uppercase;}\
 @media (min-width:1024px) and (orientation:landscape){\
+.ipad-sidebar{display:flex!important;}\
 .tab-bar{display:none!important;}\
-body>.ipad-sidebar{display:flex!important;}\
-.screen{padding-bottom:0!important;}\
-.navbar{padding-left:72px!important;}\
-#screen-results>.scroll-content,#screen-prognose>.scroll-content{display:flex!important;flex-direction:row!important;gap:0!important;padding:0!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}\
-.ipad-left-panel{width:42%!important;padding:16px!important;overflow-y:auto!important;border-right:1px solid rgba(255,255,255,0.07)!important;height:100%!important;box-sizing:border-box!important;}\
-.ipad-right-panel{width:58%!important;padding:16px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;}\
-#match-list-container{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:14px!important;padding:16px!important;}\
-.ipad-panel-label{font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--accent);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.08);}\
-.ipad-sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:68px!important;background:var(--bg2)!important;border-right:1px solid rgba(255,255,255,0.07)!important;flex-direction:column!important;align-items:center!important;padding:20px 0 12px!important;gap:4px!important;z-index:200!important;box-shadow:4px 0 20px rgba(0,0,0,0.3)!important;}\
-.ipad-nav-item{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;padding:10px 0!important;width:100%!important;cursor:pointer!important;color:var(--muted)!important;font-size:9px!important;font-weight:700!important;letter-spacing:0.05em!important;transition:all 0.2s!important;border-left:2px solid transparent!important;text-transform:uppercase!important;}\
-.ipad-nav-item.active{color:var(--accent)!important;border-left-color:var(--accent)!important;background:rgba(224,182,73,0.07)!important;}\
-.ipad-nav-item svg{width:22px!important;height:22px!important;stroke:currentColor!important;fill:none!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important;}\
-.ipad-logo{font-size:11px;font-weight:900;color:var(--accent);letter-spacing:0.05em;margin-bottom:12px;}\
+.phone{max-width:none!important;width:100%!important;margin:0!important;border-radius:0!important;box-shadow:none!important;}\
+.screen{padding-bottom:0!important;min-height:100vh!important;}\
+.navbar{padding-left:84px!important;}\
+.scroll-content{padding-left:72px!important;}\
+.fab{right:20px!important;bottom:20px!important;}\
+#screen-results>.scroll-content{display:flex!important;flex-direction:row!important;padding:0 0 0 72px!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}\
+#screen-prognose>.scroll-content{display:flex!important;flex-direction:row!important;padding:0 0 0 72px!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}\
+.ipad-left-panel{width:44%!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;border-right:1px solid rgba(224,182,73,0.08)!important;background:rgba(0,0,0,0.15)!important;}\
+.ipad-right-panel{width:56%!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;}\
+.ipad-panel-label{display:block!important;}\
+#screen-matches>.scroll-content{padding-left:72px!important;}\
+#match-list-container{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:16px!important;padding:20px!important;}\
 }\
 ";
 document.head.appendChild(_st);
 })();const t=Pe();const[i,_refs,_matches]=await Promise.all([jt(),loadReferenceShooters(),Vt(),Promise.resolve()]);i?g=i:g={firstName:t.name||((s=t.email)==null?void 0:s.split("@")[0])||"",lastName:"",division:"",category:"",powerFactor:"",region:"",club:"",draw:null,reloadTime:null};refShooters=_refs;$=_matches;if($&&$.length>0){const a=new Date,n=$.filter(r=>r.status!=="finished"&&r.date);if(n.length>0){let r=n[0],u=Math.abs(new Date(n[0].date)-a);for(const m of n){const b=new Date(m.date),f=Math.abs(b-a);f<u&&(u=f,r=m)}R=r.id}}ke&&ke(),ke=qt(a=>{$=a,fe(),te()}),Zt(a=>{ee=a,Ye()}),e.innerHTML=`
 <div id="global-spinner" style="display:none;pointer-events:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;flex-direction:column;gap:14px;"><div class="spinner-ring"></div><div class="spinner-text" id="spinner-text"></div></div>
-<div class="phone">
-
-<!-- HOME -->
 <div class="ipad-sidebar" style="display:none;">
   <div class="ipad-logo">IC</div>
   <div class="ipad-nav-item active" id="ipad-nav-home" onclick="switchTab('screen-home')">
@@ -575,6 +580,9 @@ document.head.appendChild(_st);
     <span>Profile</span>
   </div>
 </div>
+<div class="phone">
+
+<!-- HOME -->
 <div class="screen active" id="screen-home">
  <div class="navbar">
  <div class="nav-title">I<span>D</span></div>

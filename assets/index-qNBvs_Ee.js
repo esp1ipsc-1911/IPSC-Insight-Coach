@@ -2478,13 +2478,12 @@ const Ft_en=`
       var importBtn=o("ess-import-btn");
       if(stageSelDiv&&stageChkDiv){
         var stageDefs2=icStageDefs(match);
-        stageChkDiv.innerHTML=allParsed.stages.map(function(sr){
-          var sdef=stageDefs2[sr.num-1]||stageDefs2.find(function(x){return x.number===sr.num;})||{};
-          var sname=sdef.name||("Stage "+sr.num);
-          return '<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;font-size:13px;">'
-            +'<input type="checkbox" value="'+sr.num+'" checked style="width:16px;height:16px;accent-color:var(--accent);">'
-            +'<span>S'+sr.num+' — '+sname
-            +(sr.hf>0?' <span style="color:var(--accent);font-size:11px;">HF '+sr.hf.toFixed(2)+'</span>':'')+"</span>"
+        stageChkDiv.innerHTML=stageDefs2.map(function(sdef,sidx){
+          var snum=sdef.number||(sidx+1);
+          var sname=sdef.name||("Stage "+snum);
+          return '<label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05);">'
+            +'<input type="checkbox" value="'+snum+'" style="width:16px;height:16px;accent-color:var(--accent);">'
+            +'<span><b style="color:var(--accent);">S'+snum+'</b> — '+sname+'</span>'
             +'</label>';
         }).join("");
         stageSelDiv.style.display="block";
@@ -2514,9 +2513,17 @@ async function essConfirmPaste(mode){
     // Filter to selected stages if mode==="selected"
     if(mode==="selected"){
       var chkBoxes=document.querySelectorAll("#ess-stage-checkboxes input[type=checkbox]:checked");
-      var selectedNums=Array.from(chkBoxes).map(function(cb){return parseInt(cb.value);});
+      var selectedNums=Array.from(chkBoxes).map(function(cb){return parseInt(cb.value);}).sort(function(a,b){return a-b;});
       if(!selectedNums.length){alert("No stages selected.");return;}
-      allParsed={shooterName:allParsed.shooterName,stages:allParsed.stages.filter(function(sr){return selectedNums.includes(sr.num);})};
+      if(selectedNums.length!==allParsed.stages.length){
+        if(selectedNums.length<allParsed.stages.length){
+          allParsed={shooterName:allParsed.shooterName,stages:allParsed.stages.slice(0,selectedNums.length).map(function(sr,i){return Object.assign({},sr,{num:selectedNums[i]});})};
+        } else {
+          allParsed={shooterName:allParsed.shooterName,stages:allParsed.stages.map(function(sr,i){return Object.assign({},sr,{num:selectedNums[i]});})};
+        }
+      } else {
+        allParsed={shooterName:allParsed.shooterName,stages:allParsed.stages.map(function(sr,i){return Object.assign({},sr,{num:selectedNums[i]});})};
+      }
     }
     var shooter=match.shooters?match.shooters.find(function(s){return s.id===selectedShooterId||(selectedShooterId==="me"&&s.isMe);}):null;
     if(!shooter){shooter=await icEnsureShooter(match,selectedShooterId||icCurrentShooterId());}

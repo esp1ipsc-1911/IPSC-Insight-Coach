@@ -506,7 +506,8 @@ html,body,*{background-color:inherit;font-family:-apple-system,BlinkMacSystemFon
 .prof-avatar-cam{position:absolute;bottom:0;left:0;right:0;height:26px;background:rgba(0,0,0,0.52);display:flex;align-items:center;justify-content:center;pointer-events:none;border-radius:0 0 50px 50px;}\
 .prof-avatar-cam svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}\
 /* === DROPDOWN === */\
-.match-dropdown{background:var(--card2)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;box-shadow:0 8px 32px rgba(0,0,0,0.5)!important;}\
+.match-chip-wrapper{position:relative!important;z-index:100!important;}\
+match-dropdown{background:var(--card2)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;box-shadow:0 8px 32px rgba(0,0,0,0.5)!important;z-index:1000!important;position:absolute!important;left:0!important;right:0!important;top:100%!important;}\
 .match-dropdown-item{border-bottom:1px solid var(--border)!important;padding:11px 14px!important;}\
 .match-dropdown-item.active{background:var(--accent-fade)!important;}\
 .match-dropdown-dot{width:7px!important;height:7px!important;border-radius:50%!important;background:var(--accent)!important;flex-shrink:0!important;}\
@@ -542,7 +543,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .phone{max-width:none!important;width:100vw!important;margin:0!important;border-radius:0!important;box-shadow:none!important;}\
 .screen{padding-bottom:0!important;min-height:100vh!important;width:100vw!important;}\
 .screen.active{display:flex!important;flex-direction:column!important;}\
-.navbar{padding-left:88px!important;background:rgba(10,12,15,0.95)!important;backdrop-filter:blur(12px)!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;width:100%!important;box-sizing:border-box!important;}\
+.navbar{padding-left:88px!important;background:rgba(10,12,15,0.95)!important;backdrop-filter:blur(12px)!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;width:100%!important;box-sizing:border-box!important;z-index:50!important;position:relative!important;}\
 .scroll-content{padding-left:0!important;flex:1!important;width:100%!important;box-sizing:border-box!important;}\
 .fab{right:24px!important;bottom:24px!important;box-shadow:0 4px 24px rgba(224,182,73,0.35)!important;}\
 .ipad-panel-label{display:block!important;}\

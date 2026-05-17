@@ -550,12 +550,11 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 #home-content{width:100%!important;display:flex!important;flex-direction:row!important;height:100%!important;}\
 .ipad-home-left{width:40%!important;min-width:280px!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;border-right:1px solid rgba(255,255,255,0.06)!important;background:rgba(0,0,0,0.2)!important;}\
 .ipad-home-right{flex:1!important;min-width:0!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;}\
-#screen-results>.scroll-content{display:flex!important;flex-direction:row!important;padding:0 0 0 72px!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}\
+#screen-results>.scroll-content{padding:0 0 0 72px!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}\
 #results-content{display:flex!important;flex-direction:row!important;width:100%!important;height:100%!important;}\
-.ipad-live-left{width:38%!important;min-width:280px!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;border-right:1px solid rgba(224,182,73,0.08)!important;background:rgba(0,0,0,0.15)!important;}\
+.ipad-live-left{width:36%!important;min-width:260px!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;border-right:1px solid rgba(224,182,73,0.08)!important;background:rgba(0,0,0,0.15)!important;}\
 .ipad-live-right{flex:1!important;min-width:0!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;}\
-.ipad-live-right .mu-wrap{display:block!important;}\
-.ipad-live-right>div:first-child{margin-top:0!important;}\
+.ipad-live-right .mu-wrap{display:block!important;margin-top:0!important;}\
 #screen-prognose>.scroll-content{display:flex!important;flex-direction:row!important;padding:0 0 0 72px!important;overflow:hidden!important;height:calc(100vh - 56px)!important;}\
 .ipad-left-panel{width:42%!important;min-width:260px!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;border-right:1px solid rgba(224,182,73,0.08)!important;background:rgba(0,0,0,0.2)!important;}\
 .ipad-right-panel{flex:1!important;min-width:0!important;padding:20px!important;overflow-y:auto!important;height:100%!important;box-sizing:border-box!important;}\
@@ -723,14 +722,7 @@ document.head.appendChild(_st);
  <div class="nav-avatar" id="nav-av-results" onclick="switchTab('screen-profile')">${le()}</div>
  </div>
  <div class="scroll-content">
-  <div class="ipad-left-panel">
-   <div class="ipad-panel-label">STAGE RESULTS</div>
-   <div id="results-content"></div>
-  </div>
-  <div class="ipad-right-panel" id="results-right-panel" style="display:none;">
-   <div class="ipad-panel-label">LIVE STATISTICS</div>
-   <div id="results-stats-panel"></div>
-  </div>
+  <div id="results-content"></div>
  </div>
  <div class="tab-bar">
  <div class="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></div><span class="lang-home">${d("home")}</span></div>

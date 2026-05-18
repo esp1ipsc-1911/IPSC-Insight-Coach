@@ -905,27 +905,7 @@
       <div id="stageList" class="stage-list"></div>
       <div class="form-actions" style="margin-top:12px;">
         <button id="addStageBtn" class="btn btn-primary">+ Ny stage</button>
-        <button id="importStagesBtn" class="btn btn-secondary">📋 Importer stages</button>
         <button id="saveStagesBtn" class="btn btn-secondary">Lagre stages</button>
-      </div>
-
-      <!-- Import stages panel -->
-      <div id="importStagesPanel" style="display:none; margin-top:16px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:18px;">
-        <div style="font-size:14px; font-weight:700; margin-bottom:8px; color:var(--text);">Importer stages fra tabell</div>
-        <div style="font-size:12px; color:var(--muted); margin-bottom:12px; line-height:1.6;">
-          Lim inn tabelldata kopiert fra Word, Excel eller nettside.<br>
-          Forventet format per linje: <code style="background:var(--bg2);padding:2px 6px;border-radius:4px;color:var(--accent);">Stage  Paper targets  Poppers  Steel plates</code>
-        </div>
-        <textarea id="importStagesInput" class="form-input" rows="10" placeholder="1	5	4	0&#10;2	8	4	1&#10;3	4	2	2" style="font-family:monospace; font-size:13px; width:100%; resize:vertical;"></textarea>
-        <div id="importStagesPreview" style="margin-top:10px; font-size:12px; color:var(--muted);"></div>
-        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
-          <button id="confirmImportStagesBtn" class="btn btn-primary">Importer stages</button>
-          <button id="cancelImportStagesBtn" class="btn btn-secondary">Avbryt</button>
-          <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); cursor:pointer; margin-left:auto;">
-            <input type="checkbox" id="importStagesReplace" style="accent-color:var(--accent);" />
-            Erstatt eksisterende stages
-          </label>
-        </div>
       </div>
 
       <div class="form-actions">
@@ -1817,6 +1797,44 @@
       }
     };
 
+    async function syncParticipantsToShooters(match) {
+      const participants = Array.isArray(match.participants) ? match.participants : [];
+      const shooters = Array.isArray(match.shooters) ? match.shooters : [];
+      const existingIds = new Set(shooters.map(s => String(s.id)));
+
+      const missing = participants.filter(uid => !existingIds.has(String(uid)));
+      if (!missing.length) return false;
+
+      const newShooters = [...shooters];
+      for (const uid of missing) {
+        try {
+          const userSnap = await getDoc(doc(db, 'users', uid));
+          if (userSnap.exists()) {
+            const u = userSnap.data();
+            newShooters.push({
+              id: uid,
+              isMe: uid === match.ownerId,
+              firstName: u.firstName || '',
+              lastName: u.lastName || '',
+              division: u.division || 'Classic',
+              pf: u.powerFactor || 'minor',
+              club: u.club || '',
+              stages: []
+            });
+          }
+        } catch (e) {
+          console.warn('syncParticipantsToShooters: could not fetch user', uid, e);
+        }
+      }
+
+      if (newShooters.length > shooters.length) {
+        await setDoc(doc(db, 'matches', String(match.id)), { shooters: newShooters, updatedAt: new Date().toISOString() }, { merge: true });
+        match.shooters = newShooters;
+        return true;
+      }
+      return false;
+    }
+
     window.openMatchAdmin = async (matchId) => {
       const match = allMatchesCache.find(m => String(m.id) === String(matchId));
       if (!match) {
@@ -1841,6 +1859,17 @@
       renderParticipants();
       renderStages();
       $('matchModal').classList.add('open');
+
+      // Sync participants → shooters i bakgrunnen
+      try {
+        const synced = await syncParticipantsToShooters(currentMatch);
+        if (synced) {
+          showMatchSuccess('Deltakere synkronisert som skyttere');
+          await loadMatches();
+        }
+      } catch (e) {
+        console.warn('syncParticipantsToShooters feil:', e);
+      }
     };
 
     function renderParticipants() {
@@ -1918,8 +1947,12 @@
         await updateDoc(doc(db, 'matches', String(currentMatch.id)), { participants: arrayUnion(userId) });
         currentMatch.participants = [...(currentMatch.participants || []), userId];
         renderParticipants();
+
+        // Sync den nye deltakeren som skytter umiddelbart
+        await syncParticipantsToShooters(currentMatch);
+
         await loadMatches();
-        showMatchSuccess('Bruker lagt til i matchen');
+        showMatchSuccess('Bruker lagt til i matchen og synkronisert som skytter');
       } catch (error) {
         showMatchError('Kunne ikke legge til deltaker: ' + error.message);
       }
@@ -2046,70 +2079,6 @@
       currentMatchStages.push(normalizeStage({}, currentMatchStages.length));
       renderStages();
     };
-
-    $('importStagesBtn').onclick = () => {
-      const panel = $('importStagesPanel');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      if (panel.style.display === 'block') {
-        $('importStagesInput').value = '';
-        $('importStagesPreview').textContent = '';
-        $('importStagesInput').focus();
-      }
-    };
-
-    $('importStagesInput').addEventListener('input', () => {
-      const parsed = parseStageTable($('importStagesInput').value);
-      const preview = $('importStagesPreview');
-      if (parsed.length === 0) {
-        preview.textContent = '';
-      } else {
-        preview.innerHTML = '<span style="color:var(--green);">✓ ' + parsed.length + ' stage' + (parsed.length !== 1 ? 'r' : '') + ' klar til import</span>' +
-          parsed.map(s => '<div style="margin-top:4px;color:var(--text);">Stage ' + s.number + ': ' + s.paperTargets + ' paper, ' + s.poppers + ' poppers, ' + s.plates + ' plates</div>').join('');
-      }
-    });
-
-    $('cancelImportStagesBtn').onclick = () => {
-      $('importStagesPanel').style.display = 'none';
-    };
-
-    $('confirmImportStagesBtn').onclick = () => {
-      const parsed = parseStageTable($('importStagesInput').value);
-      if (parsed.length === 0) {
-        $('importStagesPreview').innerHTML = '<span style="color:var(--red);">Ingen gyldige stages funnet. Sjekk formatet.</span>';
-        return;
-      }
-      const replace = $('importStagesReplace').checked;
-      if (replace) {
-        currentMatchStages = parsed;
-      } else {
-        const offset = currentMatchStages.length;
-        parsed.forEach((s, i) => {
-          s.number = offset + i + 1;
-          s.name = 'Stage ' + (offset + i + 1);
-          currentMatchStages.push(s);
-        });
-      }
-      $('importStagesPanel').style.display = 'none';
-      renderStages();
-      showMatchSuccess(parsed.length + ' stage' + (parsed.length !== 1 ? 'r' : '') + ' importert');
-    };
-
-    function parseStageTable(raw) {
-      const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
-      const stages = [];
-      for (const line of lines) {
-        const cols = line.split(/\t|  +/).map(c => c.trim()).filter(c => c !== '');
-        if (cols.length < 2) continue;
-        const stageNum = parseInt(cols[0], 10);
-        if (isNaN(stageNum) || stageNum <= 0) continue;
-        const paper   = parseInt(cols[1] || '0', 10) || 0;
-        const poppers = parseInt(cols[2] || '0', 10) || 0;
-        const plates  = parseInt(cols[3] || '0', 10) || 0;
-        const s = normalizeStage({ number: stageNum, name: 'Stage ' + stageNum, paperTargets: paper, poppers: poppers, plates: plates }, stages.length);
-        stages.push(s);
-      }
-      return stages;
-    }
 
     window.updateStageField = (index, field, value) => {
       if (!currentMatchStages[index]) return;

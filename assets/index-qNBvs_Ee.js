@@ -238,7 +238,7 @@ e.innerHTML=`
  .modal-body { display: flex; flex-direction: column; gap: 14px; }
  .field-group { display: flex; flex-direction: column; gap: 6px; }
  .field-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
- .field-input { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 14px; width: 100%; }
+ .field-input { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 14px; width: 100%; box-sizing: border-box; }
  .field-select { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 14px; width: 100%; }
  .field-input:focus, .field-select:focus { outline: none; border-color: var(--accent); }
 </style>
@@ -271,12 +271,6 @@ e.innerHTML=`
    <!-- LOGIN SECTION -->
    <form id="loginSection" class="login-section active" onsubmit="return false;" autocomplete="on">
     
- <div class="field-group" style="margin-top:12px;">
-  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 0;">
-   <input type="checkbox" id="stage-single-shot" style="width:18px;height:18px;accent-color:var(--accent);">
-   <span style="font-size:14px;font-weight:600;">Single shot per paper target</span>
-  </label>
- </div>
  <div class="field-group">
      <div class="field-lbl" id="loginEmailLabel">
       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>Email
@@ -990,7 +984,7 @@ document.head.appendChild(_st);
  </div>
  <input type="hidden" id="edit-match-stages" value="0">
  <div style="margin-top:10px;">
- <button class="btn-primary" onclick="openCreateStageFromEdit()" style="width:100%;>+ Stage</button>
+ <button class="btn-primary" onclick="openCreateStageFromEdit()" style="width:100%;">+ Stage</button>
  </div>
  <div class="field-group">
  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
@@ -1345,7 +1339,7 @@ document.head.appendChild(_st);
 </div>
   <div></div>
  </div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button onclick="deleteCurrentStage()" style="padding:14px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:12px;color:#f87171;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;">DELETE STAGE</button><button class="btn-primary" onclick="saveStage()" style="margin-top:0;">${d("save")}</button></div>
+ <div class="field-group" style="margin-top:4px;"><label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 0;"><input type="checkbox" id="stage-single-shot" style="width:18px;height:18px;accent-color:var(--accent);"><span style="font-size:14px;font-weight:600;">Single shot per paper target</span></label></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button onclick="deleteCurrentStage()" style="padding:14px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:12px;color:#f87171;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;">DELETE STAGE</button><button class="btn-primary" onclick="saveStage()" style="margin-top:0;">${d("save")}</button></div>
  </div>
  </div>
 </div>

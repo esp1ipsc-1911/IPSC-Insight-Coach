@@ -902,6 +902,21 @@
       <div id="matchUserSearchResults" style="margin-top:14px;"></div>
 
       <div class="section-title">Stages / scoring-oppsett</div>
+
+      <div id="stageImportBox" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px;">📋 Importer stages fra tekst</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+          Lim inn tabelldata kopiert fra Word, PDF eller Excel. Én rad per stage.<br>
+          Forventet format: <span style="color:var(--text);font-family:monospace;">Stage &nbsp; Paper targets &nbsp; Poppers &nbsp; Steel plates</span>
+        </div>
+        <textarea id="stageImportText" class="form-textarea" style="min-height:120px;font-family:monospace;font-size:13px;" placeholder="1&#9;5&#9;4&#9;0&#10;2&#9;8&#9;4&#9;1&#10;3&#9;4&#9;2&#9;2"></textarea>
+        <div style="display:flex;gap:10px;margin-top:10px;align-items:center;">
+          <button id="parseStagesBtn" class="btn btn-primary">Generer stages fra tekst</button>
+          <button id="clearImportBtn" class="btn btn-secondary btn-sm" style="min-height:36px;">Tøm</button>
+          <span id="stageImportFeedback" style="font-size:12px;color:var(--green);display:none;"></span>
+        </div>
+      </div>
+
       <div id="stageList" class="stage-list"></div>
       <div class="form-actions" style="margin-top:12px;">
         <button id="addStageBtn" class="btn btn-primary">+ Ny stage</button>
@@ -2231,6 +2246,72 @@
     $('matchModal').addEventListener('click', (e) => {
       if (e.target === $('matchModal')) $('closeMatchModalBtn').click();
     });
+
+    // ── Stage import from pasted text ──────────────────────────────────
+    function parseStageText(raw) {
+      const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+      const stages = [];
+
+      for (const line of lines) {
+        // Split on tabs, multiple spaces, or semicolons
+        const cols = line.split(/\t|;|(?:\s{2,})/).map(c => c.trim()).filter(Boolean);
+
+        // Need at least 4 columns: stage#, paper, poppers, plates
+        if (cols.length < 4) continue;
+
+        // Skip header rows (first cell is not a number)
+        const stageNum = parseInt(cols[0], 10);
+        if (!Number.isFinite(stageNum) || stageNum <= 0) continue;
+
+        const paper   = parseInt(cols[1], 10) || 0;
+        const poppers = parseInt(cols[2], 10) || 0;
+        const plates  = parseInt(cols[3], 10) || 0;
+
+        stages.push(normalizeStage({
+          number:        stageNum,
+          name:          'Stage ' + stageNum,
+          paperTargets:  paper,
+          poppers:       poppers,
+          plates:        plates,
+          shotsPerPaper: 2
+        }, stageNum - 1));
+      }
+
+      return stages;
+    }
+
+    $('parseStagesBtn').onclick = () => {
+      const raw = $('stageImportText').value;
+      const feedback = $('stageImportFeedback');
+
+      if (!raw.trim()) {
+        feedback.textContent = 'Lim inn tekst først.';
+        feedback.style.color = 'var(--red)';
+        feedback.style.display = 'inline';
+        return;
+      }
+
+      const parsed = parseStageText(raw);
+      if (!parsed.length) {
+        feedback.textContent = 'Fant ingen gyldige stage-rader. Sjekk formatet.';
+        feedback.style.color = 'var(--red)';
+        feedback.style.display = 'inline';
+        return;
+      }
+
+      currentMatchStages = parsed;
+      renderStages();
+
+      feedback.textContent = '\u2713 ' + parsed.length + ' stages generert — husk å trykke «Lagre stages»';
+      feedback.style.color = 'var(--green)';
+      feedback.style.display = 'inline';
+      setTimeout(() => { feedback.style.display = 'none'; }, 5000);
+    };
+
+    $('clearImportBtn').onclick = () => {
+      $('stageImportText').value = '';
+      $('stageImportFeedback').style.display = 'none';
+    };
   </script>
 </body>
 </html>

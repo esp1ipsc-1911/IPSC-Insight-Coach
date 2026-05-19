@@ -594,6 +594,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 #screen-profile .profile-badges{justify-content:center!important;}\
 #screen-profile .btn-primary{width:100%!important;}\
 #screen-matches>.scroll-content{padding-left:72px!important;}\
+#screen-teams>.scroll-content{padding-left:72px!important;}\
 #match-list-container{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))!important;gap:16px!important;padding:20px!important;}\
 .standings-table,table{width:100%!important;}\
 }\

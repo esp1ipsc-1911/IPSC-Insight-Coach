@@ -228,6 +228,19 @@ e.innerHTML=`
  .gdpr-modal-inner p, .gdpr-modal-inner li { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
  .gdpr-modal-inner ul { padding-left: 16px; margin: 4px 0; }
  .gdpr-close { width: 100%; margin-top: 18px; padding: 12px; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: #0a0c0f; border: none; border-radius: 10px; font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+
+ .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; align-items: flex-end; justify-content: center; padding: 0; }
+ .modal-overlay.open { display: flex; }
+ .modal-sheet { background: var(--card); border-top: 2px solid var(--accent); border-radius: 20px 20px 0 0; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 20px 20px 40px; }
+ .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+ .modal-title { font-size: 13px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+ .modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 4px 8px; }
+ .modal-body { display: flex; flex-direction: column; gap: 14px; }
+ .field-group { display: flex; flex-direction: column; gap: 6px; }
+ .field-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+ .field-input { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 14px; width: 100%; }
+ .field-select { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 14px; width: 100%; }
+ .field-input:focus, .field-select:focus { outline: none; border-color: var(--accent); }
 </style>
 
 <div class="login-page" id="loginPage">

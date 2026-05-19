@@ -2253,8 +2253,21 @@
       const stages = [];
 
       for (const line of lines) {
-        // Split on tabs, multiple spaces, or semicolons
-        const cols = line.split(/\t|;|(?:\s{2,})/).map(c => c.trim()).filter(Boolean);
+        // Strip markdown pipe-table pipes and collapse
+        let cleaned = line;
+        if (cleaned.startsWith('|')) cleaned = cleaned.slice(1);
+        if (cleaned.endsWith('|')) cleaned = cleaned.slice(0, -1);
+
+        // Skip separator rows like |---|---|
+        if (/^[-|\s:]+$/.test(cleaned)) continue;
+
+        // Split on pipe (markdown table), tabs, multiple spaces, or semicolons
+        let cols;
+        if (line.includes('|')) {
+          cols = cleaned.split('|').map(c => c.trim()).filter(Boolean);
+        } else {
+          cols = cleaned.split(/\t|;|(?:\s{2,})/).map(c => c.trim()).filter(Boolean);
+        }
 
         // Need at least 4 columns: stage#, paper, poppers, plates
         if (cols.length < 4) continue;

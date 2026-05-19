@@ -120,7 +120,8 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
   i.querySelectorAll("[data-edit-id]").forEach(s=>{s.onclick=()=>{
     var form=document.getElementById("edit-shooter-form-"+s.dataset.editId);
     if(form){form.style.display=form.style.display==="none"?"block":"none";s.textContent=form.style.display==="block"?"Close":"Edit";}
-  }})}async function saveEditShooter(shooterId){
+  }})};
+async function saveEditShooter(shooterId){
   const match=$.find(m=>m.id!=null&&m.id.toString()===String(R));
   if(!match||!match.shooters)return;
   const s=match.shooters.find(x=>x.id===shooterId);

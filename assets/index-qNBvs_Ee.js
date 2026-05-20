@@ -130,10 +130,9 @@ function icRenderEditMatchShootersList(e){
     return;
   }
   i.innerHTML=t.map(function(s){
-    var fn=s.firstName||""; var ln=s.lastName||"";
+    var fn=s.firstName||"";var ln=s.lastName||"";
     var a=[fn,ln].join(" ").trim()||"Shooter";
-    var n=s.division||"-"; var pf=s.pf||"minor";
-    var r=pf.toUpperCase();
+    var n=s.division||"-";var pf=s.pf||"minor";var r=pf.toUpperCase();
     var h='';
     h+='<div style="padding:12px;background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">';

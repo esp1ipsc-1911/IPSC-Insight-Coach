@@ -116,71 +116,7 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
  <button class="gdpr-btn gdpr-btn-accept">Accept and Continue</button>
  </div>
  </div>
- `,document.body.appendChild(s);const a=s.querySelector(".gdpr-close-btn"),n=s.querySelector(".gdpr-btn-accept"),r=s.querySelector(".gdpr-btn-decline"),u=s.querySelector(".gdpr-modal-overlay"),m=()=>{s.remove()};a.addEventListener("click",()=>{m(),i&&i()}),u.addEventListener("click",()=>{m(),i&&i()}),r.addEventListener("click",()=>{m(),i&&i()}),n.addEventListener("click",()=>{m(),e&&e()}),document.body.style.overflow="hidden";const b=m,f=()=>{document.body.style.overflow="",b()};a.onclick=()=>{f(),i&&i()},u.onclick=()=>{f(),i&&i()},r.onclick=()=>{f(),i&&i()},n.onclick=()=>{f(),e&&e()}}function Rt(){const e=document.createElement("div");return e.className="gdpr-checkbox-container";e.style.cssText="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;margin-bottom:16px;",function icRenderEditMatchShootersList(e){const i=o("edit-match-shooters-list");if(!i||!e)return;const t=(e.shooters||[]).filter(s=>!(s!=null&&s.isMe));if(!t.length){i.innerHTML=`<div style="padding:12px;background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--muted);font-size:13px;">No additional shooters have been added.</div>`;return}i.innerHTML=t.map(s=>{const a=[s.firstName||"",s.lastName||""].join(" ").trim()||"Ukjent skytter",n=s.division||"—",r=(s.pf||"minor").toUpperCase();return `<div style="padding:12px;background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;"><div><div style="font-weight:600;">${a}</div><div style="font-size:12px;color:var(--muted);">${n} · ${r}</div></div><div style="display:flex;gap:8px;"><button type="button" style="background:rgba(224,182,73,0.12);border:1px solid rgba(224,182,73,0.3);border-radius:8px;padding:8px 12px;cursor:pointer;color:var(--accent);font-size:12px;font-weight:600;" data-edit-id="${s.id}">Edit</button><button type="button" class="btn-secondary" style="border:none;border-radius:8px;padding:8px 12px;cursor:pointer;" data-shooter-id="${s.id}">Delete</button></div></div><div id="edit-shooter-form-${s.id}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">First name</div><input id="ef-fn-${s.id}" value="${s.firstName||''}" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div><div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Last name</div><input id="ef-ln-${s.id}" value="${s.lastName||''}" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div><div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Division</div><input id="ef-div-${s.id}" value="${s.division||''}" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div><div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Power factor</div><select id="ef-pf-${s.id}" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"><option value="minor" ${(s.pf||'minor')==='minor'?'selected':''}>Minor</option><option value="major" ${(s.pf||'minor')==='major'?'selected':''}>Major</option></select></div></div><button onclick="window.saveEditShooter('${s.id}')" style="margin-top:8px;width:100%;padding:8px;background:var(--accent);color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">Save</button></div></div>`}).join(""),i.querySelectorAll("[data-shooter-id]").forEach(s=>{s.onclick=()=>removeEditMatchShooter(s.dataset.shooterId)});
-  i.querySelectorAll("[data-edit-id]").forEach(s=>{s.onclick=()=>{
-    var form=document.getElementById("edit-shooter-form-"+s.dataset.editId);
-    if(form){form.style.display=form.style.display==="none"?"block":"none";s.textContent=form.style.display==="block"?"Close":"Edit";}
-  }})};
-window.icRenderEditMatchShootersList=icRenderEditMatchShootersList;
-function icRenderEditMatchShootersList(e){
-  var i=document.getElementById("edit-match-shooters-list");
-  if(!i||!e)return;
-  var t=(e.shooters||[]).filter(function(s){return!(s&&s.isMe);});
-  if(!t.length){
-    i.innerHTML='<div style="padding:12px;background:var(--bg);color:var(--muted);font-size:13px;">No additional shooters have been added.</div>';
-    return;
-  }
-  i.innerHTML=t.map(function(s){
-    var fn=s.firstName||"";var ln=s.lastName||"";
-    var a=[fn,ln].join(" ").trim()||"Shooter";
-    var n=s.division||"-";var pf=s.pf||"minor";var r=pf.toUpperCase();
-    var h='';
-    h+='<div style="padding:12px;background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">';
-    h+='<div><div style="font-weight:600;">'+a+'</div><div style="font-size:12px;color:var(--muted);">'+n+' \xc2\xb7 '+r+'</div></div>';
-    h+='<div style="display:flex;gap:8px;">';
-    h+='<button type="button" data-edit-id="'+s.id+'" style="background:rgba(224,182,73,0.12);border:1px solid rgba(224,182,73,0.3);border-radius:8px;padding:8px 12px;cursor:pointer;color:var(--accent);font-size:12px;font-weight:600;">Edit</button>';
-    h+='<button type="button" data-shooter-id="'+s.id+'" class="btn-secondary" style="border:none;border-radius:8px;padding:8px 12px;cursor:pointer;">Delete</button>';
-    h+='</div></div>';
-    h+='<div id="edit-shooter-form-'+s.id+'" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);">';
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
-    h+='<div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">First name</div><input id="ef-fn-'+s.id+'" value="'+fn+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div>';
-    h+='<div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Last name</div><input id="ef-ln-'+s.id+'" value="'+ln+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div>';
-    h+='<div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Division</div><input id="ef-div-'+s.id+'" value="'+(s.division||"")+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div>';
-    h+='<div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Power factor</div><select id="ef-pf-'+s.id+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;">';
-    h+='<option value="minor"'+(pf==="minor"?" selected":"")+'>Minor</option>';
-    h+='<option value="major"'+(pf==="major"?" selected":"")+'>Major</option>';
-    h+='</select></div></div>';
-    h+='<button data-save-id="'+s.id+'" style="margin-top:8px;width:100%;padding:8px;background:var(--accent);color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">Save</button>';
-    h+='</div></div>';
-    return h;
-  }).join("");
-  i.querySelectorAll("[data-shooter-id]").forEach(function(x){x.onclick=function(){removeEditMatchShooter(x.dataset.shooterId);};});
-  i.querySelectorAll("[data-edit-id]").forEach(function(x){x.onclick=function(){var f=document.getElementById("edit-shooter-form-"+x.dataset.editId);if(f){f.style.display=f.style.display==="none"?"block":"none";x.textContent=f.style.display==="block"?"Close":"Edit";}};});
-  i.querySelectorAll("[data-save-id]").forEach(function(x){x.onclick=function(){window.saveEditShooter(x.dataset.saveId);};});
-}
-window.icRenderEditMatchShootersList=icRenderEditMatchShootersList;
-
-async function saveEditShooter(shooterId){
-  const match=$.find(m=>m.id!=null&&m.id.toString()===String(R));
-  if(!match||!match.shooters)return;
-  const s=match.shooters.find(x=>x.id===shooterId);
-  if(!s)return;
-  const fn=document.getElementById("ef-fn-"+shooterId);
-  const ln=document.getElementById("ef-ln-"+shooterId);
-  const div=document.getElementById("ef-div-"+shooterId);
-  const pf=document.getElementById("ef-pf-"+shooterId);
-  if(fn)s.firstName=fn.value.trim();
-  if(ln)s.lastName=ln.value.trim();
-  if(div)s.division=div.value.trim();
-  if(pf)s.pf=pf.value;
-  try{
-    await de(U(O,"matches",match.id),{shooters:match.shooters});
-    icRenderEditMatchShootersList(match);
-  }catch(e){alert("Could not save: "+e.message);}
-}
-window.saveEditShooter=saveEditShooter;
-e.innerHTML=`
+ `,document.body.appendChild(s);const a=s.querySelector(".gdpr-close-btn"),n=s.querySelector(".gdpr-btn-accept"),r=s.querySelector(".gdpr-btn-decline"),u=s.querySelector(".gdpr-modal-overlay"),m=()=>{s.remove()};a.addEventListener("click",()=>{m(),i&&i()}),u.addEventListener("click",()=>{m(),i&&i()}),r.addEventListener("click",()=>{m(),i&&i()}),n.addEventListener("click",()=>{m(),e&&e()}),document.body.style.overflow="hidden";const b=m,f=()=>{document.body.style.overflow="",b()};a.onclick=()=>{f(),i&&i()},u.onclick=()=>{f(),i&&i()},r.onclick=()=>{f(),i&&i()},n.onclick=()=>{f(),e&&e()}}function Rt(){const e=document.createElement("div");return e.className="gdpr-checkbox-container";e.style.cssText="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;margin-bottom:16px;"e.innerHTML=`
  <label class="gdpr-checkbox-label">
  <input type="checkbox" id="gdpr-consent-checkbox" class="gdpr-checkbox" required>
  <span class="gdpr-checkbox-text">
@@ -1476,7 +1412,43 @@ window.icOpenEditStageResult=icOpenEditStageResult;function icPopulateTeamCountr
     el.appendChild(opt);
   });
 }
-window.icPopulateTeamCountry=icPopulateTeamCountry,window.deleteCurrentStage=deleteCurrentStage,window.openInviteUser=ks,window.openInvitationsModal=Is,window.acceptInvitation=Cs,window.declineInvitation=_s,window.searchUsers=xs,window.toggleUserSelection=Ss,window.sendMultipleInvitations=Ls,window.searchUsersNewMatch=Ps,window.toggleUserNewMatch=Es,window.searchUsersEditMatch=Ts,window.toggleUserEditMatch=Ms,window.confirmDeleteMatch=gs,window.deleteMatchConfirmed=vs,window.uploadAndScanResult=Hs,window.saveOCRResult=Gs,window.icOpenManualResult=icOpenManualResult,window.importESSVerify=importESSVerify,window.essConfirmPaste=essConfirmPaste;window.essSelectAllStages=essSelectAllStages,window.openCreateStageFromUpload=Us,window.toggleMatchDropdown=ds,window.selectMatchFromDropdown=cs,window.toggleReferenceShootersEnabled=toggleReferenceShootersEnabled,window.toggleReferenceShooterChoice=toggleReferenceShooterChoice,window.updateReferenceShooterOverride=updateReferenceShooterOverride,window.toggleLiveFilter=toggleLiveFilter,window.toggleTips=toggleTips,window.deleteRun=deleteRun,window.openCreateTeam=openCreateTeam,window.editTeam=editTeam,window.deleteTeam=deleteTeam,window.saveTeam=saveTeam,window.renderTeamsScreen=renderTeamsScreen;window.toggleTeamDetail=toggleTeamDetail;window.toggleDQ=toggleDQ;window.refreshFromFirebase=refreshFromFirebase;window.uploadProfilePhoto=uploadProfilePhoto;window.saveEditShooter=saveEditShooter}async function refreshFromFirebase(){const btns=document.querySelectorAll('.nav-refresh-btn');btns.forEach(function(b){b.classList.add('spinning');b.disabled=true;});try{const results=await Promise.all([jt(),loadReferenceShooters(),Vt()]);const newProfile=results[0];const newRefs=results[1];const newMatches=results[2];if(newProfile){g=newProfile;}refShooters=newRefs;$=newMatches;if($&&$.length>0&&R){const still=$.find(function(m){return m.id!=null&&m.id.toString()===String(R);});if(!still){R=null;}}if($&&$.length>0&&!R){const now=new Date();const active=$.filter(function(m){return m.status!=='finished'&&m.date;});if(active.length>0){let best=active[0];let bestDiff=Math.abs(new Date(active[0].date)-now);for(const m of active){const diff=Math.abs(new Date(m.date)-now);if(diff<bestDiff){bestDiff=diff;best=m;}}R=best.id;}}const screens=document.querySelectorAll('.screen.active');const activeId=screens.length>0?screens[0].id:null;try{gt();}catch(e){}try{fe();}catch(e){}try{te();}catch(e){}try{_e();}catch(e){}try{De();}catch(e){}try{vt();}catch(e){}if(activeId==='screen-teams'){try{renderTeamsScreen();}catch(e){}}if(R){try{pt(R);}catch(e){}}}catch(err){console.error('refreshFromFirebase error:',err);}finally{btns.forEach(function(b){b.classList.remove('spinning');b.disabled=false;});}}function toggleTeamDetail(el){var id=el.dataset?el.dataset.tid:el;var row=document.getElementById(id);if(row)row.style.display=row.style.display==='none'?'table-row':'none';}
+window.icPopulateTeamCountry=icPopulateTeamCountry,window.deleteCurrentStage=deleteCurrentStage,window.openInviteUser=ks,window.openInvitationsModal=Is,window.acceptInvitation=Cs,window.declineInvitation=_s,window.searchUsers=xs,window.toggleUserSelection=Ss,window.sendMultipleInvitations=Ls,window.searchUsersNewMatch=Ps,window.toggleUserNewMatch=Es,window.searchUsersEditMatch=Ts,window.toggleUserEditMatch=Ms,window.confirmDeleteMatch=gs,window.deleteMatchConfirmed=vs,window.uploadAndScanResult=Hs,window.saveOCRResult=Gs,window.icOpenManualResult=icOpenManualResult,window.importESSVerify=importESSVerify,window.essConfirmPaste=essConfirmPaste;window.essSelectAllStages=essSelectAllStages,window.openCreateStageFromUpload=Us,window.toggleMatchDropdown=ds,window.selectMatchFromDropdown=cs,window.toggleReferenceShootersEnabled=toggleReferenceShootersEnabled,window.toggleReferenceShooterChoice=toggleReferenceShooterChoice,window.updateReferenceShooterOverride=updateReferenceShooterOverride,window.toggleLiveFilter=toggleLiveFilter,window.toggleTips=toggleTips,window.deleteRun=deleteRun,window.openCreateTeam=openCreateTeam,window.editTeam=editTeam,window.deleteTeam=deleteTeam,window.saveTeam=saveTeam,window.renderTeamsScreen=renderTeamsScreen;window.toggleTeamDetail=toggleTeamDetail;window.toggleDQ=toggleDQ;window.refreshFromFirebase=refreshFromFirebase;window.uploadProfilePhoto=uploadProfilePhoto}
+async function saveEditShooter(shooterId){
+  const match=$.find(m=>m.id!=null&&m.id.toString()===String(R));
+  if(!match||!match.shooters)return;
+  const s=match.shooters.find(x=>x.id===shooterId);
+  if(!s)return;
+  const fn=document.getElementById("ef-fn-"+shooterId);
+  const ln=document.getElementById("ef-ln-"+shooterId);
+  const dv=document.getElementById("ef-div-"+shooterId);
+  const pf=document.getElementById("ef-pf-"+shooterId);
+  if(fn)s.firstName=fn.value.trim();
+  if(ln)s.lastName=ln.value.trim();
+  if(dv)s.division=dv.value.trim();
+  if(pf)s.pf=pf.value;
+  try{
+    await Ee(match.id,{shooters:match.shooters});
+    icRenderEditMatchShootersList(match);
+  }catch(e){alert("Could not save: "+e.message);}
+}
+window.saveEditShooter=saveEditShooter;
+function icRenderEditMatchShootersList(e){
+  const i=document.getElementById("edit-match-shooters-list");
+  if(!i||!e)return;
+  const t=(e.shooters||[]).filter(s=>!(s!=null&&s.isMe));
+  if(!t.length){i.innerHTML='<div style="padding:12px;background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--muted);font-size:13px;">No additional shooters have been added.</div>';return;}
+  i.innerHTML=t.map(s=>{
+    const a=[s.firstName||"",s.lastName||""].join(" ").trim()||"Ukjent skytter";
+    const n=s.division||"—";
+    const r=(s.pf||"minor").toUpperCase();
+    return `<div style="padding:12px;background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;"><div><div style="font-weight:600;">${a}</div><div style="font-size:12px;color:var(--muted);">${n} · ${r}</div></div><div style="display:flex;gap:8px;"><button type="button" data-edit-id="${s.id}" style="background:rgba(224,182,73,0.12);border:1px solid rgba(224,182,73,0.3);border-radius:8px;padding:8px 12px;cursor:pointer;color:var(--accent);font-size:12px;font-weight:600;">Edit</button><button type="button" data-shooter-id="${s.id}" class="btn-secondary" style="border:none;border-radius:8px;padding:8px 12px;cursor:pointer;">Delete</button></div></div><div id="edit-shooter-form-${s.id}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">First name</div><input id="ef-fn-${s.id}" value="${s.firstName||''}" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div><div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Last name</div><input id="ef-ln-${s.id}" value="${s.lastName||''}" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div><div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Division</div><input id="ef-div-${s.id}" value="${s.division||''}" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div><div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Power factor</div><select id="ef-pf-${s.id}" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"><option value="minor" ${(s.pf||'minor')==='minor'?'selected':''}>Minor</option><option value="major" ${(s.pf||'minor')==='major'?'selected':''}>Major</option></select></div></div><button data-save-id="${s.id}" style="margin-top:8px;width:100%;padding:8px;background:var(--accent);color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">Save</button></div></div>`;
+  }).join("");
+  i.querySelectorAll("[data-shooter-id]").forEach(s=>{s.onclick=()=>removeEditMatchShooter(s.dataset.shooterId);});
+  i.querySelectorAll("[data-edit-id]").forEach(s=>{s.onclick=()=>{const f=document.getElementById("edit-shooter-form-"+s.dataset.editId);if(f){f.style.display=f.style.display==="none"?"block":"none";s.textContent=f.style.display==="block"?"Close":"Edit";}}});
+  i.querySelectorAll("[data-save-id]").forEach(s=>{s.onclick=()=>window.saveEditShooter(s.dataset.saveId);});
+}
+window.icRenderEditMatchShootersList=icRenderEditMatchShootersList;
+async function refreshFromFirebase(){const btns=document.querySelectorAll('.nav-refresh-btn');btns.forEach(function(b){b.classList.add('spinning');b.disabled=true;});try{const results=await Promise.all([jt(),loadReferenceShooters(),Vt()]);const newProfile=results[0];const newRefs=results[1];const newMatches=results[2];if(newProfile){g=newProfile;}refShooters=newRefs;$=newMatches;if($&&$.length>0&&R){const still=$.find(function(m){return m.id!=null&&m.id.toString()===String(R);});if(!still){R=null;}}if($&&$.length>0&&!R){const now=new Date();const active=$.filter(function(m){return m.status!=='finished'&&m.date;});if(active.length>0){let best=active[0];let bestDiff=Math.abs(new Date(active[0].date)-now);for(const m of active){const diff=Math.abs(new Date(m.date)-now);if(diff<bestDiff){bestDiff=diff;best=m;}}R=best.id;}}const screens=document.querySelectorAll('.screen.active');const activeId=screens.length>0?screens[0].id:null;try{gt();}catch(e){}try{fe();}catch(e){}try{te();}catch(e){}try{_e();}catch(e){}try{De();}catch(e){}try{vt();}catch(e){}if(activeId==='screen-teams'){try{renderTeamsScreen();}catch(e){}}if(R){try{pt(R);}catch(e){}}}catch(err){console.error('refreshFromFirebase error:',err);}finally{btns.forEach(function(b){b.classList.remove('spinning');b.disabled=false;});}}function toggleTeamDetail(el){var id=el.dataset?el.dataset.tid:el;var row=document.getElementById(id);if(row)row.style.display=row.style.display==='none'?'table-row':'none';}
 function toggleDQ(matchId,shooterId){
   const match=$.find(e=>e.id!=null&&e.id.toString()===String(matchId));
   if(!match)return;

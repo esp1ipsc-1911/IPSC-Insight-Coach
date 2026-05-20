@@ -121,6 +121,44 @@ import{initializeApp as bt}from"https://www.gstatic.com/firebasejs/10.12.2/fireb
     var form=document.getElementById("edit-shooter-form-"+s.dataset.editId);
     if(form){form.style.display=form.style.display==="none"?"block":"none";s.textContent=form.style.display==="block"?"Close":"Edit";}
   }})};
+window.icRenderEditMatchShootersList=function(e){
+  var i=document.getElementById("edit-match-shooters-list");
+  if(!i||!e)return;
+  var t=(e.shooters||[]).filter(function(s){return!(s&&s.isMe);});
+  if(!t.length){i.innerHTML='<div style="padding:12px;background:var(--bg);color:var(--muted);font-size:13px;">No additional shooters have been added.</div>';return;}
+  i.innerHTML=t.map(function(s){
+    var fn=s.firstName||""; var ln=s.lastName||"";
+    var a=[fn,ln].join(" ").trim()||"Shooter";
+    var n=s.division||"-"; var r=(s.pf||"minor").toUpperCase();
+    var pf=s.pf||"minor";
+    var h='<div style="padding:12px;background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">';
+    h+='<div><div style="font-weight:600;">'+a+'</div><div style="font-size:12px;color:var(--muted);">'+n+' · '+r+'</div></div>';
+    h+='<div style="display:flex;gap:8px;">';
+    h+='<button type="button" data-edit-id="'+s.id+'" style="background:rgba(224,182,73,0.12);border:1px solid rgba(224,182,73,0.3);border-radius:8px;padding:8px 12px;cursor:pointer;color:var(--accent);font-size:12px;font-weight:600;">Edit</button>';
+    h+='<button type="button" data-shooter-id="'+s.id+'" class="btn-secondary" style="border:none;border-radius:8px;padding:8px 12px;cursor:pointer;">Delete</button>';
+    h+='</div></div>';
+    h+='<div id="edit-shooter-form-'+s.id+'" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);">';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+    h+='<div><label style="font-size:11px;color:var(--muted);">First name</label>';
+    h+='<input id="ef-fn-'+s.id+'" value="'+fn+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div>';
+    h+='<div><label style="font-size:11px;color:var(--muted);">Last name</label>';
+    h+='<input id="ef-ln-'+s.id+'" value="'+ln+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div>';
+    h+='<div><label style="font-size:11px;color:var(--muted);">Division</label>';
+    h+='<input id="ef-div-'+s.id+'" value="'+(s.division||"")+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;"></div>';
+    h+='<div><label style="font-size:11px;color:var(--muted);">PF</label>';
+    h+='<select id="ef-pf-'+s.id+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:13px;box-sizing:border-box;">';
+    h+='<option value="minor"'+(pf==="minor"?" selected":"")+'>Minor</option>';
+    h+='<option value="major"'+(pf==="major"?" selected":"")+'>Major</option>';
+    h+='</select></div></div>';
+    h+='<button data-save-id="'+s.id+'" style="margin-top:8px;width:100%;padding:8px;background:var(--accent);color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">Save</button>';
+    h+='</div></div>';
+    return h;
+  }).join("");
+  i.querySelectorAll("[data-shooter-id]").forEach(function(x){x.onclick=function(){removeEditMatchShooter(x.dataset.shooterId);};});
+  i.querySelectorAll("[data-edit-id]").forEach(function(x){x.onclick=function(){var f=document.getElementById("edit-shooter-form-"+x.dataset.editId);if(f){f.style.display=f.style.display==="none"?"block":"none";x.textContent=f.style.display==="block"?"Close":"Edit";}};});
+  i.querySelectorAll("[data-save-id]").forEach(function(x){x.onclick=function(){window.saveEditShooter(x.dataset.saveId);};});
+};
 async function saveEditShooter(shooterId){
   const match=$.find(m=>m.id!=null&&m.id.toString()===String(R));
   if(!match||!match.shooters)return;

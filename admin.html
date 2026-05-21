@@ -600,6 +600,7 @@
         <button id="tabRolesBtn" class="tab-btn" type="button">Roller</button>
         <button id="tabShootersBtn" class="tab-btn" type="button">Referanseskyttere</button>
         <button id="tabMatchesBtn" class="tab-btn" type="button">Matcher</button>
+        <button id="tabRewardsBtn" class="tab-btn" type="button">🏆 Rewards</button>
       </div>
 
       <div id="codesPanel" class="panel active">
@@ -705,6 +706,108 @@
             <thead><tr><th>ID</th><th>Navn</th><th>Dato</th><th>Status</th><th>Eier</th><th>Deltakere</th><th>Stages</th><th>Handlinger</th></tr></thead>
             <tbody id="matchesTable"><tr><td data-label="Status" colspan="8" class="loading">Laster...</td></tr></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REWARDS PANEL -->
+  <div id="rewardsPanel" class="panel">
+    <div class="section-title">🏆 Rewards — Manuell tildeling</div>
+
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="flex:1;min-width:200px;">
+        <label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px;">Søk bruker (navn eller e-post)</label>
+        <input type="text" id="rewardsUserSearch" placeholder="Navn eller e-post..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;" />
+      </div>
+      <button id="rewardsSearchBtn" class="btn btn-primary" type="button">Søk</button>
+    </div>
+
+    <div id="rewardsUserList" style="margin-bottom:16px;"></div>
+
+    <div id="rewardsUserDetail" style="display:none;">
+      <div style="background:#1a1a1a;border-radius:10px;padding:16px;margin-bottom:16px;border:1px solid #333;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div>
+            <div id="rewardsUserName" style="font-size:16px;font-weight:700;"></div>
+            <div id="rewardsUserEmail" style="font-size:12px;color:#aaa;"></div>
+            <div id="rewardsUserXP" style="font-size:12px;color:#E8B84B;margin-top:2px;"></div>
+          </div>
+        </div>
+
+        <!-- Tildel reward -->
+        <div style="background:#111;border-radius:8px;padding:12px;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#E8B84B;">Tildel reward manuelt</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:1;min-width:180px;">
+              <label style="font-size:11px;color:#aaa;display:block;margin-bottom:4px;">Reward</label>
+              <select id="rewardsGrantSelect" style="width:100%;padding:8px;border-radius:6px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:13px;">
+                <option value="">— Velg reward —</option>
+                <optgroup label="🥇 Plassering">
+                  <option value="placement_gold|gold|🏆 Match Winner|Won a match">🏆 Match Winner (Gull)</option>
+                  <option value="placement_silver|silver|🥈 Podium Finish|Top 3 in a match">🥈 Podium Finish (Sølv)</option>
+                  <option value="placement_bronze|bronze|🎯 Top 5|Top 5 in a match">🎯 Top 5 (Bronse)</option>
+                  <option value="stage_dom_gold|gold|⚡ Stage Dominator|Won 5+ stages">⚡ Stage Dominator (Gull)</option>
+                  <option value="stage_dom_silver|silver|⚡ Stage Fighter|Won 3+ stages">⚡ Stage Fighter (Sølv)</option>
+                  <option value="stage_dom_bronze|bronze|⚡ Stage Winner|Won a stage">⚡ Stage Winner (Bronse)</option>
+                </optgroup>
+                <optgroup label="🎯 Presisjon">
+                  <option value="acc_diamond|diamond|💎 Diamond Accuracy|95%+ A rate overall">💎 Diamond Accuracy</option>
+                  <option value="acc_gold|gold|🎯 Gold Accuracy|90%+ A rate overall">🎯 Gold Accuracy (Gull)</option>
+                  <option value="acc_silver|silver|🎯 Silver Accuracy|85%+ A rate overall">🎯 Silver Accuracy (Sølv)</option>
+                  <option value="acc_bronze|bronze|🎯 Bronze Accuracy|75%+ A rate overall">🎯 Bronze Accuracy (Bronse)</option>
+                </optgroup>
+                <optgroup label="🔥 Hit Factor">
+                  <option value="hf_diamond|diamond|🔥 HF Legend|Achieved 8.0+ HF">🔥 HF Legend (Diamant)</option>
+                  <option value="hf_gold|gold|🔥 Speed Demon|Achieved 6.0+ HF">🔥 Speed Demon (Gull)</option>
+                  <option value="hf_silver|silver|🔥 Fast Shooter|Achieved 4.0+ HF">🔥 Fast Shooter (Sølv)</option>
+                  <option value="hf_bronze|bronze|🔥 Getting Fast|Achieved 2.0+ HF">🔥 Getting Fast (Bronse)</option>
+                </optgroup>
+                <optgroup label="📈 Forbedring">
+                  <option value="impr_gold|gold|📈 Major Improvement|+10% total score growth">📈 Major Improvement (Gull)</option>
+                  <option value="impr_silver|silver|📈 Improving Fast|+5% total score growth">📈 Improving Fast (Sølv)</option>
+                  <option value="impr_bronze|bronze|📈 On The Up|+2% total score growth">📈 On The Up (Bronse)</option>
+                </optgroup>
+                <optgroup label="🏅 Aktivitet">
+                  <option value="act_diamond|diamond|🏅 Century Club|100+ matches played">🏅 Century Club (Diamant)</option>
+                  <option value="act_gold|gold|🏅 Veteran|25+ matches played">🏅 Veteran (Gull)</option>
+                  <option value="act_silver|silver|🏅 Regular|10+ matches played">🏅 Regular (Sølv)</option>
+                  <option value="act_bronze|bronze|🏅 Getting Started|5+ matches played">🏅 Getting Started (Bronse)</option>
+                  <option value="stages_diamond|diamond|🎪 Stage Machine|500+ stages shot">🎪 Stage Machine (Diamant)</option>
+                  <option value="stages_gold|gold|🎪 Stage Veteran|100+ stages shot">🎪 Stage Veteran (Gull)</option>
+                  <option value="stages_silver|silver|🎪 Stage Regular|25+ stages shot">🎪 Stage Regular (Sølv)</option>
+                </optgroup>
+                <optgroup label="⭐ Referanseskytter">
+                  <option value="ref_diamond|diamond|⭐ Giant Killer|Beat reference 10+ times">⭐ Giant Killer (Diamant)</option>
+                  <option value="ref_gold|gold|⭐ Reference Beater|Beat reference 5+ times">⭐ Reference Beater (Gull)</option>
+                  <option value="ref_silver|silver|⭐ Challenger|Beat reference 3+ times">⭐ Challenger (Sølv)</option>
+                  <option value="ref_bronze|bronze|⭐ First Blood|Beat a reference shooter">⭐ First Blood (Bronse)</option>
+                </optgroup>
+                <optgroup label="🎯 Streaks">
+                  <option value="streak_diamond|diamond|🎯 Accuracy Machine|10 consecutive stages 90%+ A">🎯 Accuracy Machine (Diamant)</option>
+                  <option value="streak_gold|gold|🎯 On Fire|5 consecutive stages 90%+ A">🎯 On Fire (Gull)</option>
+                  <option value="streak_silver|silver|🎯 Hot Streak|3 consecutive stages 90%+ A">🎯 Hot Streak (Sølv)</option>
+                </optgroup>
+                <optgroup label="🍌 Special / Easter Egg">
+                  <option value="golden_banana|gold|🍌 Golden Banana|Priset for enestående... kreativitet på banen. Ikke alle fortjener dette. Du er spesiell — på godt og vondt.">🍌 Golden Banana</option>
+                  <option value="easter_egg_1|diamond|👑 The Chosen One|Bare én person i hele appen har fått denne. Vi sier ikke hvem de andre er. Det er fordi det ikke finnes andre.">👑 The Chosen One (Diamant)</option>
+                  <option value="easter_egg_2|silver|🦆 Duck Mode|Rolig på overflaten. Sparker som fan under vann. Kjenner du deg igjen?">🦆 Duck Mode (Sølv)</option>
+                </optgroup>
+              </select>
+            </div>
+            <div style="min-width:180px;">
+              <label style="font-size:11px;color:#aaa;display:block;margin-bottom:4px;">Tilpasset melding (valgfri)</label>
+              <input type="text" id="rewardsGrantNote" placeholder="Fra admin: ..." style="width:100%;padding:8px;border-radius:6px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:13px;" />
+            </div>
+            <button id="rewardsGrantBtn" class="btn btn-primary" type="button">Tildel</button>
+          </div>
+          <div id="rewardsGrantFeedback" style="margin-top:8px;font-size:13px;display:none;"></div>
+        </div>
+
+        <!-- Eksisterende rewards -->
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Eksisterende rewards</div>
+          <div id="rewardsExistingList">Laster...</div>
         </div>
       </div>
     </div>
@@ -1092,6 +1195,134 @@
     tabRolesBtn.onclick = () => setTab('roles');
     tabShootersBtn.onclick = () => setTab('shooters');
     tabMatchesBtn.onclick = () => setTab('matches');
+    tabRewardsBtn.onclick = () => setTab('rewards');
+
+    // ── REWARDS MODULE ────────────────────────────────────────────────────────
+    let rewardsCurrentUser = null;
+
+    document.getElementById('rewardsSearchBtn').onclick = async () => {
+      const q = document.getElementById('rewardsUserSearch').value.trim().toLowerCase();
+      const listEl = document.getElementById('rewardsUserList');
+      const detailEl = document.getElementById('rewardsUserDetail');
+      if (!q) return;
+      listEl.innerHTML = '<div style="color:#aaa;font-size:13px;">Søker...</div>';
+      detailEl.style.display = 'none';
+      rewardsCurrentUser = null;
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        const matches = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          const name = `${d.firstName||''} ${d.lastName||''}`.trim().toLowerCase();
+          const email = (d.email||'').toLowerCase();
+          if (name.includes(q) || email.includes(q)) matches.push({id: doc.id, ...d});
+        });
+        if (!matches.length) {
+          listEl.innerHTML = '<div style="color:#aaa;font-size:13px;">Ingen brukere funnet.</div>';
+          return;
+        }
+        listEl.innerHTML = matches.map(u => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#1a1a1a;border-radius:8px;margin-bottom:6px;border:1px solid #2a2a2a;cursor:pointer;" onclick="window._rewardsSelectUser('${u.id}')">
+            <div>
+              <div style="font-weight:700;">${escapeHtml(`${u.firstName||''} ${u.lastName||''}`.trim()||'—')}</div>
+              <div style="font-size:12px;color:#aaa;">${escapeHtml(u.email||'')} <span style="color:#555;margin-left:6px;">${u.id}</span></div>
+            </div>
+            <div style="font-size:12px;color:#E8B84B;">${(u.xp||0)} XP</div>
+          </div>`).join('');
+      } catch(e) {
+        listEl.innerHTML = `<div style="color:#e55;">Feil: ${escapeHtml(e.message)}</div>`;
+      }
+    };
+
+    window._rewardsSelectUser = async (uid) => {
+      const detailEl = document.getElementById('rewardsUserDetail');
+      document.getElementById('rewardsExistingList').innerHTML = 'Laster...';
+      detailEl.style.display = 'block';
+      try {
+        const snap = await getDoc(doc(db, 'users', uid));
+        if (!snap.exists()) return;
+        const u = {id: uid, ...snap.data()};
+        rewardsCurrentUser = u;
+        document.getElementById('rewardsUserName').textContent = `${u.firstName||''} ${u.lastName||''}`.trim()||'—';
+        document.getElementById('rewardsUserEmail').textContent = u.email||'';
+        document.getElementById('rewardsUserXP').textContent = `${u.xp||0} XP`;
+        _rewardsRenderExisting(u.manualRewards||[]);
+      } catch(e) {
+        detailEl.innerHTML = `<div style="color:#e55;">Feil: ${escapeHtml(e.message)}</div>`;
+      }
+    };
+
+    function _rewardsRenderExisting(rewards) {
+      const el = document.getElementById('rewardsExistingList');
+      if (!rewards.length) {
+        el.innerHTML = '<div style="color:#555;font-size:13px;">Ingen manuelle rewards tildelt ennå.</div>';
+        return;
+      }
+      const tierColor = {bronze:'#CD7F32', silver:'#C0C0C0', gold:'#E8B84B', diamond:'#74BFFF'};
+      el.innerHTML = rewards.map((r, idx) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#111;border-radius:8px;margin-bottom:6px;border:1px solid #222;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:22px;">${r.icon||'🏅'}</div>
+            <div>
+              <div style="font-weight:700;color:${tierColor[r.tier]||'#fff'};">${escapeHtml(r.name)}</div>
+              <div style="font-size:11px;color:#aaa;">${escapeHtml(r.desc||'')}</div>
+              ${r.note ? `<div style="font-size:11px;color:#E8B84B;margin-top:2px;">💬 ${escapeHtml(r.note)}</div>` : ''}
+              <div style="font-size:10px;color:#555;margin-top:2px;">${r.grantedAt ? new Date(r.grantedAt).toLocaleDateString('nb-NO') : ''}</div>
+            </div>
+          </div>
+          <button onclick="window._rewardsRemove(${idx})" style="background:rgba(229,85,85,0.15);border:1px solid rgba(229,85,85,0.3);color:#e55;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;">Fjern</button>
+        </div>`).join('');
+    }
+
+    document.getElementById('rewardsGrantBtn').onclick = async () => {
+      const fb = document.getElementById('rewardsGrantFeedback');
+      const sel = document.getElementById('rewardsGrantSelect').value;
+      const note = document.getElementById('rewardsGrantNote').value.trim();
+      if (!rewardsCurrentUser) return;
+      if (!sel) { fb.style.display='block'; fb.style.color='#e55'; fb.textContent='Velg en reward først.'; return; }
+      const [id, tier, name, desc] = sel.split('|');
+      const icon = name.match(/^(\p{Emoji})/u)?.[1] || '🏅';
+      const cleanName = name.replace(/^(\p{Emoji}\s*)/u, '');
+      const newReward = { id, tier, name: cleanName, icon, desc, note: note||null, grantedBy: 'admin', grantedAt: Date.now() };
+      fb.style.display = 'block';
+      fb.style.color = '#aaa';
+      fb.textContent = 'Lagrer...';
+      try {
+        const existing = rewardsCurrentUser.manualRewards || [];
+        const updated = [...existing, newReward];
+        await updateDoc(doc(db, 'users', rewardsCurrentUser.id), { manualRewards: updated });
+        rewardsCurrentUser.manualRewards = updated;
+        _rewardsRenderExisting(updated);
+        fb.style.color = '#4caf50';
+        fb.textContent = `✓ "${cleanName}" tildelt ${rewardsCurrentUser.firstName||'bruker'}!`;
+        document.getElementById('rewardsGrantSelect').value = '';
+        document.getElementById('rewardsGrantNote').value = '';
+      } catch(e) {
+        fb.style.color = '#e55';
+        fb.textContent = 'Feil: ' + e.message;
+      }
+    };
+
+    window._rewardsRemove = async (idx) => {
+      if (!rewardsCurrentUser) return;
+      const existing = rewardsCurrentUser.manualRewards || [];
+      const name = existing[idx]?.name || 'reward';
+      if (!confirm(`Fjern "${name}" fra ${rewardsCurrentUser.firstName||'bruker'}?`)) return;
+      const updated = existing.filter((_, i) => i !== idx);
+      try {
+        await updateDoc(doc(db, 'users', rewardsCurrentUser.id), { manualRewards: updated });
+        rewardsCurrentUser.manualRewards = updated;
+        _rewardsRenderExisting(updated);
+      } catch(e) {
+        alert('Feil: ' + e.message);
+      }
+    };
+
+    // Allow Enter key in search
+    document.getElementById('rewardsUserSearch').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('rewardsSearchBtn').click();
+    });
+    // ── END REWARDS MODULE ────────────────────────────────────────────────────
 
     function setTab(tab) {
       currentTab = tab;
@@ -1100,12 +1331,14 @@
       tabRolesBtn.classList.toggle('active', tab === 'roles');
       tabShootersBtn.classList.toggle('active', tab === 'shooters');
       tabMatchesBtn.classList.toggle('active', tab === 'matches');
+      tabRewardsBtn.classList.toggle('active', tab === 'rewards');
 
       codesPanel.classList.toggle('active', tab === 'codes');
       usersPanel.classList.toggle('active', tab === 'users');
       rolesPanel.classList.toggle('active', tab === 'roles');
       shootersPanel.classList.toggle('active', tab === 'shooters');
       matchesPanel.classList.toggle('active', tab === 'matches');
+      rewardsPanel.classList.toggle('active', tab === 'rewards');
     }
 
     async function loadCodes() {

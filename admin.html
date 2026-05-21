@@ -1456,7 +1456,7 @@
           <tr>
             <td data-label="E-post">${escapeHtml(role.email)}</td>
             <td data-label="Navn">${escapeHtml(role.name || '—')}</td>
-            <td data-label="Rolle"><span class="badge ${role.role === 'admin' ? 'badge-admin' : 'badge-director'}">${escapeHtml(role.role || '—')}</span></td>
+            <td data-label="Rolle"><span class="badge ${role.role === 'admin' ? 'badge-admin' : role.role === 'coach' ? 'badge-active' : 'badge-director'}">${escapeHtml(role.role || '—')}</span></td>
             <td data-label="Handlinger">
               <div class="action-btns">
                 <button class="btn btn-sm btn-secondary" onclick="window.editRole('${escapeAttr(role.email)}')">Rediger</button>
@@ -1490,13 +1490,28 @@
 
     $('saveRoleBtn').onclick = async () => {
       const email = $('roleEmail').value.trim().toLowerCase();
-      const payload = { name: $('roleName').value.trim(), role: $('roleType').value };
+      const roleType = $('roleType').value;
+      const payload = { name: $('roleName').value.trim(), role: roleType };
       if (!email) {
         showError($('roleError'), 'E-post er påkrevd');
         return;
       }
       try {
         await setDoc(doc(db, 'adminUsers', email), payload, { merge: true });
+
+        // For coach-rollen: skriv role: 'coach' direkte på brukerens dokument i users-samlingen
+        // coach.html sjekker users/{uid}.role, ikke adminUsers
+        if (roleType === 'coach') {
+          const usersSnap = await getDocs(collection(db, 'users'));
+          for (const userDoc of usersSnap.docs) {
+            const data = userDoc.data();
+            if (String(data.email || '').toLowerCase() === email) {
+              await updateDoc(doc(db, 'users', userDoc.id), { role: 'coach' });
+              break;
+            }
+          }
+        }
+
         $('roleModal').classList.remove('open');
         await loadRoles();
         await loadAllUsers();

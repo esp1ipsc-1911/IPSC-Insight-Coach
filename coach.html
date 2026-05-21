@@ -175,6 +175,39 @@
     /* ── LOADING ── */
     .loading-msg{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;}
 
+    /* ── STAGE DETAIL EXPAND ── */
+    .stage-detail{display:none;padding:10px 14px;background:var(--bg2);border-top:1px solid var(--border);animation:fadeIn .15s ease;}
+    .stage-detail.open{display:block;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+    .sd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;}
+    .sd-cell{background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center;}
+    .sd-val{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;}
+    .sd-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+    .sd-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;}
+    .sd-row:last-child{border-bottom:none;}
+
+    /* ── STANDINGS ── */
+    .standings-section{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .standings-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+    .standings-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
+    .standings-table{width:100%;border-collapse:collapse;font-size:11px;}
+    .standings-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:3px 4px;font-weight:700;border-bottom:1px solid var(--border);text-align:left;}
+    .standings-table td{padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.04);}
+    .standings-table tr:last-child td{border-bottom:none;}
+    .standings-table tr.me td{background:rgba(232,184,75,.06);}
+    .standings-table tr.ref-row td{color:var(--blue);}
+    .ref-badge{display:inline-block;padding:1px 5px;border-radius:4px;background:rgba(74,158,255,.15);color:var(--blue);font-size:9px;font-weight:700;margin-left:4px;border:1px solid rgba(74,158,255,.25);}
+
+    /* ── ADD/EDIT SHOOTER MODAL ── */
+    .shooter-modal .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .shooter-list-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;}
+    .shooter-list-item-name{font-weight:700;font-size:13px;}
+    .shooter-list-item-meta{font-size:11px;color:var(--muted);}
+    .shooter-list-actions{display:flex;gap:5px;flex-shrink:0;}
+    .spill.clickable{cursor:pointer;transition:background .12s,border-color .12s;}
+    .spill.clickable:hover{background:rgba(232,184,75,.15);border-color:rgba(232,184,75,.4);}
+    .spill.active-detail{background:rgba(232,184,75,.2);border-color:rgba(232,184,75,.5);color:var(--accent);}
+
     /* ── RESPONSIVE ── */
     @media(max-width:700px){
       .shooter-grid{grid-template-columns:1fr;}
@@ -233,12 +266,21 @@
         <div class="match-title" id="matchTitle">—</div>
         <div class="match-meta" id="matchMeta">—</div>
       </div>
-      <div class="match-stats" id="matchStats"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="match-stats" id="matchStats"></div>
+        <button onclick="window.openShooterModal()" class="btn btn-primary btn-sm" style="white-space:nowrap;">+ Legg til skytter</button>
+      </div>
     </div>
   </div>
 
   <!-- standings strip -->
   <div class="standings-strip" id="standingsStrip" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0;">
+      <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Live standings</span>
+      <button id="toggleRefStandingsBtn" class="tog-btn on" style="font-size:10px;padding:3px 8px;">
+        <span class="dot"></span>Ref
+      </button>
+    </div>
     <div class="standings-strip-inner" id="standingsInner"></div>
   </div>
 
@@ -247,6 +289,59 @@
     <div class="loading-msg"><div class="spinner"></div>Kobler til…</div>
   </div>
 
+</div>
+
+<!-- ══ SHOOTER MODAL (add/edit) ══ -->
+<div id="shooterModal" class="modal shooter-modal">
+  <div class="modal-content" style="max-width:480px;">
+    <div class="modal-title" id="shooterModalTitle">Legg til skytter</div>
+    <div class="modal-sub" id="shooterModalSub">Legges til i matchen</div>
+    <div id="shooterError" class="error-box" style="display:none;"></div>
+    <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div>
+        <label class="form-label">Fornavn</label>
+        <input id="shFirstName" class="form-input" type="text" placeholder="Fornavn" />
+      </div>
+      <div>
+        <label class="form-label">Etternavn</label>
+        <input id="shLastName" class="form-input" type="text" placeholder="Etternavn" />
+      </div>
+      <div>
+        <label class="form-label">Divisjon</label>
+        <select id="shDivision" class="form-select">
+          <option value="Classic">Classic</option>
+          <option value="Production">Production</option>
+          <option value="Production Optics">Production Optics</option>
+          <option value="Standard">Standard</option>
+          <option value="Open">Open</option>
+          <option value="Revolver">Revolver</option>
+          <option value="Pistol Caliber Carbine">PCC</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Power Factor</label>
+        <select id="shPF" class="form-select">
+          <option value="minor">Minor</option>
+          <option value="major">Major</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="form-label">Klubb</label>
+        <input id="shClub" class="form-input" type="text" placeholder="Klubb" />
+      </div>
+    </div>
+    <input type="hidden" id="shEditId" value="" />
+    <div class="form-actions">
+      <button id="saveShooterBtn" class="btn btn-primary">Lagre skytter</button>
+      <button id="cancelShooterBtn" class="btn btn-secondary">Avbryt</button>
+    </div>
+
+    <!-- Eksisterende skyttere -->
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;" id="shooterListSection" style="display:none;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;font-weight:700;">Skyttere i matchen</div>
+      <div id="shooterListEl"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ RESULT MODAL ══ -->
@@ -311,7 +406,9 @@ let matchUnsubscribes = [];
 let allMatchData     = {};
 let allRefShooters   = [];
 let refVisible       = true;
+let refInStandings   = true;    // show ref shooters in standings
 let resultTarget     = null;    // { shooterUid, shooterName, matchId }
+let shooterEditId    = null;    // id of shooter being edited
 
 const $ = id => document.getElementById(id);
 
@@ -538,24 +635,56 @@ function renderDash() {
 
 // ── Standings strip ───────────────────────────────────
 function renderStandings(match, stageDefs, myShooters) {
-  const totals = calcMatchTotals(match, stageDefs);
-  if (!totals.length) { $('standingsStrip').style.display='none'; return; }
+  const shooterTotals = calcMatchTotals(match, stageDefs);
+
+  // Build ref entries if toggled on
+  let allEntries = [...shooterTotals];
+  if (refInStandings && allRefShooters.length) {
+    // Get match division from my shooters
+    const myDiv = myShooters[0]?.division || '';
+    allRefShooters
+      .filter(r => !r.division || r.division.toLowerCase() === myDiv.toLowerCase())
+      .slice(0,4)
+      .forEach(r => {
+        const hf = r.mediumHF || r.shortHF || r.longHF || 0;
+        // Estimate ref pts based on avg HF × total stage time weight
+        const estPts = hf * stageDefs.length * 15; // rough proxy
+        allEntries.push({ uid:'ref_'+r.id, name: r.name || r.id, pts: estPts, isRef: true });
+      });
+    allEntries.sort((a,b) => b.pts - a.pts);
+  }
+
+  if (!allEntries.length) { $('standingsStrip').style.display='none'; return; }
 
   const myUids = new Set(myShooters.map(s=>s.uid));
-  const leader = totals[0].pts;
+  const leader = allEntries[0].pts;
   $('standingsStrip').style.display = '';
-  $('standingsInner').innerHTML = totals.map((t,i) => {
+  $('standingsInner').innerHTML = allEntries.map((t,i) => {
     const mine = myUids.has(t.uid);
     const pct  = leader>0 ? (t.pts/leader*100).toFixed(1) : '0.0';
     return `
-      <div class="s-chip ${mine?'mine':''}">
-        <span class="s-chip-rank">${i+1}</span>
-        <span class="s-chip-name">${escH(t.name)}</span>
-        <span class="s-chip-pts">${t.pts.toFixed(1)}</span>
+      <div class="s-chip ${mine?'mine':''} ${t.isRef?'ref-chip':''}">
+        <span class="s-chip-rank" style="${t.isRef?'color:var(--blue);':''}">${i+1}</span>
+        <span class="s-chip-name">${escH(t.name)}${t.isRef?'<span class="ref-badge">REF</span>':''}</span>
+        <span class="s-chip-pts">${t.pts.toFixed(0)}</span>
         <span class="s-chip-pct">${pct}%</span>
       </div>`;
   }).join('');
 }
+
+// Toggle ref in standings
+$('toggleRefStandingsBtn').onclick = () => {
+  refInStandings = !refInStandings;
+  $('toggleRefStandingsBtn').classList.toggle('on', refInStandings);
+  const matches = Object.values(allMatchData);
+  if (matches.length) {
+    const match = matches[0];
+    const stageDefs = getStageDefs(match);
+    const allShooters = getMatchShooters(match);
+    const myShooters = allShooters.filter(s => allowedUids.includes(s.uid));
+    renderStandings(match, stageDefs, myShooters);
+  }
+};
 
 // ── Render one shooter card ───────────────────────────
 function renderCard(s, match, stageDefs, rankMap) {
@@ -605,7 +734,8 @@ function renderCard(s, match, stageDefs, rankMap) {
   const pills = stageDefs.map(sd => {
     const n = Number(sd.number);
     const isDone = doneNums.includes(n);
-    return `<div class="spill ${isDone?'done':'pending'}">${n}</div>`;
+    return `<div class="spill ${isDone?'done':'pending'} clickable"
+      onclick="window.toggleStageDetail('${escA(uid)}',${n},${JSON.stringify(isDone)})">${n}</div>`;
   }).join('');
 
   // HF chart SVG
@@ -665,9 +795,10 @@ function renderCard(s, match, stageDefs, rankMap) {
       </div>
 
       <div class="stages-section">
-        <div class="stages-lbl">Stages</div>
+        <div class="stages-lbl">Stages — klikk for detaljer</div>
         <div class="stage-pills">${pills}</div>
       </div>
+      <div id="sd-${escA(uid)}" class="stage-detail"></div>
 
       <div class="chart-section">
         <div class="chart-lbl">
@@ -839,6 +970,85 @@ window.togRef = (uid, btn) => {
   list.style.display = isOpen ? 'none' : 'grid';
   btn.classList.toggle('open', !isOpen);
 };
+
+// ── Stage detail expand ──────────────────────────────
+window.toggleStageDetail = (uid, stageNum, isDone) => {
+  const detailEl = document.getElementById('sd-' + uid);
+  if (!detailEl) return;
+
+  // Toggle off if same stage clicked
+  if (detailEl.dataset.openStage === String(stageNum) && detailEl.classList.contains('open')) {
+    detailEl.classList.remove('open');
+    detailEl.dataset.openStage = '';
+    document.querySelectorAll(`#card-${uid} .spill`).forEach(p => p.classList.remove('active-detail'));
+    return;
+  }
+
+  // Highlight pill
+  document.querySelectorAll(`#card-${uid} .spill`).forEach(p => p.classList.remove('active-detail'));
+  event.currentTarget && event.currentTarget.classList.add('active-detail');
+
+  if (!isDone) {
+    detailEl.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:4px 0;">Stage ${stageNum} er ikke skutt ennå.</div>`;
+    detailEl.dataset.openStage = String(stageNum);
+    detailEl.classList.add('open');
+    return;
+  }
+
+  // Find shooter data
+  const match = Object.values(allMatchData)[0];
+  if (!match) return;
+  const shooter = (match.shooters||[]).find(s => String(s.id)===uid);
+  const st = (shooter?.stages||[]).find(s => Number(s.num||s.number)===stageNum);
+  if (!st) { detailEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Ingen data for denne stage.</div>'; detailEl.classList.add('open'); return; }
+
+  const pf   = (shooter.pf||shooter.powerFactor||'minor').toLowerCase();
+  const pts  = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+  const hf   = st.time>0 ? pts/st.time : 0;
+  const shots = (st.a||0)+(st.c||0)+(st.d||0)+(st.miss||0);
+  const aPct  = shots>0 ? Math.round((st.a||0)/shots*100) : 0;
+
+  // Stage metrics for rankings
+  const stageDef = getStageDefs(match).find(s => Number(s.number)===stageNum);
+  const metrics  = stageMetrics(match, stageNum);
+  const myRank   = metrics.findIndex(m => String(m.id)===uid) + 1;
+  const stagePts = metrics.length>0 && metrics[0].hf>0 ? (hf/metrics[0].hf*(stageMaxPts(stageDef||{}))).toFixed(1) : '—';
+
+  detailEl.innerHTML = `
+    <div style="font-size:11px;color:var(--accent);font-weight:700;margin-bottom:8px;">Stage ${stageNum}${stageDef?.name?' — '+escH(stageDef.name):''}</div>
+    <div class="sd-grid">
+      <div class="sd-cell"><div class="sd-val">${st.time?.toFixed(2)||'—'}</div><div class="sd-lbl">Tid (s)</div></div>
+      <div class="sd-cell"><div class="sd-val" style="color:var(--accent);">${hf.toFixed(2)}</div><div class="sd-lbl">HF</div></div>
+      <div class="sd-cell"><div class="sd-val">${pts}</div><div class="sd-lbl">Poeng</div></div>
+      <div class="sd-cell"><div class="sd-val" style="color:${myRank===1?'var(--green)':'var(--text)'};">${myRank||'—'}</div><div class="sd-lbl">Rang</div></div>
+    </div>
+    <div class="sd-row"><span style="color:var(--muted);">A / C / D</span><span style="font-weight:700;">${st.a||0} / ${st.c||0} / ${st.d||0}</span></div>
+    <div class="sd-row"><span style="color:var(--muted);">Miss / NS / Proc</span><span style="font-weight:700;color:${(st.miss||0)>0?'var(--red)':'var(--text)'};">${st.miss||0} / ${st.ns||0} / ${st.proc||0}</span></div>
+    <div class="sd-row"><span style="color:var(--muted);">A%</span><span style="font-weight:700;color:${aPct>=85?'var(--green)':aPct>=70?'var(--text)':'var(--red)'};">${aPct}%</span></div>
+    <div class="sd-row"><span style="color:var(--muted);">Stage-poeng</span><span style="font-weight:700;color:var(--accent);">${stagePts}</span></div>
+  `;
+  detailEl.dataset.openStage = String(stageNum);
+  detailEl.classList.add('open');
+};
+
+// ── Stage metrics helper ──────────────────────────────
+function stageMetrics(match, stageNum) {
+  const results = [];
+  (match.shooters||[]).forEach(sh => {
+    const st = (sh.stages||[]).find(s => Number(s.num||s.number)===stageNum && s.time>0);
+    if (!st) return;
+    const pf  = (sh.pf||sh.powerFactor||'minor').toLowerCase();
+    const pts = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+    const hf  = st.time>0 ? pts/st.time : 0;
+    results.push({ id: String(sh.id), hf, pts });
+  });
+  return results.sort((a,b) => b.hf-a.hf);
+}
+
+function stageMaxPts(sd) {
+  const ss = sd.singleShot?1:2;
+  return Math.max(0, ((sd.paperTargets||0)*5*ss) + (((sd.poppers||0)+(sd.plates||0))*5));
+}
 
 // ── Coach tip ─────────────────────────────────────────
 function coachTip(aPct, avgHF, doneCount) {
@@ -1049,6 +1259,105 @@ $('saveResBtn').onclick = async () => {
     setTimeout(() => { $('resultModal').classList.remove('open'); $('resSuccess').style.display='none'; }, 1400);
   } catch(e) { showErr($('resError'), 'Kunne ikke lagre: '+e.message); }
 };
+
+// ── Add / Edit / Delete Shooter ──────────────────────
+window.openShooterModal = () => {
+  const match = Object.values(allMatchData)[0];
+  if (!match) return;
+  shooterEditId = null;
+  $('shooterModalTitle').textContent = 'Legg til skytter';
+  $('shooterModalSub').textContent = match.name || 'Matchen';
+  $('shFirstName').value=''; $('shLastName').value='';
+  $('shDivision').value='Classic'; $('shPF').value='minor'; $('shClub').value='';
+  $('shEditId').value='';
+  $('shooterError').style.display='none';
+  renderShooterList(match);
+  $('shooterModal').classList.add('open');
+};
+
+window.editShooterInModal = (id) => {
+  const match = Object.values(allMatchData)[0];
+  if (!match) return;
+  const sh = (match.shooters||[]).find(s => String(s.id)===String(id) && !s.isMe);
+  if (!sh) return;
+  shooterEditId = String(id);
+  $('shooterModalTitle').textContent = 'Rediger skytter';
+  $('shFirstName').value = sh.firstName||'';
+  $('shLastName').value  = sh.lastName||'';
+  $('shDivision').value  = sh.division||'Classic';
+  $('shPF').value        = sh.pf||sh.powerFactor||'minor';
+  $('shClub').value      = sh.club||'';
+  $('shEditId').value    = String(id);
+  $('shooterError').style.display='none';
+};
+
+window.deleteShooterFromModal = async (id) => {
+  if (!confirm('Slett denne skytteren?')) return;
+  const match = Object.values(allMatchData)[0];
+  if (!match) return;
+  const shooters = (match.shooters||[]).filter(s => String(s.id)!==String(id));
+  try {
+    await updateDoc(doc(db, 'matches', String(match.id)), { shooters });
+  } catch(e) { alert('Feil: '+e.message); }
+};
+
+function renderShooterList(match) {
+  const listEl = $('shooterListEl');
+  const sec    = $('shooterListSection');
+  const others = (match.shooters||[]).filter(s => !s.isMe);
+  if (!others.length) { sec.style.display='none'; return; }
+  sec.style.display='block';
+  listEl.innerHTML = others.map(s => {
+    const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || String(s.id);
+    const meta = [s.division, (s.pf||'').toUpperCase(), s.club].filter(Boolean).join(' · ');
+    return `
+      <div class="shooter-list-item">
+        <div>
+          <div class="shooter-list-item-name">${escH(name)}</div>
+          <div class="shooter-list-item-meta">${escH(meta)}</div>
+        </div>
+        <div class="shooter-list-actions">
+          <button class="btn btn-sm btn-ghost" onclick="window.editShooterInModal('${escA(String(s.id))}')">Rediger</button>
+          <button class="btn btn-sm btn-danger" onclick="window.deleteShooterFromModal('${escA(String(s.id))}')">Slett</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+$('saveShooterBtn').onclick = async () => {
+  const match = Object.values(allMatchData)[0];
+  if (!match) return;
+  const fn  = $('shFirstName').value.trim();
+  const ln  = $('shLastName').value.trim();
+  const div = $('shDivision').value;
+  const pf  = $('shPF').value;
+  const club= $('shClub').value.trim();
+  if (!fn && !ln) { showErr($('shooterError'), 'Fornavn eller etternavn er påkrevd'); return; }
+
+  const shooters = JSON.parse(JSON.stringify(match.shooters||[]));
+  const editId = $('shEditId').value;
+
+  if (editId) {
+    // Edit existing
+    const idx = shooters.findIndex(s => String(s.id)===editId);
+    if (idx>=0) { shooters[idx] = { ...shooters[idx], firstName:fn, lastName:ln, division:div, pf, club }; }
+  } else {
+    // Add new with unique id
+    const newId = 'manual_' + Date.now();
+    shooters.push({ id:newId, isMe:false, firstName:fn, lastName:ln, division:div, pf, club, stages:[] });
+  }
+
+  try {
+    await updateDoc(doc(db, 'matches', String(match.id)), { shooters });
+    $('shFirstName').value=''; $('shLastName').value=''; $('shClub').value='';
+    $('shEditId').value=''; shooterEditId=null;
+    $('shooterModalTitle').textContent='Legg til skytter';
+    $('shooterError').style.display='none';
+  } catch(e) { showErr($('shooterError'), 'Kunne ikke lagre: '+e.message); }
+};
+
+$('cancelShooterBtn').onclick = () => { $('shooterModal').classList.remove('open'); shooterEditId=null; };
+$('shooterModal').addEventListener('click', e => { if(e.target===$('shooterModal')) { $('shooterModal').classList.remove('open'); shooterEditId=null; } });
 
 // ── Helpers ───────────────────────────────────────────
 function showErr(el, msg) { el.textContent=msg; el.style.display='block'; }

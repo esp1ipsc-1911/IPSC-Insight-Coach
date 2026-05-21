@@ -1749,8 +1749,26 @@ function icRenderRewards() {
         html += '</div></div></div>';
         return;
       }
-      html += '<div style="background:var(--bg);border-radius:8px;padding:10px;display:flex;align-items:flex-start;gap:8px;border:1px solid '+_col+'33;">';
-      html += badgeSVG(r.tier, 32);
+      if(r.id==='grand_old_man'){
+        html += '<div style="background:linear-gradient(135deg,rgba(60,50,30,0.7),rgba(20,20,20,0.9));border-radius:10px;padding:14px;display:flex;align-items:flex-start;gap:10px;border:1px solid rgba(192,192,192,0.35);box-shadow:0 0 12px rgba(192,192,192,0.1);">';
+        // SVG Walker / rollator
+        html += '<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-top:2px;">'
+             +  '<line x1="8" y1="6" x2="6" y2="30" stroke="#C0C0C0" stroke-width="2.2" stroke-linecap="round"/>'
+             +  '<line x1="28" y1="6" x2="30" y2="30" stroke="#C0C0C0" stroke-width="2.2" stroke-linecap="round"/>'
+             +  '<line x1="8" y1="6" x2="28" y2="6" stroke="#C0C0C0" stroke-width="2.2" stroke-linecap="round"/>'
+             +  '<line x1="7" y1="16" x2="29" y2="16" stroke="#C0C0C0" stroke-width="1.8" stroke-linecap="round"/>'
+             +  '<circle cx="6" cy="30" r="3" fill="none" stroke="#C0C0C0" stroke-width="1.8"/>'
+             +  '<circle cx="30" cy="30" r="3" fill="none" stroke="#C0C0C0" stroke-width="1.8"/>'
+             +  '<line x1="14" y1="6" x2="12" y2="13" stroke="#C0C0C0" stroke-width="1.5" stroke-linecap="round"/>'
+             +  '<line x1="22" y1="6" x2="24" y2="13" stroke="#C0C0C0" stroke-width="1.5" stroke-linecap="round"/>'
+             +  '</svg>';
+        html += '<div style="flex:1;">';
+        html += '<div style="font-size:14px;font-weight:800;color:#C0C0C0;">The Grand Old Man</div>';
+        html += '<div style="font-size:11px;color:rgba(200,200,200,0.8);margin-top:4px;line-height:1.5;">'+(r.desc||'')+'</div>';
+        if(r.note) html += '<div style="font-size:11px;color:#E8B84B;margin-top:6px;font-style:italic;">💬 '+r.note+'</div>';
+        html += '</div></div>';
+        return;
+      }
       html += '<div style="flex:1;min-width:0;">';
       html += '<div style="font-size:12px;font-weight:700;color:'+_col+';">'+(r.icon||'🏅')+' '+r.name+'</div>';
       html += '<div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;">'+(r.desc||'')+'</div>';

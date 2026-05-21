@@ -799,40 +799,11 @@
     </div>
   </div>
 
-  <!-- ══ SETUP ══════════════════════════════════════ -->
+  <!-- ══ SETUP (loading screen only) ════════════════ -->
   <div id="setupSection" style="display:none;">
-    <div style="margin-bottom:24px;">
-      <div style="font-size:26px;font-weight:800;letter-spacing:-0.02em;">IPSC <span style="color:var(--accent);">INSIGHT</span></div>
-      <div style="color:var(--muted);font-size:14px;margin-top:4px;">Coach Dashboard</div>
-    </div>
-
-    <!-- Step 1: velg match -->
-    <div class="setup-card">
-      <div class="setup-title">
-        <div class="step">1</div>
-        Velg match
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">Aktive og nylige matcher</label>
-        <select id="matchSelect" class="form-select">
-          <option value="">— Laster matcher… —</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Step 2: velg skyttere -->
-    <div class="setup-card" id="shooterPickCard" style="display:none;">
-      <div class="setup-title">
-        <div class="step">2</div>
-        Velg skyttere å følge
-      </div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">Velg én eller flere. Du kan endre dette under matchen.</div>
-      <div id="shooterPickList" class="shooter-select-list">
-        <div class="loading-msg" style="padding:20px;"><div class="spinner"></div>Laster skyttere…</div>
-      </div>
-      <div class="form-actions">
-        <button id="startDashBtn" class="btn btn-primary" style="min-height:44px;">Start dashboard →</button>
-      </div>
+    <div class="loading-msg" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <div class="spinner"></div>
+      Laster dine skyttere…
     </div>
   </div>
 
@@ -847,8 +818,7 @@
         <button id="toggleRefAllBtn" class="toggle-ref-all active" title="Referanseskyttere">
           <span class="dot"></span>Ref-skyttere
         </button>
-        <button id="addShooterBtn" class="btn btn-ghost btn-sm">+ Skytter</button>
-        <button id="changeMatchBtn" class="btn btn-secondary btn-sm">Bytt match</button>
+        <button id="changeMatchBtn" class="btn btn-secondary btn-sm" style="display:none;">Bytt match</button>
         <button id="logoutBtn" class="btn btn-secondary btn-sm">Logg ut</button>
       </div>
     </div>
@@ -914,17 +884,7 @@
     </div>
   </div>
 
-  <!-- ══ ADD SHOOTER MODAL ═══════════════════════════ -->
-  <div id="addShooterModal" class="modal">
-    <div class="modal-content" style="max-width:460px;">
-      <div class="modal-title">Legg til skytter å følge</div>
-      <div class="modal-sub">Velg en deltaker i matchen som ikke allerede følges.</div>
-      <div id="addShooterList" class="shooter-select-list" style="max-height:300px;"></div>
-      <div class="form-actions">
-        <button id="cancelAddShooterBtn" class="btn btn-secondary">Lukk</button>
-      </div>
-    </div>
-  </div>
+  <!-- Add shooter modal removed — admin controls access via coachAccess -->
 
   <script type="module">
     import { auth, db } from './src/firebase.js';
@@ -994,6 +954,7 @@
             allowedShooterUids = [];
           }
           showSetup();
+          await autoStartDashboard();
         } catch (e) {
           await doLogout('Feil ved innlogging: ' + e.message);
         }
@@ -1039,7 +1000,6 @@
       $('loginSection').style.display = 'none';
       $('setupSection').style.display = 'block';
       $('dashSection').style.display  = 'none';
-      loadMatchList();
     }
 
     function showDash() {
@@ -1048,108 +1008,64 @@
       $('dashSection').style.display  = 'block';
     }
 
-    // ── Load match list ───────────────────────────────
-    async function loadMatchList() {
-      const sel = $('matchSelect');
-      sel.innerHTML = '<option value="">Laster…</option>';
+    // ── Auto-start: find matches containing allowed shooters ──────────────
+    async function autoStartDashboard() {
+      if (!allowedShooterUids || allowedShooterUids.length === 0) {
+        // No access yet — show dash with empty state
+        showDash();
+        $('dashContent').innerHTML = `
+          <div class="loading-msg">
+            <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+            <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen skyttere tildelt</div>
+            <div style="color:var(--muted);font-size:13px;">Admin må tildele deg skyttere før du kan bruke dashboard-et.</div>
+          </div>`;
+        return;
+      }
+
       try {
+        // Find all matches where any allowed shooter is a participant
         const snap = await getDocs(collection(db, 'matches'));
-        const matches = [];
-        snap.forEach(d => matches.push({ id: d.id, ...d.data() }));
-        matches.sort((a, b) => {
-          const da = a.date || a.createdAt?.toDate?.()?.toISOString() || '';
-          const db_ = b.date || b.createdAt?.toDate?.()?.toISOString() || '';
+        const relevantMatches = [];
+        snap.forEach(d => {
+          const data = d.data();
+          const shooters = (data.shooters || []).filter(s => !s.isMe);
+          const hasAllowed = shooters.some(s => allowedShooterUids.includes(String(s.id)));
+          const participantsHasAllowed = (data.participants || []).some(uid => allowedShooterUids.includes(uid));
+          if (hasAllowed || participantsHasAllowed) {
+            relevantMatches.push({ id: d.id, ...data });
+          }
+        });
+
+        relevantMatches.sort((a, b) => {
+          const da = a.date || ''; const db_ = b.date || '';
           return db_ > da ? 1 : -1;
         });
-        sel.innerHTML = '<option value="">— Velg match —</option>' +
-          matches.map(m => `<option value="${escHtml(m.id)}">${escHtml(m.name || m.id)} ${m.date ? '(' + m.date + ')' : ''} — ${m.status || ''}</option>`).join('');
-      } catch (e) {
-        sel.innerHTML = '<option value="">Feil ved lasting av matcher</option>';
-      }
-    }
 
-    $('matchSelect').onchange = async function () {
-      const matchId = this.value;
-      $('shooterPickCard').style.display = matchId ? 'block' : 'none';
-      if (!matchId) return;
-      await loadShooterPicker(matchId);
-    };
-
-    async function loadShooterPicker(matchId) {
-      const list = $('shooterPickList');
-      list.innerHTML = '<div class="loading-msg" style="padding:20px;"><div class="spinner"></div>Laster…</div>';
-      try {
-        const snap = await getDoc(doc(db, 'matches', matchId));
-        if (!snap.exists()) { list.innerHTML = '<div class="loading-msg">Match ikke funnet</div>'; return; }
-        const match = { id: snap.id, ...snap.data() };
-        const shooters = match.shooters || [];
-
-        // Also load user names for participant UIDs not yet in shooters array
-        const participants = match.participants || [];
-        const knownIds = new Set(shooters.map(s => String(s.id)));
-        const extraUsers = [];
-        for (const uid of participants) {
-          if (!knownIds.has(String(uid))) {
-            try {
-              const ud = await getDoc(doc(db, 'users', uid));
-              if (ud.exists()) {
-                const u = ud.data();
-                extraUsers.push({ id: uid, firstName: u.firstName || '', lastName: u.lastName || '', division: u.division || '', pf: u.powerFactor || 'minor', club: u.club || '', stages: [] });
-              }
-            } catch {}
-          }
-        }
-
-        // Filter to only shooters this coach has access to
-        const allShootersRaw = [...shooters.filter(s => !s.isMe), ...extraUsers];
-        const allShooters = allowedShooterUids !== null && allowedShooterUids.length >= 0
-          ? allShootersRaw.filter(s => allowedShooterUids.includes(String(s.id)))
-          : allShootersRaw;
-
-        if (!allShooters.length) {
-          const msg = (allowedShooterUids !== null && allowedShooterUids.length === 0)
-            ? 'Du har ikke fått tilgang til noen skyttere ennå. Kontakt admin.'
-            : 'Ingen av dine skyttere er deltakere i denne matchen.';
-          list.innerHTML = '<div class="loading-msg" style="padding:16px;">' + msg + '</div>';
+        if (!relevantMatches.length) {
+          showDash();
+          $('dashContent').innerHTML = `
+            <div class="loading-msg">
+              <div style="font-size:40px;margin-bottom:12px;">🎯</div>
+              <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen aktive matcher</div>
+              <div style="color:var(--muted);font-size:13px;">Dine skyttere er ikke påmeldt noen matcher ennå.</div>
+            </div>`;
           return;
         }
 
-        list.innerHTML = allShooters.map(s => {
-          const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || String(s.id);
-          const meta = [s.division, s.pf, s.club].filter(Boolean).join(' · ');
-          return `
-            <div class="shooter-pick-item" data-id="${escHtml(String(s.id))}" onclick="togglePick(this)">
-              <div class="shooter-pick-check">
-                <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
-                  <path d="M1 5l3.5 3.5L11 1" stroke="#0a0c10" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <div>
-                <div class="shooter-pick-name">${escHtml(name)}</div>
-                <div class="shooter-pick-meta">${escHtml(meta)}</div>
-              </div>
-            </div>`;
-        }).join('');
+        // Start with the most recent match, subscribe to all relevant matches
+        trackedShooterIds = [...allowedShooterUids];
+        await startMultiMatchDashboard(relevantMatches);
       } catch (e) {
-        list.innerHTML = `<div class="loading-msg">Feil: ${escHtml(e.message)}</div>`;
+        showDash();
+        $('dashContent').innerHTML = `<div class="loading-msg">Feil ved lasting: ${escHtml(e.message)}</div>`;
       }
     }
 
-    window.togglePick = (el) => {
-      el.classList.toggle('selected');
-    };
+    // ── Start multi-match dashboard ──────────────────
+    let matchUnsubscribes = []; // support multiple match listeners
+    let allMatchData = {};      // { matchId: matchData }
 
-    $('startDashBtn').onclick = async () => {
-      const matchId = $('matchSelect').value;
-      if (!matchId) return;
-      const selected = [...$('shooterPickList').querySelectorAll('.shooter-pick-item.selected')];
-      if (!selected.length) { alert('Velg minst én skytter.'); return; }
-      trackedShooterIds = selected.map(el => el.dataset.id);
-      await startDashboard(matchId);
-    };
-
-    // ── Start dashboard ───────────────────────────────
-    async function startDashboard(matchId) {
+    async function startMultiMatchDashboard(matches) {
       showDash();
       $('dashContent').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Kobler til live data…</div>';
 
@@ -1160,26 +1076,40 @@
         refSnap.forEach(d => allReferenceShooters.push({ id: d.id, ...d.data() }));
       } catch {}
 
-      // Unsubscribe previous listener
-      if (matchUnsubscribe) matchUnsubscribe();
+      // Unsubscribe any old listeners
+      matchUnsubscribes.forEach(u => u());
+      matchUnsubscribes = [];
+      allMatchData = {};
 
-      matchUnsubscribe = onSnapshot(doc(db, 'matches', matchId), snap => {
-        if (!snap.exists()) {
-          $('dashContent').innerHTML = '<div class="loading-msg">Match ikke funnet eller slettet.</div>';
-          return;
-        }
-        currentMatch = { id: snap.id, ...snap.data() };
-        renderDash();
-      }, err => {
-        $('dashContent').innerHTML = `<div class="loading-msg">Feil: ${escHtml(err.message)}</div>`;
+      // Subscribe to each relevant match
+      matches.forEach(m => {
+        const unsub = onSnapshot(doc(db, 'matches', m.id), snap => {
+          if (snap.exists()) {
+            allMatchData[snap.id] = { id: snap.id, ...snap.data() };
+          } else {
+            delete allMatchData[snap.id];
+          }
+          renderMultiDash();
+        }, err => {
+          console.warn('Match listener error', err);
+        });
+        matchUnsubscribes.push(unsub);
       });
     }
 
+    // Keep old startDashboard as alias for single match (used by result modal)
+    async function startDashboard(matchId) {
+      const snap = await getDoc(doc(db, 'matches', matchId));
+      if (snap.exists()) await startMultiMatchDashboard([{ id: snap.id, ...snap.data() }]);
+    }
+
     $('changeMatchBtn').onclick = () => {
-      if (matchUnsubscribe) { matchUnsubscribe(); matchUnsubscribe = null; }
+      matchUnsubscribes.forEach(u => u());
+      matchUnsubscribes = [];
+      allMatchData = {};
       currentMatch = null;
       trackedShooterIds = [];
-      showSetup();
+      autoStartDashboard();
     };
 
     // ── Toggle all ref shooters ───────────────────────
@@ -1191,90 +1121,67 @@
       });
     };
 
-    // ── Add shooter to tracked ────────────────────────
-    $('addShooterBtn').onclick = () => {
-      if (!currentMatch) return;
-      const allShooters = (currentMatch.shooters || [])
-        .filter(s => !s.isMe)
-        .filter(s => !allowedShooterUids || allowedShooterUids.length === 0 || allowedShooterUids.includes(String(s.id)));
-      const available = allShooters.filter(s => !trackedShooterIds.includes(String(s.id)));
+    // addShooterBtn removed — admin controls access via coachAccess
+    window.addTrackedShooter = () => {};
 
-      if (!available.length) {
-        alert('Alle skyttere i matchen følges allerede.');
+    // removeTracked disabled — admin controls access
+    window.removeTracked = () => {};
+
+    // ── Render multi-match dashboard ─────────────────
+    function renderMultiDash() {
+      const matches = Object.values(allMatchData);
+      if (!matches.length) {
+        $('dashContent').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Venter på data…</div>';
         return;
       }
 
-      const list = $('addShooterList');
-      list.innerHTML = available.map(s => {
-        const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || String(s.id);
-        const meta = [s.division, s.pf, s.club].filter(Boolean).join(' · ');
-        return `
-          <div class="shooter-pick-item" onclick="addTrackedShooter('${escAttr(String(s.id))}', this)">
-            <div class="shooter-pick-check">
-              <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
-                <path d="M1 5l3.5 3.5L11 1" stroke="#0a0c10" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div>
-              <div class="shooter-pick-name">${escHtml(name)}</div>
-              <div class="shooter-pick-meta">${escHtml(meta)}</div>
-            </div>
-          </div>`;
-      }).join('');
+      // Update topbar with match names
+      $('topMatchName').innerHTML = matches
+        .map(m => `<strong>${escHtml(m.name || m.id)}</strong>`)
+        .join(' &nbsp;·&nbsp; ');
 
-      $('addShooterModal').classList.add('open');
-    };
+      // Collect all allowed shooters across all matches
+      let allCards = [];
+      matches.forEach(match => {
+        const stageDefs = getStageDefs(match);
+        const shooters = (match.shooters || []).filter(s => {
+          if (s.isMe) return false;
+          if (!allowedShooterUids || !allowedShooterUids.includes(String(s.id))) return false;
+          return true;
+        });
+        shooters.forEach(s => {
+          allCards.push({ shooter: s, stageDefs, match });
+        });
+      });
 
-    window.addTrackedShooter = (id, el) => {
-      if (trackedShooterIds.includes(id)) return;
-      trackedShooterIds.push(id);
-      el.classList.add('selected');
-      setTimeout(() => {
-        $('addShooterModal').classList.remove('open');
-        renderDash();
-      }, 300);
-    };
-
-    $('cancelAddShooterBtn').onclick = () => $('addShooterModal').classList.remove('open');
-
-    // ── Remove shooter from tracked ───────────────────
-    window.removeTracked = (id) => {
-      trackedShooterIds = trackedShooterIds.filter(x => x !== id);
-      renderDash();
-    };
-
-    // ── Render dashboard ──────────────────────────────
-    function renderDash() {
-      if (!currentMatch) return;
-      const match = currentMatch;
-      $('topMatchName').innerHTML = `<strong>${escHtml(match.name || match.id)}</strong> &nbsp;·&nbsp; ${escHtml(match.date || '')} &nbsp;·&nbsp; ${escHtml(match.status || '')}`;
-
-      const stageDefs = getStageDefs(match);
-      const shooters  = (match.shooters || []).filter(s => {
-        if (s.isMe) return false;
-        if (!trackedShooterIds.includes(String(s.id))) return false;
-        // Enforce coachAccess — never show shooters not in allowed list
-        if (allowedShooterUids && allowedShooterUids.length > 0 && !allowedShooterUids.includes(String(s.id))) return false;
+      // Deduplicate by shooter id (keep most recent match entry)
+      const seen = new Set();
+      allCards = allCards.filter(({ shooter }) => {
+        if (seen.has(String(shooter.id))) return false;
+        seen.add(String(shooter.id));
         return true;
       });
 
-      if (!shooters.length) {
+      if (!allCards.length) {
         $('dashContent').innerHTML = `
           <div class="loading-msg">
-            Ingen valgte skyttere å vise.<br>
-            <button class="btn btn-primary" style="margin-top:16px;" onclick="document.getElementById('addShooterBtn').click()">+ Legg til skytter</button>
+            <div style="font-size:40px;margin-bottom:12px;">🎯</div>
+            <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen skyttere å vise</div>
+            <div style="color:var(--muted);font-size:13px;">Dine tildelte skyttere er ikke påmeldt noen av matchene.</div>
           </div>`;
         return;
       }
 
-      const html = `<div class="shooter-grid">${shooters.map(s => renderCard(s, stageDefs, match)).join('')}</div>`;
+      const html = `<div class="shooter-grid">${allCards.map(({ shooter, stageDefs, match }) => renderCard(shooter, stageDefs, match)).join('')}</div>`;
       $('dashContent').innerHTML = html;
 
-      // Apply current ref toggle state
       if (!refShootersVisible) {
         document.querySelectorAll('.ref-section').forEach(el => el.style.display = 'none');
       }
     }
+
+    // Keep renderDash as alias
+    function renderDash() { renderMultiDash(); }
 
     // ── Render one shooter card ───────────────────────
     function renderCard(shooter, stageDefs, match) {
@@ -1346,9 +1253,7 @@
                 <span class="badge badge-pf-${pf === 'major' ? 'major' : 'minor'}">${escHtml(pf.toUpperCase())}</span>
               </div>
             </div>
-            <div class="card-header-actions">
-              <button class="btn btn-sm btn-ghost" onclick="window.removeTracked('${escAttr(id)}')" title="Fjern fra oversikt">✕</button>
-            </div>
+            <div class="card-header-actions"></div>
           </div>
 
           <div class="stats-row">
@@ -1423,7 +1328,7 @@
           ${tip ? `<div class="coach-tip">${tip}</div>` : ''}
 
           <div class="card-footer">
-            <button class="btn btn-primary btn-sm" onclick="openResultModal('${escAttr(id)}', '${escAttr(name)}')">+ Legg til resultat</button>
+            <button class="btn btn-primary btn-sm" onclick="openResultModal('${escAttr(id)}', '${escAttr(name)}', '${escAttr(match.id)}')">+ Legg til resultat</button>
           </div>
         </div>`;
     }
@@ -1503,10 +1408,17 @@
     }
 
     // ── Result modal ──────────────────────────────────
-    window.openResultModal = (shooterId, shooterName) => {
-      if (!currentMatch) return;
+    window.openResultModal = (shooterId, shooterName, matchId) => {
+      // Find the match this shooter belongs to
+      const match = matchId
+        ? allMatchData[matchId]
+        : Object.values(allMatchData).find(m =>
+            (m.shooters || []).some(s => String(s.id) === String(shooterId))
+          );
+      if (!match) return;
+      currentMatch = match;
       resultTarget = { shooterId, shooterName };
-      const stageDefs = getStageDefs(currentMatch);
+      const stageDefs = getStageDefs(match);
 
       $('resultModalTitle').textContent = 'Legg til resultat';
       $('resultModalSub').textContent   = shooterName;
@@ -1553,7 +1465,7 @@
 
     $('cancelResultBtn').onclick = () => $('resultModal').classList.remove('open');
     $('resultModal').addEventListener('click', e => { if (e.target === $('resultModal')) $('resultModal').classList.remove('open'); });
-    $('addShooterModal').addEventListener('click', e => { if (e.target === $('addShooterModal')) $('addShooterModal').classList.remove('open'); });
+
 
     $('saveResultBtn').onclick = async () => {
       if (!resultTarget || !currentMatch) return;

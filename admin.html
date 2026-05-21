@@ -677,11 +677,14 @@
         </div>
 
         <div class="actions">
+          <select id="coachMatchSelect" class="form-select" style="max-width:380px;">
+            <option value="">— Velg match for å tildele skyttere —</option>
+          </select>
           <button id="refreshCoachBtn" class="btn btn-secondary">↻ Oppdater</button>
         </div>
 
         <div id="coachList" style="display:grid;gap:14px;margin-top:4px;">
-          <div class="loading">Laster coaches…</div>
+          <div style="color:var(--muted);font-size:14px;padding:20px 0;">Velg en match ovenfor for å administrere skyttertilgang per coach.</div>
         </div>
       </div>
 
@@ -843,20 +846,15 @@
       <div id="coachAccessError" class="error" style="display:none;"></div>
       <div id="coachAccessSuccess" class="success" style="display:none;"></div>
 
-      <div class="section-title" style="margin-top:0;">Skyttere med tilgang</div>
-      <div id="coachCurrentShooters" style="display:grid;gap:8px;margin-bottom:16px;max-height:220px;overflow-y:auto;">
+      <div class="section-title" style="margin-top:0;">Velg skyttere fra matchen</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Kun skyttere i valgt match vises. Hak av for å gi coach tilgang.</div>
+      <div id="coachShooterChecklist" style="display:grid;gap:7px;max-height:420px;overflow-y:auto;">
         <div class="loading">Laster…</div>
       </div>
 
-      <div class="section-title">Legg til skytter</div>
-      <div class="actions" style="margin-bottom:10px;">
-        <input id="coachShooterSearch" class="form-input search-inline" type="text" placeholder="Søk etter navn eller e-post" />
-        <button id="coachShooterSearchBtn" class="btn btn-primary">Søk</button>
-      </div>
-      <div id="coachShooterSearchResults" style="display:grid;gap:8px;max-height:220px;overflow-y:auto;"></div>
-
       <div class="form-actions" style="margin-top:18px;">
-        <button id="closeCoachAccessBtn" class="btn btn-secondary">Lukk</button>
+        <button id="saveCoachAccessBtn" class="btn btn-primary">Lagre tilgang</button>
+        <button id="closeCoachAccessBtn" class="btn btn-secondary">Avbryt</button>
       </div>
     </div>
   </div>
@@ -2616,31 +2614,65 @@
 
     // ══ COACH ACCESS MODULE ═══════════════════════════════════════════════
 
-    let coachAccessCache = {}; // { coachUid: { shooterUids: [...] } }
+    let coachAccessCache = {};   // { coachUid: { shooterUids: [...] } }
     let currentCoachUid = null;
+    let currentCoachMatchShooters = []; // shooters from selected match
+    let allMatchesForCoach = [];        // matches cache for coach panel
 
     async function loadCoachPanel() {
       const listEl = $('coachList');
-      listEl.innerHTML = '<div class="loading">Laster coaches…</div>';
+
+      // Load matches into dropdown if not already loaded
+      if (!allMatchesForCoach.length) {
+        try {
+          const snap = await getDocs(collection(db, 'matches'));
+          allMatchesForCoach = [];
+          snap.forEach(d => allMatchesForCoach.push({ id: d.id, ...d.data() }));
+          allMatchesForCoach.sort((a, b) => {
+            const da = a.date || ''; const db_ = b.date || '';
+            return db_ > da ? 1 : -1;
+          });
+          const sel = $('coachMatchSelect');
+          sel.innerHTML = '<option value="">— Velg match for å tildele skyttere —</option>' +
+            allMatchesForCoach.map(m =>
+              `<option value="${escapeAttr(m.id)}">${escapeHtml(m.name || m.id)} ${m.date ? '(' + m.date + ')' : ''}</option>`
+            ).join('');
+        } catch (e) {
+          console.warn('Could not load matches for coach panel', e);
+        }
+      }
+
+      // Count coaches
+      const coaches = allUsersCache.filter(u => {
+        const roles = Array.isArray(u.roles) ? u.roles : (u.role ? [u.role] : []);
+        return roles.includes('coach');
+      });
+      $('statCoachPanelTotal').textContent = coaches.length;
+
+      const selectedMatchId = $('coachMatchSelect').value;
+      if (!selectedMatchId) {
+        listEl.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0;">Velg en match ovenfor for å administrere skyttertilgang per coach.</div>';
+        $('statCoachPanelAssigned').textContent = '0';
+        return;
+      }
+
+      listEl.innerHTML = '<div class="loading">Laster…</div>';
 
       try {
-        // Find all users with coach role
-        const coaches = allUsersCache.filter(u => {
-          const roles = Array.isArray(u.roles) ? u.roles : (u.role ? [u.role] : []);
-          return roles.includes('coach');
-        });
-
-        $('statCoachPanelTotal').textContent = coaches.length;
+        // Load shooters from selected match
+        const matchSnap = await getDoc(doc(db, 'matches', selectedMatchId));
+        if (!matchSnap.exists()) {
+          listEl.innerHTML = '<div class="error">Match ikke funnet.</div>';
+          return;
+        }
+        currentCoachMatchShooters = (matchSnap.data().shooters || []).filter(s => !s.isMe);
 
         if (!coaches.length) {
           listEl.innerHTML = '<div class="empty-state"><h3>Ingen coaches</h3><p>Tildel coach-rollen til en bruker under Roller-fanen.</p></div>';
-          $('statCoachPanelAssigned').textContent = '0';
           return;
         }
 
-        // Load coachAccess docs for all coaches — use individual try/catch
-        // so a missing document (permission denied on non-existent doc) doesn't
-        // crash the whole panel
+        // Load coachAccess for all coaches
         let totalAssigned = 0;
         await Promise.all(coaches.map(async coach => {
           try {
@@ -2649,24 +2681,26 @@
             coachAccessCache[coach.id] = data;
             totalAssigned += (data.shooterUids || []).length;
           } catch {
-            // Document doesn't exist yet — treat as empty access list
             coachAccessCache[coach.id] = { shooterUids: [] };
           }
         }));
-
         $('statCoachPanelAssigned').textContent = totalAssigned;
 
+        // Render coach cards
         listEl.innerHTML = coaches.map(coach => {
           const name = `${coach.firstName || ''} ${coach.lastName || ''}`.trim() || coach.email || coach.id;
           const access = coachAccessCache[coach.id] || { shooterUids: [] };
-          const count = (access.shooterUids || []).length;
+          const assignedInMatch = currentCoachMatchShooters.filter(s =>
+            (access.shooterUids || []).includes(String(s.id))
+          ).length;
           return `
             <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
               <div>
                 <div style="font-size:16px;font-weight:800;">${escapeHtml(name)}</div>
                 <div style="font-size:12px;color:var(--muted);margin-top:3px;">${escapeHtml(coach.email || '')} &nbsp;·&nbsp; ${escapeHtml(coach.division || '')} ${escapeHtml(coach.club || '')}</div>
-                <div style="margin-top:8px;">
-                  <span class="badge badge-active">${count} skytter${count === 1 ? '' : 'e'} med tilgang</span>
+                <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                  <span class="badge badge-active">${assignedInMatch} av ${currentCoachMatchShooters.length} skyttere i matchen</span>
+                  <span class="badge badge-user">${(access.shooterUids || []).length} totalt</span>
                 </div>
               </div>
               <button class="btn btn-primary" onclick="window.openCoachAccess('${escapeAttr(coach.id)}', '${escapeAttr(name)}')">
@@ -2679,116 +2713,93 @@
       }
     }
 
-    window.openCoachAccess = async (coachUid, coachName) => {
+    $('coachMatchSelect').onchange = () => loadCoachPanel();
+
+    window.openCoachAccess = (coachUid, coachName) => {
       currentCoachUid = coachUid;
-      $('coachAccessModalTitle').textContent = 'Skyttertilgang — ' + coachName;
-      $('coachAccessModalSub').textContent = 'Skyttere coach kan følge på tvers av alle matcher.';
+      $('coachAccessModalTitle').textContent = 'Tilgang — ' + coachName;
+      $('coachAccessModalSub').textContent = 'Hak av skyttere fra matchen. Tilgangen gjelder på tvers av alle matcher.';
       $('coachAccessError').style.display = 'none';
       $('coachAccessSuccess').style.display = 'none';
-      $('coachShooterSearch').value = '';
-      $('coachShooterSearchResults').innerHTML = '';
+      renderCoachChecklist();
       $('coachAccessModal').classList.add('open');
-      renderCoachCurrentShooters();
     };
 
-    function renderCoachCurrentShooters() {
-      const el = $('coachCurrentShooters');
+    function renderCoachChecklist() {
+      const el = $('coachShooterChecklist');
       if (!currentCoachUid) return;
       const access = coachAccessCache[currentCoachUid] || { shooterUids: [] };
-      const uids = access.shooterUids || [];
+      const checked = new Set(access.shooterUids || []);
 
-      if (!uids.length) {
-        el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ingen skyttere tildelt ennå.</div>';
+      if (!currentCoachMatchShooters.length) {
+        el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ingen skyttere i denne matchen.</div>';
         return;
       }
 
-      el.innerHTML = uids.map(uid => {
-        const user = allUsersCache.find(u => u.id === uid);
-        const name = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email : uid;
-        const meta = user ? [user.division, user.club].filter(Boolean).join(' · ') : '';
+      el.innerHTML = currentCoachMatchShooters.map(s => {
+        const sid = String(s.id);
+        const sname = [s.firstName, s.lastName].filter(Boolean).join(' ') || sid;
+        const meta = [s.division, s.pf, s.club].filter(Boolean).join(' · ');
+        const isChecked = checked.has(sid);
         return `
-          <div class="participant-card">
-            <div class="participant-meta">
-              <div class="participant-name">${escapeHtml(name)}</div>
-              <div class="participant-sub">${escapeHtml(meta)}</div>
+          <label style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border:1px solid ${isChecked ? 'rgba(76,175,125,.35)' : 'var(--border)'};border-radius:var(--radius-sm);cursor:pointer;transition:border-color .12s;">
+            <input type="checkbox" value="${escapeAttr(sid)}" ${isChecked ? 'checked' : ''} style="width:17px;height:17px;accent-color:var(--accent);flex-shrink:0;" onchange="this.closest('label').style.borderColor=this.checked?'rgba(76,175,125,.35)':'var(--border)'">
+            <div>
+              <div style="font-weight:700;font-size:14px;">${escapeHtml(sname)}</div>
+              <div style="font-size:12px;color:var(--muted);">${escapeHtml(meta)}</div>
             </div>
-            <button class="btn btn-sm btn-danger" onclick="window.removeCoachShooter('${escapeAttr(uid)}')">Fjern</button>
-          </div>`;
+          </label>`;
       }).join('');
     }
 
-    window.removeCoachShooter = async (shooterUid) => {
+    $('saveCoachAccessBtn').onclick = async () => {
       if (!currentCoachUid) return;
-      const access = coachAccessCache[currentCoachUid] || { shooterUids: [] };
-      const updated = (access.shooterUids || []).filter(u => u !== shooterUid);
-      try {
-        await setDoc(doc(db, 'coachAccess', currentCoachUid), { shooterUids: updated, updatedAt: new Date().toISOString() });
-        coachAccessCache[currentCoachUid] = { shooterUids: updated };
-        renderCoachCurrentShooters();
-        loadCoachPanel();
-      } catch (e) {
-        showError($('coachAccessError'), 'Feil: ' + e.message);
-      }
-    };
+      $('coachAccessError').style.display = 'none';
 
-    window.addCoachShooter = async (shooterUid) => {
-      if (!currentCoachUid) return;
-      const access = coachAccessCache[currentCoachUid] || { shooterUids: [] };
-      const existing = access.shooterUids || [];
-      if (existing.includes(shooterUid)) return;
-      const updated = [...existing, shooterUid];
+      // Collect checked shooter IDs from match
+      const matchShooterIds = new Set(currentCoachMatchShooters.map(s => String(s.id)));
+      const checkedInModal = new Set(
+        [...$('coachShooterChecklist').querySelectorAll('input[type=checkbox]:checked')]
+          .map(cb => cb.value)
+      );
+
+      // Keep existing UIDs that are NOT in this match (from other matches), then add/remove match UIDs
+      const existing = coachAccessCache[currentCoachUid]?.shooterUids || [];
+      const fromOtherMatches = existing.filter(uid => !matchShooterIds.has(uid));
+      const updated = [...fromOtherMatches, ...checkedInModal];
+
       try {
-        await setDoc(doc(db, 'coachAccess', currentCoachUid), { shooterUids: updated, updatedAt: new Date().toISOString() });
+        await setDoc(doc(db, 'coachAccess', currentCoachUid), {
+          shooterUids: updated,
+          updatedAt: new Date().toISOString()
+        });
         coachAccessCache[currentCoachUid] = { shooterUids: updated };
-        renderCoachCurrentShooters();
-        $('coachShooterSearchResults').innerHTML = '';
-        $('coachShooterSearch').value = '';
+
         const successEl = $('coachAccessSuccess');
-        successEl.textContent = 'Skytter lagt til!';
+        successEl.textContent = '✓ Tilgang lagret!';
         successEl.style.display = 'block';
-        setTimeout(() => { successEl.style.display = 'none'; }, 2000);
-        loadCoachPanel();
+        setTimeout(() => {
+          successEl.style.display = 'none';
+          $('coachAccessModal').classList.remove('open');
+          currentCoachUid = null;
+          loadCoachPanel();
+        }, 1200);
       } catch (e) {
-        showError($('coachAccessError'), 'Feil: ' + e.message);
+        $('coachAccessError').textContent = 'Feil: ' + e.message;
+        $('coachAccessError').style.display = 'block';
       }
     };
 
-    $('coachShooterSearchBtn').onclick = () => {
-      const term = $('coachShooterSearch').value.trim().toLowerCase();
-      const resultsEl = $('coachShooterSearchResults');
-      if (!term) { resultsEl.innerHTML = ''; return; }
-
-      const access = coachAccessCache[currentCoachUid] || { shooterUids: [] };
-      const alreadyAdded = new Set(access.shooterUids || []);
-
-      const matches = allUsersCache.filter(u => {
-        if (alreadyAdded.has(u.id)) return false;
-        const name = `${u.firstName || ''} ${u.lastName || ''}`.trim().toLowerCase();
-        return name.includes(term) || String(u.email || '').toLowerCase().includes(term);
-      }).slice(0, 10);
-
-      if (!matches.length) {
-        resultsEl.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ingen treff.</div>';
-        return;
-      }
-
-      resultsEl.innerHTML = matches.map(u => {
-        const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email;
-        const meta = [u.division, u.club].filter(Boolean).join(' · ');
-        return `
-          <div class="user-search-item">
-            <div class="user-search-meta">
-              <div class="user-search-name">${escapeHtml(name)}</div>
-              <div class="user-search-sub">${escapeHtml(meta)} &nbsp;·&nbsp; ${escapeHtml(u.email || '')}</div>
-            </div>
-            <button class="btn btn-sm btn-primary" onclick="window.addCoachShooter('${escapeAttr(u.id)}')">+ Legg til</button>
-          </div>`;
-      }).join('');
+    $('closeCoachAccessBtn').onclick = () => {
+      $('coachAccessModal').classList.remove('open');
+      currentCoachUid = null;
     };
-
-    $('coachShooterSearch').addEventListener('keydown', e => { if (e.key === 'Enter') $('coachShooterSearchBtn').click(); });
-    $('closeCoachAccessBtn').onclick = () => { $('coachAccessModal').classList.remove('open'); currentCoachUid = null; };
-    $('coachAccessModal').addEventListener('click', e => { if (e.target === $('coachAccessModal')) { $('coachAccessModal').classList.remove('open'); currentCoachUid = null; } });
+    $('coachAccessModal').addEventListener('click', e => {
+      if (e.target === $('coachAccessModal')) {
+        $('coachAccessModal').classList.remove('open');
+        currentCoachUid = null;
+      }
+    });
 
     // ══ END COACH ACCESS MODULE ═══════════════════════════════════════════
 

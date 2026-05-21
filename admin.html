@@ -2715,17 +2715,59 @@
         const snap = await getDoc(doc(db, 'matches', matchId));
         if (!snap.exists()) { shootersEl.innerHTML = '<div class="error">Match ikke funnet.</div>'; return; }
 
-        const matchShooters = (snap.data().shooters || []).filter(s => !s.isMe);
-        if (!matchShooters.length) {
-          shootersEl.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ingen skyttere i denne matchen ennå.</div>';
+        const matchData = snap.data();
+
+        // Build shooter list from shooters[] array (those who have results)
+        const fromShooters = (matchData.shooters || [])
+          .filter(s => !s.isMe)
+          .map(s => ({
+            id:        String(s.id),
+            firstName: s.firstName || '',
+            lastName:  s.lastName  || '',
+            division:  s.division  || '',
+            pf:        s.pf || s.powerFactor || '',
+            club:      s.club || ''
+          }));
+
+        const knownIds = new Set(fromShooters.map(s => s.id));
+
+        // Also resolve participants[] UIDs not yet in shooters array
+        const participants = matchData.participants || [];
+        const extraUids = participants.map(String).filter(uid => !knownIds.has(uid));
+
+        const extraUsers = [];
+        await Promise.all(extraUids.map(async uid => {
+          try {
+            const ud = await getDoc(doc(db, 'users', uid));
+            if (ud.exists()) {
+              const u = ud.data();
+              extraUsers.push({
+                id:        uid,
+                firstName: u.firstName || '',
+                lastName:  u.lastName  || '',
+                division:  u.division  || '',
+                pf:        u.powerFactor || '',
+                club:      u.club || ''
+              });
+            }
+          } catch {}
+        }));
+
+        const allShooters = [...fromShooters, ...extraUsers];
+
+        if (!allShooters.length) {
+          shootersEl.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ingen deltakere i denne matchen ennå.</div>';
           return;
         }
+
+        // Sort by last name
+        allShooters.sort((a, b) => a.lastName.localeCompare(b.lastName, 'no'));
 
         const access  = coachAccessCache[coachId] || { shooterUids: [] };
         const checked = new Set(access.shooterUids || []);
 
-        shootersEl.innerHTML = matchShooters.map(s => {
-          const sid   = String(s.id);
+        shootersEl.innerHTML = allShooters.map(s => {
+          const sid   = s.id;
           const sname = [s.firstName, s.lastName].filter(Boolean).join(' ') || sid;
           const meta  = [s.division, s.pf, s.club].filter(Boolean).join(' · ');
           const isChk = checked.has(sid);

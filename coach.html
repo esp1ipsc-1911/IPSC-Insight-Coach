@@ -1029,12 +1029,26 @@
         const snap = await getDocs(collection(db, 'matches'));
         const relevantMatches = [];
         snap.forEach(d => {
-          const data = d.data();
-          const shooters = (data.shooters || []).filter(s => !s.isMe);
-          const hasAllowed = shooters.some(s => allowedShooterUids.includes(String(s.id)));
-          const participantsHasAllowed = (data.participants || []).some(uid => allowedShooterUids.includes(String(uid)));
-          if (hasAllowed || participantsHasAllowed) {
-            relevantMatches.push({ id: d.id, ...data });
+          try {
+            const data = d.data();
+            // Guard: shooters must be an array of objects
+            const rawShooters = Array.isArray(data.shooters) ? data.shooters : [];
+            const shooters = rawShooters.filter(s => s && typeof s === 'object' && !s.isMe);
+            const hasAllowed = shooters.some(s => {
+              const sid = s.id != null ? String(s.id) : '';
+              return sid && allowedShooterUids.includes(sid);
+            });
+            // Guard: participants must be array of strings
+            const rawParticipants = Array.isArray(data.participants) ? data.participants : [];
+            const participantsHasAllowed = rawParticipants.some(uid => {
+              const uidStr = uid != null ? String(uid) : '';
+              return uidStr && allowedShooterUids.includes(uidStr);
+            });
+            if (hasAllowed || participantsHasAllowed) {
+              relevantMatches.push({ id: d.id, ...data });
+            }
+          } catch (innerErr) {
+            console.warn('Skipping match due to error:', d.id, innerErr);
           }
         });
 
@@ -1085,7 +1099,8 @@
 
       // Subscribe to each relevant match
       matches.forEach(m => {
-        const unsub = onSnapshot(doc(db, 'matches', m.id), snap => {
+        if (!m.id) { console.warn('Skipping match with no id', m); return; }
+        const unsub = onSnapshot(doc(db, 'matches', String(m.id)), snap => {
           if (snap.exists()) {
             allMatchData[snap.id] = { id: snap.id, ...snap.data() };
           } else {

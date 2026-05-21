@@ -629,24 +629,15 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
   // Use ALL shooters from match.shooters[] for standings
   // shooterTotals comes from calcMatchTotals which already covers all shooters
   // But we also need to catch manually added shooters with no results yet
-  const allMatchShooters = (match.shooters||[]).filter(s => !s.isMe);
-  const totalMap = {};
-  (shooterTotals||[]).forEach(t => { totalMap[String(t.uid)] = t; });
+  // Use shooterTotals directly — already includes all shooters incl. isMe
+  // shooterTotals comes from calcMatchTotals which uses stage-normalised scoring
+  let allEntries = (shooterTotals||[]).map(t => ({
+    uid:   t.uid,
+    name:  t.name,
+    pts:   t.pts || 0,
+    isRef: false
+  }));
 
-  // Build complete entry list
-  let allEntries = allMatchShooters.map(s => {
-    const uid = String(s.id);
-    const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || uid;
-    const existing = totalMap[uid];
-    return {
-      uid,
-      name,
-      pts: existing ? (existing.pts||0) : 0,
-      isRef: false
-    };
-  });
-
-  // Sort by pts desc
   allEntries.sort((a,b) => b.pts - a.pts);
 
   // Add ref shooters if toggle is on
@@ -688,7 +679,7 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
     allEntries.map((t,i) => {
       const mine = myUids.has(t.uid);
       const pct  = leader>0 ? (t.pts/leader*100).toFixed(1) : '0.0';
-      const ptsStr = t.pts > 0 ? Math.round(t.pts).toString() : '—';
+      const ptsStr = t.pts > 0 ? t.pts.toFixed(1) : '—';
       return '<tr class="' + (mine?'me':'') + ' ' + (t.isRef?'ref-row':'') + '">' +
         '<td style="font-weight:800;' + (mine?'color:var(--accent);':t.isRef?'color:var(--blue);':'') + '">' + (i+1) + '</td>' +
         '<td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escH(t.name) + (t.isRef?'<span class="ref-badge">REF</span>':'') + '</td>' +
@@ -1021,12 +1012,19 @@ window.toggleStageDetail = (uid, stageNum, isDone) => {
     return;
   }
 
-  // Find shooter data
-  const match = Object.values(allMatchData)[0];
-  if (!match) return;
-  const shooter = (match.shooters||[]).find(s => String(s.id)===uid);
-  const st = (shooter?.stages||[]).find(s => Number(s.num||s.number)===stageNum);
-  if (!st) { detailEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Ingen data for denne stage.</div>'; detailEl.classList.add('open'); return; }
+  // Find shooter data — search across ALL matches for this uid
+  let match = null, shooter = null, st = null;
+  for (const m of Object.values(allMatchData)) {
+    const sh = (m.shooters||[]).find(s => String(s.id)===uid);
+    if (sh) {
+      const found = (sh.stages||[]).find(s => Number(s.num||s.number)===stageNum);
+      if (found) { match=m; shooter=sh; st=found; break; }
+      // Keep as fallback even if this stage not found
+      if (!shooter) { match=m; shooter=sh; }
+    }
+  }
+  if (!shooter) { detailEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Ingen data funnet.</div>'; detailEl.classList.add('open'); return; }
+  if (!st) { detailEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Stage ' + stageNum + ' er ikke skutt ennå.</div>'; detailEl.classList.add('open'); return; }
 
   const pf   = (shooter.pf||shooter.powerFactor||'minor').toLowerCase();
   const pts  = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
@@ -1094,6 +1092,7 @@ window.toggleStageDetail = (uid, stageNum, isDone) => {
 // ── Stage metrics helper ──────────────────────────────
 function stageMetrics(match, stageNum) {
   const results = [];
+  // Include ALL shooters (isMe + manual + regular)
   (match.shooters||[]).forEach(sh => {
     const st = (sh.stages||[]).find(s => Number(s.num||s.number)===stageNum && s.time>0);
     if (!st) return;
@@ -1117,35 +1116,62 @@ function coachTip(aPct, avgHF, doneCount) {
   return '⚡ Stol på baseline — skyt kontrollert.';
 }
 
-// ── Match totals (standings) — ALL shooters incl. manually added ──
+// ── Match totals (standings) — stage-normalised scoring (IPSC method) ──
+// Uses same method as appen: for each stage, best HF = 100%, others get proportional pts
 function calcMatchTotals(match, stageDefs) {
   const totals = {};
-  const stageNums = stageDefs.map(sd => Number(sd.number));
 
-  // 1. All shooters in match.shooters[] (includes manually added)
-  const matchShooters = (match.shooters||[]).filter(s => !s.isMe);
-  matchShooters.forEach(sh => {
-    const uid  = String(sh.id);
+  // Include ALL shooters: both isMe and non-isMe, plus participants
+  const allMatchShooters = (match.shooters||[]);  // do NOT filter isMe here
+  const shooterIds = new Set();
+
+  allMatchShooters.forEach(sh => {
+    const uid = String(sh.id);
+    shooterIds.add(uid);
     const name = [sh.firstName, sh.lastName].filter(Boolean).join(' ') || _userCache[uid]?.name || uid;
-    const pf   = (sh.pf||sh.powerFactor||'minor').toLowerCase();
-    let pts = 0;
-    (sh.stages||[]).forEach(st => {
-      if (!(st.time>0)) return;
-      if (!stageNums.includes(Number(st.num||st.number))) return;
-      pts += calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
-    });
-    totals[uid] = { uid, name, pts };
+    totals[uid] = { uid, name, stagePts: 0, rawPts: 0, pf: (sh.pf||sh.powerFactor||'minor').toLowerCase() };
   });
 
-  // 2. Participants not yet in shooters[] (joined but no results)
-  const shooterIds = new Set(matchShooters.map(s => String(s.id)));
+  // Participants not in shooters[]
   (match.participants||[]).map(String).forEach(uid => {
     if (shooterIds.has(uid)) return;
+    shooterIds.add(uid);
     const cached = _userCache[uid];
-    totals[uid] = { uid, name: cached?.name || uid, pts: 0 };
+    totals[uid] = { uid, name: cached?.name || uid, stagePts: 0, rawPts: 0, pf: 'minor' };
   });
 
-  return Object.values(totals).sort((a,b) => b.pts - a.pts);
+  // For each stage: find best HF, then give each shooter proportional stage pts
+  stageDefs.forEach(sd => {
+    const stageNum = Number(sd.number);
+    const maxPts = stageMaxPts(sd);
+
+    // Collect all results for this stage
+    const stageResults = [];
+    allMatchShooters.forEach(sh => {
+      const uid = String(sh.id);
+      const st  = (sh.stages||[]).find(s => Number(s.num||s.number)===stageNum && s.time>0);
+      if (!st) return;
+      const pf  = (sh.pf||sh.powerFactor||'minor').toLowerCase();
+      const pts = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+      const hf  = st.time>0 ? pts/st.time : 0;
+      stageResults.push({ uid, hf, pts });
+    });
+
+    if (!stageResults.length) return;
+    const bestHF = Math.max(...stageResults.map(r => r.hf));
+    if (bestHF <= 0) return;
+
+    stageResults.forEach(r => {
+      if (!totals[r.uid]) return;
+      const stagePts = (r.hf / bestHF) * maxPts;
+      totals[r.uid].stagePts += stagePts;
+      totals[r.uid].rawPts  += r.pts;
+    });
+  });
+
+  return Object.values(totals)
+    .map(t => ({ ...t, pts: t.stagePts }))
+    .sort((a,b) => b.pts - a.pts);
 }
 
 // ── Get all match shooters (participants + shooters[]) ─
@@ -1183,35 +1209,36 @@ function getMatchShooters(match) {
   const seen = new Set();
   const result = [];
 
-  // 1. Participants
-  participants.forEach(uid => {
-    if (seen.has(uid)) return;
-    seen.add(uid);
-    const sh = byUid[uid];
-    const name = sh
-      ? [sh.firstName, sh.lastName].filter(Boolean).join(' ') || uid
-      : (_userCache[uid]?.name || uid);
-    result.push({
-      uid,
-      name,
-      division: sh?.division || _userCache[uid]?.division || '',
-      pf:       sh?.pf || sh?.powerFactor || _userCache[uid]?.pf || 'minor',
-      club:     sh?.club || _userCache[uid]?.club || ''
-    });
-  });
-
-  // 2. Manually added shooters not in participants[]
-  shootersArr.forEach(s => {
+  // 1. All shooters in match.shooters[] (includes isMe and manual)
+  // Use shooters[] as primary source — it has names and division
+  const allSh = (match.shooters||[]);
+  allSh.forEach(s => {
     const uid = String(s.id);
     if (seen.has(uid)) return;
     seen.add(uid);
-    const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || uid;
+    const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || _userCache[uid]?.name || uid;
     result.push({
       uid,
       name,
-      division: s.division || '',
-      pf:       s.pf || s.powerFactor || 'minor',
-      club:     s.club || ''
+      division: s.division || _userCache[uid]?.division || '',
+      pf:       s.pf || s.powerFactor || _userCache[uid]?.pf || 'minor',
+      club:     s.club || _userCache[uid]?.club || '',
+      isMe:     !!s.isMe
+    });
+  });
+
+  // 2. Participants not yet in shooters[] (joined but no results/entry)
+  participants.forEach(uid => {
+    if (seen.has(uid)) return;
+    seen.add(uid);
+    const cached = _userCache[uid];
+    result.push({
+      uid,
+      name:     cached?.name || uid,
+      division: cached?.division || '',
+      pf:       cached?.pf || 'minor',
+      club:     cached?.club || '',
+      isMe:     false
     });
   });
 

@@ -428,20 +428,28 @@ onAuthStateChanged(auth, async user => {
       $('setupSection').style.display = 'flex';
       $('dashSection').style.display  = 'none';
 
-      // Load coachAccess — get both shooterUids and matchId
-      let coachMatchId = null;
+      // Load coachAccess — new format: { matches: [{matchId, shooterUids}] }
+      let coachMatches = []; // [{matchId, shooterUids:[]}]
       try {
         const as = await getDoc(doc(db, 'coachAccess', user.uid));
         if (as.exists()) {
-          const raw = as.data().shooterUids || [];
-          allowedUids  = raw.map(String).filter(u => u && u !== 'undefined');
-          coachMatchId = as.data().matchId ? String(as.data().matchId) : null;
-        } else {
-          allowedUids = [];
+          const data = as.data();
+          if (Array.isArray(data.matches)) {
+            coachMatches = data.matches.filter(m => m.matchId && (m.shooterUids||[]).length > 0);
+          } else {
+            // Legacy format migration
+            const legacyUids = (data.shooterUids||[]).map(String).filter(u => u && u !== 'undefined');
+            if (legacyUids.length && data.matchId) {
+              coachMatches = [{ matchId: String(data.matchId), shooterUids: legacyUids }];
+            }
+          }
         }
-      } catch { allowedUids = []; }
+      } catch { coachMatches = []; }
 
-      await autoStart(coachMatchId);
+      // Build allowedUids = all UIDs across all matches (for compatibility)
+      allowedUids = [...new Set(coachMatches.flatMap(m => m.shooterUids))];
+
+      await autoStart(coachMatches);
     } catch (e) { await logout('Feil: ' + e.message); }
   } else {
     currentUser = null;
@@ -474,16 +482,16 @@ $('loginPassword').addEventListener('keydown', e => { if(e.key==='Enter') $('log
 $('logoutBtn').onclick = () => logout();
 
 // ── Auto-start ────────────────────────────────────────
-async function autoStart(coachMatchId) {
-  if (!allowedUids || allowedUids.length===0) {
+async function autoStart(coachMatches) {  // coachMatches = [{matchId, shooterUids}]
+  if (!coachMatches || !coachMatches.length) {
     $('loginSection').style.display = 'none';
     $('setupSection').style.display = 'none';
     $('dashSection').style.display  = 'block';
     $('dashContent').innerHTML = `
       <div class="loading-msg">
         <div style="font-size:40px;margin-bottom:12px;">🔒</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen skyttere tildelt</div>
-        <div style="color:var(--muted);font-size:13px;">Admin må tildele deg skyttere.</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen matcher tildelt</div>
+        <div style="color:var(--muted);font-size:13px;">Admin må tildele deg skyttere og matcher.</div>
       </div>`;
     return;
   }
@@ -495,67 +503,31 @@ async function autoStart(coachMatchId) {
     rs.forEach(d => allRefShooters.push({ id: d.id, ...d.data() }));
   } catch {}
 
-  // Find match — use coachMatchId from coachAccess if available
+  $('loginSection').style.display = 'none';
+  $('setupSection').style.display = 'none';
+  $('dashSection').style.display  = 'block';
+
+  // Subscribe to ALL assigned matches simultaneously
+  matchUnsubscribes.forEach(u => u());
+  matchUnsubscribes = [];
+  allMatchData = {};
+
+  // Store per-match allowed UIDs
+  window._coachMatchUids = {};
+  coachMatches.forEach(m => {
+    window._coachMatchUids[String(m.matchId)] = (m.shooterUids||[]).map(String);
+  });
+
   try {
-    let chosen = null;
-
-    if (coachMatchId) {
-      // Admin has specified a match — load it directly
-      try {
-        const ms = await getDoc(doc(db, 'matches', coachMatchId));
-        if (ms.exists()) chosen = { id: ms.id, ...ms.data() };
-      } catch {}
-    }
-
-    if (!chosen) {
-      // Fallback: find most recent match where allowed UIDs are participants
-      const snap = await getDocs(collection(db, 'matches'));
-      const relevant = [];
-      snap.forEach(d => {
-        try {
-          const data = d.data();
-          const participants = (data.participants||[]).map(String);
-          if (participants.some(uid => allowedUids.includes(uid)))
-            relevant.push({ id: d.id, ...data });
-        } catch {}
+    coachMatches.forEach(entry => {
+      const mid = String(entry.matchId);
+      const unsub = onSnapshot(doc(db, 'matches', mid), snap => {
+        if (snap.exists()) { allMatchData[snap.id] = { id: snap.id, ...snap.data() }; }
+        else { delete allMatchData[snap.id]; }
+        renderDash();
       });
-      relevant.sort((a,b) => {
-        const aA = (a.status||'').toLowerCase()==='active'?1:0;
-        const bA = (b.status||'').toLowerCase()==='active'?1:0;
-        if (bA!==aA) return bA-aA;
-        return (b.date||'') > (a.date||'') ? 1 : -1;
-      });
-      chosen = relevant[0] || null;
-    }
-
-    if (!chosen) {
-      $('loginSection').style.display = 'none';
-      $('setupSection').style.display = 'none';
-      $('dashSection').style.display  = 'block';
-      $('dashContent').innerHTML = `
-        <div class="loading-msg">
-          <div style="font-size:40px;margin-bottom:12px;">🎯</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen aktive matcher</div>
-          <div style="color:var(--muted);font-size:13px;">Admin har ikke tildelt en match ennå.</div>
-        </div>`;
-      return;
-    }
-    $('loginSection').style.display = 'none';
-    $('setupSection').style.display = 'none';
-    $('dashSection').style.display  = 'block';
-
-    // Subscribe
-    matchUnsubscribes.forEach(u => u());
-    matchUnsubscribes = [];
-    allMatchData = {};
-
-    const unsub = onSnapshot(doc(db, 'matches', String(chosen.id)), snap => {
-      if (snap.exists()) { allMatchData[snap.id] = { id: snap.id, ...snap.data() }; }
-      else { delete allMatchData[snap.id]; }
-      renderDash();
+      matchUnsubscribes.push(unsub);
     });
-    matchUnsubscribes.push(unsub);
-
   } catch(e) {
     $('dashContent').innerHTML = `<div class="loading-msg">Feil: ${escH(e.message)}</div>`;
   }
@@ -570,120 +542,132 @@ $('toggleRefAllBtn').onclick = () => {
   });
 };
 
-// ── Render dashboard ──────────────────────────────────
+// ── Render dashboard — all matches ───────────────────
 function renderDash() {
   const matches = Object.values(allMatchData);
-  if (!matches.length) return;
+  if (!matches.length) {
+    $('dashContent').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Venter på data…</div>';
+    return;
+  }
+  matches.sort((a,b) => (b.date||'') > (a.date||'') ? 1 : -1);
 
-  const match = matches[0];
+  $('topMatchName').innerHTML = matches
+    .map(m => `<strong>${escH(m.name||m.id)}</strong>`)
+    .join(' &nbsp;·&nbsp; ');
 
-  // Topbar
-  $('topMatchName').innerHTML =
-    `<strong>${escH(match.name||match.id)}</strong> &nbsp;·&nbsp; ${escH(match.date||'')} &nbsp;·&nbsp; ${escH(match.status||'')}`;
+  $('matchHeader').style.display = 'none';
+  $('standingsStrip').style.display = 'none';
 
-  // Match header
-  const stageDefs = getStageDefs(match);
+  $('dashContent').innerHTML = matches.map(match => renderMatchSection(match)).join('') ||
+    '<div class="loading-msg">Ingen data.</div>';
+
+  if (!refVisible) {
+    document.querySelectorAll('.ref-section').forEach(el => el.style.display='none');
+  }
+  matches.forEach(m => resolveUnknownNames(m));
+}
+
+function renderMatchSection(match) {
+  const mid = String(match.id);
+  const matchUids = (window._coachMatchUids||{})[mid] || allowedUids || [];
+  const stageDefs  = getStageDefs(match);
   const allShooters = getMatchShooters(match);
-  const myShooters  = allShooters.filter(s => allowedUids.includes(String(s.uid)));
+  const myShooters  = allShooters.filter(s => matchUids.includes(String(s.uid)));
 
-  // Count skutt stages across coach's shooters
   const shotCounts = myShooters.map(s => {
     const sh = (match.shooters||[]).find(x => String(x.id)===s.uid);
     return (sh?.stages||[]).filter(st => st.time>0).length;
   });
   const avgShot = shotCounts.length ? Math.round(shotCounts.reduce((a,b)=>a+b,0)/shotCounts.length) : 0;
 
-  $('matchHeader').style.display = '';
-  $('matchTitle').textContent = match.name || match.id;
-  $('matchMeta').textContent = [match.date, match.location, match.type].filter(Boolean).join(' · ');
-  $('matchStats').innerHTML = `
-    <div class="mstat"><div class="mstat-val">${stageDefs.length}</div><div class="mstat-lbl">Stages</div></div>
-    <div class="mstat"><div class="mstat-val">${myShooters.length}</div><div class="mstat-lbl">Mine skyttere</div></div>
-    <div class="mstat"><div class="mstat-val" style="color:var(--green);">${avgShot}</div><div class="mstat-lbl">Snitt skutt</div></div>
-    <div class="mstat"><div class="mstat-val" style="color:var(--muted);">${stageDefs.length-avgShot}</div><div class="mstat-lbl">Igjen</div></div>
-  `;
-
-  // Standings strip — all participants ranked
-  renderStandings(match, stageDefs, myShooters);
-
-  // Shooter cards
-  if (!myShooters.length) {
-    $('dashContent').innerHTML = `
-      <div class="loading-msg">
-        <div>Ingen av dine skyttere er deltakere i denne matchen.</div>
-      </div>`;
-    return;
-  }
-
-  // Compute standings rank for each shooter
   const totals = calcMatchTotals(match, stageDefs);
   const rankMap = {};
   totals.forEach((t,i) => { rankMap[t.uid] = i+1; });
 
-  $('dashContent').innerHTML = `<div class="shooter-grid">${
-    myShooters.map(s => renderCard(s, match, stageDefs, rankMap)).join('')
-  }</div>`;
+  const standingsHtml = buildStandingsTable(match, stageDefs, myShooters, totals);
+  const cardsHtml = myShooters.length
+    ? myShooters.map(s => renderCard(s, match, stageDefs, rankMap)).join('')
+    : `<div class="loading-msg" style="padding:30px;font-size:13px;">Ingen tildelte skyttere er deltakere i denne matchen.</div>`;
 
-  // Apply ref toggle
-  if (!refVisible) {
-    document.querySelectorAll('.ref-section').forEach(el => el.style.display='none');
-  }
-
-  // Resolve any unknown shooter names async (participants not in shooters[])
-  resolveUnknownNames(match);
+  return `
+    <div class="match-section" id="msec-${escA(mid)}" style="margin-bottom:28px;">
+      <div style="background:linear-gradient(135deg,rgba(19,23,32,0),rgba(26,30,40,.6));border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:18px;font-weight:800;">${escH(match.name||match.id)}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${escH([match.date,match.location,match.type].filter(Boolean).join(' · '))}</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+          <div class="mstat"><div class="mstat-val">${stageDefs.length}</div><div class="mstat-lbl">Stages</div></div>
+          <div class="mstat"><div class="mstat-val">${myShooters.length}</div><div class="mstat-lbl">Skyttere</div></div>
+          <div class="mstat"><div class="mstat-val" style="color:var(--green);">${avgShot}</div><div class="mstat-lbl">Snitt skutt</div></div>
+          <div class="mstat"><div class="mstat-val" style="color:var(--muted);">${stageDefs.length-avgShot}</div><div class="mstat-lbl">Igjen</div></div>
+          <button onclick="window.openShooterModalForMatch('${escA(mid)}')" class="btn btn-primary btn-sm">+ Skytter</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 280px;align-items:start;">
+        <div style="padding:12px 16px;">
+          <div class="shooter-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr));">
+            ${cardsHtml}
+          </div>
+        </div>
+        <div style="border-left:1px solid var(--border);padding:12px;position:sticky;top:52px;max-height:calc(100vh - 52px);overflow-y:auto;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Live standings</div>
+            <button onclick="window.toggleRefInStandings('${escA(mid)}')" id="refStandBtn-${escA(mid)}" class="tog-btn on" style="font-size:10px;padding:2px 7px;"><span class="dot"></span>Ref</button>
+          </div>
+          ${standingsHtml}
+        </div>
+      </div>
+    </div>`;
 }
 
-// ── Standings strip ───────────────────────────────────
-function renderStandings(match, stageDefs, myShooters) {
-  const shooterTotals = calcMatchTotals(match, stageDefs);
-
-  // Build ref entries if toggled on
-  let allEntries = [...shooterTotals];
-  if (refInStandings && allRefShooters.length) {
-    // Get match division from my shooters
+function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
+  const myUids = new Set(myShooters.map(s => s.uid));
+  const mid = String(match.id);
+  const showRef = (window._refInStandings||{})[mid] !== false;
+  let allEntries = shooterTotals.map(t => ({ ...t, isRef: false }));
+  if (showRef && allRefShooters.length) {
     const myDiv = myShooters[0]?.division || '';
     allRefShooters
-      .filter(r => !r.division || r.division.toLowerCase() === myDiv.toLowerCase())
+      .filter(r => !r.division || r.division.toLowerCase()===(myDiv||'').toLowerCase())
       .slice(0,4)
       .forEach(r => {
-        const hf = r.mediumHF || r.shortHF || r.longHF || 0;
-        // Estimate ref pts based on avg HF × total stage time weight
-        const estPts = hf * stageDefs.length * 15; // rough proxy
-        allEntries.push({ uid:'ref_'+r.id, name: r.name || r.id, pts: estPts, isRef: true });
+        const hf = r.mediumHF||r.shortHF||r.longHF||0;
+        allEntries.push({ uid:'ref_'+r.id, name: r.name||r.id, pts: hf * stageDefs.length * 15, isRef: true });
       });
-    allEntries.sort((a,b) => b.pts - a.pts);
+    allEntries.sort((a,b) => b.pts-a.pts);
   }
-
-  if (!allEntries.length) { $('standingsStrip').style.display='none'; return; }
-
-  const myUids = new Set(myShooters.map(s=>s.uid));
+  if (!allEntries.length) return '<div style="color:var(--muted);font-size:12px;padding:8px 0;">Ingen resultater ennå.</div>';
   const leader = allEntries[0].pts;
-  $('standingsStrip').style.display = '';
-  $('standingsInner').innerHTML = allEntries.map((t,i) => {
-    const mine = myUids.has(t.uid);
-    const pct  = leader>0 ? (t.pts/leader*100).toFixed(1) : '0.0';
-    return `
-      <div class="s-chip ${mine?'mine':''} ${t.isRef?'ref-chip':''}">
-        <span class="s-chip-rank" style="${t.isRef?'color:var(--blue);':''}">${i+1}</span>
-        <span class="s-chip-name">${escH(t.name)}${t.isRef?'<span class="ref-badge">REF</span>':''}</span>
-        <span class="s-chip-pts">${t.pts.toFixed(0)}</span>
-        <span class="s-chip-pct">${pct}%</span>
-      </div>`;
-  }).join('');
+  return `<table class="standings-table">
+    <thead><tr>
+      <th style="width:22px;">#</th><th>Navn</th>
+      <th style="text-align:right;">Pts</th><th style="text-align:right;">%</th>
+    </tr></thead>
+    <tbody>${allEntries.map((t,i) => {
+      const mine = myUids.has(t.uid);
+      const pct  = leader>0 ? (t.pts/leader*100).toFixed(1) : '0.0';
+      return `<tr class="${mine?'me':''} ${t.isRef?'ref-row':''}">
+        <td style="font-weight:800;${mine?'color:var(--accent);':t.isRef?'color:var(--blue);':''}">${i+1}</td>
+        <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escH(t.name)}${t.isRef?'<span class="ref-badge">REF</span>':''}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">${t.pts.toFixed(0)}</td>
+        <td style="text-align:right;color:${mine?'var(--accent)':t.isRef?'var(--blue)':'var(--muted)'};">${pct}%</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
 }
 
-// Toggle ref in standings
-$('toggleRefStandingsBtn').onclick = () => {
-  refInStandings = !refInStandings;
-  $('toggleRefStandingsBtn').classList.toggle('on', refInStandings);
-  const matches = Object.values(allMatchData);
-  if (matches.length) {
-    const match = matches[0];
-    const stageDefs = getStageDefs(match);
-    const allShooters = getMatchShooters(match);
-    const myShooters = allShooters.filter(s => allowedUids.includes(s.uid));
-    renderStandings(match, stageDefs, myShooters);
-  }
+window.toggleRefInStandings = (mid) => {
+  window._refInStandings = window._refInStandings || {};
+  window._refInStandings[mid] = (window._refInStandings[mid] === false) ? true : false;
+  const btn = document.getElementById('refStandBtn-' + mid);
+  if (btn) btn.classList.toggle('on', window._refInStandings[mid] !== false);
+  renderDash();
+};
+
+window.openShooterModalForMatch = (matchId) => {
+  window._shooterModalMatchId = matchId;
+  window.openShooterModal();
 };
 
 // ── Render one shooter card ───────────────────────────
@@ -1259,8 +1243,10 @@ $('saveResBtn').onclick = async () => {
 
 // ── Add / Edit / Delete Shooter ──────────────────────
 window.openShooterModal = () => {
-  const match = Object.values(allMatchData)[0];
+  const matchId = window._shooterModalMatchId || Object.keys(allMatchData)[0];
+  const match = matchId ? allMatchData[matchId] : Object.values(allMatchData)[0];
   if (!match) return;
+  window._shooterModalMatchId = String(match.id);
   shooterEditId = null;
   $('shooterModalTitle').textContent = 'Legg til skytter';
   $('shooterModalSub').textContent = match.name || 'Matchen';
@@ -1290,7 +1276,8 @@ window.editShooterInModal = (id) => {
 
 window.deleteShooterFromModal = async (id) => {
   if (!confirm('Slett denne skytteren?')) return;
-  const match = Object.values(allMatchData)[0];
+  const matchId = window._shooterModalMatchId || Object.keys(allMatchData)[0];
+  const match = matchId ? allMatchData[matchId] : Object.values(allMatchData)[0];
   if (!match) return;
   const shooters = (match.shooters||[]).filter(s => String(s.id)!==String(id));
   try {
@@ -1322,7 +1309,8 @@ function renderShooterList(match) {
 }
 
 $('saveShooterBtn').onclick = async () => {
-  const match = Object.values(allMatchData)[0];
+  const matchId = window._shooterModalMatchId || Object.keys(allMatchData)[0];
+  const match = matchId ? allMatchData[matchId] : Object.values(allMatchData)[0];
   if (!match) return;
   const fn  = $('shFirstName').value.trim();
   const ln  = $('shLastName').value.trim();

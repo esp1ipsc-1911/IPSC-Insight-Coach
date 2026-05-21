@@ -2717,43 +2717,51 @@
 
         const matchData = snap.data();
 
-        // Build shooter list from shooters[] array (those who have results)
-        const fromShooters = (matchData.shooters || [])
-          .filter(s => !s.isMe)
-          .map(s => ({
-            id:        String(s.id),
-            firstName: s.firstName || '',
-            lastName:  s.lastName  || '',
-            division:  s.division  || '',
-            pf:        s.pf || s.powerFactor || '',
-            club:      s.club || ''
-          }));
+        // Build shooter list using participants[] as canonical UID source.
+        // participants[] always contains real Firebase user UIDs.
+        // We resolve each UID to a user profile from users/{uid} or from shooters[].
+        const participants = (matchData.participants || []).map(String).filter(Boolean);
+        const shootersArr  = (matchData.shooters || []).filter(s => !s.isMe);
 
-        const knownIds = new Set(fromShooters.map(s => s.id));
+        // Build a lookup: uid -> shooter data from shooters[]
+        // shooters[].id should equal the UID if set correctly
+        const shooterByUid = {};
+        shootersArr.forEach(s => {
+          if (s.id) shooterByUid[String(s.id)] = s;
+        });
 
-        // Also resolve participants[] UIDs not yet in shooters array
-        const participants = matchData.participants || [];
-        const extraUids = participants.map(String).filter(uid => !knownIds.has(uid));
-
-        const extraUsers = [];
-        await Promise.all(extraUids.map(async uid => {
-          try {
-            const ud = await getDoc(doc(db, 'users', uid));
-            if (ud.exists()) {
-              const u = ud.data();
-              extraUsers.push({
-                id:        uid,
-                firstName: u.firstName || '',
-                lastName:  u.lastName  || '',
-                division:  u.division  || '',
-                pf:        u.powerFactor || '',
-                club:      u.club || ''
-              });
-            }
-          } catch {}
+        // Resolve every participant to a display record
+        const allShooters = [];
+        await Promise.all(participants.map(async uid => {
+          const fromMatch = shooterByUid[uid];
+          if (fromMatch) {
+            // Already have name/division from shooters[]
+            allShooters.push({
+              id:        uid,   // always use UID as the canonical id
+              firstName: fromMatch.firstName || '',
+              lastName:  fromMatch.lastName  || '',
+              division:  fromMatch.division  || '',
+              pf:        fromMatch.pf || fromMatch.powerFactor || '',
+              club:      fromMatch.club || ''
+            });
+          } else {
+            // Not in shooters[] yet — look up users collection
+            try {
+              const ud = await getDoc(doc(db, 'users', uid));
+              if (ud.exists()) {
+                const u = ud.data();
+                allShooters.push({
+                  id:        uid,
+                  firstName: u.firstName || '',
+                  lastName:  u.lastName  || '',
+                  division:  u.division  || '',
+                  pf:        u.powerFactor || '',
+                  club:      u.club || ''
+                });
+              }
+            } catch {}
+          }
         }));
-
-        const allShooters = [...fromShooters, ...extraUsers];
 
         if (!allShooters.length) {
           shootersEl.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ingen deltakere i denne matchen ennå.</div>';
@@ -2799,6 +2807,8 @@
 
       if (!matchId || !shootersEl) return;
 
+
+
       // Get all shooter IDs in the currently shown match
       const checkboxes    = shootersEl.querySelectorAll('input[type=checkbox]');
       const matchShooterIds = new Set([...checkboxes].map(cb => cb.value));
@@ -2812,9 +2822,10 @@
       try {
         await setDoc(doc(db, 'coachAccess', coachId), {
           shooterUids: updated,
+          matchId: matchId,          // which match these UIDs belong to
           updatedAt: new Date().toISOString()
         });
-        coachAccessCache[coachId] = { shooterUids: updated };
+        coachAccessCache[coachId] = { shooterUids: updated, matchId };
 
         if (countBadge) countBadge.textContent = `${updated.length} skytter${updated.length === 1 ? '' : 'e'} med tilgang`;
         $('statCoachPanelAssigned').textContent =

@@ -331,14 +331,20 @@ onAuthStateChanged(auth, async user => {
       $('setupSection').style.display = 'flex';
       $('dashSection').style.display  = 'none';
 
-      // Load coachAccess
+      // Load coachAccess — get both shooterUids and matchId
+      let coachMatchId = null;
       try {
         const as = await getDoc(doc(db, 'coachAccess', user.uid));
-        const raw = as.exists() ? (as.data().shooterUids||[]) : [];
-        allowedUids = raw.map(String).filter(u => u && u !== 'undefined');
+        if (as.exists()) {
+          const raw = as.data().shooterUids || [];
+          allowedUids  = raw.map(String).filter(u => u && u !== 'undefined');
+          coachMatchId = as.data().matchId ? String(as.data().matchId) : null;
+        } else {
+          allowedUids = [];
+        }
       } catch { allowedUids = []; }
 
-      await autoStart();
+      await autoStart(coachMatchId);
     } catch (e) { await logout('Feil: ' + e.message); }
   } else {
     currentUser = null;
@@ -371,7 +377,7 @@ $('loginPassword').addEventListener('keydown', e => { if(e.key==='Enter') $('log
 $('logoutBtn').onclick = () => logout();
 
 // ── Auto-start ────────────────────────────────────────
-async function autoStart() {
+async function autoStart(coachMatchId) {
   if (!allowedUids || allowedUids.length===0) {
     $('loginSection').style.display = 'none';
     $('setupSection').style.display = 'none';
@@ -392,27 +398,40 @@ async function autoStart() {
     rs.forEach(d => allRefShooters.push({ id: d.id, ...d.data() }));
   } catch {}
 
-  // Find relevant matches
+  // Find match — use coachMatchId from coachAccess if available
   try {
-    const snap = await getDocs(collection(db, 'matches'));
-    const relevant = [];
-    snap.forEach(d => {
+    let chosen = null;
+
+    if (coachMatchId) {
+      // Admin has specified a match — load it directly
       try {
-        const data = d.data();
-        const participants = (data.participants||[]).map(String);
-        const hasAllowed = participants.some(uid => allowedUids.includes(uid));
-        if (hasAllowed) relevant.push({ id: d.id, ...data });
+        const ms = await getDoc(doc(db, 'matches', coachMatchId));
+        if (ms.exists()) chosen = { id: ms.id, ...ms.data() };
       } catch {}
-    });
+    }
 
-    relevant.sort((a,b) => {
-      const aA = (a.status||'').toLowerCase()==='active'?1:0;
-      const bA = (b.status||'').toLowerCase()==='active'?1:0;
-      if (bA!==aA) return bA-aA;
-      return (b.date||'') > (a.date||'') ? 1 : -1;
-    });
+    if (!chosen) {
+      // Fallback: find most recent match where allowed UIDs are participants
+      const snap = await getDocs(collection(db, 'matches'));
+      const relevant = [];
+      snap.forEach(d => {
+        try {
+          const data = d.data();
+          const participants = (data.participants||[]).map(String);
+          if (participants.some(uid => allowedUids.includes(uid)))
+            relevant.push({ id: d.id, ...data });
+        } catch {}
+      });
+      relevant.sort((a,b) => {
+        const aA = (a.status||'').toLowerCase()==='active'?1:0;
+        const bA = (b.status||'').toLowerCase()==='active'?1:0;
+        if (bA!==aA) return bA-aA;
+        return (b.date||'') > (a.date||'') ? 1 : -1;
+      });
+      chosen = relevant[0] || null;
+    }
 
-    if (!relevant.length) {
+    if (!chosen) {
       $('loginSection').style.display = 'none';
       $('setupSection').style.display = 'none';
       $('dashSection').style.display  = 'block';
@@ -420,13 +439,10 @@ async function autoStart() {
         <div class="loading-msg">
           <div style="font-size:40px;margin-bottom:12px;">🎯</div>
           <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen aktive matcher</div>
-          <div style="color:var(--muted);font-size:13px;">Dine skyttere er ikke påmeldt noen matcher ennå.</div>
+          <div style="color:var(--muted);font-size:13px;">Admin har ikke tildelt en match ennå.</div>
         </div>`;
       return;
     }
-
-    // Use only the most recent/active match
-    const chosen = relevant[0];
     $('loginSection').style.display = 'none';
     $('setupSection').style.display = 'none';
     $('dashSection').style.display  = 'block';
@@ -515,6 +531,9 @@ function renderDash() {
   if (!refVisible) {
     document.querySelectorAll('.ref-section').forEach(el => el.style.display='none');
   }
+
+  // Resolve any unknown shooter names async (participants not in shooters[])
+  resolveUnknownNames(match);
 }
 
 // ── Standings strip ───────────────────────────────────
@@ -858,6 +877,30 @@ function calcMatchTotals(match, stageDefs) {
 }
 
 // ── Get all match shooters (participants + shooters[]) ─
+// userCache filled lazily when names are missing
+const _userCache = {};
+
+async function resolveUserName(uid) {
+  if (_userCache[uid]) return _userCache[uid];
+  try {
+    const ud = await getDoc(doc(db, 'users', uid));
+    if (ud.exists()) {
+      const d = ud.data();
+      _userCache[uid] = {
+        name:     [d.firstName, d.lastName].filter(Boolean).join(' ') || d.email || uid,
+        division: d.division || '',
+        pf:       d.powerFactor || 'minor',
+        club:     d.club || ''
+      };
+    } else {
+      _userCache[uid] = { name: uid, division:'', pf:'minor', club:'' };
+    }
+  } catch {
+    _userCache[uid] = { name: uid, division:'', pf:'minor', club:'' };
+  }
+  return _userCache[uid];
+}
+
 function getMatchShooters(match) {
   const participants = (match.participants||[]).map(String);
   const shootersArr  = (match.shooters||[]).filter(s => !s.isMe);
@@ -869,9 +912,29 @@ function getMatchShooters(match) {
     const sh = byUid[uid];
     const name = sh
       ? [sh.firstName, sh.lastName].filter(Boolean).join(' ') || uid
-      : uid;
-    return { uid, name, division: sh?.division||'', pf: sh?.pf||sh?.powerFactor||'minor', club: sh?.club||'' };
+      : (_userCache[uid]?.name || uid);   // use cache if already resolved
+    return {
+      uid,
+      name,
+      division: sh?.division || _userCache[uid]?.division || '',
+      pf:       sh?.pf || sh?.powerFactor || _userCache[uid]?.pf || 'minor',
+      club:     sh?.club || _userCache[uid]?.club || ''
+    };
   });
+}
+
+// Resolve unknown names after first render
+async function resolveUnknownNames(match) {
+  const participants = (match.participants||[]).map(String);
+  const shootersArr  = (match.shooters||[]).filter(s => !s.isMe);
+  const byUid = {};
+  shootersArr.forEach(s => { if(s.id) byUid[String(s.id)] = s; });
+
+  const unknowns = participants.filter(uid => !byUid[uid] && !_userCache[uid]);
+  if (!unknowns.length) return;
+
+  await Promise.all(unknowns.map(uid => resolveUserName(uid)));
+  renderDash(); // re-render with resolved names
 }
 
 function getStageDefs(match) {

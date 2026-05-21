@@ -2638,18 +2638,21 @@
           return;
         }
 
-        // Load coachAccess docs for all coaches
-        const accessSnaps = await Promise.all(
-          coaches.map(c => getDoc(doc(db, 'coachAccess', c.id)))
-        );
-
+        // Load coachAccess docs for all coaches — use individual try/catch
+        // so a missing document (permission denied on non-existent doc) doesn't
+        // crash the whole panel
         let totalAssigned = 0;
-        coaches.forEach((coach, i) => {
-          const snap = accessSnaps[i];
-          const data = snap.exists() ? snap.data() : { shooterUids: [] };
-          coachAccessCache[coach.id] = data;
-          totalAssigned += (data.shooterUids || []).length;
-        });
+        await Promise.all(coaches.map(async coach => {
+          try {
+            const snap = await getDoc(doc(db, 'coachAccess', coach.id));
+            const data = snap.exists() ? snap.data() : { shooterUids: [] };
+            coachAccessCache[coach.id] = data;
+            totalAssigned += (data.shooterUids || []).length;
+          } catch {
+            // Document doesn't exist yet — treat as empty access list
+            coachAccessCache[coach.id] = { shooterUids: [] };
+          }
+        }));
 
         $('statCoachPanelAssigned').textContent = totalAssigned;
 

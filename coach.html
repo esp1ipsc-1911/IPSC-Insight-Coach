@@ -1045,10 +1045,7 @@ function stageMetrics(match, stageNum) {
   return results.sort((a,b) => b.hf-a.hf);
 }
 
-function stageMaxPts(sd) {
-  const ss = sd.singleShot?1:2;
-  return Math.max(0, ((sd.paperTargets||0)*5*ss) + (((sd.poppers||0)+(sd.plates||0))*5));
-}
+// stageMaxPts defined above
 
 // ── Coach tip ─────────────────────────────────────────
 function coachTip(aPct, avgHF, doneCount) {

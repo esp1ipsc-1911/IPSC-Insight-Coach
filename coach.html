@@ -968,6 +968,7 @@
     let refShootersVisible = true;
     let allReferenceShooters = [];
     let resultTarget = null; // { shooterId, shooterName }
+    let allowedShooterUids = null; // null = not loaded yet, [] = no access, [...] = allowed UIDs
 
     // ── DOM refs ─────────────────────────────────────
     const $ = id => document.getElementById(id);
@@ -979,11 +980,19 @@
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (!userDoc.exists()) { await doLogout('Bruker ikke funnet.'); return; }
           const data = userDoc.data();
-          if (data.role !== 'coach' && data.role !== 'admin') {
+          const userRoles = Array.isArray(data.roles) ? data.roles : (data.role ? [data.role] : []);
+          if (!userRoles.includes('coach') && !userRoles.includes('admin') && data.role !== 'coach' && data.role !== 'admin') {
             await doLogout('Du har ikke coach-tilgang. Kontakt admin.');
             return;
           }
           currentUser = { uid: user.uid, ...data };
+          // Load this coach's allowed shooter UIDs from coachAccess
+          try {
+            const accessSnap = await getDoc(doc(db, 'coachAccess', user.uid));
+            allowedShooterUids = accessSnap.exists() ? (accessSnap.data().shooterUids || []) : [];
+          } catch {
+            allowedShooterUids = [];
+          }
           showSetup();
         } catch (e) {
           await doLogout('Feil ved innlogging: ' + e.message);
@@ -1091,10 +1100,17 @@
           }
         }
 
-        const allShooters = [...shooters.filter(s => !s.isMe), ...extraUsers];
+        // Filter to only shooters this coach has access to
+        const allShootersRaw = [...shooters.filter(s => !s.isMe), ...extraUsers];
+        const allShooters = allowedShooterUids !== null && allowedShooterUids.length >= 0
+          ? allShootersRaw.filter(s => allowedShooterUids.includes(String(s.id)))
+          : allShootersRaw;
 
         if (!allShooters.length) {
-          list.innerHTML = '<div class="loading-msg" style="padding:16px;">Ingen skyttere i denne matchen ennå.</div>';
+          const msg = (allowedShooterUids !== null && allowedShooterUids.length === 0)
+            ? 'Du har ikke fått tilgang til noen skyttere ennå. Kontakt admin.'
+            : 'Ingen av dine skyttere er deltakere i denne matchen.';
+          list.innerHTML = '<div class="loading-msg" style="padding:16px;">' + msg + '</div>';
           return;
         }
 
@@ -1178,7 +1194,9 @@
     // ── Add shooter to tracked ────────────────────────
     $('addShooterBtn').onclick = () => {
       if (!currentMatch) return;
-      const allShooters = (currentMatch.shooters || []).filter(s => !s.isMe);
+      const allShooters = (currentMatch.shooters || [])
+        .filter(s => !s.isMe)
+        .filter(s => !allowedShooterUids || allowedShooterUids.length === 0 || allowedShooterUids.includes(String(s.id)));
       const available = allShooters.filter(s => !trackedShooterIds.includes(String(s.id)));
 
       if (!available.length) {
@@ -1232,7 +1250,13 @@
       $('topMatchName').innerHTML = `<strong>${escHtml(match.name || match.id)}</strong> &nbsp;·&nbsp; ${escHtml(match.date || '')} &nbsp;·&nbsp; ${escHtml(match.status || '')}`;
 
       const stageDefs = getStageDefs(match);
-      const shooters  = (match.shooters || []).filter(s => !s.isMe && trackedShooterIds.includes(String(s.id)));
+      const shooters  = (match.shooters || []).filter(s => {
+        if (s.isMe) return false;
+        if (!trackedShooterIds.includes(String(s.id))) return false;
+        // Enforce coachAccess — never show shooters not in allowed list
+        if (allowedShooterUids && allowedShooterUids.length > 0 && !allowedShooterUids.includes(String(s.id))) return false;
+        return true;
+      });
 
       if (!shooters.length) {
         $('dashContent').innerHTML = `

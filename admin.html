@@ -598,6 +598,7 @@
         <button id="tabCodesBtn" class="tab-btn active" type="button">Invitasjonskoder</button>
         <button id="tabUsersBtn" class="tab-btn" type="button">Brukere</button>
         <button id="tabRolesBtn" class="tab-btn" type="button">Roller</button>
+        <button id="tabCoachBtn" class="tab-btn" type="button">🎯 Coach</button>
         <button id="tabShootersBtn" class="tab-btn" type="button">Referanseskyttere</button>
         <button id="tabMatchesBtn" class="tab-btn" type="button">Matcher</button>
         <button id="tabRewardsBtn" class="tab-btn" type="button">🏆 Rewards</button>
@@ -649,21 +650,38 @@
 
       <div id="rolesPanel" class="panel">
         <div class="stats-grid">
-          <div class="stat-card"><div class="stat-value" id="statRolesTotal">0</div><div class="stat-label">Totalt roller</div></div>
+          <div class="stat-card"><div class="stat-value" id="statRolesTotal">0</div><div class="stat-label">Totalt brukere m/rolle</div></div>
           <div class="stat-card"><div class="stat-value" id="statAdminsTotal">0</div><div class="stat-label">Admins</div></div>
           <div class="stat-card"><div class="stat-value" id="statDirectorsTotal">0</div><div class="stat-label">Match directors</div></div>
+          <div class="stat-card"><div class="stat-value" id="statCoachesTotal">0</div><div class="stat-label">Coaches</div></div>
         </div>
 
         <div class="actions">
-          <button id="createRoleBtn" class="btn btn-primary">+ Ny rolle</button>
+          <input id="rolesSearchInput" class="form-input search-inline" type="text" placeholder="Søk etter navn eller e-post" />
+          <button id="searchRolesBtn" class="btn btn-primary">Søk</button>
           <button id="refreshRolesBtn" class="btn btn-secondary">↻ Oppdater</button>
         </div>
 
         <div class="table-container">
           <table>
-            <thead><tr><th>E-post</th><th>Navn</th><th>Rolle</th><th>Handlinger</th></tr></thead>
-            <tbody id="rolesTable"><tr><td data-label="Status" colspan="4" class="loading">Laster...</td></tr></tbody>
+            <thead><tr><th>Navn</th><th>E-post</th><th>Divisjon</th><th>Roller</th><th>Handlinger</th></tr></thead>
+            <tbody id="rolesTable"><tr><td data-label="Status" colspan="5" class="loading">Laster...</td></tr></tbody>
           </table>
+        </div>
+      </div>
+
+      <div id="coachPanel" class="panel">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-value" id="statCoachPanelTotal">0</div><div class="stat-label">Coaches</div></div>
+          <div class="stat-card"><div class="stat-value" id="statCoachPanelAssigned">0</div><div class="stat-label">Tildelte skyttere</div></div>
+        </div>
+
+        <div class="actions">
+          <button id="refreshCoachBtn" class="btn btn-secondary">↻ Oppdater</button>
+        </div>
+
+        <div id="coachList" style="display:grid;gap:14px;margin-top:4px;">
+          <div class="loading">Laster coaches…</div>
         </div>
       </div>
 
@@ -817,6 +835,32 @@
     </div>
   </div>
 
+  <!-- Coach access modal -->
+  <div id="coachAccessModal" class="modal">
+    <div class="modal-content" style="max-width:680px;">
+      <div class="modal-title" id="coachAccessModalTitle">Administrer skyttertilgang</div>
+      <div class="modal-sub" id="coachAccessModalSub" style="color:var(--muted);font-size:13px;margin-bottom:16px;">—</div>
+      <div id="coachAccessError" class="error" style="display:none;"></div>
+      <div id="coachAccessSuccess" class="success" style="display:none;"></div>
+
+      <div class="section-title" style="margin-top:0;">Skyttere med tilgang</div>
+      <div id="coachCurrentShooters" style="display:grid;gap:8px;margin-bottom:16px;max-height:220px;overflow-y:auto;">
+        <div class="loading">Laster…</div>
+      </div>
+
+      <div class="section-title">Legg til skytter</div>
+      <div class="actions" style="margin-bottom:10px;">
+        <input id="coachShooterSearch" class="form-input search-inline" type="text" placeholder="Søk etter navn eller e-post" />
+        <button id="coachShooterSearchBtn" class="btn btn-primary">Søk</button>
+      </div>
+      <div id="coachShooterSearchResults" style="display:grid;gap:8px;max-height:220px;overflow-y:auto;"></div>
+
+      <div class="form-actions" style="margin-top:18px;">
+        <button id="closeCoachAccessBtn" class="btn btn-secondary">Lukk</button>
+      </div>
+    </div>
+  </div>
+
   <div id="createModal" class="modal">
     <div class="modal-content" style="max-width:520px;">
       <div class="modal-title">Opprett ny kode</div>
@@ -852,13 +896,22 @@
         <div class="form-group"><label class="form-label">Klubb</label><input id="userClub" class="form-input" type="text" /></div>
         <div class="form-group"><label class="form-label">Divisjon</label><input id="userDivision" class="form-input" type="text" /></div>
         <div class="form-group"><label class="form-label">Power Factor</label><input id="userPowerFactor" class="form-input" type="text" /></div>
-        <div class="form-group">
-          <label class="form-label">Rolle</label>
-          <select id="userRole" class="form-select">
-            <option value="user">user</option>
-            <option value="match_director">match_director</option>
-            <option value="admin">admin</option>
-          </select>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Roller (velg én eller flere)</label>
+          <div id="userRolesCheckboxes" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;">
+            <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;">
+              <input type="checkbox" id="roleCheck_user" value="user" style="width:16px;height:16px;accent-color:var(--accent);"> user
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;">
+              <input type="checkbox" id="roleCheck_coach" value="coach" style="width:16px;height:16px;accent-color:var(--accent);"> coach
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;">
+              <input type="checkbox" id="roleCheck_match_director" value="match_director" style="width:16px;height:16px;accent-color:var(--accent);"> match_director
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;">
+              <input type="checkbox" id="roleCheck_admin" value="admin" style="width:16px;height:16px;accent-color:var(--accent);"> admin
+            </label>
+          </div>
         </div>
       </div>
       <div class="form-actions">
@@ -870,20 +923,32 @@
 
   <div id="roleModal" class="modal">
     <div class="modal-content" style="max-width:560px;">
-      <div class="modal-title" id="roleModalTitle">Opprett rolle</div>
+      <div class="modal-title" id="roleModalTitle">Rediger roller</div>
       <div id="roleError" class="error" style="display:none;"></div>
-      <div class="form-group"><label class="form-label">E-post</label><input id="roleEmail" class="form-input" type="email" placeholder="bruker@domene.no" /></div>
-      <div class="form-group"><label class="form-label">Navn (valgfritt)</label><input id="roleName" class="form-input" type="text" placeholder="Fullt navn" /></div>
       <div class="form-group">
-        <label class="form-label">Rolle</label>
-        <select id="roleType" class="form-select">
-          <option value="admin">Admin</option>
-          <option value="match_director">Match director</option>
-          <option value="coach">Coach</option>
-        </select>
+        <label class="form-label">Bruker</label>
+        <input id="roleEmail" class="form-input" type="text" disabled style="color:var(--muted);" />
       </div>
+      <div class="form-group">
+        <label class="form-label">Roller (velg én eller flere)</label>
+        <div id="roleCheckboxes" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;">
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;">
+            <input type="checkbox" id="roleCheck2_user" value="user" style="width:16px;height:16px;accent-color:var(--accent);"> user
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;">
+            <input type="checkbox" id="roleCheck2_coach" value="coach" style="width:16px;height:16px;accent-color:var(--accent);"> coach
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;">
+            <input type="checkbox" id="roleCheck2_match_director" value="match_director" style="width:16px;height:16px;accent-color:var(--accent);"> match_director
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;">
+            <input type="checkbox" id="roleCheck2_admin" value="admin" style="width:16px;height:16px;accent-color:var(--accent);"> admin
+          </label>
+        </div>
+      </div>
+      <input type="hidden" id="roleEditingUid" value="" />
       <div class="form-actions">
-        <button id="saveRoleBtn" class="btn btn-primary">Lagre</button>
+        <button id="saveRoleBtn" class="btn btn-primary">Lagre roller</button>
         <button id="cancelRoleBtn" class="btn btn-secondary">Avbryt</button>
       </div>
     </div>
@@ -1139,11 +1204,13 @@
     const tabCodesBtn = $('tabCodesBtn');
     const tabUsersBtn = $('tabUsersBtn');
     const tabRolesBtn = $('tabRolesBtn');
+    const tabCoachBtn = $('tabCoachBtn');
     const tabShootersBtn = $('tabShootersBtn');
     const tabMatchesBtn = $('tabMatchesBtn');
     const codesPanel = $('codesPanel');
     const usersPanel = $('usersPanel');
     const rolesPanel = $('rolesPanel');
+    const coachPanel = $('coachPanel');
     const shootersPanel = $('shootersPanel');
     const matchesPanel = $('matchesPanel');
 
@@ -1193,11 +1260,26 @@
 
     $('logoutBtn').onclick = async () => { await signOut(auth); };
     $('refreshBtn').onclick = async () => { await loadCodes(); };
-    $('refreshRolesBtn').onclick = async () => { await loadRoles(); };
+    $('refreshRolesBtn').onclick = async () => { await loadRoles(); await loadAllUsers(); };
+
+    $('searchRolesBtn').onclick = () => {
+      const term = $('rolesSearchInput').value.trim().toLowerCase();
+      if (!term) { renderRolesTable(allUsersCache); return; }
+      const filtered = allUsersCache.filter(u => {
+        const name = `${u.firstName||''} ${u.lastName||''}`.trim().toLowerCase();
+        return name.includes(term) || String(u.email||'').toLowerCase().includes(term);
+      });
+      renderRolesTable(filtered);
+    };
+
+    $('rolesSearchInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('searchRolesBtn').click(); });
+
+    $('refreshCoachBtn').onclick = () => loadCoachPanel();
 
     tabCodesBtn.onclick = () => setTab('codes');
     tabUsersBtn.onclick = () => setTab('users');
     tabRolesBtn.onclick = () => setTab('roles');
+    tabCoachBtn.onclick = () => { setTab('coach'); loadCoachPanel(); };
     tabShootersBtn.onclick = () => setTab('shooters');
     tabMatchesBtn.onclick = () => setTab('matches');
     tabRewardsBtn.onclick = () => setTab('rewards');
@@ -1334,6 +1416,7 @@
       tabCodesBtn.classList.toggle('active', tab === 'codes');
       tabUsersBtn.classList.toggle('active', tab === 'users');
       tabRolesBtn.classList.toggle('active', tab === 'roles');
+      tabCoachBtn.classList.toggle('active', tab === 'coach');
       tabShootersBtn.classList.toggle('active', tab === 'shooters');
       tabMatchesBtn.classList.toggle('active', tab === 'matches');
       tabRewardsBtn.classList.toggle('active', tab === 'rewards');
@@ -1341,6 +1424,7 @@
       codesPanel.classList.toggle('active', tab === 'codes');
       usersPanel.classList.toggle('active', tab === 'users');
       rolesPanel.classList.toggle('active', tab === 'roles');
+      coachPanel.classList.toggle('active', tab === 'coach');
       shootersPanel.classList.toggle('active', tab === 'shooters');
       matchesPanel.classList.toggle('active', tab === 'matches');
       rewardsPanel.classList.toggle('active', tab === 'rewards');
@@ -1442,109 +1526,155 @@
         snap.forEach(docSnap => roles.push({ email: docSnap.id, ...docSnap.data() }));
         roles.sort((a, b) => String(a.email).localeCompare(String(b.email), 'no'));
         allRolesCache = roles;
-
-        $('statRolesTotal').textContent = roles.length;
-        $('statAdminsTotal').textContent = roles.filter(r => r.role === 'admin').length;
-        $('statDirectorsTotal').textContent = roles.filter(r => r.role === 'match_director').length;
-
-        if (!roles.length) {
-          rolesTable.innerHTML = '<tr><td data-label="Info" colspan="4" class="empty-state"><h3>Ingen roller</h3><p>Legg til admin eller match director</p></td></tr>';
-          return;
-        }
-
-        rolesTable.innerHTML = roles.map(role => `
-          <tr>
-            <td data-label="E-post">${escapeHtml(role.email)}</td>
-            <td data-label="Navn">${escapeHtml(role.name || '—')}</td>
-            <td data-label="Rolle"><span class="badge ${role.role === 'admin' ? 'badge-admin' : role.role === 'coach' ? 'badge-active' : 'badge-director'}">${escapeHtml(role.role || '—')}</span></td>
-            <td data-label="Handlinger">
-              <div class="action-btns">
-                <button class="btn btn-sm btn-secondary" onclick="window.editRole('${escapeAttr(role.email)}')">Rediger</button>
-                <button class="btn btn-sm btn-danger" onclick="window.deleteRole('${escapeAttr(role.email)}')">Slett</button>
-              </div>
-            </td>
-          </tr>
-        `).join('');
+        // Stats will be updated after allUsersCache is populated in renderRolesTable
+        renderRolesTable(allUsersCache);
       } catch (error) {
-        rolesTable.innerHTML = `<tr><td data-label="Feil" colspan="4" class="error">Feil ved lasting av roller: ${escapeHtml(error.message)}</td></tr>`;
+        rolesTable.innerHTML = `<tr><td data-label="Feil" colspan="5" class="error">Feil ved lasting av roller: ${escapeHtml(error.message)}</td></tr>`;
       }
+    }
+
+    function getUserRoles(user) {
+      if (Array.isArray(user.roles) && user.roles.length) return user.roles;
+      if (user.role) return [user.role];
+      return ['user'];
+    }
+
+    function renderRolesTable(users) {
+      if (!users || !users.length) {
+        rolesTable.innerHTML = '<tr><td data-label="Info" colspan="5" class="empty-state"><h3>Ingen brukere</h3><p>Laster...</p></td></tr>';
+        return;
+      }
+
+      const withElevated = users.filter(u => {
+        const r = getUserRoles(u);
+        return r.some(x => x !== 'user');
+      });
+
+      const totalEl = $('statRolesTotal');
+      const adminsEl = $('statAdminsTotal');
+      const directorsEl = $('statDirectorsTotal');
+      const coachesEl = $('statCoachesTotal');
+      if (totalEl) totalEl.textContent = withElevated.length;
+      if (adminsEl) adminsEl.textContent = users.filter(u => getUserRoles(u).includes('admin')).length;
+      if (directorsEl) directorsEl.textContent = users.filter(u => getUserRoles(u).includes('match_director')).length;
+      if (coachesEl) coachesEl.textContent = users.filter(u => getUserRoles(u).includes('coach')).length;
+
+      rolesTable.innerHTML = users.map(user => {
+        const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.displayName || '—';
+        const userRoles = getUserRoles(user);
+        const badgesHtml = userRoles.map(r => {
+          const cls = r === 'admin' ? 'badge-admin' : r === 'coach' ? 'badge-active' : r === 'match_director' ? 'badge-director' : 'badge-user';
+          return `<span class="badge ${cls}">${escapeHtml(r)}</span>`;
+        }).join(' ');
+        return `
+          <tr>
+            <td data-label="Navn">${escapeHtml(displayName)}</td>
+            <td data-label="E-post">${escapeHtml(user.email || '—')}</td>
+            <td data-label="Divisjon">${escapeHtml(user.division || '—')}</td>
+            <td data-label="Roller">${badgesHtml}</td>
+            <td data-label="Handlinger">
+              <button class="btn btn-sm btn-secondary" onclick="window.editRoleForUser('${escapeAttr(user.id)}')">Rediger roller</button>
+            </td>
+          </tr>`;
+      }).join('');
     }
 
     function getRoleForEmail(email) {
       const lower = String(email || '').toLowerCase();
+      // Check users cache first (has roles array)
+      const userDoc = allUsersCache.find(u => String(u.email || '').toLowerCase() === lower);
+      if (userDoc) return userDoc.role || 'user';
       const roleDoc = allRolesCache.find(r => String(r.email || '').toLowerCase() === lower);
       return roleDoc?.role || 'user';
     }
 
-    $('createRoleBtn').onclick = () => {
-      $('roleError').style.display = 'none';
-      $('roleModalTitle').textContent = 'Opprett rolle';
-      $('roleEmail').disabled = false;
-      $('roleEmail').value = '';
-      $('roleName').value = '';
-      $('roleType').value = 'admin';
-      $('roleModal').classList.add('open');
-    };
+    // createRoleBtn removed — roles are now edited directly from the users list
+    // Kept as no-op to avoid errors if referenced elsewhere
 
     $('cancelRoleBtn').onclick = () => $('roleModal').classList.remove('open');
+    $('roleModal').addEventListener('click', e => { if (e.target === $('roleModal')) $('roleModal').classList.remove('open'); });
 
     $('saveRoleBtn').onclick = async () => {
-      const email = $('roleEmail').value.trim().toLowerCase();
-      const roleType = $('roleType').value;
-      const payload = { name: $('roleName').value.trim(), role: roleType };
-      if (!email) {
-        showError($('roleError'), 'E-post er påkrevd');
-        return;
-      }
-      try {
-        await setDoc(doc(db, 'adminUsers', email), payload, { merge: true });
+      const uid = $('roleEditingUid').value;
+      if (!uid) { showError($('roleError'), 'Ingen bruker valgt.'); return; }
 
-        // For coach-rollen: skriv role: 'coach' direkte på brukerens dokument i users-samlingen
-        // coach.html sjekker users/{uid}.role, ikke adminUsers
-        if (roleType === 'coach') {
-          const usersSnap = await getDocs(collection(db, 'users'));
-          for (const userDoc of usersSnap.docs) {
-            const data = userDoc.data();
-            if (String(data.email || '').toLowerCase() === email) {
-              await updateDoc(doc(db, 'users', userDoc.id), { role: 'coach' });
-              break;
-            }
-          }
+      // Collect checked roles from role modal checkboxes
+      const selectedRoles = ['user','coach','match_director','admin']
+        .filter(r => { const cb = $('roleCheck2_' + r); return cb && cb.checked; });
+      if (!selectedRoles.length) selectedRoles.push('user');
+
+      const primaryRole = selectedRoles.find(r => r !== 'user') || 'user';
+      const user = allUsersCache.find(u => u.id === uid);
+      const email = user?.email || '';
+
+      try {
+        // Write roles array + primary role to users collection
+        await updateDoc(doc(db, 'users', uid), {
+          roles: selectedRoles,
+          role: primaryRole,
+          updatedAt: new Date().toISOString()
+        });
+
+        // Sync adminUsers for elevated roles
+        const fullName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
+        const hasElevated = selectedRoles.some(r => r !== 'user');
+        if (hasElevated && email) {
+          await setDoc(doc(db, 'adminUsers', email), {
+            email, name: fullName,
+            role: primaryRole,
+            roles: selectedRoles,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } else if (email) {
+          const existingRoleDoc = allRolesCache.find(r => String(r.email || '').toLowerCase() === email.toLowerCase());
+          if (existingRoleDoc) await deleteDoc(doc(db, 'adminUsers', email));
         }
 
         $('roleModal').classList.remove('open');
         await loadRoles();
         await loadAllUsers();
       } catch (error) {
-        showError($('roleError'), 'Kunne ikke lagre rolle: ' + error.message);
+        showError($('roleError'), 'Kunne ikke lagre roller: ' + error.message);
       }
     };
 
-    window.editRole = (email) => {
-      const role = allRolesCache.find(r => r.email === email);
-      if (!role) return;
+    window.editRoleForUser = (userId) => {
+      const user = allUsersCache.find(u => u.id === userId);
+      if (!user) { alert('Fant ikke bruker'); return; }
+      const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || userId;
+      const userRoles = Array.isArray(user.roles) ? user.roles : (user.role ? [user.role] : ['user']);
+
       $('roleError').style.display = 'none';
-      $('roleModalTitle').textContent = 'Rediger rolle';
-      $('roleEmail').disabled = true;
-      $('roleEmail').value = role.email || '';
-      $('roleName').value = role.name || '';
-      $('roleType').value = role.role || 'match_director';
+      $('roleModalTitle').textContent = 'Rediger roller';
+      $('roleEmail').value = `${displayName} (${user.email || ''})`;
+      $('roleEditingUid').value = userId;
+
+      ['user','coach','match_director','admin'].forEach(r => {
+        const cb = $('roleCheck2_' + r);
+        if (cb) cb.checked = userRoles.includes(r);
+      });
+
       $('roleModal').classList.add('open');
     };
 
+    // Legacy — kept for backward compat if referenced anywhere
+    window.editRole = (email) => {
+      const user = allUsersCache.find(u => String(u.email || '').toLowerCase() === String(email || '').toLowerCase());
+      if (user) { window.editRoleForUser(user.id); return; }
+    };
+
     window.deleteRole = async (email) => {
+      // Legacy — remove from adminUsers if needed
       if (String(email).toLowerCase() === String(currentUser?.email || '').toLowerCase()) {
-        alert('Du kan ikke slette din egen rolle mens du er logget inn.');
-        return;
+        alert('Du kan ikke slette din egen rolle mens du er logget inn.'); return;
       }
-      if (!confirm(`Er du sikker på at du vil slette rollen for "${email}"?`)) return;
+      if (!confirm('Fjerne alle roller for ' + email + '?')) return;
       try {
         await deleteDoc(doc(db, 'adminUsers', email));
-        await loadRoles();
-        await loadAllUsers();
-      } catch (error) {
-        alert('Feil ved sletting: ' + error.message);
-      }
+        const user = allUsersCache.find(u => String(u.email||'').toLowerCase() === email.toLowerCase());
+        if (user) await updateDoc(doc(db, 'users', user.id), { role: 'user', roles: ['user'] });
+        await loadRoles(); await loadAllUsers();
+      } catch (e) { alert('Feil: ' + e.message); }
     };
 
     async function loadAllUsers() {
@@ -1563,6 +1693,7 @@
         $('statUsersClassic').textContent = users.filter(u => String(u.division || '') === 'Classic').length;
 
         renderUsersTable(users);
+        renderRolesTable(users);
       } catch (error) {
         usersTable.innerHTML = `<tr><td data-label="Feil" colspan="7" class="error">Feil ved lasting av brukere: ${escapeHtml(error.message)}</td></tr>`;
       }
@@ -1584,7 +1715,7 @@
             <td data-label="E-post">${escapeHtml(user.email || '—')}</td>
             <td data-label="Divisjon">${escapeHtml(user.division || '—')}</td>
             <td data-label="Klubb">${escapeHtml(user.club || '—')}</td>
-            <td data-label="Rolle"><span class="badge ${role === 'admin' ? 'badge-admin' : role === 'match_director' ? 'badge-director' : 'badge-user'}">${escapeHtml(role)}</span></td>
+            <td data-label="Rolle">${getUserRoles(user).map(r => `<span class="badge ${r === 'admin' ? 'badge-admin' : r === 'coach' ? 'badge-active' : r === 'match_director' ? 'badge-director' : 'badge-user'}">${escapeHtml(r)}</span>`).join(' ')}</td>
             <td data-label="Handlinger"><button class="btn btn-sm btn-secondary" onclick="window.editUser('${escapeAttr(user.id)}')">Rediger</button> <button class="btn btn-sm btn-danger" onclick="window.deleteUser('${escapeAttr(user.id)}', '${escapeAttr(displayName)}')">Slett</button></td>
           </tr>
         `;
@@ -1612,10 +1743,7 @@
 
     window.editUser = (userId) => {
       const user = allUsersCache.find(u => u.id === userId);
-      if (!user) {
-        alert('Fant ikke bruker');
-        return;
-      }
+      if (!user) { alert('Fant ikke bruker'); return; }
       currentEditingUserId = userId;
       $('userError').style.display = 'none';
       $('userUid').value = user.id || '';
@@ -1625,18 +1753,31 @@
       $('userClub').value = user.club || '';
       $('userDivision').value = user.division || '';
       $('userPowerFactor').value = user.powerFactor || '';
-      $('userRole').value = getRoleForEmail(user.email);
+
+      // Populate role checkboxes — support both roles[] array and legacy role string
+      const userRoles = Array.isArray(user.roles) ? user.roles
+        : (user.role ? [user.role] : ['user']);
+      ['user','coach','match_director','admin'].forEach(r => {
+        const cb = $('roleCheck_' + r);
+        if (cb) cb.checked = userRoles.includes(r);
+      });
+
       $('userModal').classList.add('open');
     };
 
     $('saveUserBtn').onclick = async () => {
       if (!currentEditingUserId) return;
       const email = $('userEmail').value.trim().toLowerCase();
-      const nextRole = $('userRole').value;
-      if (!email) {
-        showError($('userError'), 'E-post er påkrevd');
-        return;
-      }
+      if (!email) { showError($('userError'), 'E-post er påkrevd'); return; }
+
+      // Collect checked roles
+      const selectedRoles = ['user','coach','match_director','admin']
+        .filter(r => { const cb = $('roleCheck_' + r); return cb && cb.checked; });
+      if (!selectedRoles.length) selectedRoles.push('user');
+
+      // Primary role = first non-user role, or 'user'
+      const primaryRole = selectedRoles.find(r => r !== 'user') || 'user';
+
       try {
         await setDoc(doc(db, 'users', currentEditingUserId), {
           email,
@@ -1645,21 +1786,25 @@
           club: $('userClub').value.trim(),
           division: $('userDivision').value.trim(),
           powerFactor: $('userPowerFactor').value.trim(),
+          roles: selectedRoles,
+          role: primaryRole,
           updatedAt: new Date().toISOString()
         }, { merge: true });
 
-        const existingRoleDoc = allRolesCache.find(r => String(r.email || '').toLowerCase() === email);
-        if (nextRole === 'user') {
-          if (existingRoleDoc) {
-            await deleteDoc(doc(db, 'adminUsers', email));
-          }
-        } else {
+        // Sync adminUsers collection for non-user roles
+        const fullName = `${$('userFirstName').value.trim()} ${$('userLastName').value.trim()}`.trim();
+        const hasElevatedRole = selectedRoles.some(r => r !== 'user');
+        if (hasElevatedRole) {
           await setDoc(doc(db, 'adminUsers', email), {
-            email,
-            name: `${$('userFirstName').value.trim()} ${$('userLastName').value.trim()}`.trim(),
-            role: nextRole,
+            email, name: fullName,
+            role: primaryRole,
+            roles: selectedRoles,
             updatedAt: new Date().toISOString()
           }, { merge: true });
+        } else {
+          // Only 'user' role — remove from adminUsers if present
+          const existingRoleDoc = allRolesCache.find(r => String(r.email || '').toLowerCase() === email);
+          if (existingRoleDoc) await deleteDoc(doc(db, 'adminUsers', email));
         }
 
         $('userModal').classList.remove('open');
@@ -2468,6 +2613,181 @@
         minute: '2-digit'
       });
     }
+
+    // ══ COACH ACCESS MODULE ═══════════════════════════════════════════════
+
+    let coachAccessCache = {}; // { coachUid: { shooterUids: [...] } }
+    let currentCoachUid = null;
+
+    async function loadCoachPanel() {
+      const listEl = $('coachList');
+      listEl.innerHTML = '<div class="loading">Laster coaches…</div>';
+
+      try {
+        // Find all users with coach role
+        const coaches = allUsersCache.filter(u => {
+          const roles = Array.isArray(u.roles) ? u.roles : (u.role ? [u.role] : []);
+          return roles.includes('coach');
+        });
+
+        $('statCoachPanelTotal').textContent = coaches.length;
+
+        if (!coaches.length) {
+          listEl.innerHTML = '<div class="empty-state"><h3>Ingen coaches</h3><p>Tildel coach-rollen til en bruker under Roller-fanen.</p></div>';
+          $('statCoachPanelAssigned').textContent = '0';
+          return;
+        }
+
+        // Load coachAccess docs for all coaches
+        const accessSnaps = await Promise.all(
+          coaches.map(c => getDoc(doc(db, 'coachAccess', c.id)))
+        );
+
+        let totalAssigned = 0;
+        coaches.forEach((coach, i) => {
+          const snap = accessSnaps[i];
+          const data = snap.exists() ? snap.data() : { shooterUids: [] };
+          coachAccessCache[coach.id] = data;
+          totalAssigned += (data.shooterUids || []).length;
+        });
+
+        $('statCoachPanelAssigned').textContent = totalAssigned;
+
+        listEl.innerHTML = coaches.map(coach => {
+          const name = `${coach.firstName || ''} ${coach.lastName || ''}`.trim() || coach.email || coach.id;
+          const access = coachAccessCache[coach.id] || { shooterUids: [] };
+          const count = (access.shooterUids || []).length;
+          return `
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:16px;font-weight:800;">${escapeHtml(name)}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:3px;">${escapeHtml(coach.email || '')} &nbsp;·&nbsp; ${escapeHtml(coach.division || '')} ${escapeHtml(coach.club || '')}</div>
+                <div style="margin-top:8px;">
+                  <span class="badge badge-active">${count} skytter${count === 1 ? '' : 'e'} med tilgang</span>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="window.openCoachAccess('${escapeAttr(coach.id)}', '${escapeAttr(name)}')">
+                Administrer tilgang
+              </button>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        listEl.innerHTML = `<div class="error">Feil: ${escapeHtml(e.message)}</div>`;
+      }
+    }
+
+    window.openCoachAccess = async (coachUid, coachName) => {
+      currentCoachUid = coachUid;
+      $('coachAccessModalTitle').textContent = 'Skyttertilgang — ' + coachName;
+      $('coachAccessModalSub').textContent = 'Skyttere coach kan følge på tvers av alle matcher.';
+      $('coachAccessError').style.display = 'none';
+      $('coachAccessSuccess').style.display = 'none';
+      $('coachShooterSearch').value = '';
+      $('coachShooterSearchResults').innerHTML = '';
+      $('coachAccessModal').classList.add('open');
+      renderCoachCurrentShooters();
+    };
+
+    function renderCoachCurrentShooters() {
+      const el = $('coachCurrentShooters');
+      if (!currentCoachUid) return;
+      const access = coachAccessCache[currentCoachUid] || { shooterUids: [] };
+      const uids = access.shooterUids || [];
+
+      if (!uids.length) {
+        el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ingen skyttere tildelt ennå.</div>';
+        return;
+      }
+
+      el.innerHTML = uids.map(uid => {
+        const user = allUsersCache.find(u => u.id === uid);
+        const name = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email : uid;
+        const meta = user ? [user.division, user.club].filter(Boolean).join(' · ') : '';
+        return `
+          <div class="participant-card">
+            <div class="participant-meta">
+              <div class="participant-name">${escapeHtml(name)}</div>
+              <div class="participant-sub">${escapeHtml(meta)}</div>
+            </div>
+            <button class="btn btn-sm btn-danger" onclick="window.removeCoachShooter('${escapeAttr(uid)}')">Fjern</button>
+          </div>`;
+      }).join('');
+    }
+
+    window.removeCoachShooter = async (shooterUid) => {
+      if (!currentCoachUid) return;
+      const access = coachAccessCache[currentCoachUid] || { shooterUids: [] };
+      const updated = (access.shooterUids || []).filter(u => u !== shooterUid);
+      try {
+        await setDoc(doc(db, 'coachAccess', currentCoachUid), { shooterUids: updated, updatedAt: new Date().toISOString() });
+        coachAccessCache[currentCoachUid] = { shooterUids: updated };
+        renderCoachCurrentShooters();
+        loadCoachPanel();
+      } catch (e) {
+        showError($('coachAccessError'), 'Feil: ' + e.message);
+      }
+    };
+
+    window.addCoachShooter = async (shooterUid) => {
+      if (!currentCoachUid) return;
+      const access = coachAccessCache[currentCoachUid] || { shooterUids: [] };
+      const existing = access.shooterUids || [];
+      if (existing.includes(shooterUid)) return;
+      const updated = [...existing, shooterUid];
+      try {
+        await setDoc(doc(db, 'coachAccess', currentCoachUid), { shooterUids: updated, updatedAt: new Date().toISOString() });
+        coachAccessCache[currentCoachUid] = { shooterUids: updated };
+        renderCoachCurrentShooters();
+        $('coachShooterSearchResults').innerHTML = '';
+        $('coachShooterSearch').value = '';
+        const successEl = $('coachAccessSuccess');
+        successEl.textContent = 'Skytter lagt til!';
+        successEl.style.display = 'block';
+        setTimeout(() => { successEl.style.display = 'none'; }, 2000);
+        loadCoachPanel();
+      } catch (e) {
+        showError($('coachAccessError'), 'Feil: ' + e.message);
+      }
+    };
+
+    $('coachShooterSearchBtn').onclick = () => {
+      const term = $('coachShooterSearch').value.trim().toLowerCase();
+      const resultsEl = $('coachShooterSearchResults');
+      if (!term) { resultsEl.innerHTML = ''; return; }
+
+      const access = coachAccessCache[currentCoachUid] || { shooterUids: [] };
+      const alreadyAdded = new Set(access.shooterUids || []);
+
+      const matches = allUsersCache.filter(u => {
+        if (alreadyAdded.has(u.id)) return false;
+        const name = `${u.firstName || ''} ${u.lastName || ''}`.trim().toLowerCase();
+        return name.includes(term) || String(u.email || '').toLowerCase().includes(term);
+      }).slice(0, 10);
+
+      if (!matches.length) {
+        resultsEl.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Ingen treff.</div>';
+        return;
+      }
+
+      resultsEl.innerHTML = matches.map(u => {
+        const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email;
+        const meta = [u.division, u.club].filter(Boolean).join(' · ');
+        return `
+          <div class="user-search-item">
+            <div class="user-search-meta">
+              <div class="user-search-name">${escapeHtml(name)}</div>
+              <div class="user-search-sub">${escapeHtml(meta)} &nbsp;·&nbsp; ${escapeHtml(u.email || '')}</div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="window.addCoachShooter('${escapeAttr(u.id)}')">+ Legg til</button>
+          </div>`;
+      }).join('');
+    };
+
+    $('coachShooterSearch').addEventListener('keydown', e => { if (e.key === 'Enter') $('coachShooterSearchBtn').click(); });
+    $('closeCoachAccessBtn').onclick = () => { $('coachAccessModal').classList.remove('open'); currentCoachUid = null; };
+    $('coachAccessModal').addEventListener('click', e => { if (e.target === $('coachAccessModal')) { $('coachAccessModal').classList.remove('open'); currentCoachUid = null; } });
+
+    // ══ END COACH ACCESS MODULE ═══════════════════════════════════════════
 
     function escapeHtml(value) {
       return String(value ?? '')

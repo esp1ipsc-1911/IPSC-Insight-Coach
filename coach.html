@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPSC Insight – Coach</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #0a0c10;
+      --bg2:     #111318;
+      --bg3:     #181c24;
+      --card:    #1a1e28;
+      --border:  rgba(255,255,255,0.08);
+      --accent:  #e8b84b;
+      --accent2: #f0d080;
+      --red:     #e05252;
+      --green:   #4caf7d;
+      --blue:    #4a9eff;
+      --orange:  #f07030;
+      --text:    #f0f2f5;
+      --muted:   #8a93a1;
+      --sub:     #9ca3af;
+      --radius:  14px;
+      --radius-sm: 10px;
+      --shadow:  0 14px 40px rgba(0,0,0,.3);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── TOPBAR ────────────────────────────────────── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,12,16,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-brand {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .topbar-brand span { color: var(--accent); }
+
+    .topbar-match {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-match strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .toggle-ref-all {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .toggle-ref-all.active {
+      border-color: rgba(74,158,255,.4);
+      background: rgba(74,158,255,.12);
+      color: var(--blue);
+    }
+
+    .toggle-ref-all .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-sm);
+      min-height: 36px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter .12s, transform .12s;
+    }
+
+    .btn:hover { filter: brightness(1.06); }
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-sm { min-height: 30px; padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+
+    /* ── LOGIN ─────────────────────────────────────── */
+    #loginSection {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 360px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .login-logo {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .login-logo span { color: var(--accent); }
+
+    .login-sub {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      min-height: 44px;
+      padding: 11px 13px;
+      background: var(--bg3);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: rgba(232,184,75,.55);
+      box-shadow: 0 0 0 3px rgba(232,184,75,.08);
+    }
+
+    .error-box {
+      background: rgba(224,82,82,.12);
+      border: 1px solid rgba(224,82,82,.25);
+      color: var(--red);
+      padding: 10px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .success-box {
+      background: rgba(76,175,125,.12);
+      border: 1px solid rgba(76,175,125,.25);
+      color: var(--green);
+      padding: 10px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    /* ── SETUP PANEL ───────────────────────────────── */
+    #setupSection {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .setup-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .setup-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setup-title .step {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .shooter-select-list {
+      display: grid;
+      gap: 8px;
+      max-height: 340px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+
+    .shooter-pick-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color .12s, background .12s;
+      user-select: none;
+    }
+
+    .shooter-pick-item:hover { border-color: rgba(232,184,75,.3); }
+
+    .shooter-pick-item.selected {
+      border-color: rgba(232,184,75,.5);
+      background: rgba(232,184,75,.07);
+    }
+
+    .shooter-pick-check {
+      width: 20px; height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .12s;
+    }
+
+    .shooter-pick-item.selected .shooter-pick-check {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .shooter-pick-check svg { display: none; }
+    .shooter-pick-item.selected .shooter-pick-check svg { display: block; }
+
+    .shooter-pick-name { font-weight: 700; font-size: 14px; }
+    .shooter-pick-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── DASHBOARD ─────────────────────────────────── */
+    #dashSection {
+      padding: 16px 16px 40px;
+    }
+
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .dash-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .dash-title span { color: var(--accent); }
+
+    .dash-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .dash-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── SHOOTER GRID ──────────────────────────────── */
+    .shooter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── SHOOTER CARD ──────────────────────────────── */
+    .shooter-card {
+      background: linear-gradient(160deg, #1c2030, #161a24);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color .2s;
+    }
+
+    .shooter-card:hover { border-color: rgba(232,184,75,.2); }
+
+    .card-header {
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-name {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .card-badges {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 5px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .badge-div {
+      background: rgba(74,158,255,.12);
+      color: var(--blue);
+      border-color: rgba(74,158,255,.22);
+    }
+
+    .badge-pf-minor {
+      background: rgba(255,255,255,.05);
+      color: var(--sub);
+      border-color: rgba(255,255,255,.1);
+    }
+
+    .badge-pf-major {
+      background: rgba(232,184,75,.1);
+      color: var(--accent);
+      border-color: rgba(232,184,75,.2);
+    }
+
+    .badge-dq {
+      background: rgba(224,82,82,.15);
+      color: var(--red);
+      border-color: rgba(224,82,82,.3);
+    }
+
+    .card-header-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* ── STATS ROW ─────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 12px 16px;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-cell {
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-val.green { color: var(--green); }
+    .stat-val.blue  { color: var(--blue); }
+    .stat-val.red   { color: var(--red); }
+    .stat-val.muted { color: var(--muted); }
+
+    .stat-lbl {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-top: 4px;
+    }
+
+    /* ── PROGRESS BAR ──────────────────────────────── */
+    .progress-section {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .progress-label strong { color: var(--text); }
+
+    .progress-track {
+      height: 6px;
+      background: var(--bg3);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .4s ease;
+    }
+
+    /* ── STAGE PILLS ───────────────────────────────── */
+    .stages-section {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stages-header {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 7px;
+    }
+
+    .stage-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .stage-pill {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--muted);
+    }
+
+    .stage-pill.done {
+      background: rgba(76,175,125,.15);
+      border-color: rgba(76,175,125,.3);
+      color: var(--green);
+    }
+
+    .stage-pill.pending {
+      background: var(--bg2);
+      color: var(--muted);
+      border-style: dashed;
+    }
+
+    /* ── PROGNOSIS ─────────────────────────────────── */
+    .prognosis-section {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .prognosis-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 8px;
+    }
+
+    .prognosis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .prognosis-item {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+    }
+
+    .prognosis-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .prognosis-lbl {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .prognosis-trend {
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .trend-up   { color: var(--green); }
+    .trend-down { color: var(--red); }
+    .trend-flat { color: var(--muted); }
+
+    /* ── REFERENCE SHOOTERS ────────────────────────── */
+    .ref-section {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ref-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .ref-toggle-btn svg { transition: transform .2s; }
+    .ref-toggle-btn.open svg { transform: rotate(180deg); }
+
+    .ref-list {
+      display: none;
+      margin-top: 8px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .ref-list.hidden { display: none; }
+
+    .ref-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 10px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .ref-name { font-weight: 700; }
+    .ref-hf   { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .ref-delta-pos { color: var(--green); font-size: 11px; font-weight: 700; }
+    .ref-delta-neg { color: var(--red);   font-size: 11px; font-weight: 700; }
+
+    /* ── CARD FOOTER ───────────────────────────────── */
+    .card-footer {
+      padding: 10px 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    /* ── COACH TIP ─────────────────────────────────── */
+    .coach-tip {
+      padding: 8px 10px;
+      background: rgba(232,184,75,.06);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      font-size: 12px;
+      color: var(--sub);
+      line-height: 1.45;
+      margin: 0 16px 10px;
+    }
+
+    /* ── MODAL ─────────────────────────────────────── */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0,0,0,.82);
+      padding: 16px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-content {
+      width: 100%;
+      max-width: 540px;
+      max-height: 92vh;
+      overflow-y: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .modal-sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .hit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .hit-cell { }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--bg3);
+      border-radius: var(--radius-sm);
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .calc-row strong { color: var(--accent); font-size: 16px; }
+
+    /* ── SECTION DIVIDER ───────────────────────────── */
+    .section-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    /* ── LOADING / EMPTY ───────────────────────────── */
+    .loading-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto 14px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+      animation: pulse 1.8s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .3; }
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────── */
+    @media (max-width: 700px) {
+      .shooter-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .topbar-match { display: none; }
+      .prognosis-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ LOGIN ══════════════════════════════════════ -->
+  <div id="loginSection">
+    <div class="login-card">
+      <div class="login-logo">IPSC <span>INSIGHT</span></div>
+      <div class="login-sub">Coach Dashboard — Logg inn</div>
+      <div id="loginError" class="error-box" style="display:none;"></div>
+      <div class="form-group">
+        <label class="form-label">E-post</label>
+        <input id="loginEmail" class="form-input" type="email" placeholder="coach@ipsc.no" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Passord</label>
+        <input id="loginPassword" class="form-input" type="password" placeholder="Passord" />
+      </div>
+      <button id="loginBtn" class="btn btn-primary" style="width:100%;min-height:44px;font-size:15px;">Logg inn</button>
+    </div>
+  </div>
+
+  <!-- ══ SETUP ══════════════════════════════════════ -->
+  <div id="setupSection" style="display:none;">
+    <div style="margin-bottom:24px;">
+      <div style="font-size:26px;font-weight:800;letter-spacing:-0.02em;">IPSC <span style="color:var(--accent);">INSIGHT</span></div>
+      <div style="color:var(--muted);font-size:14px;margin-top:4px;">Coach Dashboard</div>
+    </div>
+
+    <!-- Step 1: velg match -->
+    <div class="setup-card">
+      <div class="setup-title">
+        <div class="step">1</div>
+        Velg match
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Aktive og nylige matcher</label>
+        <select id="matchSelect" class="form-select">
+          <option value="">— Laster matcher… —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 2: velg skyttere -->
+    <div class="setup-card" id="shooterPickCard" style="display:none;">
+      <div class="setup-title">
+        <div class="step">2</div>
+        Velg skyttere å følge
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">Velg én eller flere. Du kan endre dette under matchen.</div>
+      <div id="shooterPickList" class="shooter-select-list">
+        <div class="loading-msg" style="padding:20px;"><div class="spinner"></div>Laster skyttere…</div>
+      </div>
+      <div class="form-actions">
+        <button id="startDashBtn" class="btn btn-primary" style="min-height:44px;">Start dashboard →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD ══════════════════════════════════ -->
+  <div id="dashSection" style="display:none;">
+
+    <div class="topbar">
+      <div class="topbar-brand">IPSC <span>COACH</span></div>
+      <div class="topbar-match" id="topMatchName">—</div>
+      <div class="topbar-actions">
+        <span class="live-dot" title="Live"></span>
+        <button id="toggleRefAllBtn" class="toggle-ref-all active" title="Referanseskyttere">
+          <span class="dot"></span>Ref-skyttere
+        </button>
+        <button id="addShooterBtn" class="btn btn-ghost btn-sm">+ Skytter</button>
+        <button id="changeMatchBtn" class="btn btn-secondary btn-sm">Bytt match</button>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Logg ut</button>
+      </div>
+    </div>
+
+    <div id="dashContent" style="padding:16px;">
+      <div class="loading-msg"><div class="spinner"></div>Laster dashboard…</div>
+    </div>
+  </div>
+
+  <!-- ══ RESULT MODAL ════════════════════════════════ -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="resultModalTitle">Legg til resultat</div>
+      <div class="modal-sub" id="resultModalSub">—</div>
+      <div id="resultError" class="error-box" style="display:none;"></div>
+      <div id="resultSuccess" class="success-box" style="display:none;"></div>
+
+      <div class="form-group">
+        <label class="form-label">Stage</label>
+        <select id="resStage" class="form-select"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tid (sekunder)</label>
+        <input id="resTime" class="form-input" type="number" step="0.01" min="0" placeholder="23.45" />
+      </div>
+
+      <div class="hit-grid">
+        <div class="hit-cell">
+          <label class="form-label">A</label>
+          <input id="resA" class="form-input" type="number" min="0" value="0" />
+        </div>
+        <div class="hit-cell">
+          <label class="form-label">C</label>
+          <input id="resC" class="form-input" type="number" min="0" value="0" />
+        </div>
+        <div class="hit-cell">
+          <label class="form-label">D</label>
+          <input id="resD" class="form-input" type="number" min="0" value="0" />
+        </div>
+        <div class="hit-cell">
+          <label class="form-label">Miss</label>
+          <input id="resMiss" class="form-input" type="number" min="0" value="0" />
+        </div>
+        <div class="hit-cell">
+          <label class="form-label">NS</label>
+          <input id="resNS" class="form-input" type="number" min="0" value="0" />
+        </div>
+        <div class="hit-cell">
+          <label class="form-label">Proc</label>
+          <input id="resProc" class="form-input" type="number" min="0" value="0" />
+        </div>
+      </div>
+
+      <div class="calc-row">
+        <span>Beregnet poeng / HF</span>
+        <strong id="resCalcDisplay">— / —</strong>
+      </div>
+
+      <div class="form-actions">
+        <button id="saveResultBtn" class="btn btn-primary">Lagre resultat</button>
+        <button id="cancelResultBtn" class="btn btn-secondary">Avbryt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ADD SHOOTER MODAL ═══════════════════════════ -->
+  <div id="addShooterModal" class="modal">
+    <div class="modal-content" style="max-width:460px;">
+      <div class="modal-title">Legg til skytter å følge</div>
+      <div class="modal-sub">Velg en deltaker i matchen som ikke allerede følges.</div>
+      <div id="addShooterList" class="shooter-select-list" style="max-height:300px;"></div>
+      <div class="form-actions">
+        <button id="cancelAddShooterBtn" class="btn btn-secondary">Lukk</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from './src/firebase.js';
+    import {
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import {
+      doc,
+      getDoc,
+      getDocs,
+      collection,
+      query,
+      where,
+      onSnapshot,
+      updateDoc
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    // ── Scoring constants ────────────────────────────
+    const PTS = { A: 5, C: 3, D: 1, miss: -10, ns: -10, proc: -10 };
+
+    function calcPts(pf, a, c, d, miss, ns, proc) {
+      pf = (pf || 'minor').toLowerCase();
+      const aVal = pf === 'major' ? 5 : 5;
+      const cVal = pf === 'major' ? 4 : 3;
+      const dVal = pf === 'major' ? 2 : 1;
+      return (a * aVal) + (c * cVal) + (d * dVal) + (miss * -10) + (ns * -10) + (proc * -10);
+    }
+
+    function calcHF(pts, time) {
+      if (!time || time <= 0) return 0;
+      return pts / time;
+    }
+
+    // ── State ────────────────────────────────────────
+    let currentUser = null;
+    let currentMatch = null;
+    let matchUnsubscribe = null;
+    let trackedShooterIds = [];
+    let refShootersVisible = true;
+    let allReferenceShooters = [];
+    let resultTarget = null; // { shooterId, shooterName }
+
+    // ── DOM refs ─────────────────────────────────────
+    const $ = id => document.getElementById(id);
+
+    // ── Auth ─────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (!userDoc.exists()) { await doLogout('Bruker ikke funnet.'); return; }
+          const data = userDoc.data();
+          if (data.role !== 'coach' && data.role !== 'admin') {
+            await doLogout('Du har ikke coach-tilgang. Kontakt admin.');
+            return;
+          }
+          currentUser = { uid: user.uid, ...data };
+          showSetup();
+        } catch (e) {
+          await doLogout('Feil ved innlogging: ' + e.message);
+        }
+      } else {
+        currentUser = null;
+        showLogin();
+      }
+    });
+
+    async function doLogout(msg) {
+      await signOut(auth);
+      if (msg) alert(msg);
+    }
+
+    // ── Login ─────────────────────────────────────────
+    $('loginBtn').onclick = async () => {
+      const email = $('loginEmail').value.trim();
+      const pw    = $('loginPassword').value;
+      $('loginError').style.display = 'none';
+      if (!email || !pw) { showErr($('loginError'), 'Fyll ut alle felt'); return; }
+      try {
+        await signInWithEmailAndPassword(auth, email, pw);
+      } catch (e) {
+        showErr($('loginError'), 'Innlogging feilet: ' + (e.code === 'auth/invalid-credential' ? 'Feil e-post eller passord' : e.message));
+      }
+    };
+
+    $('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
+
+    $('logoutBtn').onclick = async () => {
+      if (matchUnsubscribe) matchUnsubscribe();
+      await signOut(auth);
+    };
+
+    // ── Show sections ─────────────────────────────────
+    function showLogin() {
+      $('loginSection').style.display = 'flex';
+      $('setupSection').style.display = 'none';
+      $('dashSection').style.display  = 'none';
+    }
+
+    function showSetup() {
+      $('loginSection').style.display = 'none';
+      $('setupSection').style.display = 'block';
+      $('dashSection').style.display  = 'none';
+      loadMatchList();
+    }
+
+    function showDash() {
+      $('loginSection').style.display = 'none';
+      $('setupSection').style.display = 'none';
+      $('dashSection').style.display  = 'block';
+    }
+
+    // ── Load match list ───────────────────────────────
+    async function loadMatchList() {
+      const sel = $('matchSelect');
+      sel.innerHTML = '<option value="">Laster…</option>';
+      try {
+        const snap = await getDocs(collection(db, 'matches'));
+        const matches = [];
+        snap.forEach(d => matches.push({ id: d.id, ...d.data() }));
+        matches.sort((a, b) => {
+          const da = a.date || a.createdAt?.toDate?.()?.toISOString() || '';
+          const db_ = b.date || b.createdAt?.toDate?.()?.toISOString() || '';
+          return db_ > da ? 1 : -1;
+        });
+        sel.innerHTML = '<option value="">— Velg match —</option>' +
+          matches.map(m => `<option value="${escHtml(m.id)}">${escHtml(m.name || m.id)} ${m.date ? '(' + m.date + ')' : ''} — ${m.status || ''}</option>`).join('');
+      } catch (e) {
+        sel.innerHTML = '<option value="">Feil ved lasting av matcher</option>';
+      }
+    }
+
+    $('matchSelect').onchange = async function () {
+      const matchId = this.value;
+      $('shooterPickCard').style.display = matchId ? 'block' : 'none';
+      if (!matchId) return;
+      await loadShooterPicker(matchId);
+    };
+
+    async function loadShooterPicker(matchId) {
+      const list = $('shooterPickList');
+      list.innerHTML = '<div class="loading-msg" style="padding:20px;"><div class="spinner"></div>Laster…</div>';
+      try {
+        const snap = await getDoc(doc(db, 'matches', matchId));
+        if (!snap.exists()) { list.innerHTML = '<div class="loading-msg">Match ikke funnet</div>'; return; }
+        const match = { id: snap.id, ...snap.data() };
+        const shooters = match.shooters || [];
+
+        // Also load user names for participant UIDs not yet in shooters array
+        const participants = match.participants || [];
+        const knownIds = new Set(shooters.map(s => String(s.id)));
+        const extraUsers = [];
+        for (const uid of participants) {
+          if (!knownIds.has(String(uid))) {
+            try {
+              const ud = await getDoc(doc(db, 'users', uid));
+              if (ud.exists()) {
+                const u = ud.data();
+                extraUsers.push({ id: uid, firstName: u.firstName || '', lastName: u.lastName || '', division: u.division || '', pf: u.powerFactor || 'minor', club: u.club || '', stages: [] });
+              }
+            } catch {}
+          }
+        }
+
+        const allShooters = [...shooters.filter(s => !s.isMe), ...extraUsers];
+
+        if (!allShooters.length) {
+          list.innerHTML = '<div class="loading-msg" style="padding:16px;">Ingen skyttere i denne matchen ennå.</div>';
+          return;
+        }
+
+        list.innerHTML = allShooters.map(s => {
+          const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || String(s.id);
+          const meta = [s.division, s.pf, s.club].filter(Boolean).join(' · ');
+          return `
+            <div class="shooter-pick-item" data-id="${escHtml(String(s.id))}" onclick="togglePick(this)">
+              <div class="shooter-pick-check">
+                <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+                  <path d="M1 5l3.5 3.5L11 1" stroke="#0a0c10" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <div class="shooter-pick-name">${escHtml(name)}</div>
+                <div class="shooter-pick-meta">${escHtml(meta)}</div>
+              </div>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        list.innerHTML = `<div class="loading-msg">Feil: ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    window.togglePick = (el) => {
+      el.classList.toggle('selected');
+    };
+
+    $('startDashBtn').onclick = async () => {
+      const matchId = $('matchSelect').value;
+      if (!matchId) return;
+      const selected = [...$('shooterPickList').querySelectorAll('.shooter-pick-item.selected')];
+      if (!selected.length) { alert('Velg minst én skytter.'); return; }
+      trackedShooterIds = selected.map(el => el.dataset.id);
+      await startDashboard(matchId);
+    };
+
+    // ── Start dashboard ───────────────────────────────
+    async function startDashboard(matchId) {
+      showDash();
+      $('dashContent').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Kobler til live data…</div>';
+
+      // Load reference shooters once
+      try {
+        const refSnap = await getDocs(collection(db, 'referenceShooters'));
+        allReferenceShooters = [];
+        refSnap.forEach(d => allReferenceShooters.push({ id: d.id, ...d.data() }));
+      } catch {}
+
+      // Unsubscribe previous listener
+      if (matchUnsubscribe) matchUnsubscribe();
+
+      matchUnsubscribe = onSnapshot(doc(db, 'matches', matchId), snap => {
+        if (!snap.exists()) {
+          $('dashContent').innerHTML = '<div class="loading-msg">Match ikke funnet eller slettet.</div>';
+          return;
+        }
+        currentMatch = { id: snap.id, ...snap.data() };
+        renderDash();
+      }, err => {
+        $('dashContent').innerHTML = `<div class="loading-msg">Feil: ${escHtml(err.message)}</div>`;
+      });
+    }
+
+    $('changeMatchBtn').onclick = () => {
+      if (matchUnsubscribe) { matchUnsubscribe(); matchUnsubscribe = null; }
+      currentMatch = null;
+      trackedShooterIds = [];
+      showSetup();
+    };
+
+    // ── Toggle all ref shooters ───────────────────────
+    $('toggleRefAllBtn').onclick = () => {
+      refShootersVisible = !refShootersVisible;
+      $('toggleRefAllBtn').classList.toggle('active', refShootersVisible);
+      document.querySelectorAll('.ref-section').forEach(el => {
+        el.style.display = refShootersVisible ? '' : 'none';
+      });
+    };
+
+    // ── Add shooter to tracked ────────────────────────
+    $('addShooterBtn').onclick = () => {
+      if (!currentMatch) return;
+      const allShooters = (currentMatch.shooters || []).filter(s => !s.isMe);
+      const available = allShooters.filter(s => !trackedShooterIds.includes(String(s.id)));
+
+      if (!available.length) {
+        alert('Alle skyttere i matchen følges allerede.');
+        return;
+      }
+
+      const list = $('addShooterList');
+      list.innerHTML = available.map(s => {
+        const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || String(s.id);
+        const meta = [s.division, s.pf, s.club].filter(Boolean).join(' · ');
+        return `
+          <div class="shooter-pick-item" onclick="addTrackedShooter('${escAttr(String(s.id))}', this)">
+            <div class="shooter-pick-check">
+              <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+                <path d="M1 5l3.5 3.5L11 1" stroke="#0a0c10" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <div class="shooter-pick-name">${escHtml(name)}</div>
+              <div class="shooter-pick-meta">${escHtml(meta)}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      $('addShooterModal').classList.add('open');
+    };
+
+    window.addTrackedShooter = (id, el) => {
+      if (trackedShooterIds.includes(id)) return;
+      trackedShooterIds.push(id);
+      el.classList.add('selected');
+      setTimeout(() => {
+        $('addShooterModal').classList.remove('open');
+        renderDash();
+      }, 300);
+    };
+
+    $('cancelAddShooterBtn').onclick = () => $('addShooterModal').classList.remove('open');
+
+    // ── Remove shooter from tracked ───────────────────
+    window.removeTracked = (id) => {
+      trackedShooterIds = trackedShooterIds.filter(x => x !== id);
+      renderDash();
+    };
+
+    // ── Render dashboard ──────────────────────────────
+    function renderDash() {
+      if (!currentMatch) return;
+      const match = currentMatch;
+      $('topMatchName').innerHTML = `<strong>${escHtml(match.name || match.id)}</strong> &nbsp;·&nbsp; ${escHtml(match.date || '')} &nbsp;·&nbsp; ${escHtml(match.status || '')}`;
+
+      const stageDefs = getStageDefs(match);
+      const shooters  = (match.shooters || []).filter(s => !s.isMe && trackedShooterIds.includes(String(s.id)));
+
+      if (!shooters.length) {
+        $('dashContent').innerHTML = `
+          <div class="loading-msg">
+            Ingen valgte skyttere å vise.<br>
+            <button class="btn btn-primary" style="margin-top:16px;" onclick="document.getElementById('addShooterBtn').click()">+ Legg til skytter</button>
+          </div>`;
+        return;
+      }
+
+      const html = `<div class="shooter-grid">${shooters.map(s => renderCard(s, stageDefs, match)).join('')}</div>`;
+      $('dashContent').innerHTML = html;
+
+      // Apply current ref toggle state
+      if (!refShootersVisible) {
+        document.querySelectorAll('.ref-section').forEach(el => el.style.display = 'none');
+      }
+    }
+
+    // ── Render one shooter card ───────────────────────
+    function renderCard(shooter, stageDefs, match) {
+      const id   = String(shooter.id);
+      const name = [shooter.firstName, shooter.lastName].filter(Boolean).join(' ') || id;
+      const pf   = (shooter.pf || shooter.powerFactor || 'minor').toLowerCase();
+      const div  = shooter.division || '—';
+      const club = shooter.club || '';
+
+      const stages    = shooter.stages || [];
+      const doneNums  = stages.filter(s => s.time > 0).map(s => Number(s.num || s.number));
+      const totalDefs = stageDefs.length;
+      const doneCount = doneNums.length;
+      const pct       = totalDefs > 0 ? Math.round(doneCount / totalDefs * 100) : 0;
+
+      // Accumulate totals
+      let totalPts = 0, totalTime = 0, totalA = 0, totalC = 0, totalD = 0, totalMiss = 0, totalShots = 0;
+      stages.forEach(st => {
+        if (!(st.time > 0)) return;
+        const p = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+        totalPts  += p;
+        totalTime += st.time;
+        totalA    += st.a  || 0;
+        totalC    += st.c  || 0;
+        totalD    += st.d  || 0;
+        totalMiss += st.miss || 0;
+        totalShots += (st.a||0)+(st.c||0)+(st.d||0)+(st.miss||0);
+      });
+
+      const avgHF    = doneCount > 0 ? (totalPts / totalTime) : 0;
+      const aPct     = totalShots > 0 ? Math.round(totalA / totalShots * 100) : 0;
+      const missPct  = totalShots > 0 ? (totalMiss / totalShots * 100).toFixed(1) : '0.0';
+
+      // Prognosis – project avg HF over remaining stages
+      const remaining = totalDefs - doneCount;
+      const avgPtsPerStage = doneCount > 0 ? totalPts / doneCount : 0;
+      const projTotalPts   = totalPts + (avgPtsPerStage * remaining);
+
+      // Max pts for match
+      const matchMaxPts = stageDefs.reduce((sum, s) => sum + (s.maxPoints || ((s.paperTargets||0)*5*2 + (s.poppers||0)*5 + (s.plates||0)*5)), 0);
+      const projMatchPct = matchMaxPts > 0 ? Math.min(100, projTotalPts / matchMaxPts * 100).toFixed(1) : '—';
+
+      // Stage pills
+      const stagePills = totalDefs > 0 ? stageDefs.map(sd => {
+        const num   = Number(sd.number);
+        const isDone = doneNums.includes(num);
+        return `<div class="stage-pill ${isDone ? 'done' : 'pending'}">${num}</div>`;
+      }).join('') : '<span style="color:var(--muted);font-size:12px;">Ingen stages definert</span>';
+
+      // Reference shooters
+      const refRows = buildRefRows(shooter, pf, div, match, stageDefs);
+
+      // Coach tip
+      const tip = coachTip(aPct, avgHF, doneCount);
+
+      // Stage select for result modal
+      const stageOpts = stageDefs.map(sd =>
+        `<option value="${sd.number}" ${doneNums.includes(Number(sd.number)) ? '(skutt)' : ''}>${escHtml(sd.name || 'Stage ' + sd.number)}</option>`
+      ).join('');
+
+      return `
+        <div class="shooter-card" id="card-${escHtml(id)}">
+          <div class="card-header">
+            <div>
+              <div class="card-name">${escHtml(name)}</div>
+              <div class="card-sub">${escHtml(club)}</div>
+              <div class="card-badges">
+                <span class="badge badge-div">${escHtml(div)}</span>
+                <span class="badge badge-pf-${pf === 'major' ? 'major' : 'minor'}">${escHtml(pf.toUpperCase())}</span>
+              </div>
+            </div>
+            <div class="card-header-actions">
+              <button class="btn btn-sm btn-ghost" onclick="window.removeTracked('${escAttr(id)}')" title="Fjern fra oversikt">✕</button>
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-cell">
+              <div class="stat-val">${avgHF > 0 ? avgHF.toFixed(2) : '—'}</div>
+              <div class="stat-lbl">Avg HF</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-val ${aPct >= 85 ? 'green' : aPct >= 70 ? '' : 'red'}">${doneCount > 0 ? aPct + '%' : '—'}</div>
+              <div class="stat-lbl">A%</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-val blue">${doneCount}</div>
+              <div class="stat-lbl">Skutt</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-val muted">${remaining}</div>
+              <div class="stat-lbl">Igjen</div>
+            </div>
+          </div>
+
+          <div class="progress-section">
+            <div class="progress-label">
+              <span>Match-fremgang</span>
+              <strong>${pct}%</strong>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${pct}%"></div>
+            </div>
+          </div>
+
+          <div class="stages-section">
+            <div class="stages-header">Stages</div>
+            <div class="stage-pills">${stagePills}</div>
+          </div>
+
+          <div class="prognosis-section">
+            <div class="prognosis-header">
+              <span>Prognose (inneværende match)</span>
+            </div>
+            <div class="prognosis-grid">
+              <div class="prognosis-item">
+                <div class="prognosis-val">${avgHF > 0 ? avgHF.toFixed(2) : '—'}</div>
+                <div class="prognosis-lbl">Estimert snitt-HF</div>
+              </div>
+              <div class="prognosis-item">
+                <div class="prognosis-val">${projMatchPct !== '—' ? projMatchPct + '%' : '—'}</div>
+                <div class="prognosis-lbl">Est. match-poeng</div>
+              </div>
+              <div class="prognosis-item">
+                <div class="prognosis-val">${doneCount > 0 ? Math.round(projTotalPts) : '—'}</div>
+                <div class="prognosis-lbl">Est. totalpoeng</div>
+              </div>
+              <div class="prognosis-item">
+                <div class="prognosis-val">${missPct !== '0.0' ? missPct + '%' : '<span style="color:var(--green)">0</span>'}</div>
+                <div class="prognosis-lbl">Miss-rate</div>
+              </div>
+            </div>
+          </div>
+
+          ${refRows ? `
+          <div class="ref-section" id="ref-${escHtml(id)}">
+            <button class="ref-toggle-btn open" onclick="toggleRef('${escAttr(id)}', this)">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              Referanseskyttere
+            </button>
+            <div class="ref-list" id="reflist-${escHtml(id)}">${refRows}</div>
+          </div>` : ''}
+
+          ${tip ? `<div class="coach-tip">${tip}</div>` : ''}
+
+          <div class="card-footer">
+            <button class="btn btn-primary btn-sm" onclick="openResultModal('${escAttr(id)}', '${escAttr(name)}')">+ Legg til resultat</button>
+          </div>
+        </div>`;
+    }
+
+    // ── Toggle ref list per card ──────────────────────
+    window.toggleRef = (id, btn) => {
+      const list = document.getElementById('reflist-' + id);
+      if (!list) return;
+      const isOpen = list.style.display !== 'none' && !list.classList.contains('hidden');
+      list.style.display = isOpen ? 'none' : 'grid';
+      btn.classList.toggle('open', !isOpen);
+    };
+
+    // ── Build reference shooter rows ──────────────────
+    function buildRefRows(shooter, pf, division, match, stageDefs) {
+      const refs = allReferenceShooters.filter(r => {
+        const rd = String(r.division || '').toLowerCase();
+        const sd = String(division || '').toLowerCase();
+        return rd === sd || !r.division;
+      }).slice(0, 5);
+
+      if (!refs.length) return '';
+
+      const doneStages = (shooter.stages || []).filter(s => s.time > 0);
+      const doneCount  = doneStages.length;
+      if (!doneCount) return refs.map(r => `
+        <div class="ref-row">
+          <span class="ref-name">${escHtml(r.name || r.id)}</span>
+          <span style="color:var(--muted);font-size:11px;">Ingen data ennå</span>
+        </div>`).join('');
+
+      // Shooter avg HF
+      let shooterPts = 0, shooterTime = 0;
+      doneStages.forEach(st => {
+        shooterPts  += calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+        shooterTime += st.time;
+      });
+      const shooterHF = shooterTime > 0 ? shooterPts / shooterTime : 0;
+
+      return refs.map(r => {
+        const refHF = r.mediumHF || r.shortHF || r.longHF || 0;
+        const delta = shooterHF - refHF;
+        const sign  = delta >= 0 ? '+' : '';
+        return `
+          <div class="ref-row">
+            <span class="ref-name">${escHtml(r.name || r.id)}</span>
+            <span class="ref-hf">${refHF.toFixed(2)} HF</span>
+            <span class="${delta >= 0 ? 'ref-delta-pos' : 'ref-delta-neg'}">${sign}${delta.toFixed(2)}</span>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Coach tip logic ───────────────────────────────
+    function coachTip(aPct, avgHF, doneCount) {
+      if (doneCount < 1) return '';
+      if (aPct < 70)  return '🎯 A% under 70 — prioriter treff over tempo. Gi sikte mer tid på hvert mål.';
+      if (aPct < 80)  return '📈 A% kan løftes. Hold rytmen, men la siktet sette seg litt mer.';
+      if (aPct >= 90 && avgHF > 5) return '🔥 Solid — A% og HF er begge sterk. Kjør videre i samme spor.';
+      if (aPct >= 85) return '✅ Bra treff. Fokus på å holde tempo gjennom gjenstående stages.';
+      return '⚡ Holde rytmen — stol på baseline og skyt kontrollert.';
+    }
+
+    // ── Stage defs helper ─────────────────────────────
+    function getStageDefs(match) {
+      if (!match || !match.stages) return [];
+      return match.stages
+        .filter(s => s && (s.number != null || s.num != null || s.name))
+        .map((s, i) => ({
+          number: s.number != null ? s.number : s.num != null ? s.num : i + 1,
+          name:   s.name || 'Stage ' + (s.number || s.num || i + 1),
+          paperTargets: s.paperTargets || 0,
+          poppers:      s.poppers || 0,
+          plates:       s.plates  || 0,
+          maxPoints:    s.maxPoints || ((s.paperTargets||0) * 5 * (s.shotsPerPaper||2) + (s.poppers||0) * 5 + (s.plates||0) * 5)
+        }))
+        .sort((a, b) => a.number - b.number);
+    }
+
+    // ── Result modal ──────────────────────────────────
+    window.openResultModal = (shooterId, shooterName) => {
+      if (!currentMatch) return;
+      resultTarget = { shooterId, shooterName };
+      const stageDefs = getStageDefs(currentMatch);
+
+      $('resultModalTitle').textContent = 'Legg til resultat';
+      $('resultModalSub').textContent   = shooterName;
+      $('resultError').style.display    = 'none';
+      $('resultSuccess').style.display  = 'none';
+
+      const shooter = (currentMatch.shooters || []).find(s => String(s.id) === String(shooterId));
+      const doneNums = (shooter?.stages || []).filter(s => s.time > 0).map(s => Number(s.num || s.number));
+
+      $('resStage').innerHTML = stageDefs.length
+        ? stageDefs.map(sd => `<option value="${sd.number}">${escHtml(sd.name || 'Stage ' + sd.number)}${doneNums.includes(Number(sd.number)) ? ' ✓' : ''}</option>`).join('')
+        : '<option value="1">Stage 1</option>';
+
+      ['resTime','resA','resC','resD','resMiss','resNS','resProc'].forEach(id => {
+        $(id).value = id === 'resTime' ? '' : '0';
+      });
+      $('resCalcDisplay').textContent = '— / —';
+
+      $('resultModal').classList.add('open');
+    };
+
+    // Live calc
+    ['resTime','resA','resC','resD','resMiss','resNS','resProc'].forEach(id => {
+      $(id).addEventListener('input', updateCalc);
+    });
+
+    function updateCalc() {
+      const time = parseFloat($('resTime').value) || 0;
+      const a    = parseInt($('resA').value)    || 0;
+      const c    = parseInt($('resC').value)    || 0;
+      const d    = parseInt($('resD').value)    || 0;
+      const miss = parseInt($('resMiss').value) || 0;
+      const ns   = parseInt($('resNS').value)   || 0;
+      const proc = parseInt($('resProc').value) || 0;
+      const pf   = (() => {
+        if (!currentMatch || !resultTarget) return 'minor';
+        const s = (currentMatch.shooters || []).find(x => String(x.id) === String(resultTarget?.shooterId));
+        return s?.pf || s?.powerFactor || 'minor';
+      })();
+      const pts = calcPts(pf, a, c, d, miss, ns, proc);
+      const hf  = time > 0 ? (pts / time).toFixed(4) : '—';
+      $('resCalcDisplay').textContent = `${pts} pts / ${hf} HF`;
+    }
+
+    $('cancelResultBtn').onclick = () => $('resultModal').classList.remove('open');
+    $('resultModal').addEventListener('click', e => { if (e.target === $('resultModal')) $('resultModal').classList.remove('open'); });
+    $('addShooterModal').addEventListener('click', e => { if (e.target === $('addShooterModal')) $('addShooterModal').classList.remove('open'); });
+
+    $('saveResultBtn').onclick = async () => {
+      if (!resultTarget || !currentMatch) return;
+
+      const stageNum = parseInt($('resStage').value, 10);
+      const time     = parseFloat($('resTime').value);
+      const a        = parseInt($('resA').value)    || 0;
+      const c        = parseInt($('resC').value)    || 0;
+      const d        = parseInt($('resD').value)    || 0;
+      const miss     = parseInt($('resMiss').value) || 0;
+      const ns       = parseInt($('resNS').value)   || 0;
+      const proc     = parseInt($('resProc').value) || 0;
+
+      $('resultError').style.display = 'none';
+      if (!stageNum || !time || time <= 0) {
+        showErr($('resultError'), 'Stage og tid er påkrevd.'); return;
+      }
+
+      const shooters = JSON.parse(JSON.stringify(currentMatch.shooters || []));
+      let shooter = shooters.find(s => String(s.id) === String(resultTarget.shooterId));
+
+      if (!shooter) {
+        showErr($('resultError'), 'Skytter ikke funnet i matchen.'); return;
+      }
+
+      shooter.stages = shooter.stages || [];
+      const pf  = (shooter.pf || shooter.powerFactor || 'minor').toLowerCase();
+      const pts = calcPts(pf, a, c, d, miss, ns, proc);
+      const hf  = time > 0 ? pts / time : 0;
+
+      const stageDef = getStageDefs(currentMatch).find(sd => Number(sd.number) === stageNum);
+      const stageEntry = {
+        num:    stageNum,
+        name:   stageDef?.name || 'Stage ' + stageNum,
+        time,
+        a, c, d, miss, ns, proc,
+        pts,
+        hf,
+        shots: a + c + d + miss,
+        savedAt: Date.now()
+      };
+
+      const idx = shooter.stages.findIndex(s => (s.num || s.number) === stageNum);
+      if (idx >= 0) shooter.stages[idx] = { ...shooter.stages[idx], ...stageEntry };
+      else shooter.stages.push(stageEntry);
+      shooter.stages.sort((a, b) => (a.num || 0) - (b.num || 0));
+
+      try {
+        await updateDoc(doc(db, 'matches', String(currentMatch.id)), { shooters });
+        $('resultSuccess').textContent = `✓ Resultat lagret for stage ${stageNum}`;
+        $('resultSuccess').style.display = 'block';
+        setTimeout(() => {
+          $('resultModal').classList.remove('open');
+          $('resultSuccess').style.display = 'none';
+        }, 1400);
+      } catch (e) {
+        showErr($('resultError'), 'Kunne ikke lagre: ' + e.message);
+      }
+    };
+
+    // ── Helpers ───────────────────────────────────────
+    function showErr(el, msg) {
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function escHtml(v) {
+      return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function escAttr(v) {
+      return String(v ?? '').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    }
+  </script>
+</body>
+</html>

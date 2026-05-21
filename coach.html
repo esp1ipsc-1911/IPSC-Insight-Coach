@@ -5,1557 +5,994 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IPSC Insight – Coach</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --bg:      #0a0c10;
-      --bg2:     #111318;
-      --bg3:     #181c24;
-      --card:    #1a1e28;
-      --border:  rgba(255,255,255,0.08);
-      --accent:  #e8b84b;
-      --accent2: #f0d080;
-      --red:     #e05252;
-      --green:   #4caf7d;
-      --blue:    #4a9eff;
-      --orange:  #f07030;
-      --text:    #f0f2f5;
-      --muted:   #8a93a1;
-      --sub:     #9ca3af;
-      --radius:  14px;
-      --radius-sm: 10px;
-      --shadow:  0 14px 40px rgba(0,0,0,.3);
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      min-height: 100vh;
-    }
-
-    /* ── TOPBAR ────────────────────────────────────── */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(10,12,16,.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 20px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .topbar-brand {
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      white-space: nowrap;
-    }
-
-    .topbar-brand span { color: var(--accent); }
-
-    .topbar-match {
-      flex: 1;
-      min-width: 0;
-      font-size: 13px;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .topbar-match strong {
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    .topbar-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .toggle-ref-all {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--bg3);
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all .15s;
-      white-space: nowrap;
-    }
-
-    .toggle-ref-all.active {
-      border-color: rgba(74,158,255,.4);
-      background: rgba(74,158,255,.12);
-      color: var(--blue);
-    }
-
-    .toggle-ref-all .dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: currentColor;
-      flex-shrink: 0;
-    }
-
-    .btn {
-      border: none;
-      border-radius: var(--radius-sm);
-      min-height: 36px;
-      padding: 8px 14px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: filter .12s, transform .12s;
-    }
-
-    .btn:hover { filter: brightness(1.06); }
-    .btn:active { transform: translateY(1px); }
-
-    .btn-primary { background: var(--accent); color: var(--bg); }
-    .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
-    .btn-danger { background: var(--red); color: #fff; }
-    .btn-sm { min-height: 30px; padding: 5px 10px; font-size: 12px; border-radius: 8px; }
-    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
-
-    /* ── LOGIN ─────────────────────────────────────── */
-    #loginSection {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 360px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 28px;
-    }
-
-    .login-logo {
-      text-align: center;
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
-    }
-
-    .login-logo span { color: var(--accent); }
-
-    .login-sub {
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 24px;
-    }
-
-    .form-group { margin-bottom: 16px; }
-
-    .form-label {
-      display: block;
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: 7px;
-      font-weight: 700;
-    }
-
-    .form-input, .form-select {
-      width: 100%;
-      min-height: 44px;
-      padding: 11px 13px;
-      background: var(--bg3);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-    }
-
-    .form-input:focus, .form-select:focus {
-      outline: none;
-      border-color: rgba(232,184,75,.55);
-      box-shadow: 0 0 0 3px rgba(232,184,75,.08);
-    }
-
-    .error-box {
-      background: rgba(224,82,82,.12);
-      border: 1px solid rgba(224,82,82,.25);
-      color: var(--red);
-      padding: 10px 13px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      margin-bottom: 14px;
-    }
-
-    .success-box {
-      background: rgba(76,175,125,.12);
-      border: 1px solid rgba(76,175,125,.25);
-      color: var(--green);
-      padding: 10px 13px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      margin-bottom: 14px;
-    }
-
-    /* ── SETUP PANEL ───────────────────────────────── */
-    #setupSection {
-      max-width: 720px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-
-    .setup-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-    }
-
-    .setup-title {
-      font-size: 18px;
-      font-weight: 800;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .setup-title .step {
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: var(--bg);
-      font-size: 12px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .shooter-select-list {
-      display: grid;
-      gap: 8px;
-      max-height: 340px;
-      overflow-y: auto;
-      margin-top: 12px;
-    }
-
-    .shooter-pick-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 14px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: border-color .12s, background .12s;
-      user-select: none;
-    }
-
-    .shooter-pick-item:hover { border-color: rgba(232,184,75,.3); }
-
-    .shooter-pick-item.selected {
-      border-color: rgba(232,184,75,.5);
-      background: rgba(232,184,75,.07);
-    }
-
-    .shooter-pick-check {
-      width: 20px; height: 20px;
-      border-radius: 6px;
-      border: 2px solid var(--border);
-      background: var(--bg2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: all .12s;
-    }
-
-    .shooter-pick-item.selected .shooter-pick-check {
-      background: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .shooter-pick-check svg { display: none; }
-    .shooter-pick-item.selected .shooter-pick-check svg { display: block; }
-
-    .shooter-pick-name { font-weight: 700; font-size: 14px; }
-    .shooter-pick-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-    /* ── DASHBOARD ─────────────────────────────────── */
-    #dashSection {
-      padding: 16px 16px 40px;
-    }
-
-    .dash-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .dash-title {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-    }
-
-    .dash-title span { color: var(--accent); }
-
-    .dash-meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .dash-controls {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    /* ── SHOOTER GRID ──────────────────────────────── */
-    .shooter-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 14px;
-    }
-
-    /* ── SHOOTER CARD ──────────────────────────────── */
-    .shooter-card {
-      background: linear-gradient(160deg, #1c2030, #161a24);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: border-color .2s;
-    }
-
-    .shooter-card:hover { border-color: rgba(232,184,75,.2); }
-
-    .card-header {
-      padding: 14px 16px 10px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .card-name {
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      line-height: 1.2;
-    }
-
-    .card-sub {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .card-badges {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-      margin-top: 5px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      border: 1px solid transparent;
-    }
-
-    .badge-div {
-      background: rgba(74,158,255,.12);
-      color: var(--blue);
-      border-color: rgba(74,158,255,.22);
-    }
-
-    .badge-pf-minor {
-      background: rgba(255,255,255,.05);
-      color: var(--sub);
-      border-color: rgba(255,255,255,.1);
-    }
-
-    .badge-pf-major {
-      background: rgba(232,184,75,.1);
-      color: var(--accent);
-      border-color: rgba(232,184,75,.2);
-    }
-
-    .badge-dq {
-      background: rgba(224,82,82,.15);
-      color: var(--red);
-      border-color: rgba(224,82,82,.3);
-    }
-
-    .card-header-actions {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    /* ── STATS ROW ─────────────────────────────────── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      padding: 12px 16px;
-      gap: 6px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .stat-cell {
-      text-align: center;
-    }
-
-    .stat-val {
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 1;
-      color: var(--accent);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .stat-val.green { color: var(--green); }
-    .stat-val.blue  { color: var(--blue); }
-    .stat-val.red   { color: var(--red); }
-    .stat-val.muted { color: var(--muted); }
-
-    .stat-lbl {
-      font-size: 10px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-top: 4px;
-    }
-
-    /* ── PROGRESS BAR ──────────────────────────────── */
-    .progress-section {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .progress-label strong { color: var(--text); }
-
-    .progress-track {
-      height: 6px;
-      background: var(--bg3);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      transition: width .4s ease;
-    }
-
-    /* ── STAGE PILLS ───────────────────────────────── */
-    .stages-section {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .stages-header {
-      font-size: 10px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: 7px;
-    }
-
-    .stage-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .stage-pill {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      border: 1px solid var(--border);
-      background: var(--bg3);
-      color: var(--muted);
-    }
-
-    .stage-pill.done {
-      background: rgba(76,175,125,.15);
-      border-color: rgba(76,175,125,.3);
-      color: var(--green);
-    }
-
-    .stage-pill.pending {
-      background: var(--bg2);
-      color: var(--muted);
-      border-style: dashed;
-    }
-
-    /* ── PROGNOSIS ─────────────────────────────────── */
-    .prognosis-section {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .prognosis-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: 8px;
-    }
-
-    .prognosis-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .prognosis-item {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 8px 10px;
-    }
-
-    .prognosis-val {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .prognosis-lbl {
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .prognosis-trend {
-      font-size: 11px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-
-    .trend-up   { color: var(--green); }
-    .trend-down { color: var(--red); }
-    .trend-flat { color: var(--muted); }
-
-    /* ── REFERENCE SHOOTERS ────────────────────────── */
-    .ref-section {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .ref-toggle-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--muted);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-    }
-
-    .ref-toggle-btn svg { transition: transform .2s; }
-    .ref-toggle-btn.open svg { transform: rotate(180deg); }
-
-    .ref-list {
-      display: none;
-      margin-top: 8px;
-      display: grid;
-      gap: 5px;
-    }
-
-    .ref-list.hidden { display: none; }
-
-    .ref-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 7px 10px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 12px;
-    }
-
-    .ref-name { font-weight: 700; }
-    .ref-hf   { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
-    .ref-delta-pos { color: var(--green); font-size: 11px; font-weight: 700; }
-    .ref-delta-neg { color: var(--red);   font-size: 11px; font-weight: 700; }
-
-    /* ── CARD FOOTER ───────────────────────────────── */
-    .card-footer {
-      padding: 10px 16px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: auto;
-    }
-
-    /* ── COACH TIP ─────────────────────────────────── */
-    .coach-tip {
-      padding: 8px 10px;
-      background: rgba(232,184,75,.06);
-      border-left: 3px solid var(--accent);
-      border-radius: 0 8px 8px 0;
-      font-size: 12px;
-      color: var(--sub);
-      line-height: 1.45;
-      margin: 0 16px 10px;
-    }
-
-    /* ── MODAL ─────────────────────────────────────── */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 500;
-      background: rgba(0,0,0,.82);
-      padding: 16px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal.open { display: flex; }
-
-    .modal-content {
-      width: 100%;
-      max-width: 540px;
-      max-height: 92vh;
-      overflow-y: auto;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 24px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .modal-title {
-      font-size: 20px;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-
-    .modal-sub {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 18px;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
-
-    .hit-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 14px 0;
-    }
-
-    .hit-cell { }
-
-    .calc-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      background: var(--bg3);
-      border-radius: var(--radius-sm);
-      margin-top: 10px;
-      font-size: 13px;
-    }
-
-    .calc-row strong { color: var(--accent); font-size: 16px; }
-
-    /* ── SECTION DIVIDER ───────────────────────────── */
-    .section-sep {
-      height: 1px;
-      background: var(--border);
-      margin: 16px 0;
-    }
-
-    /* ── LOADING / EMPTY ───────────────────────────── */
-    .loading-msg {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .spinner {
-      width: 28px; height: 28px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      margin: 0 auto 14px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .live-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      display: inline-block;
-      animation: pulse 1.8s ease infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: .3; }
-    }
-
-    /* ── RESPONSIVE ────────────────────────────────── */
-    @media (max-width: 700px) {
-      .shooter-grid { grid-template-columns: 1fr; }
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-      .topbar-match { display: none; }
-      .prognosis-grid { grid-template-columns: 1fr 1fr; }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --bg:#0a0c10;--bg2:#111318;--bg3:#181c24;--card:#1a1e28;
+      --border:rgba(255,255,255,0.08);--accent:#e8b84b;--accent2:#f0d080;
+      --red:#e05252;--green:#4caf7d;--blue:#4a9eff;--orange:#f07030;
+      --text:#f0f2f5;--muted:#8a93a1;--sub:#9ca3af;
+      --radius:14px;--radius-sm:10px;--shadow:0 14px 40px rgba(0,0,0,.3);
+    }
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh;}
+
+    /* ── TOPBAR ── */
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;gap:12px;}
+    .topbar-brand{font-size:16px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+    .topbar-brand span{color:var(--accent);}
+    .topbar-match{flex:1;min-width:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .topbar-match strong{color:var(--text);}
+    .topbar-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.8s ease infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+    .btn{border:none;border-radius:var(--radius-sm);min-height:32px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:filter .12s,transform .12s;}
+    .btn:hover{filter:brightness(1.07);}
+    .btn:active{transform:translateY(1px);}
+    .btn-primary{background:var(--accent);color:var(--bg);}
+    .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+    .btn-danger{background:var(--red);color:#fff;}
+    .btn-sm{min-height:28px;padding:4px 10px;font-size:11px;}
+    .tog-btn{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+    .tog-btn.on{border-color:rgba(74,158,255,.4);background:rgba(74,158,255,.12);color:var(--blue);}
+    .tog-btn .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+    /* ── LOGIN ── */
+    #loginSection{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .login-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;}
+    .login-logo{text-align:center;font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+    .login-logo span{color:var(--accent);}
+    .login-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:24px;}
+    .form-group{margin-bottom:16px;}
+    .form-label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:700;}
+    .form-input,.form-select{width:100%;min-height:42px;padding:10px 13px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;}
+    .form-input:focus,.form-select:focus{outline:none;border-color:rgba(232,184,75,.55);box-shadow:0 0 0 3px rgba(232,184,75,.08);}
+    .error-box{background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.25);color:var(--red);padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;}
+    .success-box{background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.25);color:var(--green);padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;}
+
+    /* ── SETUP ── */
+    #setupSection{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .setup-loading{text-align:center;padding:40px 20px;}
+    .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ── DASH ── */
+    #dashSection{padding-bottom:40px;}
+
+    /* ── MATCH HEADER ── */
+    .match-header{background:linear-gradient(135deg,#13172000,#1a1e2888);border-bottom:1px solid var(--border);padding:14px 16px;}
+    .match-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+    .match-title{font-size:20px;font-weight:800;letter-spacing:-.01em;}
+    .match-title span{color:var(--accent);}
+    .match-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+    .match-stats{display:flex;gap:16px;flex-wrap:wrap;}
+    .mstat{text-align:center;}
+    .mstat-val{font-size:22px;font-weight:800;color:var(--accent);line-height:1;}
+    .mstat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+
+    /* ── STANDINGS STRIP ── */
+    .standings-strip{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;overflow-x:auto;}
+    .standings-strip-inner{display:flex;gap:6px;min-width:max-content;}
+    .s-chip{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--bg3);border:1px solid var(--border);font-size:11px;white-space:nowrap;}
+    .s-chip.mine{background:rgba(232,184,75,.1);border-color:rgba(232,184,75,.35);font-weight:700;}
+    .s-chip-rank{font-weight:800;color:var(--muted);min-width:16px;}
+    .s-chip.mine .s-chip-rank{color:var(--accent);}
+    .s-chip-name{font-weight:700;}
+    .s-chip-pts{color:var(--accent);font-weight:700;}
+    .s-chip-pct{color:var(--muted);}
+
+    /* ── SHOOTER GRID ── */
+    .shooter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;padding:14px 16px;}
+
+    /* ── SHOOTER CARD ── */
+    .scard{background:linear-gradient(160deg,#1c2030,#161a24);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;}
+    .scard:hover{border-color:rgba(232,184,75,.2);}
+
+    /* card header */
+    .scard-head{padding:12px 14px 10px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+    .scard-name{font-size:15px;font-weight:800;line-height:1.2;}
+    .scard-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .scard-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+    .badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid transparent;}
+    .badge-div{background:rgba(74,158,255,.12);color:var(--blue);border-color:rgba(74,158,255,.22);}
+    .badge-pf-minor{background:rgba(255,255,255,.05);color:var(--sub);border-color:rgba(255,255,255,.1);}
+    .badge-pf-major{background:rgba(232,184,75,.1);color:var(--accent);border-color:rgba(232,184,75,.2);}
+    .scard-rank{text-align:right;flex-shrink:0;}
+    .scard-rank-num{font-size:24px;font-weight:900;color:var(--accent);line-height:1;}
+    .scard-rank-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+    /* stats row */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);padding:10px 14px;gap:4px;border-bottom:1px solid var(--border);}
+    .stat-cell{text-align:center;}
+    .stat-val{font-size:20px;font-weight:800;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;}
+    .stat-val.green{color:var(--green);}
+    .stat-val.red{color:var(--red);}
+    .stat-val.blue{color:var(--blue);}
+    .stat-val.muted{color:var(--muted);}
+    .stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px;}
+
+    /* progress */
+    .prog-section{padding:8px 14px;border-bottom:1px solid var(--border);}
+    .prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
+    .prog-label strong{color:var(--text);}
+    .prog-track{height:5px;background:var(--bg3);border-radius:999px;overflow:hidden;}
+    .prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;}
+
+    /* stage pills */
+    .stages-section{padding:8px 14px;border-bottom:1px solid var(--border);}
+    .stages-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+    .stage-pills{display:flex;flex-wrap:wrap;gap:4px;}
+    .spill{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1px solid var(--border);background:var(--bg3);color:var(--muted);}
+    .spill.done{background:rgba(76,175,125,.15);border-color:rgba(76,175,125,.3);color:var(--green);}
+    .spill.pending{background:var(--bg2);border-style:dashed;}
+
+    /* HF chart */
+    .chart-section{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .chart-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+    .chart-legend{display:flex;gap:10px;}
+    .leg-item{display:flex;align-items:center;gap:4px;font-size:10px;}
+    .leg-dot{width:8px;height:3px;border-radius:2px;}
+    .chart-wrap{position:relative;}
+    .chart-wrap svg{width:100%;overflow:visible;}
+
+    /* prognosis */
+    .prog2-section{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .prog2-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+    .prog2-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+    .prog2-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;}
+    .prog2-val{font-size:17px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;}
+    .prog2-lbl2{font-size:10px;color:var(--muted);margin-top:2px;}
+
+    /* ref */
+    .ref-section{padding:8px 14px;border-bottom:1px solid var(--border);}
+    .ref-toggle{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+    .ref-toggle svg{transition:transform .2s;}
+    .ref-toggle.open svg{transform:rotate(180deg);}
+    .ref-list{margin-top:7px;display:grid;gap:4px;}
+    .ref-list.hidden{display:none;}
+    .ref-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:11px;}
+    .ref-name{font-weight:700;}
+    .ref-hf{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;}
+    .ref-delta-pos{color:var(--green);font-size:10px;font-weight:700;}
+    .ref-delta-neg{color:var(--red);font-size:10px;font-weight:700;}
+
+    /* tip */
+    .coach-tip{padding:7px 10px;background:rgba(232,184,75,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:11px;color:var(--sub);line-height:1.45;margin:8px 14px;}
+
+    /* card footer */
+    .scard-foot{padding:8px 14px;display:flex;gap:6px;margin-top:auto;}
+
+    /* ── MODAL ── */
+    .modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.82);padding:16px;align-items:center;justify-content:center;}
+    .modal.open{display:flex;}
+    .modal-content{width:100%;max-width:520px;max-height:92vh;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;-webkit-overflow-scrolling:touch;}
+    .modal-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+    .modal-sub{color:var(--muted);font-size:13px;margin-bottom:16px;}
+    .form-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+    .hit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;}
+    .calc-row{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:var(--bg3);border-radius:var(--radius-sm);margin-top:8px;font-size:13px;}
+    .calc-row strong{color:var(--accent);font-size:15px;}
+
+    /* ── LOADING ── */
+    .loading-msg{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:700px){
+      .shooter-grid{grid-template-columns:1fr;}
+      .stats-row{grid-template-columns:repeat(2,1fr);}
+      .topbar-match{display:none;}
     }
   </style>
 </head>
 <body>
 
-  <!-- ══ LOGIN ══════════════════════════════════════ -->
-  <div id="loginSection">
-    <div class="login-card">
-      <div class="login-logo">IPSC <span>INSIGHT</span></div>
-      <div class="login-sub">Coach Dashboard — Logg inn</div>
-      <div id="loginError" class="error-box" style="display:none;"></div>
-      <div class="form-group">
-        <label class="form-label">E-post</label>
-        <input id="loginEmail" class="form-input" type="email" placeholder="coach@ipsc.no" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Passord</label>
-        <input id="loginPassword" class="form-input" type="password" placeholder="Passord" />
-      </div>
-      <button id="loginBtn" class="btn btn-primary" style="width:100%;min-height:44px;font-size:15px;">Logg inn</button>
+<!-- ══ LOGIN ══ -->
+<div id="loginSection">
+  <div class="login-card">
+    <div class="login-logo">IPSC <span>INSIGHT</span></div>
+    <div class="login-sub">Coach Dashboard — Logg inn</div>
+    <div id="loginError" class="error-box" style="display:none;"></div>
+    <div class="form-group">
+      <label class="form-label">E-post</label>
+      <input id="loginEmail" class="form-input" type="email" placeholder="coach@ipsc.no" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Passord</label>
+      <input id="loginPassword" class="form-input" type="password" placeholder="Passord" />
+    </div>
+    <button id="loginBtn" class="btn btn-primary" style="width:100%;min-height:42px;font-size:14px;">Logg inn</button>
+  </div>
+</div>
+
+<!-- ══ SETUP ══ -->
+<div id="setupSection" style="display:none;">
+  <div class="setup-loading">
+    <div class="spinner"></div>
+    <div style="color:var(--muted);font-size:14px;">Laster dine skyttere…</div>
+  </div>
+</div>
+
+<!-- ══ DASH ══ -->
+<div id="dashSection" style="display:none;">
+
+  <div class="topbar">
+    <div class="topbar-brand">IPSC <span>COACH</span></div>
+    <div class="topbar-match" id="topMatchName">—</div>
+    <div class="topbar-actions">
+      <span class="live-dot" title="Live"></span>
+      <button id="toggleRefAllBtn" class="tog-btn on">
+        <span class="dot"></span>Ref
+      </button>
+      <button id="logoutBtn" class="btn btn-ghost btn-sm">Logg ut</button>
     </div>
   </div>
 
-  <!-- ══ SETUP (loading screen only) ════════════════ -->
-  <div id="setupSection" style="display:none;">
-    <div class="loading-msg" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-      <div class="spinner"></div>
-      Laster dine skyttere…
+  <!-- match header -->
+  <div class="match-header" id="matchHeader" style="display:none;">
+    <div class="match-header-top">
+      <div>
+        <div class="match-title" id="matchTitle">—</div>
+        <div class="match-meta" id="matchMeta">—</div>
+      </div>
+      <div class="match-stats" id="matchStats"></div>
     </div>
   </div>
 
-  <!-- ══ DASHBOARD ══════════════════════════════════ -->
-  <div id="dashSection" style="display:none;">
-
-    <div class="topbar">
-      <div class="topbar-brand">IPSC <span>COACH</span></div>
-      <div class="topbar-match" id="topMatchName">—</div>
-      <div class="topbar-actions">
-        <span class="live-dot" title="Live"></span>
-        <button id="toggleRefAllBtn" class="toggle-ref-all active" title="Referanseskyttere">
-          <span class="dot"></span>Ref-skyttere
-        </button>
-        <button id="changeMatchBtn" class="btn btn-secondary btn-sm" style="display:none;">Bytt match</button>
-        <button id="logoutBtn" class="btn btn-secondary btn-sm">Logg ut</button>
-      </div>
-    </div>
-
-    <div id="dashContent" style="padding:16px;">
-      <div class="loading-msg"><div class="spinner"></div>Laster dashboard…</div>
-    </div>
+  <!-- standings strip -->
+  <div class="standings-strip" id="standingsStrip" style="display:none;">
+    <div class="standings-strip-inner" id="standingsInner"></div>
   </div>
 
-  <!-- ══ RESULT MODAL ════════════════════════════════ -->
-  <div id="resultModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title" id="resultModalTitle">Legg til resultat</div>
-      <div class="modal-sub" id="resultModalSub">—</div>
-      <div id="resultError" class="error-box" style="display:none;"></div>
-      <div id="resultSuccess" class="success-box" style="display:none;"></div>
-
-      <div class="form-group">
-        <label class="form-label">Stage</label>
-        <select id="resStage" class="form-select"></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Tid (sekunder)</label>
-        <input id="resTime" class="form-input" type="number" step="0.01" min="0" placeholder="23.45" />
-      </div>
-
-      <div class="hit-grid">
-        <div class="hit-cell">
-          <label class="form-label">A</label>
-          <input id="resA" class="form-input" type="number" min="0" value="0" />
-        </div>
-        <div class="hit-cell">
-          <label class="form-label">C</label>
-          <input id="resC" class="form-input" type="number" min="0" value="0" />
-        </div>
-        <div class="hit-cell">
-          <label class="form-label">D</label>
-          <input id="resD" class="form-input" type="number" min="0" value="0" />
-        </div>
-        <div class="hit-cell">
-          <label class="form-label">Miss</label>
-          <input id="resMiss" class="form-input" type="number" min="0" value="0" />
-        </div>
-        <div class="hit-cell">
-          <label class="form-label">NS</label>
-          <input id="resNS" class="form-input" type="number" min="0" value="0" />
-        </div>
-        <div class="hit-cell">
-          <label class="form-label">Proc</label>
-          <input id="resProc" class="form-input" type="number" min="0" value="0" />
-        </div>
-      </div>
-
-      <div class="calc-row">
-        <span>Beregnet poeng / HF</span>
-        <strong id="resCalcDisplay">— / —</strong>
-      </div>
-
-      <div class="form-actions">
-        <button id="saveResultBtn" class="btn btn-primary">Lagre resultat</button>
-        <button id="cancelResultBtn" class="btn btn-secondary">Avbryt</button>
-      </div>
-    </div>
+  <!-- shooter grid -->
+  <div id="dashContent">
+    <div class="loading-msg"><div class="spinner"></div>Kobler til…</div>
   </div>
 
-  <!-- Add shooter modal removed — admin controls access via coachAccess -->
+</div>
 
-  <script type="module">
-    import { auth, db } from './src/firebase.js';
-    import {
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
-    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    import {
-      doc,
-      getDoc,
-      getDocs,
-      collection,
-      query,
-      where,
-      onSnapshot,
-      updateDoc
-    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+<!-- ══ RESULT MODAL ══ -->
+<div id="resultModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-title" id="resModalTitle">Legg til resultat</div>
+    <div class="modal-sub" id="resModalSub">—</div>
+    <div id="resError" class="error-box" style="display:none;"></div>
+    <div id="resSuccess" class="success-box" style="display:none;"></div>
+    <div class="form-group">
+      <label class="form-label">Stage</label>
+      <select id="resStage" class="form-select"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tid (sekunder)</label>
+      <input id="resTime" class="form-input" type="number" step="0.01" min="0" placeholder="23.45" />
+    </div>
+    <div class="hit-grid">
+      <div><label class="form-label">A</label><input id="resA" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">C</label><input id="resC" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">D</label><input id="resD" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">Miss</label><input id="resMiss" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">NS</label><input id="resNS" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">Proc</label><input id="resProc" class="form-input" type="number" min="0" value="0" /></div>
+    </div>
+    <div class="calc-row">
+      <span>Poeng / HF</span>
+      <strong id="resCalc">— / —</strong>
+    </div>
+    <div class="form-actions">
+      <button id="saveResBtn" class="btn btn-primary">Lagre</button>
+      <button id="cancelResBtn" class="btn btn-secondary">Avbryt</button>
+    </div>
+  </div>
+</div>
 
-    // ── Scoring constants ────────────────────────────
-    const PTS = { A: 5, C: 3, D: 1, miss: -10, ns: -10, proc: -10 };
+<script type="module">
+import { auth, db } from './src/firebase.js';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { doc, getDoc, getDocs, collection, onSnapshot, updateDoc, setDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-    function calcPts(pf, a, c, d, miss, ns, proc) {
-      pf = (pf || 'minor').toLowerCase();
-      const aVal = pf === 'major' ? 5 : 5;
-      const cVal = pf === 'major' ? 4 : 3;
-      const dVal = pf === 'major' ? 2 : 1;
-      return (a * aVal) + (c * cVal) + (d * dVal) + (miss * -10) + (ns * -10) + (proc * -10);
-    }
+// ── Scoring ──────────────────────────────────────────
+function calcPts(pf, a, c, d, miss, ns, proc) {
+  pf = (pf||'minor').toLowerCase();
+  const C = pf==='major'?4:3, D = pf==='major'?2:1;
+  return a*5 + c*C + d*D + miss*-10 + ns*-10 + proc*-10;
+}
+function calcHF(pts, time) { return time>0 ? pts/time : 0; }
 
-    function calcHF(pts, time) {
-      if (!time || time <= 0) return 0;
-      return pts / time;
-    }
+// from JS bundle: icStageMaxPts
+function stageMaxPts(s) {
+  const ss = s&&s.singleShot?1:2;
+  return Math.max(0, ((s.paperTargets||0)*5*ss) + (((s.poppers||0)+(s.plates||0))*5));
+}
 
-    // ── State ────────────────────────────────────────
-    let currentUser = null;
-    let currentMatch = null;
-    let matchUnsubscribe = null;
-    let trackedShooterIds = [];
-    let refShootersVisible = true;
-    let allReferenceShooters = [];
-    let resultTarget = null; // { shooterId, shooterName }
-    let allowedShooterUids = null; // null = not loaded yet, [] = no access, [...] = allowed UIDs
+// ── State ─────────────────────────────────────────────
+let currentUser      = null;
+let allowedUids      = null;    // string[] user UIDs from coachAccess
+let matchUnsubscribes = [];
+let allMatchData     = {};
+let allRefShooters   = [];
+let refVisible       = true;
+let resultTarget     = null;    // { shooterUid, shooterName, matchId }
 
-    // ── DOM refs ─────────────────────────────────────
-    const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
-    // ── Auth ─────────────────────────────────────────
-    onAuthStateChanged(auth, async user => {
-      if (user) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (!userDoc.exists()) { await doLogout('Bruker ikke funnet.'); return; }
-          const data = userDoc.data();
-          const userRoles = Array.isArray(data.roles) ? data.roles : (data.role ? [data.role] : []);
-          if (!userRoles.includes('coach') && !userRoles.includes('admin') && data.role !== 'coach' && data.role !== 'admin') {
-            await doLogout('Du har ikke coach-tilgang. Kontakt admin.');
-            return;
-          }
-          currentUser = { uid: user.uid, ...data };
-          // Load this coach's allowed shooter UIDs from coachAccess
-          try {
-            const accessSnap = await getDoc(doc(db, 'coachAccess', user.uid));
-            const raw = accessSnap.exists() ? (accessSnap.data().shooterUids || []) : [];
-            // Ensure all UIDs are strings — Firestore may return numbers
-            allowedShooterUids = raw.map(u => String(u)).filter(u => u && u !== 'undefined');
-          } catch {
-            allowedShooterUids = [];
-          }
-          showSetup();
-          await autoStartDashboard();
-        } catch (e) {
-          await doLogout('Feil ved innlogging: ' + e.message);
-        }
-      } else {
-        currentUser = null;
-        showLogin();
+// ── Auth ──────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    try {
+      const ud = await getDoc(doc(db, 'users', user.uid));
+      if (!ud.exists()) { await logout('Bruker ikke funnet.'); return; }
+      const data = ud.data();
+      const roles = Array.isArray(data.roles) ? data.roles : (data.role ? [data.role] : []);
+      if (!roles.includes('coach') && !roles.includes('admin')) {
+        await logout('Du har ikke coach-tilgang. Kontakt admin.'); return;
       }
+      currentUser = { uid: user.uid, ...data };
+      $('loginSection').style.display = 'none';
+      $('setupSection').style.display = 'flex';
+      $('dashSection').style.display  = 'none';
+
+      // Load coachAccess
+      try {
+        const as = await getDoc(doc(db, 'coachAccess', user.uid));
+        const raw = as.exists() ? (as.data().shooterUids||[]) : [];
+        allowedUids = raw.map(String).filter(u => u && u !== 'undefined');
+      } catch { allowedUids = []; }
+
+      await autoStart();
+    } catch (e) { await logout('Feil: ' + e.message); }
+  } else {
+    currentUser = null;
+    showLogin();
+  }
+});
+
+async function logout(msg) {
+  matchUnsubscribes.forEach(u => u());
+  matchUnsubscribes = [];
+  await signOut(auth);
+  if (msg) alert(msg);
+}
+
+function showLogin() {
+  $('loginSection').style.display = 'flex';
+  $('setupSection').style.display = 'none';
+  $('dashSection').style.display  = 'none';
+}
+
+$('loginBtn').onclick = async () => {
+  const email = $('loginEmail').value.trim();
+  const pw    = $('loginPassword').value;
+  $('loginError').style.display = 'none';
+  if (!email||!pw) { showErr($('loginError'),'Fyll ut alle felt'); return; }
+  try { await signInWithEmailAndPassword(auth, email, pw); }
+  catch(e) { showErr($('loginError'), e.code==='auth/invalid-credential'?'Feil e-post eller passord':e.message); }
+};
+$('loginPassword').addEventListener('keydown', e => { if(e.key==='Enter') $('loginBtn').click(); });
+$('logoutBtn').onclick = () => logout();
+
+// ── Auto-start ────────────────────────────────────────
+async function autoStart() {
+  if (!allowedUids || allowedUids.length===0) {
+    $('loginSection').style.display = 'none';
+    $('setupSection').style.display = 'none';
+    $('dashSection').style.display  = 'block';
+    $('dashContent').innerHTML = `
+      <div class="loading-msg">
+        <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen skyttere tildelt</div>
+        <div style="color:var(--muted);font-size:13px;">Admin må tildele deg skyttere.</div>
+      </div>`;
+    return;
+  }
+
+  // Load ref shooters
+  try {
+    const rs = await getDocs(collection(db, 'referenceShooters'));
+    allRefShooters = [];
+    rs.forEach(d => allRefShooters.push({ id: d.id, ...d.data() }));
+  } catch {}
+
+  // Find relevant matches
+  try {
+    const snap = await getDocs(collection(db, 'matches'));
+    const relevant = [];
+    snap.forEach(d => {
+      try {
+        const data = d.data();
+        const participants = (data.participants||[]).map(String);
+        const hasAllowed = participants.some(uid => allowedUids.includes(uid));
+        if (hasAllowed) relevant.push({ id: d.id, ...data });
+      } catch {}
     });
 
-    async function doLogout(msg) {
-      await signOut(auth);
-      if (msg) alert(msg);
-    }
+    relevant.sort((a,b) => {
+      const aA = (a.status||'').toLowerCase()==='active'?1:0;
+      const bA = (b.status||'').toLowerCase()==='active'?1:0;
+      if (bA!==aA) return bA-aA;
+      return (b.date||'') > (a.date||'') ? 1 : -1;
+    });
 
-    // ── Login ─────────────────────────────────────────
-    $('loginBtn').onclick = async () => {
-      const email = $('loginEmail').value.trim();
-      const pw    = $('loginPassword').value;
-      $('loginError').style.display = 'none';
-      if (!email || !pw) { showErr($('loginError'), 'Fyll ut alle felt'); return; }
-      try {
-        await signInWithEmailAndPassword(auth, email, pw);
-      } catch (e) {
-        showErr($('loginError'), 'Innlogging feilet: ' + (e.code === 'auth/invalid-credential' ? 'Feil e-post eller passord' : e.message));
-      }
-    };
-
-    $('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
-
-    $('logoutBtn').onclick = async () => {
-      if (matchUnsubscribe) matchUnsubscribe();
-      await signOut(auth);
-    };
-
-    // ── Show sections ─────────────────────────────────
-    function showLogin() {
-      $('loginSection').style.display = 'flex';
-      $('setupSection').style.display = 'none';
-      $('dashSection').style.display  = 'none';
-    }
-
-    function showSetup() {
-      $('loginSection').style.display = 'none';
-      $('setupSection').style.display = 'block';
-      $('dashSection').style.display  = 'none';
-    }
-
-    function showDash() {
+    if (!relevant.length) {
       $('loginSection').style.display = 'none';
       $('setupSection').style.display = 'none';
       $('dashSection').style.display  = 'block';
-    }
-
-    // ── Auto-start: find matches containing allowed shooters ──────────────
-    async function autoStartDashboard() {
-      if (!allowedShooterUids || allowedShooterUids.length === 0) {
-        // No access yet — show dash with empty state
-        showDash();
-        $('dashContent').innerHTML = `
-          <div class="loading-msg">
-            <div style="font-size:40px;margin-bottom:12px;">🔒</div>
-            <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen skyttere tildelt</div>
-            <div style="color:var(--muted);font-size:13px;">Admin må tildele deg skyttere før du kan bruke dashboard-et.</div>
-          </div>`;
-        return;
-      }
-
-      try {
-        // Find all matches where any allowed shooter is a participant
-        const snap = await getDocs(collection(db, 'matches'));
-        const relevantMatches = [];
-        snap.forEach(d => {
-          try {
-            const data = d.data();
-            // Guard: shooters must be an array of objects
-            const rawShooters = Array.isArray(data.shooters) ? data.shooters : [];
-            const shooters = rawShooters.filter(s => s && typeof s === 'object' && !s.isMe);
-            const hasAllowed = shooters.some(s => {
-              const sid = s.id != null ? String(s.id) : '';
-              return sid && allowedShooterUids.includes(sid);
-            });
-            // Guard: participants must be array of strings
-            const rawParticipants = Array.isArray(data.participants) ? data.participants : [];
-            const participantsHasAllowed = rawParticipants.some(uid => {
-              const uidStr = uid != null ? String(uid) : '';
-              return uidStr && allowedShooterUids.includes(uidStr);
-            });
-            if (hasAllowed || participantsHasAllowed) {
-              relevantMatches.push({ id: d.id, ...data });
-            }
-          } catch (innerErr) {
-            console.warn('Skipping match due to error:', d.id, innerErr);
-          }
-        });
-
-        relevantMatches.sort((a, b) => {
-          const da = a.date || ''; const db_ = b.date || '';
-          return db_ > da ? 1 : -1;
-        });
-
-        if (!relevantMatches.length) {
-          showDash();
-          $('dashContent').innerHTML = `
-            <div class="loading-msg">
-              <div style="font-size:40px;margin-bottom:12px;">🎯</div>
-              <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen aktive matcher</div>
-              <div style="color:var(--muted);font-size:13px;">Dine skyttere er ikke påmeldt noen matcher ennå.</div>
-            </div>`;
-          return;
-        }
-
-        // Start with the most recent match, subscribe to all relevant matches
-        trackedShooterIds = allowedShooterUids.map(u => String(u));
-        await startMultiMatchDashboard(relevantMatches);
-      } catch (e) {
-        showDash();
-        $('dashContent').innerHTML = `<div class="loading-msg">Feil ved lasting: ${escHtml(e.message)}</div>`;
-      }
-    }
-
-    // ── Start multi-match dashboard ──────────────────
-    let matchUnsubscribes = []; // support multiple match listeners
-    let allMatchData = {};      // { matchId: matchData }
-
-    async function startMultiMatchDashboard(matches) {
-      showDash();
-      $('dashContent').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Kobler til live data…</div>';
-
-      // Load reference shooters once
-      try {
-        const refSnap = await getDocs(collection(db, 'referenceShooters'));
-        allReferenceShooters = [];
-        refSnap.forEach(d => allReferenceShooters.push({ id: d.id, ...d.data() }));
-      } catch {}
-
-      // Unsubscribe any old listeners
-      matchUnsubscribes.forEach(u => u());
-      matchUnsubscribes = [];
-      allMatchData = {};
-
-      // Subscribe to each relevant match
-      matches.forEach(m => {
-        if (!m.id) { console.warn('Skipping match with no id', m); return; }
-        const unsub = onSnapshot(doc(db, 'matches', String(m.id)), snap => {
-          if (snap.exists()) {
-            allMatchData[snap.id] = { id: snap.id, ...snap.data() };
-          } else {
-            delete allMatchData[snap.id];
-          }
-          renderMultiDash();
-        }, err => {
-          console.warn('Match listener error', err);
-        });
-        matchUnsubscribes.push(unsub);
-      });
-    }
-
-    // Keep old startDashboard as alias for single match (used by result modal)
-    async function startDashboard(matchId) {
-      const snap = await getDoc(doc(db, 'matches', matchId));
-      if (snap.exists()) await startMultiMatchDashboard([{ id: snap.id, ...snap.data() }]);
-    }
-
-    $('changeMatchBtn').onclick = () => {
-      matchUnsubscribes.forEach(u => u());
-      matchUnsubscribes = [];
-      allMatchData = {};
-      currentMatch = null;
-      trackedShooterIds = [];
-      autoStartDashboard();
-    };
-
-    // ── Toggle all ref shooters ───────────────────────
-    $('toggleRefAllBtn').onclick = () => {
-      refShootersVisible = !refShootersVisible;
-      $('toggleRefAllBtn').classList.toggle('active', refShootersVisible);
-      document.querySelectorAll('.ref-section').forEach(el => {
-        el.style.display = refShootersVisible ? '' : 'none';
-      });
-    };
-
-    // addShooterBtn removed — admin controls access via coachAccess
-    window.addTrackedShooter = () => {};
-
-    // removeTracked disabled — admin controls access
-    window.removeTracked = () => {};
-
-    // ── Render multi-match dashboard ─────────────────
-    function renderMultiDash() {
-      const matches = Object.values(allMatchData);
-      if (!matches.length) {
-        $('dashContent').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Venter på data…</div>';
-        return;
-      }
-
-      // Update topbar with match names
-      $('topMatchName').innerHTML = matches
-        .map(m => `<strong>${escHtml(m.name || m.id)}</strong>`)
-        .join(' &nbsp;·&nbsp; ');
-
-      // Collect all allowed shooters across all matches
-      let allCards = [];
-      matches.forEach(match => {
-        const stageDefs = getStageDefs(match);
-        const shooters = (match.shooters || []).filter(s => {
-          if (s.isMe) return false;
-          if (!allowedShooterUids || !allowedShooterUids.includes(String(s.id))) return false;
-          return true;
-        });
-        shooters.forEach(s => {
-          allCards.push({ shooter: s, stageDefs, match });
-        });
-      });
-
-      // Deduplicate by shooter id (keep most recent match entry)
-      const seen = new Set();
-      allCards = allCards.filter(({ shooter }) => {
-        if (seen.has(String(shooter.id))) return false;
-        seen.add(String(shooter.id));
-        return true;
-      });
-
-      if (!allCards.length) {
-        $('dashContent').innerHTML = `
-          <div class="loading-msg">
-            <div style="font-size:40px;margin-bottom:12px;">🎯</div>
-            <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen skyttere å vise</div>
-            <div style="color:var(--muted);font-size:13px;">Dine tildelte skyttere er ikke påmeldt noen av matchene.</div>
-          </div>`;
-        return;
-      }
-
-      const html = `<div class="shooter-grid">${allCards.map(({ shooter, stageDefs, match }) => renderCard(shooter, stageDefs, match)).join('')}</div>`;
-      $('dashContent').innerHTML = html;
-
-      if (!refShootersVisible) {
-        document.querySelectorAll('.ref-section').forEach(el => el.style.display = 'none');
-      }
-    }
-
-    // Keep renderDash as alias
-    function renderDash() { renderMultiDash(); }
-
-    // ── Render one shooter card ───────────────────────
-    function renderCard(shooter, stageDefs, match) {
-      const id   = String(shooter.id);
-      const name = [shooter.firstName, shooter.lastName].filter(Boolean).join(' ') || id;
-      const pf   = (shooter.pf || shooter.powerFactor || 'minor').toLowerCase();
-      const div  = shooter.division || '—';
-      const club = shooter.club || '';
-
-      const stages    = shooter.stages || [];
-      const doneNums  = stages.filter(s => s.time > 0).map(s => Number(s.num || s.number));
-      const totalDefs = stageDefs.length;
-      const doneCount = doneNums.length;
-      const pct       = totalDefs > 0 ? Math.round(doneCount / totalDefs * 100) : 0;
-
-      // Accumulate totals
-      let totalPts = 0, totalTime = 0, totalA = 0, totalC = 0, totalD = 0, totalMiss = 0, totalShots = 0;
-      stages.forEach(st => {
-        if (!(st.time > 0)) return;
-        const p = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
-        totalPts  += p;
-        totalTime += st.time;
-        totalA    += st.a  || 0;
-        totalC    += st.c  || 0;
-        totalD    += st.d  || 0;
-        totalMiss += st.miss || 0;
-        totalShots += (st.a||0)+(st.c||0)+(st.d||0)+(st.miss||0);
-      });
-
-      const avgHF    = doneCount > 0 ? (totalPts / totalTime) : 0;
-      const aPct     = totalShots > 0 ? Math.round(totalA / totalShots * 100) : 0;
-      const missPct  = totalShots > 0 ? (totalMiss / totalShots * 100).toFixed(1) : '0.0';
-
-      // Prognosis – project avg HF over remaining stages
-      const remaining = totalDefs - doneCount;
-      const avgPtsPerStage = doneCount > 0 ? totalPts / doneCount : 0;
-      const projTotalPts   = totalPts + (avgPtsPerStage * remaining);
-
-      // Max pts for match
-      const matchMaxPts = stageDefs.reduce((sum, s) => sum + (s.maxPoints || ((s.paperTargets||0)*5*2 + (s.poppers||0)*5 + (s.plates||0)*5)), 0);
-      const projMatchPct = matchMaxPts > 0 ? Math.min(100, projTotalPts / matchMaxPts * 100).toFixed(1) : '—';
-
-      // Stage pills
-      const stagePills = totalDefs > 0 ? stageDefs.map(sd => {
-        const num   = Number(sd.number);
-        const isDone = doneNums.includes(num);
-        return `<div class="stage-pill ${isDone ? 'done' : 'pending'}">${num}</div>`;
-      }).join('') : '<span style="color:var(--muted);font-size:12px;">Ingen stages definert</span>';
-
-      // Reference shooters
-      const refRows = buildRefRows(shooter, pf, div, match, stageDefs);
-
-      // Coach tip
-      const tip = coachTip(aPct, avgHF, doneCount);
-
-      // Stage select for result modal
-      const stageOpts = stageDefs.map(sd =>
-        `<option value="${sd.number}" ${doneNums.includes(Number(sd.number)) ? '(skutt)' : ''}>${escHtml(sd.name || 'Stage ' + sd.number)}</option>`
-      ).join('');
-
-      return `
-        <div class="shooter-card" id="card-${escHtml(id)}">
-          <div class="card-header">
-            <div>
-              <div class="card-name">${escHtml(name)}</div>
-              <div class="card-sub">${escHtml(club)}</div>
-              <div class="card-badges">
-                <span class="badge badge-div">${escHtml(div)}</span>
-                <span class="badge badge-pf-${pf === 'major' ? 'major' : 'minor'}">${escHtml(pf.toUpperCase())}</span>
-              </div>
-            </div>
-            <div class="card-header-actions"></div>
-          </div>
-
-          <div class="stats-row">
-            <div class="stat-cell">
-              <div class="stat-val">${avgHF > 0 ? avgHF.toFixed(2) : '—'}</div>
-              <div class="stat-lbl">Avg HF</div>
-            </div>
-            <div class="stat-cell">
-              <div class="stat-val ${aPct >= 85 ? 'green' : aPct >= 70 ? '' : 'red'}">${doneCount > 0 ? aPct + '%' : '—'}</div>
-              <div class="stat-lbl">A%</div>
-            </div>
-            <div class="stat-cell">
-              <div class="stat-val blue">${doneCount}</div>
-              <div class="stat-lbl">Skutt</div>
-            </div>
-            <div class="stat-cell">
-              <div class="stat-val muted">${remaining}</div>
-              <div class="stat-lbl">Igjen</div>
-            </div>
-          </div>
-
-          <div class="progress-section">
-            <div class="progress-label">
-              <span>Match-fremgang</span>
-              <strong>${pct}%</strong>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill" style="width:${pct}%"></div>
-            </div>
-          </div>
-
-          <div class="stages-section">
-            <div class="stages-header">Stages</div>
-            <div class="stage-pills">${stagePills}</div>
-          </div>
-
-          <div class="prognosis-section">
-            <div class="prognosis-header">
-              <span>Prognose (inneværende match)</span>
-            </div>
-            <div class="prognosis-grid">
-              <div class="prognosis-item">
-                <div class="prognosis-val">${avgHF > 0 ? avgHF.toFixed(2) : '—'}</div>
-                <div class="prognosis-lbl">Estimert snitt-HF</div>
-              </div>
-              <div class="prognosis-item">
-                <div class="prognosis-val">${projMatchPct !== '—' ? projMatchPct + '%' : '—'}</div>
-                <div class="prognosis-lbl">Est. match-poeng</div>
-              </div>
-              <div class="prognosis-item">
-                <div class="prognosis-val">${doneCount > 0 ? Math.round(projTotalPts) : '—'}</div>
-                <div class="prognosis-lbl">Est. totalpoeng</div>
-              </div>
-              <div class="prognosis-item">
-                <div class="prognosis-val">${missPct !== '0.0' ? missPct + '%' : '<span style="color:var(--green)">0</span>'}</div>
-                <div class="prognosis-lbl">Miss-rate</div>
-              </div>
-            </div>
-          </div>
-
-          ${refRows ? `
-          <div class="ref-section" id="ref-${escHtml(id)}">
-            <button class="ref-toggle-btn open" onclick="toggleRef('${escAttr(id)}', this)">
-              <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-              Referanseskyttere
-            </button>
-            <div class="ref-list" id="reflist-${escHtml(id)}">${refRows}</div>
-          </div>` : ''}
-
-          ${tip ? `<div class="coach-tip">${tip}</div>` : ''}
-
-          <div class="card-footer">
-            <button class="btn btn-primary btn-sm" onclick="openResultModal('${escAttr(id)}', '${escAttr(name)}', '${escAttr(match.id)}')">+ Legg til resultat</button>
-          </div>
+      $('dashContent').innerHTML = `
+        <div class="loading-msg">
+          <div style="font-size:40px;margin-bottom:12px;">🎯</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen aktive matcher</div>
+          <div style="color:var(--muted);font-size:13px;">Dine skyttere er ikke påmeldt noen matcher ennå.</div>
         </div>`;
+      return;
     }
 
-    // ── Toggle ref list per card ──────────────────────
-    window.toggleRef = (id, btn) => {
-      const list = document.getElementById('reflist-' + id);
-      if (!list) return;
-      const isOpen = list.style.display !== 'none' && !list.classList.contains('hidden');
-      list.style.display = isOpen ? 'none' : 'grid';
-      btn.classList.toggle('open', !isOpen);
-    };
+    // Use only the most recent/active match
+    const chosen = relevant[0];
+    $('loginSection').style.display = 'none';
+    $('setupSection').style.display = 'none';
+    $('dashSection').style.display  = 'block';
 
-    // ── Build reference shooter rows ──────────────────
-    function buildRefRows(shooter, pf, division, match, stageDefs) {
-      const refs = allReferenceShooters.filter(r => {
-        const rd = String(r.division || '').toLowerCase();
-        const sd = String(division || '').toLowerCase();
-        return rd === sd || !r.division;
-      }).slice(0, 5);
+    // Subscribe
+    matchUnsubscribes.forEach(u => u());
+    matchUnsubscribes = [];
+    allMatchData = {};
 
-      if (!refs.length) return '';
-
-      const doneStages = (shooter.stages || []).filter(s => s.time > 0);
-      const doneCount  = doneStages.length;
-      if (!doneCount) return refs.map(r => `
-        <div class="ref-row">
-          <span class="ref-name">${escHtml(r.name || r.id)}</span>
-          <span style="color:var(--muted);font-size:11px;">Ingen data ennå</span>
-        </div>`).join('');
-
-      // Shooter avg HF
-      let shooterPts = 0, shooterTime = 0;
-      doneStages.forEach(st => {
-        shooterPts  += calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
-        shooterTime += st.time;
-      });
-      const shooterHF = shooterTime > 0 ? shooterPts / shooterTime : 0;
-
-      return refs.map(r => {
-        const refHF = r.mediumHF || r.shortHF || r.longHF || 0;
-        const delta = shooterHF - refHF;
-        const sign  = delta >= 0 ? '+' : '';
-        return `
-          <div class="ref-row">
-            <span class="ref-name">${escHtml(r.name || r.id)}</span>
-            <span class="ref-hf">${refHF.toFixed(2)} HF</span>
-            <span class="${delta >= 0 ? 'ref-delta-pos' : 'ref-delta-neg'}">${sign}${delta.toFixed(2)}</span>
-          </div>`;
-      }).join('');
-    }
-
-    // ── Coach tip logic ───────────────────────────────
-    function coachTip(aPct, avgHF, doneCount) {
-      if (doneCount < 1) return '';
-      if (aPct < 70)  return '🎯 A% under 70 — prioriter treff over tempo. Gi sikte mer tid på hvert mål.';
-      if (aPct < 80)  return '📈 A% kan løftes. Hold rytmen, men la siktet sette seg litt mer.';
-      if (aPct >= 90 && avgHF > 5) return '🔥 Solid — A% og HF er begge sterk. Kjør videre i samme spor.';
-      if (aPct >= 85) return '✅ Bra treff. Fokus på å holde tempo gjennom gjenstående stages.';
-      return '⚡ Holde rytmen — stol på baseline og skyt kontrollert.';
-    }
-
-    // ── Stage defs helper ─────────────────────────────
-    function getStageDefs(match) {
-      if (!match || !match.stages) return [];
-      return match.stages
-        .filter(s => s && (s.number != null || s.num != null || s.name))
-        .map((s, i) => ({
-          number: s.number != null ? s.number : s.num != null ? s.num : i + 1,
-          name:   s.name || 'Stage ' + (s.number || s.num || i + 1),
-          paperTargets: s.paperTargets || 0,
-          poppers:      s.poppers || 0,
-          plates:       s.plates  || 0,
-          maxPoints:    s.maxPoints || ((s.paperTargets||0) * 5 * (s.shotsPerPaper||2) + (s.poppers||0) * 5 + (s.plates||0) * 5)
-        }))
-        .sort((a, b) => a.number - b.number);
-    }
-
-    // ── Result modal ──────────────────────────────────
-    window.openResultModal = (shooterId, shooterName, matchId) => {
-      // Find the match this shooter belongs to
-      const match = matchId
-        ? allMatchData[matchId]
-        : Object.values(allMatchData).find(m =>
-            (m.shooters || []).some(s => String(s.id) === String(shooterId))
-          );
-      if (!match) return;
-      currentMatch = match;
-      resultTarget = { shooterId, shooterName };
-      const stageDefs = getStageDefs(match);
-
-      $('resultModalTitle').textContent = 'Legg til resultat';
-      $('resultModalSub').textContent   = shooterName;
-      $('resultError').style.display    = 'none';
-      $('resultSuccess').style.display  = 'none';
-
-      const shooter = (currentMatch.shooters || []).find(s => String(s.id) === String(shooterId));
-      const doneNums = (shooter?.stages || []).filter(s => s.time > 0).map(s => Number(s.num || s.number));
-
-      $('resStage').innerHTML = stageDefs.length
-        ? stageDefs.map(sd => `<option value="${sd.number}">${escHtml(sd.name || 'Stage ' + sd.number)}${doneNums.includes(Number(sd.number)) ? ' ✓' : ''}</option>`).join('')
-        : '<option value="1">Stage 1</option>';
-
-      ['resTime','resA','resC','resD','resMiss','resNS','resProc'].forEach(id => {
-        $(id).value = id === 'resTime' ? '' : '0';
-      });
-      $('resCalcDisplay').textContent = '— / —';
-
-      $('resultModal').classList.add('open');
-    };
-
-    // Live calc
-    ['resTime','resA','resC','resD','resMiss','resNS','resProc'].forEach(id => {
-      $(id).addEventListener('input', updateCalc);
+    const unsub = onSnapshot(doc(db, 'matches', String(chosen.id)), snap => {
+      if (snap.exists()) { allMatchData[snap.id] = { id: snap.id, ...snap.data() }; }
+      else { delete allMatchData[snap.id]; }
+      renderDash();
     });
+    matchUnsubscribes.push(unsub);
 
-    function updateCalc() {
-      const time = parseFloat($('resTime').value) || 0;
-      const a    = parseInt($('resA').value)    || 0;
-      const c    = parseInt($('resC').value)    || 0;
-      const d    = parseInt($('resD').value)    || 0;
-      const miss = parseInt($('resMiss').value) || 0;
-      const ns   = parseInt($('resNS').value)   || 0;
-      const proc = parseInt($('resProc').value) || 0;
-      const pf   = (() => {
-        if (!currentMatch || !resultTarget) return 'minor';
-        const s = (currentMatch.shooters || []).find(x => String(x.id) === String(resultTarget?.shooterId));
-        return s?.pf || s?.powerFactor || 'minor';
-      })();
-      const pts = calcPts(pf, a, c, d, miss, ns, proc);
-      const hf  = time > 0 ? (pts / time).toFixed(4) : '—';
-      $('resCalcDisplay').textContent = `${pts} pts / ${hf} HF`;
+  } catch(e) {
+    $('dashContent').innerHTML = `<div class="loading-msg">Feil: ${escH(e.message)}</div>`;
+  }
+}
+
+// ── Toggle ref ────────────────────────────────────────
+$('toggleRefAllBtn').onclick = () => {
+  refVisible = !refVisible;
+  $('toggleRefAllBtn').classList.toggle('on', refVisible);
+  document.querySelectorAll('.ref-section').forEach(el => {
+    el.style.display = refVisible ? '' : 'none';
+  });
+};
+
+// ── Render dashboard ──────────────────────────────────
+function renderDash() {
+  const matches = Object.values(allMatchData);
+  if (!matches.length) return;
+
+  const match = matches[0];
+
+  // Topbar
+  $('topMatchName').innerHTML =
+    `<strong>${escH(match.name||match.id)}</strong> &nbsp;·&nbsp; ${escH(match.date||'')} &nbsp;·&nbsp; ${escH(match.status||'')}`;
+
+  // Match header
+  const stageDefs = getStageDefs(match);
+  const allShooters = getMatchShooters(match);
+  const myShooters  = allShooters.filter(s => allowedUids.includes(String(s.uid)));
+
+  // Count skutt stages across coach's shooters
+  const shotCounts = myShooters.map(s => {
+    const sh = (match.shooters||[]).find(x => String(x.id)===s.uid);
+    return (sh?.stages||[]).filter(st => st.time>0).length;
+  });
+  const avgShot = shotCounts.length ? Math.round(shotCounts.reduce((a,b)=>a+b,0)/shotCounts.length) : 0;
+
+  $('matchHeader').style.display = '';
+  $('matchTitle').textContent = match.name || match.id;
+  $('matchMeta').textContent = [match.date, match.location, match.type].filter(Boolean).join(' · ');
+  $('matchStats').innerHTML = `
+    <div class="mstat"><div class="mstat-val">${stageDefs.length}</div><div class="mstat-lbl">Stages</div></div>
+    <div class="mstat"><div class="mstat-val">${myShooters.length}</div><div class="mstat-lbl">Mine skyttere</div></div>
+    <div class="mstat"><div class="mstat-val" style="color:var(--green);">${avgShot}</div><div class="mstat-lbl">Snitt skutt</div></div>
+    <div class="mstat"><div class="mstat-val" style="color:var(--muted);">${stageDefs.length-avgShot}</div><div class="mstat-lbl">Igjen</div></div>
+  `;
+
+  // Standings strip — all participants ranked
+  renderStandings(match, stageDefs, myShooters);
+
+  // Shooter cards
+  if (!myShooters.length) {
+    $('dashContent').innerHTML = `
+      <div class="loading-msg">
+        <div>Ingen av dine skyttere er deltakere i denne matchen.</div>
+      </div>`;
+    return;
+  }
+
+  // Compute standings rank for each shooter
+  const totals = calcMatchTotals(match, stageDefs);
+  const rankMap = {};
+  totals.forEach((t,i) => { rankMap[t.uid] = i+1; });
+
+  $('dashContent').innerHTML = `<div class="shooter-grid">${
+    myShooters.map(s => renderCard(s, match, stageDefs, rankMap)).join('')
+  }</div>`;
+
+  // Apply ref toggle
+  if (!refVisible) {
+    document.querySelectorAll('.ref-section').forEach(el => el.style.display='none');
+  }
+}
+
+// ── Standings strip ───────────────────────────────────
+function renderStandings(match, stageDefs, myShooters) {
+  const totals = calcMatchTotals(match, stageDefs);
+  if (!totals.length) { $('standingsStrip').style.display='none'; return; }
+
+  const myUids = new Set(myShooters.map(s=>s.uid));
+  const leader = totals[0].pts;
+  $('standingsStrip').style.display = '';
+  $('standingsInner').innerHTML = totals.map((t,i) => {
+    const mine = myUids.has(t.uid);
+    const pct  = leader>0 ? (t.pts/leader*100).toFixed(1) : '0.0';
+    return `
+      <div class="s-chip ${mine?'mine':''}">
+        <span class="s-chip-rank">${i+1}</span>
+        <span class="s-chip-name">${escH(t.name)}</span>
+        <span class="s-chip-pts">${t.pts.toFixed(1)}</span>
+        <span class="s-chip-pct">${pct}%</span>
+      </div>`;
+  }).join('');
+}
+
+// ── Render one shooter card ───────────────────────────
+function renderCard(s, match, stageDefs, rankMap) {
+  const uid     = s.uid;
+  const name    = s.name || uid;
+  const shooter = (match.shooters||[]).find(x => String(x.id)===uid) || { id:uid, stages:[] };
+  const pf      = (shooter.pf||shooter.powerFactor||'minor').toLowerCase();
+  const div     = shooter.division || s.division || '—';
+  const club    = shooter.club || s.club || '';
+
+  const done    = (shooter.stages||[]).filter(st => st.time>0);
+  const doneNums = done.map(st => Number(st.num||st.number));
+  const total   = stageDefs.length;
+  const pct     = total>0 ? Math.round(done.length/total*100) : 0;
+
+  // Accumulate
+  let totPts=0, totTime=0, totA=0, totC=0, totD=0, totMiss=0, totShots=0;
+  done.forEach(st => {
+    const p = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+    totPts  += p;
+    totTime += st.time;
+    totA    += st.a||0; totC += st.c||0; totD += st.d||0; totMiss += st.miss||0;
+    totShots += (st.a||0)+(st.c||0)+(st.d||0)+(st.miss||0);
+  });
+  const avgHF   = done.length>0 ? calcHF(totPts, totTime) : 0;
+  const aPct    = totShots>0 ? Math.round(totA/totShots*100) : 0;
+  const missPct = totShots>0 ? (totMiss/totShots*100).toFixed(1) : '0.0';
+  const rank    = rankMap[uid] || '—';
+
+  // Prognosis
+  const remaining   = total - done.length;
+  const avgPtsPerSt = done.length>0 ? totPts/done.length : 0;
+  const projTotal   = totPts + avgPtsPerSt*remaining;
+  const matchMax    = stageDefs.reduce((s,d) => s+stageMaxPts(d), 0);
+  const projPct     = matchMax>0 ? Math.min(100, projTotal/matchMax*100).toFixed(1) : '—';
+
+  // Delta vs leader
+  const totals    = calcMatchTotals(match, stageDefs);
+  const leaderPts = totals.length>0 ? totals[0].pts : 0;
+  const myTotPts  = (totals.find(t=>t.uid===uid)||{}).pts || 0;
+  const delta     = myTotPts - leaderPts;
+  const deltaStr  = done.length>0
+    ? (delta===0 ? 'LEDER' : (delta>0?'+':'')+delta.toFixed(1)+' pts')
+    : '—';
+
+  // Stage pills
+  const pills = stageDefs.map(sd => {
+    const n = Number(sd.number);
+    const isDone = doneNums.includes(n);
+    return `<div class="spill ${isDone?'done':'pending'}">${n}</div>`;
+  }).join('');
+
+  // HF chart SVG
+  const chartSvg = buildHFChart(done, stageDefs, pf, div);
+
+  // Ref shooters
+  const refRows = buildRefRows(uid, pf, div, avgHF, shooter, stageDefs);
+
+  // Coach tip
+  const tip = coachTip(aPct, avgHF, done.length);
+
+  // Stage select for result modal
+  const stageOpts = stageDefs.map(sd =>
+    `<option value="${sd.number}">${escH(sd.name||'Stage '+sd.number)}${doneNums.includes(Number(sd.number))?' ✓':''}</option>`
+  ).join('');
+
+  return `
+    <div class="scard" id="card-${escA(uid)}">
+      <div class="scard-head">
+        <div>
+          <div class="scard-name">${escH(name)}</div>
+          <div class="scard-sub">${escH(club)}</div>
+          <div class="scard-badges">
+            <span class="badge badge-div">${escH(div)}</span>
+            <span class="badge badge-pf-${pf==='major'?'major':'minor'}">${pf.toUpperCase()}</span>
+          </div>
+        </div>
+        <div class="scard-rank">
+          <div class="scard-rank-num">${rank}</div>
+          <div class="scard-rank-lbl">Rang</div>
+          <div style="font-size:11px;color:${delta===0&&done.length>0?'var(--green)':delta<0?'var(--red)':'var(--muted)'};font-weight:700;margin-top:2px;">${escH(deltaStr)}</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-val">${avgHF>0?avgHF.toFixed(2):'—'}</div>
+          <div class="stat-lbl">Avg HF</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val ${aPct>=85?'green':aPct>=70?'':'red'}">${done.length>0?aPct+'%':'—'}</div>
+          <div class="stat-lbl">A%</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val blue">${done.length}</div>
+          <div class="stat-lbl">Skutt</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val muted">${remaining}</div>
+          <div class="stat-lbl">Igjen</div>
+        </div>
+      </div>
+
+      <div class="prog-section">
+        <div class="prog-label"><span>Fremgang</span><strong>${pct}%</strong></div>
+        <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+      </div>
+
+      <div class="stages-section">
+        <div class="stages-lbl">Stages</div>
+        <div class="stage-pills">${pills}</div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-lbl">
+          <span>HF per stage</span>
+          <div class="chart-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:var(--blue);"></div>Faktisk</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--accent);border-top:1px dashed var(--accent);"></div>Prognose</div>
+          </div>
+        </div>
+        <div class="chart-wrap">${chartSvg}</div>
+      </div>
+
+      <div class="prog2-section">
+        <div class="prog2-lbl">Prognose (inneværende match)</div>
+        <div class="prog2-grid">
+          <div class="prog2-item">
+            <div class="prog2-val">${avgHF>0?avgHF.toFixed(2):'—'}</div>
+            <div class="prog2-lbl2">Est. snitt-HF</div>
+          </div>
+          <div class="prog2-item">
+            <div class="prog2-val">${projPct!=='—'?projPct+'%':'—'}</div>
+            <div class="prog2-lbl2">Est. match-%</div>
+          </div>
+          <div class="prog2-item">
+            <div class="prog2-val">${done.length>0?Math.round(projTotal):'—'}</div>
+            <div class="prog2-lbl2">Est. totalpoeng</div>
+          </div>
+          <div class="prog2-item">
+            <div class="prog2-val" style="color:${parseFloat(missPct)>0?'var(--red)':'var(--green)'}">
+              ${missPct !== '0.0' ? missPct+'%' : '0'}
+            </div>
+            <div class="prog2-lbl2">Miss-rate</div>
+          </div>
+        </div>
+      </div>
+
+      ${refRows ? `
+      <div class="ref-section" id="ref-${escA(uid)}">
+        <button class="ref-toggle open" onclick="window.togRef('${escA(uid)}',this)">
+          <svg width="11" height="7" viewBox="0 0 11 7" fill="none">
+            <path d="M1 1l4.5 4.5L10 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Referanseskyttere
+        </button>
+        <div class="ref-list" id="reflist-${escA(uid)}">${refRows}</div>
+      </div>` : ''}
+
+      ${tip ? `<div class="coach-tip">${tip}</div>` : ''}
+
+      <div class="scard-foot">
+        <button class="btn btn-primary btn-sm"
+          onclick="window.openRes('${escA(uid)}','${escA(name)}','${escA(match.id)}')">
+          + Legg til resultat
+        </button>
+      </div>
+    </div>`;
+}
+
+// ── HF chart ──────────────────────────────────────────
+function buildHFChart(done, stageDefs, pf, div) {
+  const W = 320, H = 80;
+  if (!stageDefs.length) return `<svg viewBox="0 0 ${W} ${H}"></svg>`;
+
+  // Actual HF per stage number
+  const hfMap = {};
+  done.forEach(st => {
+    const p = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+    hfMap[Number(st.num||st.number)] = calcHF(p, st.time);
+  });
+
+  const nums    = stageDefs.map(s => Number(s.number));
+  const actuals = nums.map(n => hfMap[n] ?? null);
+  const avgHF   = done.length > 0
+    ? done.reduce((sum, st) => {
+        const p = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+        return sum + calcHF(p, st.time);
+      }, 0) / done.length
+    : 0;
+
+  // Ref shooter avg HF for this division
+  const refs = allRefShooters.filter(r =>
+    !r.division || r.division.toLowerCase() === (div||'').toLowerCase()
+  ).slice(0,3);
+
+  const allVals = actuals.filter(v=>v!==null);
+  if (avgHF>0) allVals.push(avgHF);
+  refs.forEach(r => { if(r.mediumHF) allVals.push(r.mediumHF); });
+  const maxV = allVals.length ? Math.max(...allVals) * 1.15 : 10;
+  const minV = 0;
+
+  const xScale = (i) => nums.length > 1 ? (i/(nums.length-1))*(W-20)+10 : W/2;
+  const yScale = (v) => H - 4 - ((v-minV)/(maxV-minV||1))*(H-10);
+
+  // Actual line (blue) — only for done stages
+  let actualPath = '', actualDots = '';
+  let prevX = null, prevY = null;
+  nums.forEach((n,i) => {
+    const v = hfMap[n];
+    if (v == null) { prevX=null; prevY=null; return; }
+    const x = xScale(i), y = yScale(v);
+    if (prevX !== null) actualPath += ` L${x},${y}`;
+    else actualPath += `M${x},${y}`;
+    prevX=x; prevY=y;
+    actualDots += `<circle cx="${x}" cy="${y}" r="3" fill="var(--blue)" stroke="var(--bg)" stroke-width="1.5"/>`;
+  });
+
+  // Prognosis line (accent dashed) — full match
+  let progPath = '';
+  if (avgHF > 0) {
+    nums.forEach((n,i) => {
+      const x = xScale(i), y = yScale(avgHF);
+      progPath += i===0 ? `M${x},${y}` : ` L${x},${y}`;
+    });
+  }
+
+  // Ref lines (faint)
+  let refLines = '';
+  refs.forEach((r, ri) => {
+    const hf = r.mediumHF||r.shortHF||r.longHF||0;
+    if (!hf) return;
+    const y = yScale(hf);
+    const colors = ['rgba(240,112,48,.5)','rgba(74,158,255,.4)','rgba(76,175,125,.4)'];
+    refLines += `<line x1="10" y1="${y}" x2="${W-10}" y2="${y}" stroke="${colors[ri%3]}" stroke-width="1" stroke-dasharray="3,3"/>`;
+  });
+
+  // X axis labels (every 3rd stage)
+  let xLabels = '';
+  nums.forEach((n,i) => {
+    if (i%3===0 || i===nums.length-1) {
+      xLabels += `<text x="${xScale(i)}" y="${H+1}" text-anchor="middle" font-size="8" fill="rgba(138,147,161,.6)">${n}</text>`;
     }
+  });
 
-    $('cancelResultBtn').onclick = () => $('resultModal').classList.remove('open');
-    $('resultModal').addEventListener('click', e => { if (e.target === $('resultModal')) $('resultModal').classList.remove('open'); });
+  return `
+    <svg viewBox="0 0 ${W} ${H+10}" style="overflow:visible;">
+      ${refLines}
+      ${progPath ? `<path d="${progPath}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5,3" fill="none" opacity=".6"/>` : ''}
+      ${actualPath ? `<path d="${actualPath}" stroke="var(--blue)" stroke-width="2" fill="none"/>` : ''}
+      ${actualDots}
+      ${xLabels}
+    </svg>`;
+}
 
+// ── Ref rows ──────────────────────────────────────────
+function buildRefRows(uid, pf, div, shooterAvgHF, shooter, stageDefs) {
+  const refs = allRefShooters.filter(r =>
+    !r.division || r.division.toLowerCase()===(div||'').toLowerCase()
+  ).slice(0,4);
+  if (!refs.length || !shooterAvgHF) return '';
 
-    $('saveResultBtn').onclick = async () => {
-      if (!resultTarget || !currentMatch) return;
+  return refs.map(r => {
+    const refHF = r.mediumHF||r.shortHF||r.longHF||0;
+    const delta = shooterAvgHF - refHF;
+    const sign  = delta>=0?'+':'';
+    return `
+      <div class="ref-row">
+        <span class="ref-name">${escH(r.name||r.id)}</span>
+        <span class="ref-hf">${refHF.toFixed(2)} HF</span>
+        <span class="${delta>=0?'ref-delta-pos':'ref-delta-neg'}">${sign}${delta.toFixed(2)}</span>
+      </div>`;
+  }).join('');
+}
 
-      const stageNum = parseInt($('resStage').value, 10);
-      const time     = parseFloat($('resTime').value);
-      const a        = parseInt($('resA').value)    || 0;
-      const c        = parseInt($('resC').value)    || 0;
-      const d        = parseInt($('resD').value)    || 0;
-      const miss     = parseInt($('resMiss').value) || 0;
-      const ns       = parseInt($('resNS').value)   || 0;
-      const proc     = parseInt($('resProc').value) || 0;
+// ── Toggle ref per card ───────────────────────────────
+window.togRef = (uid, btn) => {
+  const list = document.getElementById('reflist-'+uid);
+  if (!list) return;
+  const isOpen = list.style.display !== 'none' && !list.classList.contains('hidden');
+  list.style.display = isOpen ? 'none' : 'grid';
+  btn.classList.toggle('open', !isOpen);
+};
 
-      $('resultError').style.display = 'none';
-      if (!stageNum || !time || time <= 0) {
-        showErr($('resultError'), 'Stage og tid er påkrevd.'); return;
-      }
+// ── Coach tip ─────────────────────────────────────────
+function coachTip(aPct, avgHF, doneCount) {
+  if (!doneCount) return '';
+  if (aPct < 70)   return '🎯 A% under 70 — prioriter treff over tempo.';
+  if (aPct < 80)   return '📈 A% kan løftes. La siktet sette seg litt mer.';
+  if (aPct >= 90 && avgHF > 5) return '🔥 Solid — A% og HF er begge sterke.';
+  if (aPct >= 85)  return '✅ Bra treff. Hold tempoet gjennom gjenstående stages.';
+  return '⚡ Stol på baseline — skyt kontrollert.';
+}
 
-      const shooters = JSON.parse(JSON.stringify(currentMatch.shooters || []));
-      let shooter = shooters.find(s => String(s.id) === String(resultTarget.shooterId));
+// ── Match totals (standings) ──────────────────────────
+function calcMatchTotals(match, stageDefs) {
+  const totals = {};
+  const allShooters = getMatchShooters(match);
+  allShooters.forEach(s => {
+    totals[s.uid] = { uid: s.uid, name: s.name, pts: 0 };
+  });
 
-      if (!shooter) {
-        showErr($('resultError'), 'Skytter ikke funnet i matchen.'); return;
-      }
+  const stageNums = stageDefs.map(sd => Number(sd.number));
+  allShooters.forEach(s => {
+    const sh = (match.shooters||[]).find(x => String(x.id)===s.uid);
+    if (!sh) return;
+    const pf = (sh.pf||sh.powerFactor||'minor').toLowerCase();
+    let shooterPts = 0, shooterTime = 0;
+    (sh.stages||[]).forEach(st => {
+      if (!(st.time>0)) return;
+      if (!stageNums.includes(Number(st.num||st.number))) return;
+      shooterPts  += calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+      shooterTime += st.time;
+    });
+    if (totals[s.uid]) totals[s.uid].pts = shooterPts;
+  });
 
-      shooter.stages = shooter.stages || [];
-      const pf  = (shooter.pf || shooter.powerFactor || 'minor').toLowerCase();
-      const pts = calcPts(pf, a, c, d, miss, ns, proc);
-      const hf  = time > 0 ? pts / time : 0;
+  return Object.values(totals).sort((a,b) => b.pts-a.pts);
+}
 
-      const stageDef = getStageDefs(currentMatch).find(sd => Number(sd.number) === stageNum);
-      const stageEntry = {
-        num:    stageNum,
-        name:   stageDef?.name || 'Stage ' + stageNum,
-        time,
-        a, c, d, miss, ns, proc,
-        pts,
-        hf,
-        shots: a + c + d + miss,
-        savedAt: Date.now()
-      };
+// ── Get all match shooters (participants + shooters[]) ─
+function getMatchShooters(match) {
+  const participants = (match.participants||[]).map(String);
+  const shootersArr  = (match.shooters||[]).filter(s => !s.isMe);
 
-      const idx = shooter.stages.findIndex(s => (s.num || s.number) === stageNum);
-      if (idx >= 0) shooter.stages[idx] = { ...shooter.stages[idx], ...stageEntry };
-      else shooter.stages.push(stageEntry);
-      shooter.stages.sort((a, b) => (a.num || 0) - (b.num || 0));
+  const byUid = {};
+  shootersArr.forEach(s => { if(s.id) byUid[String(s.id)] = s; });
 
-      try {
-        await updateDoc(doc(db, 'matches', String(currentMatch.id)), { shooters });
-        $('resultSuccess').textContent = `✓ Resultat lagret for stage ${stageNum}`;
-        $('resultSuccess').style.display = 'block';
-        setTimeout(() => {
-          $('resultModal').classList.remove('open');
-          $('resultSuccess').style.display = 'none';
-        }, 1400);
-      } catch (e) {
-        showErr($('resultError'), 'Kunne ikke lagre: ' + e.message);
-      }
-    };
+  return participants.map(uid => {
+    const sh = byUid[uid];
+    const name = sh
+      ? [sh.firstName, sh.lastName].filter(Boolean).join(' ') || uid
+      : uid;
+    return { uid, name, division: sh?.division||'', pf: sh?.pf||sh?.powerFactor||'minor', club: sh?.club||'' };
+  });
+}
 
-    // ── Helpers ───────────────────────────────────────
-    function showErr(el, msg) {
-      el.textContent = msg;
-      el.style.display = 'block';
-    }
+function getStageDefs(match) {
+  if (!match?.stages) return [];
+  return match.stages
+    .filter(s => s && (s.number!=null||s.num!=null||s.name))
+    .map((s,i) => ({
+      number: s.number!=null ? s.number : s.num!=null ? s.num : i+1,
+      name:   s.name || 'Stage '+(s.number||s.num||i+1),
+      paperTargets: s.paperTargets||0, poppers: s.poppers||0, plates: s.plates||0,
+    }))
+    .sort((a,b) => a.number-b.number);
+}
 
-    function escHtml(v) {
-      return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-    }
+// ── Result modal ──────────────────────────────────────
+window.openRes = (uid, name, matchId) => {
+  const match = allMatchData[matchId];
+  if (!match) return;
+  resultTarget = { uid, name, matchId };
 
-    function escAttr(v) {
-      return String(v ?? '').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    }
-  </script>
+  const stageDefs = getStageDefs(match);
+  const sh = (match.shooters||[]).find(s => String(s.id)===uid);
+  const doneNums = (sh?.stages||[]).filter(s=>s.time>0).map(s=>Number(s.num||s.number));
+
+  $('resModalTitle').textContent = 'Legg til resultat';
+  $('resModalSub').textContent   = name;
+  $('resError').style.display    = 'none';
+  $('resSuccess').style.display  = 'none';
+  $('resStage').innerHTML = stageDefs.length
+    ? stageDefs.map(sd =>
+        `<option value="${sd.number}">${escH(sd.name||'Stage '+sd.number)}${doneNums.includes(Number(sd.number))?' ✓':''}</option>`
+      ).join('')
+    : '<option value="1">Stage 1</option>';
+  ['resTime','resA','resC','resD','resMiss','resNS','resProc'].forEach(id => {
+    $(id).value = id==='resTime' ? '' : '0';
+  });
+  $('resCalc').textContent = '— / —';
+  $('resultModal').classList.add('open');
+};
+
+['resTime','resA','resC','resD','resMiss','resNS','resProc'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    if (!resultTarget) return;
+    const match = allMatchData[resultTarget.matchId];
+    const sh    = (match?.shooters||[]).find(s => String(s.id)===resultTarget.uid);
+    const pf    = sh?.pf||sh?.powerFactor||'minor';
+    const time  = parseFloat($('resTime').value)||0;
+    const a     = parseInt($('resA').value)||0;
+    const c     = parseInt($('resC').value)||0;
+    const d     = parseInt($('resD').value)||0;
+    const miss  = parseInt($('resMiss').value)||0;
+    const ns    = parseInt($('resNS').value)||0;
+    const proc  = parseInt($('resProc').value)||0;
+    const pts   = calcPts(pf, a, c, d, miss, ns, proc);
+    const hf    = time>0 ? (pts/time).toFixed(4) : '—';
+    $('resCalc').textContent = `${pts} pts / ${hf} HF`;
+  });
+});
+
+$('cancelResBtn').onclick = () => $('resultModal').classList.remove('open');
+$('resultModal').addEventListener('click', e => {
+  if (e.target===$('resultModal')) $('resultModal').classList.remove('open');
+});
+
+$('saveResBtn').onclick = async () => {
+  if (!resultTarget) return;
+  const { uid, matchId } = resultTarget;
+  const match = allMatchData[matchId];
+  if (!match) return;
+
+  const stageNum = parseInt($('resStage').value, 10);
+  const time     = parseFloat($('resTime').value);
+  const a        = parseInt($('resA').value)||0;
+  const c        = parseInt($('resC').value)||0;
+  const d        = parseInt($('resD').value)||0;
+  const miss     = parseInt($('resMiss').value)||0;
+  const ns       = parseInt($('resNS').value)||0;
+  const proc     = parseInt($('resProc').value)||0;
+
+  $('resError').style.display = 'none';
+  if (!stageNum || !time || time<=0) { showErr($('resError'),'Stage og tid er påkrevd.'); return; }
+
+  const shooters = JSON.parse(JSON.stringify(match.shooters||[]));
+  let sh = shooters.find(s => String(s.id)===uid);
+  if (!sh) {
+    // Create shooter entry
+    const participant = getMatchShooters(match).find(s => s.uid===uid);
+    sh = { id: uid, isMe: false,
+      firstName: participant?.name?.split(' ')[0]||'',
+      lastName:  participant?.name?.split(' ').slice(1).join(' ')||'',
+      division:  participant?.division||'', pf: participant?.pf||'minor',
+      club: participant?.club||'', stages: [] };
+    shooters.push(sh);
+  }
+
+  sh.stages = sh.stages||[];
+  const pf   = (sh.pf||'minor').toLowerCase();
+  const pts  = calcPts(pf, a, c, d, miss, ns, proc);
+  const hf   = time>0 ? pts/time : 0;
+  const sd   = getStageDefs(match).find(s => Number(s.number)===stageNum);
+
+  const entry = { num:stageNum, name:sd?.name||'Stage '+stageNum, time, a, c, d, miss, ns, proc, pts, hf, shots:a+c+d+miss, savedAt:Date.now() };
+  const idx   = sh.stages.findIndex(s => (s.num||s.number)===stageNum);
+  if (idx>=0) sh.stages[idx] = { ...sh.stages[idx], ...entry };
+  else sh.stages.push(entry);
+  sh.stages.sort((a,b) => (a.num||0)-(b.num||0));
+
+  try {
+    await updateDoc(doc(db, 'matches', String(matchId)), { shooters });
+    $('resSuccess').textContent = `✓ Lagret stage ${stageNum}`;
+    $('resSuccess').style.display = 'block';
+    setTimeout(() => { $('resultModal').classList.remove('open'); $('resSuccess').style.display='none'; }, 1400);
+  } catch(e) { showErr($('resError'), 'Kunne ikke lagre: '+e.message); }
+};
+
+// ── Helpers ───────────────────────────────────────────
+function showErr(el, msg) { el.textContent=msg; el.style.display='block'; }
+function escH(v) {
+  return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function escA(v) { return String(v??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+</script>
 </body>
 </html>

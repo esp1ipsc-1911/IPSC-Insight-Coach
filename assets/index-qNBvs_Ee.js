@@ -1624,6 +1624,7 @@ function icRenderRewards() {
   const lvl = icGetXPLevel(xp);
   const nextXP = icNextXPThreshold(xp);
   const rewards = icEvaluateRewards(g, $);
+  const manualRewards = (g && g.manualRewards) ? g.manualRewards : [];
   const earned = rewards;
 
   // XP unlocks
@@ -1724,8 +1725,28 @@ function icRenderRewards() {
       </div>`;
     });
     html += `</div>`;
-  } else {
-    html += `<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px;">Complete matches to earn rewards!</div>`;
+  }
+
+  // Manual rewards from admin
+  if (manualRewards.length) {
+    var _tc={bronze:'#CD7F32',silver:'#C0C0C0',gold:'#E8B84B',diamond:'#74BFFF'};
+    html += '<div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">⭐ Spesielle utmerkelser</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">';
+    manualRewards.forEach(function(r) {
+      var _col=_tc[r.tier]||'#E8B84B';
+      html += '<div style="background:var(--bg);border-radius:8px;padding:10px;display:flex;align-items:flex-start;gap:8px;border:1px solid '+_col+'33;">';
+      html += badgeSVG(r.tier, 32);
+      html += '<div style="flex:1;min-width:0;">';
+      html += '<div style="font-size:12px;font-weight:700;color:'+_col+';">'+(r.icon||'🏅')+' '+r.name+'</div>';
+      html += '<div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;">'+(r.desc||'')+'</div>';
+      if(r.note) html += '<div style="font-size:10px;color:'+_col+';margin-top:4px;font-style:italic;">💬 '+r.note+'</div>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  if (!earned.length && !manualRewards.length) {
+    html += '<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px;">Complete matches to earn rewards!</div>';
   }
 
   html += `</div></div>`;

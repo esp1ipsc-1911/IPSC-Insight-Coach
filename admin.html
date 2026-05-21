@@ -2772,8 +2772,13 @@
         const byUid = {};
         shootersArr.forEach(s => { if(s.id) byUid[String(s.id)] = s; });
 
+        const seen = new Set();
         const allShooters = [];
+
+        // 1. Participants — resolve from shooters[] or users collection
         await Promise.all(participants.map(async uid => {
+          if (seen.has(uid)) return;
+          seen.add(uid);
           const sh = byUid[uid];
           if (sh) {
             allShooters.push({ id: uid, firstName: sh.firstName||'', lastName: sh.lastName||'', division: sh.division||'', pf: sh.pf||sh.powerFactor||'', club: sh.club||'' });
@@ -2787,6 +2792,15 @@
             } catch {}
           }
         }));
+
+        // 2. Manually added shooters (in shooters[] but not in participants[])
+        shootersArr.forEach(s => {
+          const uid = String(s.id);
+          if (seen.has(uid)) return;
+          seen.add(uid);
+          allShooters.push({ id: uid, firstName: s.firstName||'', lastName: s.lastName||'', division: s.division||'', pf: s.pf||s.powerFactor||'', club: s.club||'' });
+        });
+
         allShooters.sort((a,b) => (a.lastName||'').localeCompare(b.lastName||'', 'no'));
 
         const checked = new Set(checkedUids.map(String));

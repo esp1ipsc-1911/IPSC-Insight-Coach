@@ -1734,6 +1734,21 @@ function icRenderRewards() {
     html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">';
     manualRewards.forEach(function(r) {
       var _col=_tc[r.tier]||'#E8B84B';
+      // Special rendering for Classic Landslaget
+      if(r.id==='classic_landslaget'){
+        html += '<div style="background:linear-gradient(135deg,rgba(0,40,100,0.6),rgba(20,20,40,0.9));border-radius:10px;padding:14px;display:flex;align-items:flex-start;gap:10px;border:1px solid rgba(116,191,255,0.4);box-shadow:0 0 16px rgba(116,191,255,0.15);">';
+        html += '<svg width="36" height="26" viewBox="0 0 22 16" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:3px;margin-top:2px;box-shadow:0 1px 4px rgba(0,0,0,0.4);"><rect width="22" height="16" fill="#EF2B2D"/><rect x="6" width="4" height="16" fill="#FFFFFF"/><rect y="6" width="22" height="4" fill="#FFFFFF"/><rect x="7" width="2" height="16" fill="#003087"/><rect y="7" width="22" height="2" fill="#003087"/></svg>';
+        html += '<div style="flex:1;">';
+        html += '<div style="font-size:14px;font-weight:800;color:#74BFFF;letter-spacing:0.03em;">Classic Landslaget</div>';
+        html += '<div style="font-size:11px;color:rgba(200,220,255,0.85);margin-top:4px;line-height:1.5;">'+(r.desc||'')+'</div>';
+        if(r.note) html += '<div style="font-size:11px;color:#E8B84B;margin-top:6px;font-style:italic;">💬 '+r.note+'</div>';
+        html += '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">';
+        html += '<span style="font-size:9px;background:rgba(116,191,255,0.2);color:#74BFFF;padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:0.06em;border:1px solid rgba(116,191,255,0.3);">NORGE</span>';
+        html += '<span style="font-size:9px;background:rgba(116,191,255,0.2);color:#74BFFF;padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:0.06em;border:1px solid rgba(116,191,255,0.3);">CLASSIC</span>';
+        html += '<span style="font-size:9px;background:rgba(232,184,75,0.2);color:#E8B84B;padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:0.06em;border:1px solid rgba(232,184,75,0.3);">LANDSLAGET</span>';
+        html += '</div></div></div>';
+        return;
+      }
       html += '<div style="background:var(--bg);border-radius:8px;padding:10px;display:flex;align-items:flex-start;gap:8px;border:1px solid '+_col+'33;">';
       html += badgeSVG(r.tier, 32);
       html += '<div style="flex:1;min-width:0;">';

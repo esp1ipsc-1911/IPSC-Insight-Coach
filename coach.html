@@ -949,7 +949,9 @@
           // Load this coach's allowed shooter UIDs from coachAccess
           try {
             const accessSnap = await getDoc(doc(db, 'coachAccess', user.uid));
-            allowedShooterUids = accessSnap.exists() ? (accessSnap.data().shooterUids || []) : [];
+            const raw = accessSnap.exists() ? (accessSnap.data().shooterUids || []) : [];
+            // Ensure all UIDs are strings — Firestore may return numbers
+            allowedShooterUids = raw.map(u => String(u)).filter(u => u && u !== 'undefined');
           } catch {
             allowedShooterUids = [];
           }
@@ -1030,7 +1032,7 @@
           const data = d.data();
           const shooters = (data.shooters || []).filter(s => !s.isMe);
           const hasAllowed = shooters.some(s => allowedShooterUids.includes(String(s.id)));
-          const participantsHasAllowed = (data.participants || []).some(uid => allowedShooterUids.includes(uid));
+          const participantsHasAllowed = (data.participants || []).some(uid => allowedShooterUids.includes(String(uid)));
           if (hasAllowed || participantsHasAllowed) {
             relevantMatches.push({ id: d.id, ...data });
           }
@@ -1053,7 +1055,7 @@
         }
 
         // Start with the most recent match, subscribe to all relevant matches
-        trackedShooterIds = [...allowedShooterUids];
+        trackedShooterIds = allowedShooterUids.map(u => String(u));
         await startMultiMatchDashboard(relevantMatches);
       } catch (e) {
         showDash();

@@ -624,69 +624,96 @@ function renderMatchSection(match) {
 }
 
 function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
-  const myUids = new Set(myShooters.map(s => s.uid));
-  const mid = String(match.id);
+  const myUids  = new Set(myShooters.map(s => s.uid));
+  const mid     = String(match.id);
   const showRef = (window._refInStandings||{})[mid] !== false;
 
-  // Use ALL shooters from match.shooters[] for standings
-  // shooterTotals comes from calcMatchTotals which already covers all shooters
-  // But we also need to catch manually added shooters with no results yet
-  // Use shooterTotals directly — already includes all shooters incl. isMe
-  // shooterTotals comes from calcMatchTotals which uses stage-normalised scoring
+  // Build entries from shooterTotals (stage-normalised, from calcMatchTotals)
   let allEntries = (shooterTotals||[]).map(t => ({
     uid:   t.uid,
-    name:  t.name,
-    pts:   t.pts || 0,
+    name:  t.name || t.uid,
+    pts:   t.pts  || 0,
     isRef: false
-  }));
-
-  allEntries.sort((a,b) => b.pts - a.pts);
+  })).sort((a,b) => b.pts - a.pts);
 
   // Add ref shooters if toggle is on
-  if (showRef && allRefShooters.length) {
-    const myDiv = myShooters[0]?.division || (allMatchShooters[0]?.division||'');
+  if (showRef && allRefShooters.length && allEntries.length) {
+    // Determine division from my shooters or first shooter in match
+    const myDiv = (myShooters[0]?.division ||
+      (match.shooters||[]).find(s => s.division)?.division || '').toLowerCase();
+
+    // Find avg HF of the leader (top scorer) to calibrate ref estimate
+    const topEntry = allEntries[0];
+    let topAvgHF = 0;
+    if (topEntry && topEntry.pts > 0) {
+      const topSh = (match.shooters||[]).find(s => String(s.id)===topEntry.uid);
+      if (topSh) {
+        let tPts = 0, tTime = 0;
+        (topSh.stages||[]).forEach(st => {
+          if (!(st.time>0)) return;
+          const pf  = (topSh.pf||topSh.powerFactor||'minor').toLowerCase();
+          tPts  += calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+          tTime += st.time;
+        });
+        topAvgHF = tTime > 0 ? tPts/tTime : 0;
+      }
+    }
+
     allRefShooters
-      .filter(r => !r.division || r.division.toLowerCase()===(myDiv||'').toLowerCase())
-      .slice(0,4)
+      .filter(r => !r.division || r.division.toLowerCase()===myDiv)
+      .slice(0, 4)
       .forEach(r => {
-        // Use stage-weighted estimate: avg ref HF × sum of stage max pts / avg HF
-        const hf = r.mediumHF||r.shortHF||r.longHF||0;
-        const matchMaxPts = stageDefs.reduce((sum,sd) => sum + stageMaxPts(sd), 0);
-        // Estimate: ref would score ~(hf/topHF) × matchMaxPts if top HF is known
-        const topEntry = allEntries[0];
-        const topHF = topEntry && topEntry.pts > 0
-          ? (() => {
-              const sh = (match.shooters||[]).find(s => String(s.id)===topEntry.uid);
-              if (!sh) return 0;
-              let pts=0, time=0;
-              (sh.stages||[]).forEach(st => { if(st.time>0){ pts+=st.pts||0; time+=st.time; } });
-              return time>0 ? pts/time : 0;
-            })()
-          : 0;
-        const estPts = topHF > 0 ? (hf/topHF) * (topEntry?.pts||0) : hf * stageDefs.length * 12;
-        allEntries.push({ uid:'ref_'+r.id, name: r.name||r.id, pts: Math.max(0, estPts), isRef: true });
+        const refHF = r.mediumHF || r.shortHF || r.longHF || 0;
+        if (!refHF) return;
+        // Estimate ref stage-pts: for each stage, ref gets (refHF/bestHFInStage)*maxPts
+        // Use topAvgHF as proxy for best HF
+        let estStagePts = 0;
+        if (topAvgHF > 0) {
+          stageDefs.forEach(sd => {
+            const maxPts     = stageMaxPts(sd);
+            const courseType = maxPts <= 60 ? 'short' : maxPts <= 120 ? 'medium' : 'long';
+            const stageRefHF = r[courseType+'HF'] || refHF;
+            estStagePts += (stageRefHF / topAvgHF) * maxPts;
+          });
+          // Scale so leader = 100%
+          const matchMaxPts = stageDefs.reduce((s,d) => s + stageMaxPts(d), 0);
+          estStagePts = (estStagePts / (matchMaxPts||1)) * topEntry.pts;
+        }
+        allEntries.push({
+          uid:   'ref_' + r.id,
+          name:  r.name || r.id,
+          pts:   Math.max(0, estStagePts),
+          isRef: true
+        });
       });
     allEntries.sort((a,b) => b.pts - a.pts);
   }
 
-  if (!allEntries.length) return '<div style="color:var(--muted);font-size:12px;padding:8px 0;">Ingen resultater ennå.</div>';
+  if (!allEntries.length) {
+    return '<div style="color:var(--muted);font-size:12px;padding:8px 0;">Ingen resultater ennå.</div>';
+  }
 
   const leader = allEntries[0].pts;
   return '<table class="standings-table">' +
     '<thead><tr>' +
-    '<th style="width:22px;">#</th><th>Navn</th>' +
-    '<th style="text-align:right;">Pts</th><th style="text-align:right;">%</th>' +
-    '</tr></thead>' +
-    '<tbody>' +
-    allEntries.map((t,i) => {
-      const mine = myUids.has(t.uid);
-      const pct  = leader>0 ? (t.pts/leader*100).toFixed(1) : '0.0';
-      const ptsStr = t.pts > 0 ? t.pts.toFixed(1) : '—';
-      return '<tr class="' + (mine?'me':'') + ' ' + (t.isRef?'ref-row':'') + '">' +
-        '<td style="font-weight:800;' + (mine?'color:var(--accent);':t.isRef?'color:var(--blue);':'') + '">' + (i+1) + '</td>' +
-        '<td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escH(t.name) + (t.isRef?'<span class="ref-badge">REF</span>':'') + '</td>' +
+    '<th style="width:22px;">#</th>' +
+    '<th>Navn</th>' +
+    '<th style="text-align:right;">Pts</th>' +
+    '<th style="text-align:right;">%</th>' +
+    '</tr></thead><tbody>' +
+    allEntries.map((t, i) => {
+      const mine   = myUids.has(t.uid);
+      const pct    = leader > 0 ? (t.pts/leader*100).toFixed(1) : '0.0';
+      const ptsStr = t.pts > 0  ? t.pts.toFixed(1) : '—';
+      const rankColor = mine ? 'color:var(--accent);' : t.isRef ? 'color:var(--blue);' : '';
+      const pctColor  = mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--muted)';
+      return '<tr class="' + (mine?'me ':'') + (t.isRef?'ref-row':'') + '">' +
+        '<td style="font-weight:800;' + rankColor + '">' + (i+1) + '</td>' +
+        '<td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' +
+          escH(t.name) + (t.isRef ? '<span class="ref-badge">REF</span>' : '') +
+        '</td>' +
         '<td style="text-align:right;font-variant-numeric:tabular-nums;">' + ptsStr + '</td>' +
-        '<td style="text-align:right;color:' + (mine?'var(--accent)':t.isRef?'var(--blue)':'var(--muted)') + ';">' + pct + '%</td>' +
+        '<td style="text-align:right;color:' + pctColor + ';">' + pct + '%</td>' +
         '</tr>';
     }).join('') +
     '</tbody></table>';

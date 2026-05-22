@@ -190,12 +190,13 @@
     .standings-section{padding:10px 14px;border-bottom:1px solid var(--border);}
     .standings-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
     .standings-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
-    .standings-table{width:100%;border-collapse:collapse;font-size:11px;}
-    .standings-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:3px 4px;font-weight:700;border-bottom:1px solid var(--border);text-align:left;}
-    .standings-table td{padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.04);}
+    .standings-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .standings-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px;font-weight:700;border-bottom:1px solid var(--border);text-align:left;}
+    .standings-table td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
     .standings-table tr:last-child td{border-bottom:none;}
-    .standings-table tr.me td{background:rgba(232,184,75,.06);}
+    .standings-table tr.me td{background:rgba(232,184,75,.07);}
     .standings-table tr.ref-row td{color:var(--blue);}
+    .standings-table td:nth-child(3),.standings-table td:nth-child(4){white-space:nowrap;}
     .ref-badge{display:inline-block;padding:1px 5px;border-radius:4px;background:rgba(74,158,255,.15);color:var(--blue);font-size:9px;font-weight:700;margin-left:4px;border:1px solid rgba(74,158,255,.25);}
 
     /* ── ADD/EDIT SHOOTER MODAL ── */
@@ -606,13 +607,13 @@ function renderMatchSection(match) {
           <button onclick="window.openShooterModalForMatch('${escA(mid)}')" class="btn btn-primary btn-sm">+ Skytter</button>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 280px;align-items:start;">
+      <div style="display:grid;grid-template-columns:1fr 340px;align-items:start;">
         <div style="padding:12px 16px;">
-          <div class="shooter-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr));">
+          <div class="shooter-grid" style="grid-template-columns:repeat(auto-fill,minmax(360px,1fr));">
             ${cardsHtml}
           </div>
         </div>
-        <div style="border-left:1px solid var(--border);padding:12px;position:sticky;top:52px;max-height:calc(100vh - 52px);overflow-y:auto;">
+        <div style="border-left:1px solid var(--border);padding:14px;position:sticky;top:52px;max-height:calc(100vh - 52px);overflow-y:auto;min-width:0;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Live standings</div>
             <button onclick="window.toggleRefInStandings('${escA(mid)}')" id="refStandBtn-${escA(mid)}" class="tog-btn on" style="font-size:10px;padding:2px 7px;"><span class="dot"></span>Ref</button>
@@ -696,10 +697,10 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
   const leader = allEntries[0].pts;
   return '<table class="standings-table">' +
     '<thead><tr>' +
-    '<th style="width:22px;">#</th>' +
-    '<th>Navn</th>' +
-    '<th style="text-align:right;">Pts</th>' +
-    '<th style="text-align:right;">%</th>' +
+    '<th style="width:24px;padding-left:6px;">#</th>' +
+    '<th style="padding-left:6px;">Navn</th>' +
+    '<th style="text-align:right;min-width:54px;">Pts</th>' +
+    '<th style="text-align:right;min-width:46px;">%</th>' +
     '</tr></thead><tbody>' +
     allEntries.map((t, i) => {
       const mine   = myUids.has(t.uid);
@@ -709,7 +710,7 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
       const pctColor  = mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--muted)';
       return '<tr class="' + (mine?'me ':'') + (t.isRef?'ref-row':'') + '">' +
         '<td style="font-weight:800;' + rankColor + '">' + (i+1) + '</td>' +
-        '<td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' +
+        '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:' + (mine?'700':'400') + ';">' +
           escH(t.name) + (t.isRef ? '<span class="ref-badge">REF</span>' : '') +
         '</td>' +
         '<td style="text-align:right;font-variant-numeric:tabular-nums;">' + ptsStr + '</td>' +

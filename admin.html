@@ -877,7 +877,7 @@
       <!-- Icon -->
       <div class="form-group">
         <label class="form-label">Ikon</label>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;">
           <div style="display:flex;gap:6px;flex-wrap:wrap;max-width:320px;" id="rewardEmojiPicker">
             <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🏆&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🏆</button>
             <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🥇&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🥇</button>
@@ -910,8 +910,16 @@
           </div>
           <div style="color:var(--muted);font-size:12px;">— eller —</div>
           <div style="flex:1;min-width:180px;">
-            <input id="rewardIconUrl" class="form-input" type="url" placeholder="https://... (bilde-URL)" />
-            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Lim inn URL til bilde (PNG, SVG, JPG)</div>
+            <div style="margin-bottom:8px;">
+              <label class="form-label" style="margin-bottom:5px;">Last opp bilde</label>
+              <input id="rewardIconFile" type="file" accept="image/*"
+                style="width:100%;font-size:12px;color:var(--muted);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;cursor:pointer;" />
+              <div id="rewardUploadProgress" style="display:none;margin-top:5px;font-size:12px;color:var(--accent);">Laster opp…</div>
+            </div>
+            <div>
+              <label class="form-label" style="margin-bottom:5px;">— eller lim inn URL</label>
+              <input id="rewardIconUrl" class="form-input" type="url" placeholder="https://... (bilde-URL)" />
+            </div>
           </div>
         </div>
         <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
@@ -1286,6 +1294,9 @@
       getFunctions,
       httpsCallable
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject }
+      from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+    const storage = getStorage();
 
     const functions = getFunctions();
     let currentUser = null;
@@ -3128,8 +3139,8 @@
               '<div style="font-size:11px;color:var(--accent);margin-top:3px;">' + (r.xp||0) + ' XP · ID: ' + escapeHtml(r.id) + '</div>' +
             '</div>' +
             '<div style="display:flex;gap:5px;flex-shrink:0;">' +
-              '<button class="btn btn-sm btn-ghost" onclick="window.openRewardTypeModal(' + JSON.stringify(r.id) + ')">Rediger</button>' +
-              '<button class="btn btn-sm btn-danger" onclick="window.deleteRewardType(' + JSON.stringify(r.id) + ')">Slett</button>' +
+              '<button class="btn btn-sm btn-ghost" data-rwid="' + escapeHtml(r.id) + '" onclick="window.openRewardTypeModal(this.dataset.rwid)">Rediger</button>' +
+              '<button class="btn btn-sm btn-danger" data-rwid="' + escapeHtml(r.id) + '" onclick="window.deleteRewardType(this.dataset.rwid)">Slett</button>' +
             '</div>' +
             '</div>';
         }).join('');
@@ -3151,11 +3162,14 @@
       $('rewardTypeId').value     = '';
       $('rewardTypeId').disabled  = false;
       $('rewardIconUrl').value    = '';
+      $('rewardIconFile').value   = '';
       $('rewardIconValue').value  = '🏆';
       $('rewardIconPreview').textContent = '🏆';
+      $('rewardUploadProgress').style.display = 'none';
       $('rewardTypeActive').checked = true;
       document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
-      document.querySelector('.emoji-pick-btn') && document.querySelector('.emoji-pick-btn').classList.add('selected');
+      const firstEmoji = document.querySelector('.emoji-pick-btn');
+      if (firstEmoji) firstEmoji.classList.add('selected');
       $('rewardTypeModalTitle').textContent = 'Ny reward-type';
 
       if (id) {
@@ -3203,9 +3217,25 @@
       const url = this.value.trim();
       if (url) {
         $('rewardIconValue').value = url;
-        $('rewardIconPreview').innerHTML = '<img src="' + escapeHtml(url) + '" style="width:36px;height:36px;object-fit:contain;border-radius:6px;" onerror="this.style.display=\'none\'" />';
+        $('rewardIconPreview').innerHTML = '<img src="' + escapeHtml(url) + '" style="width:36px;height:36px;object-fit:contain;border-radius:6px;" />';
         document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+        $('rewardIconFile').value = '';
       }
+    });
+
+    $('rewardIconFile').addEventListener('change', async function() {
+      const file = this.files[0];
+      if (!file) return;
+      // Preview locally before upload
+      const reader = new FileReader();
+      reader.onload = e => {
+        $('rewardIconPreview').innerHTML = '<img src="' + e.target.result + '" style="width:36px;height:36px;object-fit:contain;border-radius:6px;" />';
+      };
+      reader.readAsDataURL(file);
+      document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+      $('rewardIconUrl').value = '';
+      // Store file for upload on save — don't upload yet (ID might not be set)
+      window._pendingRewardFile = file;
     });
 
     // Auto-generate ID from title
@@ -3227,23 +3257,48 @@
       const rarity  = $('rewardTypeRarity').value;
       const xp      = parseInt($('rewardTypeXP').value) || 0;
       const active  = $('rewardTypeActive').checked;
-      const iconVal = $('rewardIconValue').value;
       const iconUrl = $('rewardIconUrl').value.trim();
-      const iconType = iconUrl ? 'url' : 'emoji';
-      const icon    = iconUrl || iconVal || '🏆';
 
       $('rewardTypeError').style.display = 'none';
       if (!id)    { $('rewardTypeError').textContent='ID er påkrevd'; $('rewardTypeError').style.display='block'; return; }
       if (!title) { $('rewardTypeError').textContent='Tittel er påkrevd'; $('rewardTypeError').style.display='block'; return; }
 
       const docId = editId || id;
-      const payload = { title, description: desc, rarity, xp, active, icon, iconType, updatedAt: new Date().toISOString() };
+
+      // Handle file upload if a file was selected
+      let finalIcon = iconUrl || $('rewardIconValue').value || '🏆';
+      let finalIconType = iconUrl ? 'url' : 'emoji';
+
+      if (window._pendingRewardFile) {
+        try {
+          $('rewardUploadProgress').style.display = 'block';
+          $('rewardUploadProgress').textContent = 'Laster opp bilde…';
+          const fileRef = storageRef(storage, 'rewardIcons/' + docId + '_' + Date.now());
+          const snap = await uploadBytes(fileRef, window._pendingRewardFile);
+          finalIcon = await getDownloadURL(snap.ref);
+          finalIconType = 'url';
+          $('rewardUploadProgress').textContent = '✓ Bilde lastet opp!';
+          window._pendingRewardFile = null;
+        } catch(e) {
+          $('rewardTypeError').textContent = 'Feil ved bildeopplasting: ' + e.message;
+          $('rewardTypeError').style.display = 'block';
+          $('rewardUploadProgress').style.display = 'none';
+          return;
+        }
+      }
+
+      const payload = {
+        title, description: desc, rarity, xp, active,
+        icon: finalIcon, iconType: finalIconType,
+        updatedAt: new Date().toISOString()
+      };
       if (!editId) payload.createdAt = new Date().toISOString();
 
       try {
         await setDoc(doc(db, 'rewardTypes', docId), payload, { merge: !!editId });
         $('rewardTypeSuccess').textContent = editId ? '✓ Reward oppdatert!' : '✓ Reward opprettet!';
         $('rewardTypeSuccess').style.display = 'block';
+        $('rewardUploadProgress').style.display = 'none';
         setTimeout(() => {
           $('rewardTypeModal').classList.remove('open');
           $('rewardTypeSuccess').style.display = 'none';
@@ -3253,12 +3308,19 @@
       } catch(e) {
         $('rewardTypeError').textContent = 'Feil: ' + e.message;
         $('rewardTypeError').style.display = 'block';
+        $('rewardUploadProgress').style.display = 'none';
       }
     };
 
-    $('cancelRewardTypeBtn').onclick = () => $('rewardTypeModal').classList.remove('open');
+    $('cancelRewardTypeBtn').onclick = () => {
+      window._pendingRewardFile = null;
+      $('rewardTypeModal').classList.remove('open');
+    };
     $('rewardTypeModal').addEventListener('click', e => {
-      if (e.target === $('rewardTypeModal')) $('rewardTypeModal').classList.remove('open');
+      if (e.target === $('rewardTypeModal')) {
+        window._pendingRewardFile = null;
+        $('rewardTypeModal').classList.remove('open');
+      }
     });
 
     // ── Delete reward type ────────────────────────────────────────────────
@@ -3302,16 +3364,14 @@
           byRarity[r].forEach(t => {
             const icon = t.iconType === 'url' ? '🖼️' : (t.icon||'🏆');
             const val = t.id + '|' + t.rarity + '|' + icon + ' ' + t.title + '|' + (t.description||'');
-            html += '<option value="' + escapeHtml(val) + '">' + icon + ' ' + escapeHtml(t.title) + '</option>';
+            html += '<option value="' + escapeHtml(val) + '">' + icon + ' ' + escapeHtml(t.title) + ' (' + (t.xp||0) + ' XP)</option>';
           });
           html += '</optgroup>';
         });
 
         const customGroup = document.createElement('optgroup');
         customGroup.label = '⚙️ Egendefinerte rewards';
-        customGroup.innerHTML = byRarity['legendary'] || byRarity['diamond'] || byRarity['gold'] || byRarity['silver'] || byRarity['common']
-          ? html.replace(/<optgroup[^>]*>|<\/optgroup>/g,'') : '';
-        sel.insertBefore(customGroup, sel.firstChild);
+        customGroup.innerHTML = html.replace(/<optgroup[^>]*>|<\/optgroup>/g,'');
       } catch(e) { console.warn('Could not load reward types for grant select', e); }
     }
 

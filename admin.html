@@ -1200,14 +1200,48 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          const adminDoc = await getDoc(doc(db, 'adminUsers', user.email));
-          if (adminDoc.exists()) {
+          // Force token refresh to ensure email claim is present
+          await user.getIdToken(true);
+          const email = user.email;
+
+          if (!email) {
+            alert('Ingen e-post tilknyttet kontoen. Kontakt support.');
+            await signOut(auth);
+            return;
+          }
+
+          // Check adminUsers by email
+          let hasAccess = false;
+          try {
+            const adminDoc = await getDoc(doc(db, 'adminUsers', email));
+            if (adminDoc.exists()) {
+              const role = adminDoc.data().role;
+              const roles = adminDoc.data().roles || [];
+              hasAccess = role === 'admin' || role === 'superadmin' ||
+                          roles.includes('admin') || roles.includes('superadmin');
+            }
+          } catch {}
+
+          // Fallback: check users/{uid}.roles
+          if (!hasAccess) {
+            try {
+              const userDoc = await getDoc(doc(db, 'users', user.uid));
+              if (userDoc.exists()) {
+                const d = userDoc.data();
+                const roles = Array.isArray(d.roles) ? d.roles : (d.role ? [d.role] : []);
+                hasAccess = roles.includes('admin') || roles.includes('superadmin') ||
+                            roles.includes('coach'); // coach can access admin panel
+              }
+            } catch {}
+          }
+
+          if (hasAccess) {
             currentUser = user;
             loginSection.style.display = 'none';
             adminContent.style.display = 'block';
             Promise.all([loadRoles(), loadAllUsers(), loadCodes(), loadReferenceShooters(), loadMatches()]);
           } else {
-            alert('Du har ikke admin-tilgang');
+            alert('Du har ikke admin-tilgang. Sjekk at kontoen har admin-rollen i Firestore.');
             await signOut(auth);
           }
         } catch (error) {
@@ -2659,7 +2693,7 @@
       const matchEntries = access.matches || [];
       const totalCount = matchEntries.reduce((s,m) => s+(m.shooterUids||[]).length, 0);
       const matchOpts = allMatchesForCoach.map(m =>
-        `<option value="${escapeAttr(String(m.id))}">${escapeHtml(m.name||m.id)}${m.date?' ('+m.date+')':''}</option>`
+        '<option value="'+escapeAttr(String(m.id))+'">'+escapeHtml(m.name||m.id)+(m.date?' ('+m.date+')':'')+'</option>'
       ).join('');
 
       const matchRows = matchEntries.map((entry, idx) => {
@@ -2671,11 +2705,11 @@
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:6px;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
               <div>
-                <div style="font-size:13px;font-weight:700;">${escapeHtml(mName)}${mDate?' <span style="color:var(--muted);font-weight:400;font-size:11px;">('+escapeHtml(mDate)+')</span>':''}</div>
+                <div style="font-size:13px;font-weight:700;">${escapeHtml(mName)}${mDate ? ' <span style="color:var(--muted);font-size:11px;">(' + escapeHtml(mDate) + ')</span>' : ''}</div>
                 <div style="font-size:11px;color:var(--muted);">${count} skytter${count===1?'':'e'} tildelt</div>
               </div>
               <div style="display:flex;gap:5px;">
-                <button class="btn btn-sm btn-ghost" onclick="window.toggleCoachEdit('${escapeAttr(coach.id)}',${idx})">Rediger</button>
+                <button class="btn btn-sm btn-ghost" onclick="window.toggleCoachEdit(this.dataset.coach,this.dataset.idx)" data-coach="${escapeAttr(coach.id)}" data-idx="${idx}">Rediger</button>
                 <button class="btn btn-sm btn-danger" onclick="window.removeCoachMatch('${escapeAttr(coach.id)}',${idx})">Fjern</button>
               </div>
             </div>
@@ -2683,16 +2717,16 @@
               <div style="margin-bottom:8px;">
                 <label class="form-label">Match</label>
                 <select class="form-select" id="coach-matchsel-${escapeAttr(coach.id)}-${idx}" style="max-width:100%;"
-                  onchange="window.loadCoachMatchShooters('${escapeAttr(coach.id)}',${idx},this.value)">
+                  onchange="window.loadCoachMatchShooters(this.dataset.coach,this.dataset.idx,this.value)" data-coach="${escapeAttr(coach.id)}" data-idx="${idx}">
                   <option value="">— Velg match —</option>
-                  ${allMatchesForCoach.map(m=>`<option value="${escapeAttr(String(m.id))}" ${String(m.id)===String(entry.matchId)?'selected':''}>${escapeHtml(m.name||m.id)}${m.date?' ('+m.date+')':''}</option>`).join('')}
+                  ${allMatchesForCoach.map(m=>'<option value="'+escapeAttr(String(m.id))+'" '+(String(m.id)===String(entry.matchId)?'selected':'')+'>'+escapeHtml(m.name||m.id)+(m.date?' ('+m.date+')':'')+'</option>').join('')}
                 </select>
               </div>
               <div id="coach-shooters-${escapeAttr(coach.id)}-${idx}" style="display:grid;gap:5px;max-height:260px;overflow-y:auto;margin-bottom:8px;"></div>
               <div id="coach-feedback-${escapeAttr(coach.id)}-${idx}" style="display:none;margin-bottom:6px;"></div>
               <div style="display:flex;gap:6px;">
-                <button class="btn btn-primary btn-sm" onclick="window.saveCoachMatch('${escapeAttr(coach.id)}',${idx})">Lagre</button>
-                <button class="btn btn-ghost btn-sm" onclick="window.toggleCoachEdit('${escapeAttr(coach.id)}',${idx})">Avbryt</button>
+                <button class="btn btn-primary btn-sm" onclick="window.saveCoachMatch(this.dataset.coach,this.dataset.idx)" data-coach="${escapeAttr(coach.id)}" data-idx="${idx}">Lagre</button>
+                <button class="btn btn-ghost btn-sm" onclick="window.toggleCoachEdit(this.dataset.coach,this.dataset.idx)" data-coach="${escapeAttr(coach.id)}" data-idx="${idx}">Avbryt</button>
               </div>
             </div>
           </div>`;
@@ -2716,7 +2750,7 @@
             <div style="margin-bottom:8px;">
               <label class="form-label">Velg match</label>
               <select class="form-select" id="coach-newmatch-${escapeAttr(coach.id)}" style="max-width:100%;"
-                onchange="window.loadCoachNewMatchShooters('${escapeAttr(coach.id)}',this.value)">
+                onchange="window.loadCoachNewMatchShooters(this.dataset.coach,this.value)" data-coach="${escapeAttr(coach.id)}">
                 <option value="">— Velg match —</option>
                 ${matchOpts}
               </select>
@@ -2725,18 +2759,19 @@
             <div id="coach-newfeedback-${escapeAttr(coach.id)}" style="display:none;margin-bottom:6px;"></div>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-primary btn-sm" onclick="window.saveCoachNewMatch('${escapeAttr(coach.id)}')">Lagre</button>
-              <button class="btn btn-ghost btn-sm" onclick="document.getElementById('coach-addrow-${escapeAttr(coach.id)}').style.display='none'">Avbryt</button>
+              <button class="btn btn-ghost btn-sm" onclick="document.getElementById(&quot;coach-addrow-${escapeAttr(coach.id)}&quot;).style.display=&quot;none&quot;">Avbryt</button>
             </div>
           </div>
 
           <button class="btn btn-ghost btn-sm" style="margin-top:10px;"
-            onclick="document.getElementById('coach-addrow-${escapeAttr(coach.id)}').style.display='block'">
+            onclick="document.getElementById(&quot;coach-addrow-${escapeAttr(coach.id)}&quot;).style.display=&quot;block&quot;">
             + Legg til match
           </button>
         </div>`;
     }
 
     window.toggleCoachEdit = async (coachId, idx) => {
+      idx = parseInt(idx, 10);
       const editEl = $('coach-edit-' + coachId + '-' + idx);
       if (!editEl) return;
       const isOpen = editEl.style.display !== 'none';
@@ -2748,6 +2783,7 @@
     };
 
     window.loadCoachMatchShooters = async (coachId, idx, matchId) => {
+      idx = parseInt(idx, 10);
       const shootersEl = $('coach-shooters-' + coachId + '-' + idx);
       if (!shootersEl || !matchId) return;
       shootersEl.innerHTML = '<div class="loading" style="font-size:13px;">Laster…</div>';
@@ -2770,7 +2806,7 @@
         return '<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;' +
           'background:var(--bg3);border:1px solid ' + (isChk?'rgba(76,175,125,.35)':'var(--border)') + ';' +
           'border-radius:var(--radius-sm);cursor:pointer;"' +
-          ' onchange="this.style.borderColor=this.querySelector('input').checked?'rgba(76,175,125,.35)':'var(--border)'">' +
+          ' onchange="this.style.borderColor=this.querySelector(\"input\").checked?\"rgba(76,175,125,.35)\":\"var(--border)\"">' +
           '<input type="checkbox" value="' + escapeAttr(s.id) + '" ' + (isChk?'checked':'') +
           ' style="width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;">' +
           '<div>' +
@@ -2847,6 +2883,7 @@
     }
 
     window.saveCoachMatch = async (coachId, idx) => {
+      idx = parseInt(idx, 10);
       const matchSelEl = $('coach-matchsel-' + coachId + '-' + idx);
       const shootersEl = $('coach-shooters-'  + coachId + '-' + idx);
       const feedbackEl = $('coach-feedback-'  + coachId + '-' + idx);

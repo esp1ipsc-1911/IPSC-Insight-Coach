@@ -270,7 +270,7 @@ e.innerHTML=`
     </div>
     <button class="btn-primary" id="loginBtn">Sign In</button>
     <div class="or-row"><span id="separatorText">or</span></div>
-    <button class="btn-secondary" id="showRegisterBtn">Create an Account</button>
+    <button type="button" class="btn-secondary" id="showRegisterBtn">Create an Account</button>
    </form>
 
    <!-- REGISTER SECTION -->

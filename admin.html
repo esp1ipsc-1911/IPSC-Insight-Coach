@@ -1518,8 +1518,12 @@
       if (!rewardsCurrentUser) return;
       if (!sel) { fb.style.display='block'; fb.style.color='#e55'; fb.textContent='Velg en reward først.'; return; }
       const [id, tier, name, desc] = sel.split('|');
-      const icon = name.match(/^(\p{Emoji})/u)?.[1] || '🏅';
-      const cleanName = name.replace(/^(\p{Emoji}\s*)/u, '');
+      // icon must be an emoji for app compatibility (not a URL)
+      // Extract first emoji from name field, fallback to tier-based emoji
+      const tierEmojis = { diamond:'💎', gold:'🥇', silver:'🥈', bronze:'🥉', legendary:'👑', common:'🏅' };
+      const emojiMatch = name.match(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/u);
+      const icon = emojiMatch ? emojiMatch[0] : (tierEmojis[tier] || '🏅');
+      const cleanName = name.replace(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*/u, '').trim();
       const newReward = { id, tier, name: cleanName, icon, desc, note: note||null, grantedBy: 'admin', grantedAt: Date.now() };
       fb.style.display = 'block';
       fb.style.color = '#aaa';
@@ -3371,7 +3375,9 @@
           if (!byRarity[r]) return;
           html += '<optgroup label="' + escapeHtml(rarityLabels[r]||r) + '" class="custom-reward-group">';
           byRarity[r].forEach(t => {
-            const icon = t.iconType === 'url' ? '🖼️' : (t.icon||'🏆');
+            // For URL icons, use rarity emoji so app renders correctly
+            const rarityEmojis = { diamond:'💎', gold:'🥇', silver:'🥈', bronze:'🥉', legendary:'👑', common:'🏅' };
+            const icon = (t.iconType === 'url') ? (rarityEmojis[t.rarity||'gold'] || '🏅') : (t.icon||'🏆');
             const val = t.id + '|' + (t.rarity||'gold') + '|' + icon + ' ' + t.title + '|' + (t.description||'');
             html += '<option value="' + escapeHtml(val) + '">'
               + icon + ' ' + escapeHtml(t.title) + ' (' + (t.xp||0) + ' XP)</option>';

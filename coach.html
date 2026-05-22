@@ -497,13 +497,7 @@ async function autoStart(coachMatches) {  // coachMatches = [{matchId, shooterUi
     return;
   }
 
-  // Load ref shooters
-  try {
-    const rs = await getDocs(collection(db, 'referenceShooters'));
-    allRefShooters = [];
-    rs.forEach(d => allRefShooters.push({ id: d.id, ...d.data() }));
-  } catch {}
-
+  // Show dash immediately — don't wait for ref shooters
   $('loginSection').style.display = 'none';
   $('setupSection').style.display = 'none';
   $('dashSection').style.display  = 'block';
@@ -518,6 +512,13 @@ async function autoStart(coachMatches) {  // coachMatches = [{matchId, shooterUi
   coachMatches.forEach(m => {
     window._coachMatchUids[String(m.matchId)] = (m.shooterUids||[]).map(String);
   });
+
+  // Load ref shooters in background — re-render when ready
+  getDocs(collection(db, 'referenceShooters')).then(rs => {
+    allRefShooters = [];
+    rs.forEach(d => allRefShooters.push({ id: d.id, ...d.data() }));
+    if (Object.keys(allMatchData).length) renderDash();
+  }).catch(() => {});
 
   try {
     coachMatches.forEach(entry => {

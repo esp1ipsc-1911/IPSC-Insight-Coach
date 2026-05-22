@@ -417,12 +417,6 @@ e.innerHTML=`
       <input id="registerCode" class="field" type="text" placeholder="Invitation code (required)" />
      </div>
     </div>
-    <div class="gdpr-row">
-     <input type="checkbox" id="gdpr-consent-checkbox" />
-     <label for="gdpr-consent-checkbox">
-      I have read and accepted the <a href="#" onclick="document.getElementById('gdprModal').classList.add('open');return false;">Privacy Policy</a>
-     </label>
-    </div>
     <div id="gdprCheckboxContainer"></div>
     <button class="btn-primary" id="registerBtn">Create an Account</button>
     <button class="btn-ghost" id="cancelRegisterBtn">Cancel</button>

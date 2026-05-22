@@ -3340,9 +3340,19 @@
         const types = [];
         snap.forEach(d => types.push({ id: d.id, ...d.data() }));
         const activeTypes = types.filter(r => r.active !== false);
+
+        const sel = $('rewardsGrantSelect');
+
+        // Remove all existing custom optgroups
+        sel.querySelectorAll('optgroup.custom-reward-group').forEach(g => g.remove());
+
         if (!activeTypes.length) return;
 
-        // Group by rarity
+        // Sort by rarity
+        const rarityOrder = { legendary:0, diamond:1, gold:2, silver:3, common:4 };
+        activeTypes.sort((a,b) => (rarityOrder[a.rarity]||9) - (rarityOrder[b.rarity]||9));
+
+        // Build one optgroup per rarity and insert at top of select
         const byRarity = {};
         activeTypes.forEach(r => {
           const g = r.rarity || 'common';
@@ -3350,28 +3360,29 @@
           byRarity[g].push(r);
         });
 
-        // Build new optgroup for custom rewards at top of select
-        const sel = $('rewardsGrantSelect');
-        // Remove existing custom optgroup if present
-        const existingCustom = sel.querySelector('optgroup[label="⚙️ Egendefinerte rewards"]');
-        if (existingCustom) existingCustom.remove();
+        const rarityLabels = {
+          legendary:'🌈 Legendary', diamond:'💎 Diamond',
+          gold:'🥇 Gold', silver:'🥈 Silver', common:'Common'
+        };
 
-        const rarityLabels = { legendary:'🌈 Legendary', diamond:'💎 Diamond', gold:'🥇 Gold', silver:'🥈 Silver', common:'Common' };
+        // Build HTML and insert using insertAdjacentHTML before first child
         let html = '';
         ['legendary','diamond','gold','silver','common'].forEach(r => {
           if (!byRarity[r]) return;
-          html += '<optgroup label="' + escapeHtml(rarityLabels[r]||r) + '">';
+          html += '<optgroup label="' + escapeHtml(rarityLabels[r]||r) + '" class="custom-reward-group">';
           byRarity[r].forEach(t => {
             const icon = t.iconType === 'url' ? '🖼️' : (t.icon||'🏆');
-            const val = t.id + '|' + t.rarity + '|' + icon + ' ' + t.title + '|' + (t.description||'');
-            html += '<option value="' + escapeHtml(val) + '">' + icon + ' ' + escapeHtml(t.title) + ' (' + (t.xp||0) + ' XP)</option>';
+            const val = t.id + '|' + (t.rarity||'gold') + '|' + icon + ' ' + t.title + '|' + (t.description||'');
+            html += '<option value="' + escapeHtml(val) + '">'
+              + icon + ' ' + escapeHtml(t.title) + ' (' + (t.xp||0) + ' XP)</option>';
           });
           html += '</optgroup>';
         });
 
-        const customGroup = document.createElement('optgroup');
-        customGroup.label = '⚙️ Egendefinerte rewards';
-        customGroup.innerHTML = html.replace(/<optgroup[^>]*>|<\/optgroup>/g,'');
+        if (html) {
+          // Insert at the very top of the select, before the placeholder option
+          sel.children[0].insertAdjacentHTML('afterend', html);
+        }
       } catch(e) { console.warn('Could not load reward types for grant select', e); }
     }
 

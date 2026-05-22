@@ -575,7 +575,9 @@ function renderMatchSection(match) {
   const matchUids = (window._coachMatchUids||{})[mid] || allowedUids || [];
   const stageDefs  = getStageDefs(match);
   const allShooters = getMatchShooters(match);
-  const myShooters  = allShooters.filter(s => matchUids.includes(String(s.uid)));
+  // Show ALL shooters in match — manually added ones won't be in matchUids
+  // but should still be visible to coach
+  const myShooters = allShooters;
 
   const shotCounts = myShooters.map(s => {
     const sh = (match.shooters||[]).find(x => String(x.id)===s.uid);
@@ -592,8 +594,27 @@ function renderMatchSection(match) {
     ? myShooters.map(s => renderCard(s, match, stageDefs, rankMap)).join('')
     : `<div class="loading-msg" style="padding:30px;font-size:13px;">Ingen tildelte skyttere er deltakere i denne matchen.</div>`;
 
+  // Build standings as a card (same size as shooter cards)
+  const standingsCard = `
+    <div class="scard" style="background:linear-gradient(160deg,#1c2030,#161a24);">
+      <div class="scard-head" style="border-bottom:1px solid var(--border);">
+        <div>
+          <div class="scard-name">Live Standings</div>
+          <div class="scard-sub">${escH(match.name||match.id)}</div>
+        </div>
+        <button onclick="window.toggleRefInStandings('${escA(mid)}')" id="refStandBtn-${escA(mid)}"
+          class="tog-btn on" style="font-size:10px;padding:3px 8px;flex-shrink:0;">
+          <span class="dot"></span>Ref
+        </button>
+      </div>
+      <div style="padding:10px 14px;overflow-y:auto;max-height:520px;">
+        ${standingsHtml}
+      </div>
+    </div>`;
+
   return `
     <div class="match-section" id="msec-${escA(mid)}" style="margin-bottom:28px;">
+      <!-- Match header -->
       <div style="background:linear-gradient(135deg,rgba(19,23,32,0),rgba(26,30,40,.6));border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div>
           <div style="font-size:18px;font-weight:800;">${escH(match.name||match.id)}</div>
@@ -607,18 +628,11 @@ function renderMatchSection(match) {
           <button onclick="window.openShooterModalForMatch('${escA(mid)}')" class="btn btn-primary btn-sm">+ Skytter</button>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 340px;align-items:start;">
-        <div style="padding:12px 16px;">
-          <div class="shooter-grid" style="grid-template-columns:repeat(auto-fill,minmax(360px,1fr));">
-            ${cardsHtml}
-          </div>
-        </div>
-        <div style="border-left:1px solid var(--border);padding:14px;position:sticky;top:52px;max-height:calc(100vh - 52px);overflow-y:auto;min-width:0;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Live standings</div>
-            <button onclick="window.toggleRefInStandings('${escA(mid)}')" id="refStandBtn-${escA(mid)}" class="tog-btn on" style="font-size:10px;padding:2px 7px;"><span class="dot"></span>Ref</button>
-          </div>
-          ${standingsHtml}
+      <!-- Unified grid: standings card + shooter cards -->
+      <div style="padding:12px 16px;">
+        <div class="shooter-grid" style="grid-template-columns:repeat(auto-fill,minmax(360px,1fr));">
+          ${standingsCard}
+          ${cardsHtml}
         </div>
       </div>
     </div>`;

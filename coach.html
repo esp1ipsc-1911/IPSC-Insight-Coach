@@ -695,29 +695,40 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
   }
 
   const leader = allEntries[0].pts;
-  return '<table class="standings-table">' +
-    '<thead><tr>' +
-    '<th style="width:24px;padding-left:6px;">#</th>' +
-    '<th style="padding-left:6px;">Navn</th>' +
-    '<th style="text-align:right;min-width:54px;">Pts</th>' +
-    '<th style="text-align:right;min-width:46px;">%</th>' +
-    '</tr></thead><tbody>' +
-    allEntries.map((t, i) => {
-      const mine   = myUids.has(t.uid);
-      const pct    = leader > 0 ? (t.pts/leader*100).toFixed(1) : '0.0';
-      const ptsStr = t.pts > 0  ? t.pts.toFixed(1) : '—';
-      const rankColor = mine ? 'color:var(--accent);' : t.isRef ? 'color:var(--blue);' : '';
-      const pctColor  = mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--muted)';
-      return '<tr class="' + (mine?'me ':'') + (t.isRef?'ref-row':'') + '">' +
-        '<td style="font-weight:800;' + rankColor + '">' + (i+1) + '</td>' +
-        '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:' + (mine?'700':'400') + ';">' +
-          escH(t.name) + (t.isRef ? '<span class="ref-badge">REF</span>' : '') +
-        '</td>' +
-        '<td style="text-align:right;font-variant-numeric:tabular-nums;">' + ptsStr + '</td>' +
-        '<td style="text-align:right;color:' + pctColor + ';">' + pct + '%</td>' +
-        '</tr>';
-    }).join('') +
-    '</tbody></table>';
+  // Render as simple rows — no table, avoids column misalignment issues
+  const rows = allEntries.map((t, i) => {
+    const mine     = myUids.has(t.uid);
+    const pct      = leader > 0 ? (t.pts/leader*100).toFixed(1) : '0.0';
+    const ptsStr   = t.pts > 0  ? t.pts.toFixed(1) : '—';
+    const rankClr  = mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--muted)';
+    const nameClr  = mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--text)';
+    const nameFW   = mine || t.isRef ? '700' : '400';
+    const rowBg    = mine ? 'rgba(232,184,75,.06)' : 'transparent';
+    return '<div style="display:grid;grid-template-columns:28px 1fr auto auto;gap:4px;' +
+      'align-items:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.04);' +
+      'background:' + rowBg + ';">' +
+      '<div style="font-weight:800;font-size:12px;color:' + rankClr + ';text-align:center;">' + (i+1) + '</div>' +
+      '<div style="font-size:12px;font-weight:' + nameFW + ';color:' + nameClr + ';' +
+        'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">' +
+        escH(t.name) + (t.isRef ? '<span class="ref-badge">REF</span>' : '') +
+      '</div>' +
+      '<div style="font-size:12px;font-variant-numeric:tabular-nums;color:var(--text);' +
+        'text-align:right;padding-left:6px;white-space:nowrap;">' + ptsStr + '</div>' +
+      '<div style="font-size:12px;color:' + rankClr + ';' +
+        'text-align:right;padding-left:6px;white-space:nowrap;min-width:42px;">' + pct + '%</div>' +
+      '</div>';
+  }).join('');
+
+  // Header row
+  const header = '<div style="display:grid;grid-template-columns:28px 1fr auto auto;gap:4px;' +
+    'padding:4px 4px 6px;border-bottom:1px solid var(--border);margin-bottom:2px;">' +
+    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:center;">#</div>' +
+    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Navn</div>' +
+    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:right;padding-left:6px;">Pts</div>' +
+    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:right;padding-left:6px;min-width:42px;">%</div>' +
+    '</div>';
+
+  return '<div style="font-size:12px;">' + header + rows + '</div>';
 }
 
 window.toggleRefInStandings = (mid) => {

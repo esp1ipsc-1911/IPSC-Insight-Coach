@@ -471,6 +471,16 @@
       max-width: 340px;
       width: 100%;
     }
+    .emoji-pick-btn:hover { border-color: var(--accent) !important; }
+    .emoji-pick-btn.selected { border-color: var(--accent) !important; background: rgba(232,184,75,.15) !important; }
+    .reward-type-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+    .reward-type-icon { font-size: 32px; min-width: 44px; text-align: center; }
+    .reward-type-icon img { width: 36px; height: 36px; object-fit: contain; border-radius: 6px; }
+    .rarity-common { color: #9ca3af; }
+    .rarity-silver { color: #c0c0c0; }
+    .rarity-gold { color: var(--accent); }
+    .rarity-diamond { color: #60d0ff; }
+    .rarity-legendary { color: #ff6b9d; }
 
     .login-wrap {
       min-height: calc(100vh - 120px);
@@ -731,6 +741,15 @@
 
   <!-- REWARDS PANEL -->
   <div id="rewardsPanel" class="panel">
+
+    <!-- Two tabs inside rewards panel -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+      <button class="btn btn-secondary" id="rwTabManualBtn" onclick="window.showRwTab('manual')" style="font-size:13px;">👤 Tildel manuelt</button>
+      <button class="btn btn-ghost" id="rwTabTypesBtn" onclick="window.showRwTab('types')" style="font-size:13px;">🏆 Administrer reward-typer</button>
+    </div>
+
+    <!-- TAB 1: Manual grant -->
+    <div id="rwTabManual">
     <div class="section-title">🏆 Rewards — Manuell tildeling</div>
 
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end;">
@@ -831,6 +850,115 @@
           <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Eksisterende rewards</div>
           <div id="rewardsExistingList">Laster...</div>
         </div>
+      </div>
+    </div>
+    </div><!-- end rwTabManual -->
+
+    <!-- TAB 2: Reward types management -->
+    <div id="rwTabTypes" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:0;">🏆 Reward-typer</div>
+        <button class="btn btn-primary btn-sm" onclick="window.openRewardTypeModal()">+ Ny reward</button>
+      </div>
+      <div id="rewardTypesList">
+        <div class="loading">Laster reward-typer…</div>
+      </div>
+    </div><!-- end rwTabTypes -->
+
+  </div>
+
+  <!-- Reward type modal -->
+  <div id="rewardTypeModal" class="modal">
+    <div class="modal-content" style="max-width:560px;">
+      <div class="modal-title" id="rewardTypeModalTitle">Ny reward-type</div>
+      <div id="rewardTypeError" class="error" style="display:none;"></div>
+      <div id="rewardTypeSuccess" class="success" style="display:none;"></div>
+
+      <!-- Icon -->
+      <div class="form-group">
+        <label class="form-label">Ikon</label>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;max-width:320px;" id="rewardEmojiPicker">
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🏆&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🏆</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🥇&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🥇</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🥈&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🥈</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🥉&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🥉</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🎯&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🎯</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;⚡&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">⚡</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🔥&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🔥</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;💎&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">💎</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🌟&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🌟</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;⭐&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">⭐</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🎪&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🎪</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;📈&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">📈</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🏅&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🏅</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🎖️&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🎖️</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;👑&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">👑</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🦁&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🦁</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🦅&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🦅</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🚀&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🚀</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;💪&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">💪</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🎉&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🎉</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🌈&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🌈</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🔮&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🔮</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🗡️&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🗡️</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🛡️&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🛡️</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🍌&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🍌</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🦆&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🦆</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🦯&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🦯</button>
+            <button type="button" class="emoji-pick-btn" onclick="window.selectEmoji(this,&quot;🇳🇴&quot;)" style="font-size:22px;background:var(--bg3);border:2px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;transition:border-color .12s;">🇳🇴</button>
+          </div>
+          <div style="color:var(--muted);font-size:12px;">— eller —</div>
+          <div style="flex:1;min-width:180px;">
+            <input id="rewardIconUrl" class="form-input" type="url" placeholder="https://... (bilde-URL)" />
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Lim inn URL til bilde (PNG, SVG, JPG)</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+          <div id="rewardIconPreview" style="font-size:36px;min-width:44px;text-align:center;">🏆</div>
+          <input id="rewardIconValue" class="form-input" type="hidden" value="🏆" />
+          <div style="font-size:12px;color:var(--muted);">Forhåndsvisning</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Tittel</label>
+          <input id="rewardTypeTitle" class="form-input" type="text" placeholder="F.eks. Match Winner" />
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Beskrivelse</label>
+          <input id="rewardTypeDesc" class="form-input" type="text" placeholder="F.eks. Vinn en match" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Raritet</label>
+          <select id="rewardTypeRarity" class="form-select">
+            <option value="common">Common</option>
+            <option value="silver">Silver</option>
+            <option value="gold">Gold</option>
+            <option value="diamond">Diamond</option>
+            <option value="legendary">Legendary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">XP-verdi</label>
+          <input id="rewardTypeXP" class="form-input" type="number" min="0" value="100" placeholder="100" />
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Reward-ID (unik nøkkel)</label>
+          <input id="rewardTypeId" class="form-input" type="text" placeholder="f.eks. match_winner_gold" />
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">Kun bokstaver, tall og understrek. Kan ikke endres etter oppretting.</div>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" id="rewardTypeActive" checked style="width:16px;height:16px;accent-color:var(--accent);">
+          <label for="rewardTypeActive" style="font-size:13px;cursor:pointer;">Aktiv (kan tildeles)</label>
+        </div>
+      </div>
+
+      <input type="hidden" id="rewardTypeEditId" value="" />
+      <div class="form-actions">
+        <button id="saveRewardTypeBtn" class="btn btn-primary">Lagre</button>
+        <button id="cancelRewardTypeBtn" class="btn btn-secondary">Avbryt</button>
       </div>
     </div>
   </div>
@@ -2951,6 +3079,249 @@
     }
 
     // ══ END COACH ACCESS MODULE ═══════════════════════════════════════════
+
+    // ══ REWARD TYPES MODULE ════════════════════════════════════════════════
+
+    window.showRwTab = (tab) => {
+      $('rwTabManual').style.display  = tab === 'manual' ? '' : 'none';
+      $('rwTabTypes').style.display   = tab === 'types'  ? '' : 'none';
+      $('rwTabManualBtn').className   = tab === 'manual' ? 'btn btn-secondary' : 'btn btn-ghost';
+      $('rwTabTypesBtn').className    = tab === 'types'  ? 'btn btn-secondary' : 'btn btn-ghost';
+      if (tab === 'types') loadRewardTypes();
+    };
+
+    // ── Load and render reward types ──────────────────────────────────────
+    async function loadRewardTypes() {
+      const listEl = $('rewardTypesList');
+      listEl.innerHTML = '<div class="loading">Laster…</div>';
+      try {
+        const snap = await getDocs(collection(db, 'rewardTypes'));
+        const types = [];
+        snap.forEach(d => types.push({ id: d.id, ...d.data() }));
+        types.sort((a, b) => (a.title||'').localeCompare(b.title||'', 'no'));
+
+        if (!types.length) {
+          listEl.innerHTML = '<div class="empty-state" style="padding:24px;text-align:center;"><p>Ingen reward-typer ennå. Klikk «+ Ny reward» for å opprette.</p></div>';
+          return;
+        }
+
+        const rarityOrder = { legendary:0, diamond:1, gold:2, silver:3, common:4 };
+        types.sort((a,b) => (rarityOrder[a.rarity]||99) - (rarityOrder[b.rarity]||99));
+
+        listEl.innerHTML = types.map(r => {
+          const iconHtml = r.iconType === 'url' && r.icon
+            ? '<img src="' + escapeHtml(r.icon) + '" alt="" />'
+            : '<span>' + escapeHtml(r.icon||'🏆') + '</span>';
+          const rarityClass = 'rarity-' + (r.rarity||'common');
+          const activeTag = r.active === false
+            ? '<span style="font-size:10px;background:rgba(224,82,82,.15);color:var(--red);border-radius:4px;padding:1px 5px;border:1px solid rgba(224,82,82,.2);">Inaktiv</span>'
+            : '<span style="font-size:10px;background:rgba(76,175,125,.15);color:var(--green);border-radius:4px;padding:1px 5px;border:1px solid rgba(76,175,125,.2);">Aktiv</span>';
+          return '<div class="reward-type-card">' +
+            '<div class="reward-type-icon">' + iconHtml + '</div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                '<span style="font-weight:700;font-size:14px;">' + escapeHtml(r.title||r.id) + '</span>' +
+                '<span class="' + rarityClass + '" style="font-size:11px;font-weight:700;text-transform:uppercase;">' + escapeHtml(r.rarity||'common') + '</span>' +
+                activeTag +
+              '</div>' +
+              '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' + escapeHtml(r.description||'') + '</div>' +
+              '<div style="font-size:11px;color:var(--accent);margin-top:3px;">' + (r.xp||0) + ' XP · ID: ' + escapeHtml(r.id) + '</div>' +
+            '</div>' +
+            '<div style="display:flex;gap:5px;flex-shrink:0;">' +
+              '<button class="btn btn-sm btn-ghost" onclick="window.openRewardTypeModal(' + JSON.stringify(r.id) + ')">Rediger</button>' +
+              '<button class="btn btn-sm btn-danger" onclick="window.deleteRewardType(' + JSON.stringify(r.id) + ')">Slett</button>' +
+            '</div>' +
+            '</div>';
+        }).join('');
+      } catch(e) {
+        listEl.innerHTML = '<div class="error">Feil: ' + escapeHtml(e.message) + '</div>';
+      }
+    }
+
+    // ── Open modal ────────────────────────────────────────────────────────
+    window.openRewardTypeModal = async (id) => {
+      $('rewardTypeError').style.display   = 'none';
+      $('rewardTypeSuccess').style.display = 'none';
+      $('rewardTypeEditId').value = '';
+      // Reset form
+      $('rewardTypeTitle').value  = '';
+      $('rewardTypeDesc').value   = '';
+      $('rewardTypeRarity').value = 'gold';
+      $('rewardTypeXP').value     = '100';
+      $('rewardTypeId').value     = '';
+      $('rewardTypeId').disabled  = false;
+      $('rewardIconUrl').value    = '';
+      $('rewardIconValue').value  = '🏆';
+      $('rewardIconPreview').textContent = '🏆';
+      $('rewardTypeActive').checked = true;
+      document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelector('.emoji-pick-btn') && document.querySelector('.emoji-pick-btn').classList.add('selected');
+      $('rewardTypeModalTitle').textContent = 'Ny reward-type';
+
+      if (id) {
+        try {
+          const snap = await getDoc(doc(db, 'rewardTypes', id));
+          if (snap.exists()) {
+            const r = { id: snap.id, ...snap.data() };
+            $('rewardTypeModalTitle').textContent = 'Rediger reward-type';
+            $('rewardTypeEditId').value  = r.id;
+            $('rewardTypeId').value      = r.id;
+            $('rewardTypeId').disabled   = true; // can't change id
+            $('rewardTypeTitle').value   = r.title  || '';
+            $('rewardTypeDesc').value    = r.description || '';
+            $('rewardTypeRarity').value  = r.rarity || 'gold';
+            $('rewardTypeXP').value      = r.xp     || 100;
+            $('rewardTypeActive').checked = r.active !== false;
+            if (r.iconType === 'url') {
+              $('rewardIconUrl').value   = r.icon || '';
+              $('rewardIconValue').value = r.icon || '';
+              $('rewardIconPreview').innerHTML = '<img src="' + escapeHtml(r.icon||'') + '" style="width:36px;height:36px;object-fit:contain;border-radius:6px;" />';
+            } else {
+              $('rewardIconValue').value = r.icon || '🏆';
+              $('rewardIconPreview').textContent = r.icon || '🏆';
+              document.querySelectorAll('.emoji-pick-btn').forEach(b => {
+                b.classList.toggle('selected', b.textContent === r.icon);
+              });
+            }
+          }
+        } catch(e) { console.warn('Could not load reward type', e); }
+      }
+      $('rewardTypeModal').classList.add('open');
+    };
+
+    // ── Emoji picker ──────────────────────────────────────────────────────
+    window.selectEmoji = (btn, emoji) => {
+      document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      $('rewardIconValue').value     = emoji;
+      $('rewardIconPreview').textContent = emoji;
+      $('rewardIconPreview').innerHTML   = emoji;
+      $('rewardIconUrl').value       = ''; // clear URL if emoji selected
+    };
+
+    $('rewardIconUrl').addEventListener('input', function() {
+      const url = this.value.trim();
+      if (url) {
+        $('rewardIconValue').value = url;
+        $('rewardIconPreview').innerHTML = '<img src="' + escapeHtml(url) + '" style="width:36px;height:36px;object-fit:contain;border-radius:6px;" onerror="this.style.display=\'none\'" />';
+        document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+      }
+    });
+
+    // Auto-generate ID from title
+    $('rewardTypeTitle').addEventListener('input', function() {
+      if (!$('rewardTypeEditId').value) {
+        $('rewardTypeId').value = this.value.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, '_')
+          .slice(0, 40);
+      }
+    });
+
+    // ── Save reward type ──────────────────────────────────────────────────
+    $('saveRewardTypeBtn').onclick = async () => {
+      const editId  = $('rewardTypeEditId').value;
+      const id      = $('rewardTypeId').value.trim().replace(/[^a-z0-9_]/g, '');
+      const title   = $('rewardTypeTitle').value.trim();
+      const desc    = $('rewardTypeDesc').value.trim();
+      const rarity  = $('rewardTypeRarity').value;
+      const xp      = parseInt($('rewardTypeXP').value) || 0;
+      const active  = $('rewardTypeActive').checked;
+      const iconVal = $('rewardIconValue').value;
+      const iconUrl = $('rewardIconUrl').value.trim();
+      const iconType = iconUrl ? 'url' : 'emoji';
+      const icon    = iconUrl || iconVal || '🏆';
+
+      $('rewardTypeError').style.display = 'none';
+      if (!id)    { $('rewardTypeError').textContent='ID er påkrevd'; $('rewardTypeError').style.display='block'; return; }
+      if (!title) { $('rewardTypeError').textContent='Tittel er påkrevd'; $('rewardTypeError').style.display='block'; return; }
+
+      const docId = editId || id;
+      const payload = { title, description: desc, rarity, xp, active, icon, iconType, updatedAt: new Date().toISOString() };
+      if (!editId) payload.createdAt = new Date().toISOString();
+
+      try {
+        await setDoc(doc(db, 'rewardTypes', docId), payload, { merge: !!editId });
+        $('rewardTypeSuccess').textContent = editId ? '✓ Reward oppdatert!' : '✓ Reward opprettet!';
+        $('rewardTypeSuccess').style.display = 'block';
+        setTimeout(() => {
+          $('rewardTypeModal').classList.remove('open');
+          $('rewardTypeSuccess').style.display = 'none';
+          loadRewardTypes();
+          loadRewardTypesIntoGrantSelect();
+        }, 1200);
+      } catch(e) {
+        $('rewardTypeError').textContent = 'Feil: ' + e.message;
+        $('rewardTypeError').style.display = 'block';
+      }
+    };
+
+    $('cancelRewardTypeBtn').onclick = () => $('rewardTypeModal').classList.remove('open');
+    $('rewardTypeModal').addEventListener('click', e => {
+      if (e.target === $('rewardTypeModal')) $('rewardTypeModal').classList.remove('open');
+    });
+
+    // ── Delete reward type ────────────────────────────────────────────────
+    window.deleteRewardType = async (id) => {
+      if (!confirm('Slette reward-typen "' + id + '"? Dette kan ikke angres.')) return;
+      try {
+        await deleteDoc(doc(db, 'rewardTypes', id));
+        await loadRewardTypes();
+        await loadRewardTypesIntoGrantSelect();
+      } catch(e) { alert('Feil: ' + e.message); }
+    };
+
+    // ── Load reward types into the grant select ───────────────────────────
+    async function loadRewardTypesIntoGrantSelect() {
+      try {
+        const snap = await getDocs(collection(db, 'rewardTypes'));
+        const types = [];
+        snap.forEach(d => types.push({ id: d.id, ...d.data() }));
+        const activeTypes = types.filter(r => r.active !== false);
+        if (!activeTypes.length) return;
+
+        // Group by rarity
+        const byRarity = {};
+        activeTypes.forEach(r => {
+          const g = r.rarity || 'common';
+          if (!byRarity[g]) byRarity[g] = [];
+          byRarity[g].push(r);
+        });
+
+        // Build new optgroup for custom rewards at top of select
+        const sel = $('rewardsGrantSelect');
+        // Remove existing custom optgroup if present
+        const existingCustom = sel.querySelector('optgroup[label="⚙️ Egendefinerte rewards"]');
+        if (existingCustom) existingCustom.remove();
+
+        const rarityLabels = { legendary:'🌈 Legendary', diamond:'💎 Diamond', gold:'🥇 Gold', silver:'🥈 Silver', common:'Common' };
+        let html = '';
+        ['legendary','diamond','gold','silver','common'].forEach(r => {
+          if (!byRarity[r]) return;
+          html += '<optgroup label="' + escapeHtml(rarityLabels[r]||r) + '">';
+          byRarity[r].forEach(t => {
+            const icon = t.iconType === 'url' ? '🖼️' : (t.icon||'🏆');
+            const val = t.id + '|' + t.rarity + '|' + icon + ' ' + t.title + '|' + (t.description||'');
+            html += '<option value="' + escapeHtml(val) + '">' + icon + ' ' + escapeHtml(t.title) + '</option>';
+          });
+          html += '</optgroup>';
+        });
+
+        const customGroup = document.createElement('optgroup');
+        customGroup.label = '⚙️ Egendefinerte rewards';
+        customGroup.innerHTML = byRarity['legendary'] || byRarity['diamond'] || byRarity['gold'] || byRarity['silver'] || byRarity['common']
+          ? html.replace(/<optgroup[^>]*>|<\/optgroup>/g,'') : '';
+        sel.insertBefore(customGroup, sel.firstChild);
+      } catch(e) { console.warn('Could not load reward types for grant select', e); }
+    }
+
+    // Load custom reward types on rewards tab activation
+    tabRewardsBtn.onclick = () => {
+      setTab('rewards');
+      loadRewardTypesIntoGrantSelect();
+    };
+
+    // ══ END REWARD TYPES MODULE ══════════════════════════════════════════
 
     function escapeHtml(value) {
       return String(value ?? '')

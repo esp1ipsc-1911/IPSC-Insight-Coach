@@ -125,7 +125,7 @@ e.innerHTML=`
  <a href="#" class="gdpr-link" id="gdpr-open-modal">${dt==="no"?"personvernerklæringen":"the Privacy Policy"}</a>
  </span>
  </label>
- `,setTimeout(()=>{const i=e.querySelector("#gdpr-open-modal");i&&i.addEventListener("click",t=>{t.preventDefault(),At(()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!0)},()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!1)})})},0),e}function Dt(){const e=document.getElementById("gdpr-consent-checkbox");return!e||!e.checked?{valid:!1,error:dt==="no"?"You must accept the Privacy Policy to create an account":"You must accept the Privacy Policy to create an account"}:{valid:!0}}function Bt(e,i){e.innerHTML=`
+ `,setTimeout(()=>{const i=e.querySelector("#gdpr-open-modal");i&&i.addEventListener("click",t=>{t.preventDefault(),At(()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!0)},()=>{const s=document.getElementById("gdpr-consent-checkbox");s&&(s.checked=!1)})})},0);return e}function Dt(){const e=document.getElementById("gdpr-consent-checkbox");return!e||!e.checked?{valid:!1,error:dt==="no"?"You must accept the Privacy Policy to create an account":"You must accept the Privacy Policy to create an account"}:{valid:!0}}function Bt(e,i){e.innerHTML=`
 <style>
  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  :root {

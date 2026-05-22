@@ -409,6 +409,7 @@ let refVisible       = true;
 let refInStandings   = true;    // show ref shooters in standings
 let resultTarget     = null;    // { shooterUid, shooterName, matchId }
 let shooterEditId    = null;    // id of shooter being edited
+let minimisedCards   = new Set(); // set of uids whose cards are minimised
 
 const $ = id => document.getElementById(id);
 
@@ -770,7 +771,7 @@ function renderCard(s, match, stageDefs, rankMap) {
   ).join('');
 
   return `
-    <div class="scard" id="card-${escA(uid)}">
+    <div class="scard" id="card-${escA(uid)}" style="${minimisedCards.has(uid)?'opacity:0.65;':''}">
       <div class="scard-head">
         <div>
           <div class="scard-name">${escH(name)}</div>
@@ -780,13 +781,22 @@ function renderCard(s, match, stageDefs, rankMap) {
             <span class="badge badge-pf-${pf==='major'?'major':'minor'}">${pf.toUpperCase()}</span>
           </div>
         </div>
-        <div class="scard-rank">
-          <div class="scard-rank-num">${rank}</div>
-          <div class="scard-rank-lbl">Rang</div>
-          <div style="font-size:11px;color:${delta===0&&done.length>0?'var(--green)':delta<0?'var(--red)':'var(--muted)'};font-weight:700;margin-top:2px;">${escH(deltaStr)}</div>
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <div class="scard-rank">
+            <div class="scard-rank-num">${rank}</div>
+            <div class="scard-rank-lbl">Rang</div>
+            <div style="font-size:11px;color:${delta===0&&done.length>0?'var(--green)':delta<0?'var(--red)':'var(--muted)'};font-weight:700;margin-top:2px;">${escH(deltaStr)}</div>
+          </div>
+          <button class="eye-btn btn btn-ghost btn-sm"
+            style="padding:4px 6px;margin-top:2px;"
+            title="${minimisedCards.has(uid)?'Vis skytter':'Skjul skytter'}"
+            onclick="window.toggleMinimise('${escA(uid)}')">
+            ${eyeIcon(!minimisedCards.has(uid))}
+          </button>
         </div>
       </div>
 
+      <div class="card-body" style="${minimisedCards.has(uid)?'display:none;':''}">
       <div class="stats-row">
         <div class="stat-cell">
           <div class="stat-val">${avgHF>0?avgHF.toFixed(2):'—'}</div>
@@ -871,6 +881,7 @@ function renderCard(s, match, stageDefs, rankMap) {
           + Legg til resultat
         </button>
       </div>
+      </div><!-- end card-body -->
     </div>`;
 }
 
@@ -977,6 +988,37 @@ function buildRefRows(uid, pf, div, shooterAvgHF, shooter, stageDefs) {
         <span class="${delta>=0?'ref-delta-pos':'ref-delta-neg'}">${sign}${delta.toFixed(2)}</span>
       </div>`;
   }).join('');
+}
+
+// ── Toggle card minimise ─────────────────────────────
+window.toggleMinimise = (uid) => {
+  if (minimisedCards.has(uid)) {
+    minimisedCards.delete(uid);
+  } else {
+    minimisedCards.add(uid);
+  }
+  // Re-render just this card's body
+  const card = document.getElementById('card-' + uid);
+  if (!card) return;
+  const body = card.querySelector('.card-body');
+  const eyeBtn = card.querySelector('.eye-btn');
+  if (minimisedCards.has(uid)) {
+    if (body) body.style.display = 'none';
+    if (eyeBtn) eyeBtn.title = 'Vis skytter';
+    if (eyeBtn) eyeBtn.innerHTML = eyeIcon(false);
+    card.style.opacity = '0.6';
+  } else {
+    if (body) body.style.display = '';
+    if (eyeBtn) eyeBtn.title = 'Skjul skytter';
+    if (eyeBtn) eyeBtn.innerHTML = eyeIcon(true);
+    card.style.opacity = '1';
+  }
+};
+
+function eyeIcon(open) {
+  return open
+    ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
 }
 
 // ── Toggle ref per card ───────────────────────────────
@@ -1119,33 +1161,23 @@ function coachTip(aPct, avgHF, doneCount) {
 // ── Match totals (standings) — stage-normalised scoring (IPSC method) ──
 // Uses same method as appen: for each stage, best HF = 100%, others get proportional pts
 function calcMatchTotals(match, stageDefs) {
+  // Only use match.shooters[] as source — it is THE authoritative list.
+  // participants[] is only for access control, not for scoring.
+  // sh.id is the canonical identifier for each shooter.
+  const allMatchShooters = match.shooters || [];
   const totals = {};
 
-  // Include ALL shooters: both isMe and non-isMe, plus participants
-  const allMatchShooters = (match.shooters||[]);  // do NOT filter isMe here
-  const shooterIds = new Set();
-
   allMatchShooters.forEach(sh => {
-    const uid = String(sh.id);
-    shooterIds.add(uid);
+    const uid  = String(sh.id);
     const name = [sh.firstName, sh.lastName].filter(Boolean).join(' ') || _userCache[uid]?.name || uid;
-    totals[uid] = { uid, name, stagePts: 0, rawPts: 0, pf: (sh.pf||sh.powerFactor||'minor').toLowerCase() };
+    totals[uid] = { uid, name, stagePts: 0, rawPts: 0 };
   });
 
-  // Participants not in shooters[]
-  (match.participants||[]).map(String).forEach(uid => {
-    if (shooterIds.has(uid)) return;
-    shooterIds.add(uid);
-    const cached = _userCache[uid];
-    totals[uid] = { uid, name: cached?.name || uid, stagePts: 0, rawPts: 0, pf: 'minor' };
-  });
-
-  // For each stage: find best HF, then give each shooter proportional stage pts
+  // For each stage: normalise scores so best HF = stage max pts
   stageDefs.forEach(sd => {
     const stageNum = Number(sd.number);
-    const maxPts = stageMaxPts(sd);
+    const maxPts   = stageMaxPts(sd);
 
-    // Collect all results for this stage
     const stageResults = [];
     allMatchShooters.forEach(sh => {
       const uid = String(sh.id);
@@ -1153,7 +1185,7 @@ function calcMatchTotals(match, stageDefs) {
       if (!st) return;
       const pf  = (sh.pf||sh.powerFactor||'minor').toLowerCase();
       const pts = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
-      const hf  = st.time>0 ? pts/st.time : 0;
+      const hf  = st.time > 0 ? pts / st.time : 0;
       stageResults.push({ uid, hf, pts });
     });
 
@@ -1163,15 +1195,14 @@ function calcMatchTotals(match, stageDefs) {
 
     stageResults.forEach(r => {
       if (!totals[r.uid]) return;
-      const stagePts = (r.hf / bestHF) * maxPts;
-      totals[r.uid].stagePts += stagePts;
+      totals[r.uid].stagePts += (r.hf / bestHF) * maxPts;
       totals[r.uid].rawPts  += r.pts;
     });
   });
 
   return Object.values(totals)
     .map(t => ({ ...t, pts: t.stagePts }))
-    .sort((a,b) => b.pts - a.pts);
+    .sort((a, b) => b.pts - a.pts);
 }
 
 // ── Get all match shooters (participants + shooters[]) ─

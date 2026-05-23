@@ -450,8 +450,15 @@ function loadSgCollapsed() {
 function saveSgCollapsed() {
   try { localStorage.setItem('ipsc_sg_collapsed', JSON.stringify(sgCollapsed)); } catch {}
 }
-loadCardVisibility();
-loadSgCollapsed();
+// Per-match: merge refs into standings table (true = merged, false = separate section)
+let refMergeStandings = {};  // mid -> bool
+function loadRefMerge() {
+  try { refMergeStandings = JSON.parse(localStorage.getItem('ipsc_ref_merge') || '{}'); } catch { refMergeStandings = {}; }
+}
+function saveRefMerge() {
+  try { localStorage.setItem('ipsc_ref_merge', JSON.stringify(refMergeStandings)); } catch {}
+}
+loadRefMerge();
 
 const $ = id => document.getElementById(id);
 
@@ -636,6 +643,7 @@ function renderMatchSection(match) {
     : `<div class="loading-msg" style="padding:30px;font-size:13px;">Ingen tildelte skyttere er deltakere i denne matchen.</div>`;
 
   // Build standings as a card (same size as shooter cards)
+  const refMerged = refMergeStandings[mid] !== false; // default ON
   const standingsCard = `
     <div class="scard" style="background:linear-gradient(160deg,#1c2030,#161a24);">
       <div class="scard-head" style="border-bottom:1px solid var(--border);">
@@ -643,10 +651,17 @@ function renderMatchSection(match) {
           <div class="scard-name">Live Standings</div>
           <div class="scard-sub">${escH(match.name||match.id)}</div>
         </div>
-        <button onclick="window.toggleRefInStandings('${escA(mid)}')" id="refStandBtn-${escA(mid)}"
-          class="tog-btn ${(window._refInStandings||{})[mid]!==false?'on':''}" style="font-size:10px;padding:3px 8px;flex-shrink:0;">
-          <span class="dot"></span>Ref
-        </button>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0;">
+          <button onclick="window.toggleRefMerge('${escA(mid)}')" id="refMergeBtn-${escA(mid)}"
+            class="tog-btn ${refMerged?'on':''}" style="font-size:10px;padding:3px 8px;"
+            title="Bland referanser inn i tabellen">
+            <span class="dot"></span>Mix
+          </button>
+          <button onclick="window.toggleRefInStandings('${escA(mid)}')" id="refStandBtn-${escA(mid)}"
+            class="tog-btn ${(window._refInStandings||{})[mid]!==false?'on':''}" style="font-size:10px;padding:3px 8px;">
+            <span class="dot"></span>Ref
+          </button>
+        </div>
       </div>
       <div style="padding:10px 14px;overflow-y:auto;max-height:520px;">
         ${standingsHtml}
@@ -852,6 +867,62 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
 
   if (!felt1.length && !felt2.length && !felt3.length) {
     return '<div style="color:var(--muted);font-size:12px;padding:8px 0;">Ingen resultater ennå.</div>';
+  }
+
+  // Mix mode: merge felt3 refs into felt1/felt2 and rank together
+  const mergeRefs = refMergeStandings[mid] !== false;
+
+  if (mergeRefs && felt3.length && (felt1.length || felt2.length)) {
+    // Build one merged sorted list
+    const allMerged = [...felt1, ...felt2, ...felt3].sort((a,b) => b.pts - a.pts);
+    const allActiveM = allMerged.filter(e => !e.disabled);
+    const leaderM = allActiveM[0]?.pts || 0;
+    let rankCounterM = 0;
+    const rankMapM = {};
+    allActiveM.forEach(e => { if (!e.isRef) rankMapM[e.uid] = ++rankCounterM; });
+
+    function renderMergedRow(t) {
+      const mine    = myUids.has(t.uid);
+      const pct     = (!t.disabled && leaderM > 0) ? (t.pts/leaderM*100).toFixed(1) : '—';
+      const ptsStr  = (!t.disabled && t.pts > 0)   ? t.pts.toFixed(1) : '—';
+      const rank    = rankMapM[t.uid] || '—';
+      const rankClr = t.disabled ? 'rgba(255,255,255,.2)' : t.isRef ? 'var(--orange)' : mine ? 'var(--accent)' : 'var(--text)';
+      const nameClr = t.disabled ? 'rgba(255,255,255,.25)' : t.isRef ? 'var(--orange)' : mine ? 'var(--accent)' : 'var(--text)';
+      const nameFW  = mine || t.isRef ? '700' : '400';
+      const rowBg   = mine && !t.disabled ? 'rgba(232,184,75,.06)' : t.isRef ? 'rgba(240,112,48,.04)' : 'transparent';
+      const rowOp   = t.disabled ? 'opacity:0.35;' : '';
+      const eyeOpen = t.isRef ? !t.disabled : isCardVisible(t.uid);
+      const eyeSvg  = eyeOpen
+        ? '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>'
+        : '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+      const eyeAction = t.isRef
+        ? `window.toggleShooterDisabled('${escA(t.uid)}','${escA(mid)}')`
+        : `window.toggleCardVisible('${escA(t.uid)}','${escA(mid)}')`;
+      const refTag = t.isRef ? '<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(240,112,48,.15);color:var(--orange);border:1px solid rgba(240,112,48,.25);margin-left:4px;font-weight:700;">REF</span>' : '';
+      return '<div style="display:grid;grid-template-columns:24px 18px 1fr auto auto;gap:3px;' +
+        'align-items:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.04);' +
+        'background:' + rowBg + ';' + rowOp + '">' +
+        '<button onclick="' + eyeAction + '" style="background:none;border:none;cursor:pointer;padding:2px;color:' + (eyeOpen?'var(--muted)':'rgba(255,255,255,.2)') + ';line-height:1;">' + eyeSvg + '</button>' +
+        '<div style="font-weight:800;font-size:12px;color:' + rankClr + ';text-align:center;">' + (t.isRef ? '~' : rank) + '</div>' +
+        '<div style="font-size:12px;font-weight:' + nameFW + ';color:' + nameClr + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">' + escH(t.name) + refTag + '</div>' +
+        '<div style="font-size:12px;font-variant-numeric:tabular-nums;color:var(--text);text-align:right;padding-left:4px;white-space:nowrap;">' + ptsStr + '</div>' +
+        '<div style="font-size:12px;color:' + rankClr + ';text-align:right;padding-left:4px;white-space:nowrap;min-width:38px;">' + pct + '%</div>' +
+        '</div>';
+    }
+
+    const col2 = sgCollapsed[mid] || {};
+    const isCollapsed = col2['merged'] === true;
+    const chevron = `<svg class="sg-chevron${isCollapsed?' collapsed':''}" width="10" height="7" viewBox="0 0 11 7" fill="none">
+      <path d="M1 1l4.5 4.5L10 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+    return `<div class="sg-section">
+      <div class="sg-header" onclick="window.toggleSgGroup('${escA(mid)}','merged')">
+        <div class="sg-title group-mine">Alle skyttere<span class="sg-count">${allMerged.length}</span></div>
+        ${chevron}
+      </div>
+      <div class="sg-body${isCollapsed?' collapsed':''}">
+        ${allMerged.map(renderMergedRow).join('')}
+      </div>
+    </div>`;
   }
 
   return renderGroup('Mine skyttere', felt1, 'mine', 'group-mine') +
@@ -1137,6 +1208,31 @@ function buildHFChart(done, stageDefs, pf, div) {
 }
 
 // ── Ref rows ──────────────────────────────────────────
+// ── Estimate ref shooter stats for a given stage def ──
+function estimateRefStats(r, stageDef, shooterPf) {
+  if (!stageDef) return null;
+  const maxPts  = stageMaxPts(stageDef);
+  const ct      = maxPts <= 60 ? 'short' : maxPts <= 120 ? 'medium' : 'long';
+  const refHF   = r[ct+'HF'] || r.mediumHF || r.shortHF || r.longHF || 0;
+  if (!refHF) return null;
+
+  // Total shots = paper*2 + poppers + plates
+  const totalShots = (stageDef.paperTargets||0)*2 + (stageDef.poppers||0) + (stageDef.plates||0);
+  // Est time = maxPts / refHF  (since maxPts = all A-hits, pts = maxPts if clean)
+  const estTime = refHF > 0 ? maxPts / refHF : 0;
+  // Assume elite: all A on paper, all poppers/plates hit
+  const estA    = (stageDef.paperTargets||0)*2;
+  const estSteel = (stageDef.poppers||0) + (stageDef.plates||0);
+  // Estimated pts using shooter's PF
+  const pf = (shooterPf||'minor').toLowerCase();
+  const C   = pf==='major' ? 4 : 3;
+  const estPts = estA*5 + estSteel*5; // steel always 5pts regardless of PF
+  // Actual HF from those pts/time
+  const estHFCalc = estTime > 0 ? estPts / estTime : refHF;
+
+  return { refHF, estTime, estA, estSteel, estPts, ct, totalShots };
+}
+
 function buildRefRows(uid, pf, div, shooterAvgHF, shooter, stageDefs) {
   const refs = allRefShooters.filter(r =>
     (!r.division || r.division.toLowerCase()===(div||'').toLowerCase()) &&
@@ -1144,18 +1240,40 @@ function buildRefRows(uid, pf, div, shooterAvgHF, shooter, stageDefs) {
   ).slice(0,4);
   if (!refs.length || !shooterAvgHF) return '';
 
+  // Use a representative stage def (medium length) for estimation
+  const repStage = stageDefs.find(sd => {
+    const mp = stageMaxPts(sd);
+    return mp > 60 && mp <= 120;
+  }) || stageDefs[Math.floor(stageDefs.length/2)] || stageDefs[0];
+
   return refs.map(r => {
-    const refHF = r.mediumHF||r.shortHF||r.longHF||0;
+    const est = estimateRefStats(r, repStage, pf);
+    if (!est) return '';
+    const { refHF, estTime, estA, estSteel, estPts } = est;
     const delta = shooterAvgHF - refHF;
     const sign  = delta>=0?'+':'';
+    const col   = delta>=0?'var(--green)':'var(--red)';
+    const estAStr = estSteel > 0 ? `${estA}A+${estSteel}stl` : `${estA}A`;
     return `
-      <div class="ref-row">
-        <span class="ref-name">${escH(r.name||r.id)}</span>
-        <span class="ref-hf">${refHF.toFixed(2)} HF</span>
-        <span class="${delta>=0?'ref-delta-pos':'ref-delta-neg'}">${sign}${delta.toFixed(2)}</span>
+      <div class="ref-row" style="flex-wrap:wrap;gap:4px 8px;align-items:flex-start;">
+        <span class="ref-name" style="flex:1 1 100%;">${escH(r.name||r.id)}</span>
+        <span style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;width:100%;">
+          <span class="ref-hf">${refHF.toFixed(2)} HF</span>
+          <span style="color:var(--muted);">~${estTime.toFixed(2)}s</span>
+          <span style="color:var(--sub);">~${estPts}pts</span>
+          <span style="color:var(--sub);font-size:10px;">${estAStr}</span>
+          <span class="${delta>=0?'ref-delta-pos':'ref-delta-neg'}" style="margin-left:auto;">${sign}${delta.toFixed(2)} HF</span>
+        </span>
       </div>`;
   }).join('');
 }
+
+// ── Toggle merge-refs-into-standings ─────────────────
+window.toggleRefMerge = (mid) => {
+  refMergeStandings[mid] = refMergeStandings[mid] === false ? true : false;
+  saveRefMerge();
+  renderDash();
+};
 
 // ── Toggle card visibility (show/hide the full card) ─
 window.toggleCardVisible = (uid, mid) => {
@@ -1250,26 +1368,43 @@ window.toggleStageDetail = (uid, stageNum, isDone) => {
   // Build ref section if toggle is on
   let refSection = '';
   if (refVisible && allRefShooters.length && stageDef) {
-    const shots   = (stageDef.paperTargets||0)*2 + (stageDef.poppers||0) + (stageDef.plates||0);
     const maxPts  = stageMaxPts(stageDef);
     const ct      = maxPts <= 60 ? 'short' : maxPts <= 120 ? 'medium' : 'long';
+    const totalShots = (stageDef.paperTargets||0)*2 + (stageDef.poppers||0) + (stageDef.plates||0);
     const refRows = allRefShooters
       .filter(r => (!r.division || r.division.toLowerCase() === (shooter?.division||'').toLowerCase()) && !disabledShooters.has('ref_' + r.id))
       .slice(0,4)
       .map(r => {
-        const refHF   = r[ct+'HF'] || r.mediumHF || r.shortHF || r.longHF || 0;
-        if (!refHF) return '';
-        const expTime = shots > 0 && refHF > 0 ? (maxPts / refHF).toFixed(2) : '—';
-        const delta   = refHF > 0 ? (hf - refHF) : null;
-        const sign    = delta !== null ? (delta >= 0 ? '+' : '') : '';
-        const col     = delta !== null ? (delta >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--muted)';
-        return '<div class="sd-row">' +
-          '<span style="color:var(--blue);font-weight:700;">' + escH(r.name||r.id) + '</span>' +
-          '<span style="font-size:11px;">' +
-            '<span style="color:var(--accent);font-weight:700;">' + refHF.toFixed(2) + ' HF</span>' +
-            ' &nbsp;' + expTime + 's' +
-            (delta !== null ? ' &nbsp;<span style="color:'+col+';font-weight:700;">'+sign+delta.toFixed(2)+'</span>' : '') +
-          '</span>' +
+        const est = estimateRefStats(r, stageDef, pf);
+        if (!est) return '';
+        const { refHF, estTime, estA, estSteel, estPts } = est;
+        const delta   = hf - refHF;
+        const sign    = delta >= 0 ? '+' : '';
+        const col     = delta >= 0 ? 'var(--green)' : 'var(--red)';
+        const estAStr = estSteel > 0 ? `${estA}A + ${estSteel} stl` : `${estA}A`;
+        return '<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">' +
+            '<span style="color:var(--orange);font-weight:700;font-size:12px;">' + escH(r.name||r.id) + '</span>' +
+            '<span style="color:' + col + ';font-weight:700;font-size:11px;">' + sign + delta.toFixed(2) + ' HF</span>' +
+          '</div>' +
+          '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">' +
+            '<div style="background:var(--bg3);border-radius:6px;padding:4px 6px;text-align:center;">' +
+              '<div style="font-size:13px;font-weight:800;color:var(--accent);">' + refHF.toFixed(2) + '</div>' +
+              '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;">HF</div>' +
+            '</div>' +
+            '<div style="background:var(--bg3);border-radius:6px;padding:4px 6px;text-align:center;">' +
+              '<div style="font-size:13px;font-weight:800;">~' + estTime.toFixed(2) + '</div>' +
+              '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;">Tid (s)</div>' +
+            '</div>' +
+            '<div style="background:var(--bg3);border-radius:6px;padding:4px 6px;text-align:center;">' +
+              '<div style="font-size:13px;font-weight:800;color:var(--green);">~' + estPts + '</div>' +
+              '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;">Pts</div>' +
+            '</div>' +
+            '<div style="background:var(--bg3);border-radius:6px;padding:4px 6px;text-align:center;">' +
+              '<div style="font-size:11px;font-weight:700;color:var(--sub);">' + estAStr + '</div>' +
+              '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;">Treff</div>' +
+            '</div>' +
+          '</div>' +
         '</div>';
       }).filter(Boolean).join('');
 

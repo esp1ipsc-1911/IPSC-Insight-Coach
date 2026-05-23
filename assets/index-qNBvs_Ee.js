@@ -1752,10 +1752,14 @@ function icRenderRewards() {
         html += '</div></div>';
         return;
       }
+      var _borderCol = _col + '66';
+      html += '<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;border:1px solid '+_borderCol+';margin-bottom:8px;">';
+      html += badgeSVG(r.tier||'bronze', 36);
       html += '<div style="flex:1;min-width:0;">';
-      html += '<div style="font-size:12px;font-weight:700;color:'+_col+';">'+(r.icon||'🏅')+' '+r.name+'</div>';
-      html += '<div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;">'+(r.desc||'')+'</div>';
-      if(r.note) html += '<div style="font-size:10px;color:'+_col+';margin-top:4px;font-style:italic;">💬 '+r.note+'</div>';
+      html += '<div style="font-size:14px;font-weight:800;color:'+_col+';">'+(r.name||'')+'</div>';
+      var _tierLabel = (r.tier||'bronze').charAt(0).toUpperCase()+(r.tier||'bronze').slice(1);
+      html += '<div style="font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:0.04em;">'+_tierLabel+(r.desc?' &middot; '+r.desc:'')+'</div>';
+      if(r.note) html += '<div style="font-size:10px;color:'+_col+';margin-top:5px;font-style:italic;">💬 '+r.note+'</div>';
       html += '</div></div>';
     });
     html += '</div>';

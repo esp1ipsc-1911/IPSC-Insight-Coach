@@ -209,6 +209,24 @@
     .spill.clickable:hover{background:rgba(232,184,75,.15);border-color:rgba(232,184,75,.4);}
     .spill.active-detail{background:rgba(232,184,75,.2);border-color:rgba(232,184,75,.5);color:var(--accent);}
 
+    /* ── STANDINGS GROUPS ── */
+    .sg-section{margin-bottom:4px;}
+    .sg-header{display:flex;align-items:center;justify-content:space-between;padding:5px 4px 4px;border-bottom:1px solid var(--border);margin-bottom:2px;cursor:pointer;user-select:none;}
+    .sg-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;display:flex;align-items:center;gap:6px;}
+    .sg-title .sg-count{background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:1px 6px;font-size:9px;color:var(--muted);}
+    .sg-title.group-mine{color:var(--accent);}
+    .sg-title.group-others{color:var(--blue);}
+    .sg-title.group-refs{color:var(--orange);}
+    .sg-chevron{color:var(--muted);transition:transform .2s;flex-shrink:0;}
+    .sg-chevron.collapsed{transform:rotate(-90deg);}
+    .sg-body{overflow:hidden;}
+    .sg-body.collapsed{display:none;}
+
+    /* shooter group toggle pills in header area */
+    .group-tog{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+    .group-tog.on{border-color:rgba(74,158,255,.4);background:rgba(74,158,255,.12);color:var(--blue);}
+    .group-tog .dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+
     /* ── RESPONSIVE ── */
     @media(max-width:700px){
       .shooter-grid{grid-template-columns:1fr;}
@@ -410,8 +428,30 @@ let refVisible       = true;
 let refInStandings   = true;    // show ref shooters in standings
 let resultTarget     = null;    // { shooterUid, shooterName, matchId }
 let shooterEditId    = null;    // id of shooter being edited
-let minimisedCards   = new Set(); // set of uids whose cards are minimised
 let disabledShooters = new Set(); // uids (incl. 'ref_'+id) excluded from standings + ref comparisons
+// Per-shooter card visibility: 'on' = show full card, 'off' = hide card entirely
+// Persisted in localStorage
+let cardVisibility   = {};  // uid -> true/false
+// Collapsed state for standings groups per match
+let sgCollapsed      = {};  // mid -> { mine, others, refs }
+
+function loadCardVisibility() {
+  try { cardVisibility = JSON.parse(localStorage.getItem('ipsc_card_vis') || '{}'); } catch { cardVisibility = {}; }
+}
+function saveCardVisibility() {
+  try { localStorage.setItem('ipsc_card_vis', JSON.stringify(cardVisibility)); } catch {}
+}
+function isCardVisible(uid) {
+  return cardVisibility[uid] !== false; // default visible
+}
+function loadSgCollapsed() {
+  try { sgCollapsed = JSON.parse(localStorage.getItem('ipsc_sg_collapsed') || '{}'); } catch { sgCollapsed = {}; }
+}
+function saveSgCollapsed() {
+  try { localStorage.setItem('ipsc_sg_collapsed', JSON.stringify(sgCollapsed)); } catch {}
+}
+loadCardVisibility();
+loadSgCollapsed();
 
 const $ = id => document.getElementById(id);
 
@@ -604,7 +644,7 @@ function renderMatchSection(match) {
           <div class="scard-sub">${escH(match.name||match.id)}</div>
         </div>
         <button onclick="window.toggleRefInStandings('${escA(mid)}')" id="refStandBtn-${escA(mid)}"
-          class="tog-btn on" style="font-size:10px;padding:3px 8px;flex-shrink:0;">
+          class="tog-btn ${(window._refInStandings||{})[mid]!==false?'on':''}" style="font-size:10px;padding:3px 8px;flex-shrink:0;">
           <span class="dot"></span>Ref
         </button>
       </div>
@@ -644,36 +684,54 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
   const mid     = String(match.id);
   const showRef = (window._refInStandings||{})[mid] !== false;
 
-  // Build entries from shooterTotals (stage-normalised, from calcMatchTotals)
-  // Exclude disabled shooters from pts/% calculations but still show them (dimmed)
-  const activeUids = new Set(
-    (shooterTotals||[]).map(t => t.uid).filter(u => !disabledShooters.has(u))
-  );
+  // Collapsed state for this match
+  const col = sgCollapsed[mid] || {};
 
-  let allEntries = (shooterTotals||[]).map(t => ({
-    uid:   t.uid,
-    name:  t.name || t.uid,
-    pts:   t.pts  || 0,
-    isRef: false,
-    disabled: disabledShooters.has(t.uid)
-  })).sort((a,b) => b.pts - a.pts);
+  // ── Felt 1: Mine skyttere (alle i match.shooters[] som er tildelt coach) ──
+  // ── Felt 2: Andre i matchen (alle øvrige skyttere i match.shooters[]) ──
+  // ── Felt 3: Referanseskyttere (fra referenceShooters-samlingen) ──
 
-  // Add ref shooters if toggle is on
-  if (showRef && allRefShooters.length && allEntries.length) {
+  // Build score map from shooterTotals
+  const scoreMap = {};
+  (shooterTotals||[]).forEach(t => { scoreMap[t.uid] = t.pts || 0; });
+
+  // All real shooters in match
+  const allMatchShooters = (match.shooters||[]);
+
+  // Determine "mine" = shooters whose uid is in matchUids for this match
+  const matchUids = new Set(((window._coachMatchUids||{})[mid]||[]).map(String));
+
+  // Collect felt 1 + felt 2 from match.shooters[]
+  const felt1 = [], felt2 = [];
+  allMatchShooters.forEach(sh => {
+    const uid  = String(sh.id);
+    const name = [sh.firstName, sh.lastName].filter(Boolean).join(' ') || _userCache[uid]?.name || uid;
+    const pts  = scoreMap[uid] || 0;
+    const entry = { uid, name, pts, isRef: false, disabled: disabledShooters.has(uid) };
+    if (matchUids.has(uid) || sh.isMe) felt1.push(entry);
+    else felt2.push(entry);
+  });
+
+  // Sort each group by pts desc
+  felt1.sort((a,b) => b.pts - a.pts);
+  felt2.sort((a,b) => b.pts - a.pts);
+
+  // Felt 3: ref shooters (only if toggle on)
+  const felt3 = [];
+  if (showRef && allRefShooters.length) {
     const myDiv = (myShooters[0]?.division ||
-      (match.shooters||[]).find(s => s.division)?.division || '').toLowerCase();
+      allMatchShooters.find(s => s.division)?.division || '').toLowerCase();
 
-    // Use only active (non-disabled) entries to find top scorer
-    const activeEntries = allEntries.filter(e => !e.disabled);
-    const topEntry = activeEntries[0];
+    const activeEntries = [...felt1, ...felt2].filter(e => !e.disabled);
+    const topEntry = activeEntries.sort((a,b) => b.pts - a.pts)[0];
     let topAvgHF = 0;
-    if (topEntry && topEntry.pts > 0) {
-      const topSh = (match.shooters||[]).find(s => String(s.id)===topEntry.uid);
+    if (topEntry?.pts > 0) {
+      const topSh = allMatchShooters.find(s => String(s.id)===topEntry.uid);
       if (topSh) {
-        let tPts = 0, tTime = 0;
+        let tPts=0, tTime=0;
         (topSh.stages||[]).forEach(st => {
           if (!(st.time>0)) return;
-          const pf  = (topSh.pf||topSh.powerFactor||'minor').toLowerCase();
+          const pf = (topSh.pf||topSh.powerFactor||'minor').toLowerCase();
           tPts  += calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
           tTime += st.time;
         });
@@ -683,13 +741,13 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
 
     allRefShooters
       .filter(r => !r.division || r.division.toLowerCase()===myDiv)
-      .slice(0, 4)
+      .slice(0, 6)
       .forEach(r => {
         const refId = 'ref_' + r.id;
         const refHF = r.mediumHF || r.shortHF || r.longHF || 0;
         if (!refHF) return;
         let estStagePts = 0;
-        if (topAvgHF > 0) {
+        if (topAvgHF > 0 && topEntry) {
           stageDefs.forEach(sd => {
             const maxPts     = stageMaxPts(sd);
             const courseType = maxPts <= 60 ? 'short' : maxPts <= 120 ? 'medium' : 'long';
@@ -699,76 +757,106 @@ function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
           const matchMaxPts = stageDefs.reduce((s,d) => s + stageMaxPts(d), 0);
           estStagePts = (estStagePts / (matchMaxPts||1)) * (topEntry?.pts||0);
         }
-        allEntries.push({
-          uid:   refId,
-          name:  r.name || r.id,
-          pts:   Math.max(0, estStagePts),
-          isRef: true,
+        felt3.push({
+          uid:      refId,
+          name:     r.name || r.id,
+          pts:      Math.max(0, estStagePts),
+          isRef:    true,
           disabled: disabledShooters.has(refId)
         });
       });
-    allEntries.sort((a,b) => b.pts - a.pts);
+    felt3.sort((a,b) => b.pts - a.pts);
   }
 
-  if (!allEntries.length) {
+  // Overall ranking: only active (non-disabled) felt1 + felt2
+  const allActive = [...felt1, ...felt2].filter(e => !e.disabled).sort((a,b) => b.pts - a.pts);
+  const leader = allActive[0]?.pts || 0;
+  let rankCounter = 0;
+  const rankMap2 = {};
+  allActive.forEach(e => { rankMap2[e.uid] = ++rankCounter; });
+
+  function renderGroupRow(t) {
+    const mine    = myUids.has(t.uid);
+    const pct     = (!t.disabled && leader > 0) ? (t.pts/leader*100).toFixed(1) : '—';
+    const ptsStr  = (!t.disabled && t.pts > 0)  ? t.pts.toFixed(1) : '—';
+    const rank    = rankMap2[t.uid] || '—';
+    const rankClr = t.disabled ? 'rgba(255,255,255,.2)' : mine ? 'var(--accent)' : t.isRef ? 'var(--orange)' : 'var(--text)';
+    const nameClr = t.disabled ? 'rgba(255,255,255,.25)' : mine ? 'var(--accent)' : t.isRef ? 'var(--orange)' : 'var(--text)';
+    const nameFW  = mine || t.isRef ? '700' : '400';
+    const rowBg   = mine && !t.disabled ? 'rgba(232,184,75,.06)' : 'transparent';
+    const rowOp   = t.disabled ? 'opacity:0.35;' : '';
+    const eyeOpen = isCardVisible(t.uid);
+    const eyeTip  = eyeOpen ? 'Skjul skytterkortet' : 'Vis skytterkortet';
+    const eyeSvg  = eyeOpen
+      ? '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>'
+      : '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+    // Eye button: for refs it toggles disabled (standings), for real shooters it toggles card visibility
+    const eyeAction = t.isRef
+      ? `window.toggleShooterDisabled('${escA(t.uid)}','${escA(mid)}')`
+      : `window.toggleCardVisible('${escA(t.uid)}','${escA(mid)}')`;
+    const disableSvg = t.disabled
+      ? '<svg width="10" height="10" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><line x1="3" y1="7" x2="11" y2="7" stroke="currentColor" stroke-width="1.4"/></svg>'
+      : '<svg width="10" height="10" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/></svg>';
+    const disableAction = `window.toggleShooterDisabled('${escA(t.uid)}','${escA(mid)}')`;
+    const disableTip  = t.disabled ? 'Aktiver i standings' : 'Deaktiver i standings';
+
+    // For refs: only show the standings-toggle (eye icon means disabled from standings)
+    // For real shooters: show card-visibility eye + standings-disable circle
+    let actionBtns = '';
+    if (t.isRef) {
+      const refEyeOpen = !t.disabled;
+      const refEyeSvg  = refEyeOpen
+        ? '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>'
+        : '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+      actionBtns = `<button onclick="${escA(disableAction)}" title="${refEyeOpen?'Skjul referanse':'Vis referanse'}"
+        style="background:none;border:none;cursor:pointer;padding:2px;color:${refEyeOpen?'var(--muted)':'rgba(255,255,255,.2)'};line-height:1;">${refEyeSvg}</button>`;
+    } else {
+      actionBtns =
+        `<button onclick="window.toggleCardVisible('${escA(t.uid)}','${escA(mid)}')" title="${eyeTip}"
+          style="background:none;border:none;cursor:pointer;padding:2px;color:${eyeOpen?'var(--muted)':'rgba(255,255,255,.2)'};line-height:1;">${eyeSvg}</button>` +
+        `<button onclick="${disableAction}" title="${disableTip}"
+          style="background:none;border:none;cursor:pointer;padding:2px;color:${t.disabled?'var(--red)':'rgba(255,255,255,.15)'};line-height:1;">${disableSvg}</button>`;
+    }
+
+    return '<div style="display:grid;grid-template-columns:' + (t.isRef ? '24px' : '24px 20px') + ' 18px 1fr auto auto;gap:3px;' +
+      'align-items:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.04);' +
+      'background:' + rowBg + ';' + rowOp + '">' +
+      actionBtns +
+      '<div style="font-weight:800;font-size:12px;color:' + rankClr + ';text-align:center;">' + (t.isRef ? '—' : rank) + '</div>' +
+      '<div style="font-size:12px;font-weight:' + nameFW + ';color:' + nameClr + ';' +
+        'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">' +
+        escH(t.name) +
+      '</div>' +
+      '<div style="font-size:12px;font-variant-numeric:tabular-nums;color:var(--text);' +
+        'text-align:right;padding-left:4px;white-space:nowrap;">' + ptsStr + '</div>' +
+      '<div style="font-size:12px;color:' + rankClr + ';' +
+        'text-align:right;padding-left:4px;white-space:nowrap;min-width:38px;">' + pct + '%</div>' +
+      '</div>';
+  }
+
+  function renderGroup(title, entries, groupKey, colorClass) {
+    const isCollapsed = col[groupKey] === true;
+    const chevron = `<svg class="sg-chevron${isCollapsed?' collapsed':''}" width="10" height="7" viewBox="0 0 11 7" fill="none">
+      <path d="M1 1l4.5 4.5L10 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+    const rows = entries.map(renderGroupRow).join('');
+    return `<div class="sg-section">
+      <div class="sg-header" onclick="window.toggleSgGroup('${escA(mid)}','${groupKey}')">
+        <div class="sg-title ${colorClass}">${escH(title)}<span class="sg-count">${entries.length}</span></div>
+        ${chevron}
+      </div>
+      <div class="sg-body${isCollapsed?' collapsed':''}">
+        ${rows || '<div style="color:var(--muted);font-size:11px;padding:6px 4px;">Ingen skyttere.</div>'}
+      </div>
+    </div>`;
+  }
+
+  if (!felt1.length && !felt2.length && !felt3.length) {
     return '<div style="color:var(--muted);font-size:12px;padding:8px 0;">Ingen resultater ennå.</div>';
   }
 
-  // Rank only among active (non-disabled) entries
-  const activeEntries = allEntries.filter(e => !e.disabled);
-  const leader = activeEntries.length > 0 ? activeEntries[0].pts : (allEntries[0]?.pts || 0);
-
-  // Assign ranks only to active entries
-  let rankCounter = 0;
-  const rankMap = {};
-  allEntries.forEach(e => { if (!e.disabled) rankMap[e.uid] = ++rankCounter; });
-
-  const rows = allEntries.map((t) => {
-    const mine     = myUids.has(t.uid);
-    const pct      = (!t.disabled && leader > 0) ? (t.pts/leader*100).toFixed(1) : '—';
-    const ptsStr   = (!t.disabled && t.pts > 0)  ? t.pts.toFixed(1) : '—';
-    const rank     = rankMap[t.uid] || '—';
-    const rankClr  = t.disabled ? 'rgba(255,255,255,.2)' : mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--muted)';
-    const nameClr  = t.disabled ? 'rgba(255,255,255,.25)' : mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--text)';
-    const nameFW   = mine || t.isRef ? '700' : '400';
-    const rowBg    = mine && !t.disabled ? 'rgba(232,184,75,.06)' : 'transparent';
-    const rowOp    = t.disabled ? 'opacity:0.35;' : '';
-    const eyeOpen  = !t.disabled;
-    const eyeTip   = t.disabled ? 'Aktiver skytter' : 'Deaktiver skytter';
-    const eyeSvg   = eyeOpen
-      ? '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>'
-      : '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
-    return '<div style="display:grid;grid-template-columns:22px 16px 1fr auto auto auto;gap:4px;' +
-      'align-items:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.04);' +
-      'background:' + rowBg + ';' + rowOp + '">' +
-      '<button onclick="window.toggleShooterDisabled(\'' + escA(t.uid) + '\',\'' + escA(mid) + '\')" ' +
-        'title="' + eyeTip + '" ' +
-        'style="background:none;border:none;cursor:pointer;padding:2px;color:' + (eyeOpen ? 'var(--muted)' : 'rgba(255,255,255,.2)') + ';line-height:1;flex-shrink:0;">' +
-        eyeSvg +
-      '</button>' +
-      '<div style="font-weight:800;font-size:12px;color:' + rankClr + ';text-align:center;">' + rank + '</div>' +
-      '<div style="font-size:12px;font-weight:' + nameFW + ';color:' + nameClr + ';' +
-        'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">' +
-        escH(t.name) + (t.isRef ? '<span class="ref-badge">REF</span>' : '') +
-      '</div>' +
-      '<div style="font-size:12px;font-variant-numeric:tabular-nums;color:var(--text);' +
-        'text-align:right;padding-left:6px;white-space:nowrap;">' + ptsStr + '</div>' +
-      '<div style="font-size:12px;color:' + rankClr + ';' +
-        'text-align:right;padding-left:6px;white-space:nowrap;min-width:42px;">' + pct + '%</div>' +
-      '</div>';
-  }).join('');
-
-  // Header row
-  const header = '<div style="display:grid;grid-template-columns:22px 16px 1fr auto auto auto;gap:4px;' +
-    'padding:4px 4px 6px;border-bottom:1px solid var(--border);margin-bottom:2px;">' +
-    '<div></div>' +
-    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:center;">#</div>' +
-    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Navn</div>' +
-    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:right;padding-left:6px;">Pts</div>' +
-    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:right;padding-left:6px;min-width:42px;">%</div>' +
-    '</div>';
-
-  return '<div style="font-size:12px;">' + header + rows + '</div>';
+  return renderGroup('Mine skyttere', felt1, 'mine', 'group-mine') +
+    renderGroup('Andre i matchen', felt2, 'others', 'group-others') +
+    (felt3.length ? renderGroup('Referanser', felt3, 'refs', 'group-refs') : '');
 }
 
 window.toggleRefInStandings = (mid) => {
@@ -787,6 +875,9 @@ window.openShooterModalForMatch = (matchId) => {
 // ── Render one shooter card ───────────────────────────
 function renderCard(s, match, stageDefs, rankMap) {
   const uid     = s.uid;
+  // If card is set to hidden, render nothing
+  if (!isCardVisible(uid)) return '';
+
   const name    = s.name || uid;
   const shooter = (match.shooters||[]).find(x => String(x.id)===uid) || { id:uid, stages:[] };
   const pf      = (shooter.pf||shooter.powerFactor||'minor').toLowerCase();
@@ -851,7 +942,7 @@ function renderCard(s, match, stageDefs, rankMap) {
   ).join('');
 
   return `
-    <div class="scard" id="card-${escA(uid)}" style="${minimisedCards.has(uid)?'opacity:0.65;':''}">
+    <div class="scard" id="card-${escA(uid)}">
       <div class="scard-head">
         <div>
           <div class="scard-name">${escH(name)}</div>
@@ -870,7 +961,7 @@ function renderCard(s, match, stageDefs, rankMap) {
         </div>
       </div>
 
-      <div class="card-body" style="${minimisedCards.has(uid)?'display:none;':''}">
+      <div class="card-body">
       <div class="stats-row">
         <div class="stat-cell">
           <div class="stat-val">${avgHF>0?avgHF.toFixed(2):'—'}</div>
@@ -1066,46 +1157,18 @@ function buildRefRows(uid, pf, div, shooterAvgHF, shooter, stageDefs) {
   }).join('');
 }
 
-// ── Toggle card minimise ─────────────────────────────
-window.toggleMinimise = (uid) => {
-  if (minimisedCards.has(uid)) {
-    minimisedCards.delete(uid);
-  } else {
-    minimisedCards.add(uid);
-  }
-  // Re-render just this card's body
-  const card = document.getElementById('card-' + uid);
-  if (!card) return;
-  const body = card.querySelector('.card-body');
-  const eyeBtn = card.querySelector('.eye-btn');
-  if (minimisedCards.has(uid)) {
-    if (body) body.style.display = 'none';
-    if (eyeBtn) eyeBtn.title = 'Vis skytter';
-    if (eyeBtn) eyeBtn.innerHTML = eyeIcon(false);
-    card.style.opacity = '0.6';
-  } else {
-    if (body) body.style.display = '';
-    if (eyeBtn) eyeBtn.title = 'Skjul skytter';
-    if (eyeBtn) eyeBtn.innerHTML = eyeIcon(true);
-    card.style.opacity = '1';
-  }
+// ── Toggle card visibility (show/hide the full card) ─
+window.toggleCardVisible = (uid, mid) => {
+  cardVisibility[uid] = !isCardVisible(uid);
+  saveCardVisibility();
+  renderDash();
 };
 
-// ── Toggle shooter in/out of standings + ref comparisons ─
-window.toggleShooterDisabled = (uid, mid) => {
-  if (disabledShooters.has(uid)) {
-    disabledShooters.delete(uid);
-  } else {
-    disabledShooters.add(uid);
-  }
-  // Also dim/undim shooter card if it's a real shooter (not ref_)
-  if (!uid.startsWith('ref_')) {
-    const card = document.getElementById('card-' + uid);
-    if (card) {
-      card.style.opacity = disabledShooters.has(uid) ? '0.35' : '1';
-    }
-  }
-  // Re-render standings for this match only
+// ── Toggle standings group collapse ──────────────────
+window.toggleSgGroup = (mid, groupKey) => {
+  sgCollapsed[mid] = sgCollapsed[mid] || {};
+  sgCollapsed[mid][groupKey] = !sgCollapsed[mid][groupKey];
+  saveSgCollapsed();
   renderDash();
 };
 
@@ -1114,6 +1177,16 @@ function eyeIcon(open) {
     ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>'
     : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
 }
+
+// ── Toggle shooter in/out of standings + ref comparisons ─
+window.toggleShooterDisabled = (uid, mid) => {
+  if (disabledShooters.has(uid)) {
+    disabledShooters.delete(uid);
+  } else {
+    disabledShooters.add(uid);
+  }
+  renderDash();
+};
 
 // ── Toggle ref per card ───────────────────────────────
 window.togRef = (uid, btn) => {
@@ -1370,7 +1443,7 @@ function getMatchShooters(match) {
   return result;
 }
 
-// Resolve unknown names after first render
+// Resolve unknown names after first render — and persist division to match.shooters[]
 async function resolveUnknownNames(match) {
   const participants = (match.participants||[]).map(String);
   const shootersArr  = (match.shooters||[]).filter(s => !s.isMe);
@@ -1378,10 +1451,36 @@ async function resolveUnknownNames(match) {
   shootersArr.forEach(s => { if(s.id) byUid[String(s.id)] = s; });
 
   const unknowns = participants.filter(uid => !byUid[uid] && !_userCache[uid]);
-  if (!unknowns.length) return;
+  if (!unknowns.length) {
+    // Check if any existing shooters are missing division — try to persist it
+    await persistMissingDivisions(match);
+    return;
+  }
 
   await Promise.all(unknowns.map(uid => resolveUserName(uid)));
   renderDash(); // re-render with resolved names
+  await persistMissingDivisions(match);
+}
+
+// Write division/pf from users[] into match.shooters[] if missing (coach has write access)
+async function persistMissingDivisions(match) {
+  const shooters = JSON.parse(JSON.stringify(match.shooters||[]));
+  let changed = false;
+  for (const sh of shooters) {
+    const uid = String(sh.id);
+    if (!sh.division && _userCache[uid]?.division) {
+      sh.division = _userCache[uid].division;
+      changed = true;
+    }
+    if (!sh.pf && !sh.powerFactor && _userCache[uid]?.pf) {
+      sh.pf = _userCache[uid].pf;
+      changed = true;
+    }
+  }
+  if (!changed) return;
+  try {
+    await updateDoc(doc(db, 'matches', String(match.id)), { shooters });
+  } catch { /* silent — not critical */ }
 }
 
 function getStageDefs(match) {

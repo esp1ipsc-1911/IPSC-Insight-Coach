@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPSC Insight – Coach</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --bg:#0a0c10;--bg2:#111318;--bg3:#181c24;--card:#1a1e28;
+      --border:rgba(255,255,255,0.08);--accent:#e8b84b;--accent2:#f0d080;
+      --red:#e05252;--green:#4caf7d;--blue:#4a9eff;--orange:#f07030;
+      --text:#f0f2f5;--muted:#8a93a1;--sub:#9ca3af;
+      --radius:14px;--radius-sm:10px;--shadow:0 14px 40px rgba(0,0,0,.3);
+    }
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh;}
+
+    /* ── TOPBAR ── */
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;gap:12px;}
+    .topbar-brand{font-size:16px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+    .topbar-brand span{color:var(--accent);}
+    .topbar-match{flex:1;min-width:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .topbar-match strong{color:var(--text);}
+    .topbar-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.8s ease infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+    .btn{border:none;border-radius:var(--radius-sm);min-height:32px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:filter .12s,transform .12s;}
+    .btn:hover{filter:brightness(1.07);}
+    .btn:active{transform:translateY(1px);}
+    .btn-primary{background:var(--accent);color:var(--bg);}
+    .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+    .btn-danger{background:var(--red);color:#fff;}
+    .btn-sm{min-height:28px;padding:4px 10px;font-size:11px;}
+    .tog-btn{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+    .tog-btn.on{border-color:rgba(74,158,255,.4);background:rgba(74,158,255,.12);color:var(--blue);}
+    .tog-btn .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+    /* ── LOGIN ── */
+    #loginSection{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .login-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;}
+    .login-logo{text-align:center;font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+    .login-logo span{color:var(--accent);}
+    .login-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:24px;}
+    .form-group{margin-bottom:16px;}
+    .form-label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:700;}
+    .form-input,.form-select{width:100%;min-height:42px;padding:10px 13px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;}
+    .form-input:focus,.form-select:focus{outline:none;border-color:rgba(232,184,75,.55);box-shadow:0 0 0 3px rgba(232,184,75,.08);}
+    .error-box{background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.25);color:var(--red);padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;}
+    .success-box{background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.25);color:var(--green);padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;}
+
+    /* ── SETUP ── */
+    #setupSection{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .setup-loading{text-align:center;padding:40px 20px;}
+    .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ── DASH ── */
+    #dashSection{padding-bottom:40px;}
+
+    /* ── MATCH HEADER ── */
+    .match-header{background:linear-gradient(135deg,#13172000,#1a1e2888);border-bottom:1px solid var(--border);padding:14px 16px;}
+    .match-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+    .match-title{font-size:20px;font-weight:800;letter-spacing:-.01em;}
+    .match-title span{color:var(--accent);}
+    .match-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+    .match-stats{display:flex;gap:16px;flex-wrap:wrap;}
+    .mstat{text-align:center;}
+    .mstat-val{font-size:22px;font-weight:800;color:var(--accent);line-height:1;}
+    .mstat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+
+    /* ── STANDINGS STRIP ── */
+    .standings-strip{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;overflow-x:auto;}
+    .standings-strip-inner{display:flex;gap:6px;min-width:max-content;}
+    .s-chip{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--bg3);border:1px solid var(--border);font-size:11px;white-space:nowrap;}
+    .s-chip.mine{background:rgba(232,184,75,.1);border-color:rgba(232,184,75,.35);font-weight:700;}
+    .s-chip-rank{font-weight:800;color:var(--muted);min-width:16px;}
+    .s-chip.mine .s-chip-rank{color:var(--accent);}
+    .s-chip-name{font-weight:700;}
+    .s-chip-pts{color:var(--accent);font-weight:700;}
+    .s-chip-pct{color:var(--muted);}
+
+    /* ── SHOOTER GRID ── */
+    .shooter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;padding:14px 16px;}
+
+    /* ── SHOOTER CARD ── */
+    .scard{background:linear-gradient(160deg,#1c2030,#161a24);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;}
+    .scard:hover{border-color:rgba(232,184,75,.2);}
+
+    /* card header */
+    .scard-head{padding:12px 14px 10px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+    .scard-name{font-size:15px;font-weight:800;line-height:1.2;}
+    .scard-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .scard-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+    .badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid transparent;}
+    .badge-div{background:rgba(74,158,255,.12);color:var(--blue);border-color:rgba(74,158,255,.22);}
+    .badge-pf-minor{background:rgba(255,255,255,.05);color:var(--sub);border-color:rgba(255,255,255,.1);}
+    .badge-pf-major{background:rgba(232,184,75,.1);color:var(--accent);border-color:rgba(232,184,75,.2);}
+    .scard-rank{text-align:right;flex-shrink:0;}
+    .scard-rank-num{font-size:24px;font-weight:900;color:var(--accent);line-height:1;}
+    .scard-rank-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+    /* stats row */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);padding:10px 14px;gap:4px;border-bottom:1px solid var(--border);}
+    .stat-cell{text-align:center;}
+    .stat-val{font-size:20px;font-weight:800;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;}
+    .stat-val.green{color:var(--green);}
+    .stat-val.red{color:var(--red);}
+    .stat-val.blue{color:var(--blue);}
+    .stat-val.muted{color:var(--muted);}
+    .stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px;}
+
+    /* progress */
+    .prog-section{padding:8px 14px;border-bottom:1px solid var(--border);}
+    .prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
+    .prog-label strong{color:var(--text);}
+    .prog-track{height:5px;background:var(--bg3);border-radius:999px;overflow:hidden;}
+    .prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;}
+
+    /* stage pills */
+    .stages-section{padding:8px 14px;border-bottom:1px solid var(--border);}
+    .stages-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+    .stage-pills{display:flex;flex-wrap:wrap;gap:4px;}
+    .spill{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1px solid var(--border);background:var(--bg3);color:var(--muted);}
+    .spill.done{background:rgba(76,175,125,.15);border-color:rgba(76,175,125,.3);color:var(--green);}
+    .spill.pending{background:var(--bg2);border-style:dashed;}
+
+    /* HF chart */
+    .chart-section{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .chart-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+    .chart-legend{display:flex;gap:10px;}
+    .leg-item{display:flex;align-items:center;gap:4px;font-size:10px;}
+    .leg-dot{width:8px;height:3px;border-radius:2px;}
+    .chart-wrap{position:relative;}
+    .chart-wrap svg{width:100%;overflow:visible;}
+
+    /* prognosis */
+    .prog2-section{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .prog2-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+    .prog2-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+    .prog2-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;}
+    .prog2-val{font-size:17px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;}
+    .prog2-lbl2{font-size:10px;color:var(--muted);margin-top:2px;}
+
+    /* ref */
+    .ref-section{padding:8px 14px;border-bottom:1px solid var(--border);}
+    .ref-toggle{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+    .ref-toggle svg{transition:transform .2s;}
+    .ref-toggle.open svg{transform:rotate(180deg);}
+    .ref-list{margin-top:7px;display:grid;gap:4px;}
+    .ref-list.hidden{display:none;}
+    .ref-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:11px;}
+    .ref-name{font-weight:700;}
+    .ref-hf{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;}
+    .ref-delta-pos{color:var(--green);font-size:10px;font-weight:700;}
+    .ref-delta-neg{color:var(--red);font-size:10px;font-weight:700;}
+
+    /* tip */
+    .coach-tip{padding:7px 10px;background:rgba(232,184,75,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:11px;color:var(--sub);line-height:1.45;margin:8px 14px;}
+
+    /* card footer */
+    .scard-foot{padding:8px 14px;display:flex;gap:6px;margin-top:auto;}
+
+    /* ── MODAL ── */
+    .modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.82);padding:16px;align-items:center;justify-content:center;}
+    .modal.open{display:flex;}
+    .modal-content{width:100%;max-width:520px;max-height:92vh;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;-webkit-overflow-scrolling:touch;}
+    .modal-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+    .modal-sub{color:var(--muted);font-size:13px;margin-bottom:16px;}
+    .form-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+    .hit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;}
+    .calc-row{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:var(--bg3);border-radius:var(--radius-sm);margin-top:8px;font-size:13px;}
+    .calc-row strong{color:var(--accent);font-size:15px;}
+
+    /* ── LOADING ── */
+    .loading-msg{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;}
+
+    /* ── STAGE DETAIL EXPAND ── */
+    .stage-detail{display:none;padding:10px 14px;background:var(--bg2);border-top:1px solid var(--border);animation:fadeIn .15s ease;}
+    .stage-detail.open{display:block;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+    .sd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;}
+    .sd-cell{background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center;}
+    .sd-val{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;}
+    .sd-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+    .sd-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;}
+    .sd-row:last-child{border-bottom:none;}
+
+    /* ── STANDINGS ── */
+    .standings-section{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .standings-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+    .standings-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
+    .standings-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .standings-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px;font-weight:700;border-bottom:1px solid var(--border);text-align:left;}
+    .standings-table td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+    .standings-table tr:last-child td{border-bottom:none;}
+    .standings-table tr.me td{background:rgba(232,184,75,.07);}
+    .standings-table tr.ref-row td{color:var(--blue);}
+    .standings-table td:nth-child(3),.standings-table td:nth-child(4){white-space:nowrap;}
+    .ref-badge{display:inline-block;padding:1px 5px;border-radius:4px;background:rgba(74,158,255,.15);color:var(--blue);font-size:9px;font-weight:700;margin-left:4px;border:1px solid rgba(74,158,255,.25);}
+
+    /* ── ADD/EDIT SHOOTER MODAL ── */
+    .shooter-modal .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .shooter-list-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;}
+    .shooter-list-item-name{font-weight:700;font-size:13px;}
+    .shooter-list-item-meta{font-size:11px;color:var(--muted);}
+    .shooter-list-actions{display:flex;gap:5px;flex-shrink:0;}
+    .spill.clickable{cursor:pointer;transition:background .12s,border-color .12s;}
+    .spill.clickable:hover{background:rgba(232,184,75,.15);border-color:rgba(232,184,75,.4);}
+    .spill.active-detail{background:rgba(232,184,75,.2);border-color:rgba(232,184,75,.5);color:var(--accent);}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:700px){
+      .shooter-grid{grid-template-columns:1fr;}
+      .stats-row{grid-template-columns:repeat(2,1fr);}
+      .topbar-match{display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="loginSection">
+  <div class="login-card">
+    <div class="login-logo">IPSC <span>INSIGHT</span></div>
+    <div class="login-sub">Coach Dashboard — Logg inn</div>
+    <div id="loginError" class="error-box" style="display:none;"></div>
+    <div class="form-group">
+      <label class="form-label">E-post</label>
+      <input id="loginEmail" class="form-input" type="email" placeholder="coach@ipsc.no" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Passord</label>
+      <input id="loginPassword" class="form-input" type="password" placeholder="Passord" />
+    </div>
+    <button id="loginBtn" class="btn btn-primary" style="width:100%;min-height:42px;font-size:14px;">Logg inn</button>
+  </div>
+</div>
+
+<!-- ══ SETUP ══ -->
+<div id="setupSection" style="display:none;">
+  <div class="setup-loading">
+    <div class="spinner"></div>
+    <div style="color:var(--muted);font-size:14px;">Laster dine skyttere…</div>
+  </div>
+</div>
+
+<!-- ══ DASH ══ -->
+<div id="dashSection" style="display:none;">
+
+  <div class="topbar">
+    <div class="topbar-brand">IPSC <span>COACH</span></div>
+    <div class="topbar-match" id="topMatchName">—</div>
+    <div class="topbar-actions">
+      <span class="live-dot" title="Live"></span>
+      <button id="toggleRefAllBtn" class="tog-btn on">
+        <span class="dot"></span>Ref
+      </button>
+      <button id="logoutBtn" class="btn btn-ghost btn-sm">Logg ut</button>
+    </div>
+  </div>
+
+  <!-- match header -->
+  <div class="match-header" id="matchHeader" style="display:none;">
+    <div class="match-header-top">
+      <div>
+        <div class="match-title" id="matchTitle">—</div>
+        <div class="match-meta" id="matchMeta">—</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="match-stats" id="matchStats"></div>
+        <button onclick="window.openShooterModal()" class="btn btn-primary btn-sm" style="white-space:nowrap;">+ Legg til skytter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- standings strip -->
+  <div class="standings-strip" id="standingsStrip" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0;">
+      <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Live standings</span>
+      <button id="toggleRefStandingsBtn" class="tog-btn on" style="font-size:10px;padding:3px 8px;">
+        <span class="dot"></span>Ref
+      </button>
+    </div>
+    <div class="standings-strip-inner" id="standingsInner"></div>
+  </div>
+
+  <!-- shooter grid -->
+  <div id="dashContent">
+    <div class="loading-msg"><div class="spinner"></div>Kobler til…</div>
+  </div>
+
+</div>
+
+<!-- ══ SHOOTER MODAL (add/edit) ══ -->
+<div id="shooterModal" class="modal shooter-modal">
+  <div class="modal-content" style="max-width:480px;">
+    <div class="modal-title" id="shooterModalTitle">Legg til skytter</div>
+    <div class="modal-sub" id="shooterModalSub">Legges til i matchen</div>
+    <div id="shooterError" class="error-box" style="display:none;"></div>
+    <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div>
+        <label class="form-label">Fornavn</label>
+        <input id="shFirstName" class="form-input" type="text" placeholder="Fornavn" />
+      </div>
+      <div>
+        <label class="form-label">Etternavn</label>
+        <input id="shLastName" class="form-input" type="text" placeholder="Etternavn" />
+      </div>
+      <div>
+        <label class="form-label">Divisjon</label>
+        <select id="shDivision" class="form-select">
+          <option value="Classic">Classic</option>
+          <option value="Production">Production</option>
+          <option value="Production Optics">Production Optics</option>
+          <option value="Standard">Standard</option>
+          <option value="Open">Open</option>
+          <option value="Revolver">Revolver</option>
+          <option value="Pistol Caliber Carbine">PCC</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Power Factor</label>
+        <select id="shPF" class="form-select">
+          <option value="minor">Minor</option>
+          <option value="major">Major</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="form-label">Klubb</label>
+        <input id="shClub" class="form-input" type="text" placeholder="Klubb" />
+      </div>
+    </div>
+    <input type="hidden" id="shEditId" value="" />
+    <div class="form-actions">
+      <button id="saveShooterBtn" class="btn btn-primary">Lagre skytter</button>
+      <button id="cancelShooterBtn" class="btn btn-secondary">Avbryt</button>
+    </div>
+
+    <!-- Eksisterende skyttere -->
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;" id="shooterListSection" style="display:none;">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;font-weight:700;">Skyttere i matchen</div>
+      <div id="shooterListEl"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESULT MODAL ══ -->
+<div id="resultModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-title" id="resModalTitle">Legg til resultat</div>
+    <div class="modal-sub" id="resModalSub">—</div>
+    <div id="resError" class="error-box" style="display:none;"></div>
+    <div id="resSuccess" class="success-box" style="display:none;"></div>
+    <div class="form-group">
+      <label class="form-label">Stage</label>
+      <select id="resStage" class="form-select"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tid (sekunder)</label>
+      <input id="resTime" class="form-input" type="number" step="0.01" min="0" placeholder="23.45" />
+    </div>
+    <div class="hit-grid">
+      <div><label class="form-label">A</label><input id="resA" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">C</label><input id="resC" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">D</label><input id="resD" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">Miss</label><input id="resMiss" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">NS</label><input id="resNS" class="form-input" type="number" min="0" value="0" /></div>
+      <div><label class="form-label">Proc</label><input id="resProc" class="form-input" type="number" min="0" value="0" /></div>
+    </div>
+    <div class="calc-row">
+      <span>Poeng / HF</span>
+      <strong id="resCalc">— / —</strong>
+    </div>
+    <div class="form-actions">
+      <button id="saveResBtn" class="btn btn-primary">Lagre</button>
+      <button id="cancelResBtn" class="btn btn-secondary">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { auth, db } from './src/firebase.js';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { doc, getDoc, getDocs, collection, onSnapshot, updateDoc, setDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+// ── Scoring ──────────────────────────────────────────
+function calcPts(pf, a, c, d, miss, ns, proc) {
+  pf = (pf||'minor').toLowerCase();
+  const C = pf==='major'?4:3, D = pf==='major'?2:1;
+  return a*5 + c*C + d*D + miss*-10 + ns*-10 + proc*-10;
+}
+function calcHF(pts, time) { return time>0 ? pts/time : 0; }
+
+// from JS bundle: icStageMaxPts
+function stageMaxPts(s) {
+  const ss = s&&s.singleShot?1:2;
+  return Math.max(0, ((s.paperTargets||0)*5*ss) + (((s.poppers||0)+(s.plates||0))*5));
+}
+
+// ── State ─────────────────────────────────────────────
+let currentUser      = null;
+let allowedUids      = null;    // string[] user UIDs from coachAccess
+let matchUnsubscribes = [];
+let allMatchData     = {};
+let allRefShooters   = [];
+let refVisible       = true;
+let refInStandings   = true;    // show ref shooters in standings
+let resultTarget     = null;    // { shooterUid, shooterName, matchId }
+let shooterEditId    = null;    // id of shooter being edited
+let minimisedCards   = new Set(); // set of uids whose cards are minimised
+let disabledShooters = new Set(); // uids (incl. 'ref_'+id) excluded from standings + ref comparisons
+
+const $ = id => document.getElementById(id);
+
+// ── Auth ──────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    try {
+      // Fetch user profile and coachAccess in parallel — independent calls
+      const [ud, as] = await Promise.all([
+        getDoc(doc(db, 'users', user.uid)),
+        getDoc(doc(db, 'coachAccess', user.uid)).catch(() => null)
+      ]);
+
+      if (!ud.exists()) { await logout('Bruker ikke funnet.'); return; }
+      const data = ud.data();
+      const roles = Array.isArray(data.roles) ? data.roles : (data.role ? [data.role] : []);
+      if (!roles.includes('coach') && !roles.includes('admin')) {
+        await logout('Du har ikke coach-tilgang. Kontakt admin.'); return;
+      }
+      currentUser = { uid: user.uid, ...data };
+      $('loginSection').style.display = 'none';
+      $('setupSection').style.display = 'flex';
+      $('dashSection').style.display  = 'none';
+
+      // Parse coachAccess — new format: { matches: [{matchId, shooterUids}] }
+      let coachMatches = [];
+      try {
+        if (as && as.exists()) {
+          const asData = as.data();
+          if (Array.isArray(asData.matches)) {
+            coachMatches = asData.matches.filter(m => m.matchId && (m.shooterUids||[]).length > 0);
+          } else {
+            const legacyUids = (asData.shooterUids||[]).map(String).filter(u => u && u !== 'undefined');
+            if (legacyUids.length && asData.matchId) {
+              coachMatches = [{ matchId: String(asData.matchId), shooterUids: legacyUids }];
+            }
+          }
+        }
+      } catch { coachMatches = []; }
+
+      allowedUids = [...new Set(coachMatches.flatMap(m => m.shooterUids))];
+
+      await autoStart(coachMatches);
+    } catch (e) { await logout('Feil: ' + e.message); }
+  } else {
+    currentUser = null;
+    showLogin();
+  }
+});
+
+async function logout(msg) {
+  matchUnsubscribes.forEach(u => u());
+  matchUnsubscribes = [];
+  await signOut(auth);
+  if (msg) alert(msg);
+}
+
+function showLogin() {
+  $('loginSection').style.display = 'flex';
+  $('setupSection').style.display = 'none';
+  $('dashSection').style.display  = 'none';
+}
+
+$('loginBtn').onclick = async () => {
+  const email = $('loginEmail').value.trim();
+  const pw    = $('loginPassword').value;
+  $('loginError').style.display = 'none';
+  if (!email||!pw) { showErr($('loginError'),'Fyll ut alle felt'); return; }
+  try { await signInWithEmailAndPassword(auth, email, pw); }
+  catch(e) { showErr($('loginError'), e.code==='auth/invalid-credential'?'Feil e-post eller passord':e.message); }
+};
+$('loginPassword').addEventListener('keydown', e => { if(e.key==='Enter') $('loginBtn').click(); });
+$('logoutBtn').onclick = () => logout();
+
+// ── Auto-start ────────────────────────────────────────
+async function autoStart(coachMatches) {  // coachMatches = [{matchId, shooterUids}]
+  if (!coachMatches || !coachMatches.length) {
+    $('loginSection').style.display = 'none';
+    $('setupSection').style.display = 'none';
+    $('dashSection').style.display  = 'block';
+    $('dashContent').innerHTML = `
+      <div class="loading-msg">
+        <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Ingen matcher tildelt</div>
+        <div style="color:var(--muted);font-size:13px;">Admin må tildele deg skyttere og matcher.</div>
+      </div>`;
+    return;
+  }
+
+  // Show dash immediately — don't wait for ref shooters
+  $('loginSection').style.display = 'none';
+  $('setupSection').style.display = 'none';
+  $('dashSection').style.display  = 'block';
+
+  // Subscribe to ALL assigned matches simultaneously
+  matchUnsubscribes.forEach(u => u());
+  matchUnsubscribes = [];
+  allMatchData = {};
+
+  // Store per-match allowed UIDs
+  window._coachMatchUids = {};
+  coachMatches.forEach(m => {
+    window._coachMatchUids[String(m.matchId)] = (m.shooterUids||[]).map(String);
+  });
+
+  // Load ref shooters in background — re-render when ready
+  getDocs(collection(db, 'referenceShooters')).then(rs => {
+    allRefShooters = [];
+    rs.forEach(d => allRefShooters.push({ id: d.id, ...d.data() }));
+    if (Object.keys(allMatchData).length) renderDash();
+  }).catch(() => {});
+
+  try {
+    coachMatches.forEach(entry => {
+      const mid = String(entry.matchId);
+      const unsub = onSnapshot(doc(db, 'matches', mid), snap => {
+        if (snap.exists()) { allMatchData[snap.id] = { id: snap.id, ...snap.data() }; }
+        else { delete allMatchData[snap.id]; }
+        renderDash();
+      });
+      matchUnsubscribes.push(unsub);
+    });
+  } catch(e) {
+    $('dashContent').innerHTML = `<div class="loading-msg">Feil: ${escH(e.message)}</div>`;
+  }
+}
+
+// ── Toggle ref ────────────────────────────────────────
+$('toggleRefAllBtn').onclick = () => {
+  refVisible = !refVisible;
+  $('toggleRefAllBtn').classList.toggle('on', refVisible);
+  document.querySelectorAll('.ref-section').forEach(el => {
+    el.style.display = refVisible ? '' : 'none';
+  });
+};
+
+// ── Render dashboard — all matches ───────────────────
+function renderDash() {
+  const matches = Object.values(allMatchData);
+  if (!matches.length) {
+    $('dashContent').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Venter på data…</div>';
+    return;
+  }
+  matches.sort((a,b) => (b.date||'') > (a.date||'') ? 1 : -1);
+
+  $('topMatchName').innerHTML = matches
+    .map(m => `<strong>${escH(m.name||m.id)}</strong>`)
+    .join(' &nbsp;·&nbsp; ');
+
+  $('matchHeader').style.display = 'none';
+  $('standingsStrip').style.display = 'none';
+
+  $('dashContent').innerHTML = matches.map(match => renderMatchSection(match)).join('') ||
+    '<div class="loading-msg">Ingen data.</div>';
+
+  if (!refVisible) {
+    document.querySelectorAll('.ref-section').forEach(el => el.style.display='none');
+  }
+  matches.forEach(m => resolveUnknownNames(m));
+}
+
+function renderMatchSection(match) {
+  const mid = String(match.id);
+  const matchUids = (window._coachMatchUids||{})[mid] || allowedUids || [];
+  const stageDefs  = getStageDefs(match);
+  const allShooters = getMatchShooters(match);
+  // Show ALL shooters in match — manually added ones won't be in matchUids
+  // but should still be visible to coach
+  const myShooters = allShooters;
+
+  const shotCounts = myShooters.map(s => {
+    const sh = (match.shooters||[]).find(x => String(x.id)===s.uid);
+    return (sh?.stages||[]).filter(st => st.time>0).length;
+  });
+  const avgShot = shotCounts.length ? Math.round(shotCounts.reduce((a,b)=>a+b,0)/shotCounts.length) : 0;
+
+  const totals = calcMatchTotals(match, stageDefs);
+  const rankMap = {};
+  totals.forEach((t,i) => { rankMap[t.uid] = i+1; });
+
+  const standingsHtml = buildStandingsTable(match, stageDefs, myShooters, totals);
+  const cardsHtml = myShooters.length
+    ? myShooters.map(s => renderCard(s, match, stageDefs, rankMap)).join('')
+    : `<div class="loading-msg" style="padding:30px;font-size:13px;">Ingen tildelte skyttere er deltakere i denne matchen.</div>`;
+
+  // Build standings as a card (same size as shooter cards)
+  const standingsCard = `
+    <div class="scard" style="background:linear-gradient(160deg,#1c2030,#161a24);">
+      <div class="scard-head" style="border-bottom:1px solid var(--border);">
+        <div>
+          <div class="scard-name">Live Standings</div>
+          <div class="scard-sub">${escH(match.name||match.id)}</div>
+        </div>
+        <button onclick="window.toggleRefInStandings('${escA(mid)}')" id="refStandBtn-${escA(mid)}"
+          class="tog-btn on" style="font-size:10px;padding:3px 8px;flex-shrink:0;">
+          <span class="dot"></span>Ref
+        </button>
+      </div>
+      <div style="padding:10px 14px;overflow-y:auto;max-height:520px;">
+        ${standingsHtml}
+      </div>
+    </div>`;
+
+  return `
+    <div class="match-section" id="msec-${escA(mid)}" style="margin-bottom:28px;">
+      <!-- Match header -->
+      <div style="background:linear-gradient(135deg,rgba(19,23,32,0),rgba(26,30,40,.6));border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:18px;font-weight:800;">${escH(match.name||match.id)}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${escH([match.date,match.location,match.type].filter(Boolean).join(' · '))}</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+          <div class="mstat"><div class="mstat-val">${stageDefs.length}</div><div class="mstat-lbl">Stages</div></div>
+          <div class="mstat"><div class="mstat-val">${myShooters.length}</div><div class="mstat-lbl">Skyttere</div></div>
+          <div class="mstat"><div class="mstat-val" style="color:var(--green);">${avgShot}</div><div class="mstat-lbl">Snitt skutt</div></div>
+          <div class="mstat"><div class="mstat-val" style="color:var(--muted);">${stageDefs.length-avgShot}</div><div class="mstat-lbl">Igjen</div></div>
+          <button onclick="window.openShooterModalForMatch('${escA(mid)}')" class="btn btn-primary btn-sm">+ Skytter</button>
+        </div>
+      </div>
+      <!-- Unified grid: standings card + shooter cards -->
+      <div style="padding:12px 16px;">
+        <div class="shooter-grid" style="grid-template-columns:repeat(auto-fill,minmax(360px,1fr));">
+          ${standingsCard}
+          ${cardsHtml}
+        </div>
+      </div>
+    </div>`;
+}
+
+function buildStandingsTable(match, stageDefs, myShooters, shooterTotals) {
+  const myUids  = new Set(myShooters.map(s => s.uid));
+  const mid     = String(match.id);
+  const showRef = (window._refInStandings||{})[mid] !== false;
+
+  // Build entries from shooterTotals (stage-normalised, from calcMatchTotals)
+  // Exclude disabled shooters from pts/% calculations but still show them (dimmed)
+  const activeUids = new Set(
+    (shooterTotals||[]).map(t => t.uid).filter(u => !disabledShooters.has(u))
+  );
+
+  let allEntries = (shooterTotals||[]).map(t => ({
+    uid:   t.uid,
+    name:  t.name || t.uid,
+    pts:   t.pts  || 0,
+    isRef: false,
+    disabled: disabledShooters.has(t.uid)
+  })).sort((a,b) => b.pts - a.pts);
+
+  // Add ref shooters if toggle is on
+  if (showRef && allRefShooters.length && allEntries.length) {
+    const myDiv = (myShooters[0]?.division ||
+      (match.shooters||[]).find(s => s.division)?.division || '').toLowerCase();
+
+    // Use only active (non-disabled) entries to find top scorer
+    const activeEntries = allEntries.filter(e => !e.disabled);
+    const topEntry = activeEntries[0];
+    let topAvgHF = 0;
+    if (topEntry && topEntry.pts > 0) {
+      const topSh = (match.shooters||[]).find(s => String(s.id)===topEntry.uid);
+      if (topSh) {
+        let tPts = 0, tTime = 0;
+        (topSh.stages||[]).forEach(st => {
+          if (!(st.time>0)) return;
+          const pf  = (topSh.pf||topSh.powerFactor||'minor').toLowerCase();
+          tPts  += calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+          tTime += st.time;
+        });
+        topAvgHF = tTime > 0 ? tPts/tTime : 0;
+      }
+    }
+
+    allRefShooters
+      .filter(r => !r.division || r.division.toLowerCase()===myDiv)
+      .slice(0, 4)
+      .forEach(r => {
+        const refId = 'ref_' + r.id;
+        const refHF = r.mediumHF || r.shortHF || r.longHF || 0;
+        if (!refHF) return;
+        let estStagePts = 0;
+        if (topAvgHF > 0) {
+          stageDefs.forEach(sd => {
+            const maxPts     = stageMaxPts(sd);
+            const courseType = maxPts <= 60 ? 'short' : maxPts <= 120 ? 'medium' : 'long';
+            const stageRefHF = r[courseType+'HF'] || refHF;
+            estStagePts += (stageRefHF / topAvgHF) * maxPts;
+          });
+          const matchMaxPts = stageDefs.reduce((s,d) => s + stageMaxPts(d), 0);
+          estStagePts = (estStagePts / (matchMaxPts||1)) * (topEntry?.pts||0);
+        }
+        allEntries.push({
+          uid:   refId,
+          name:  r.name || r.id,
+          pts:   Math.max(0, estStagePts),
+          isRef: true,
+          disabled: disabledShooters.has(refId)
+        });
+      });
+    allEntries.sort((a,b) => b.pts - a.pts);
+  }
+
+  if (!allEntries.length) {
+    return '<div style="color:var(--muted);font-size:12px;padding:8px 0;">Ingen resultater ennå.</div>';
+  }
+
+  // Rank only among active (non-disabled) entries
+  const activeEntries = allEntries.filter(e => !e.disabled);
+  const leader = activeEntries.length > 0 ? activeEntries[0].pts : (allEntries[0]?.pts || 0);
+
+  // Assign ranks only to active entries
+  let rankCounter = 0;
+  const rankMap = {};
+  allEntries.forEach(e => { if (!e.disabled) rankMap[e.uid] = ++rankCounter; });
+
+  const rows = allEntries.map((t) => {
+    const mine     = myUids.has(t.uid);
+    const pct      = (!t.disabled && leader > 0) ? (t.pts/leader*100).toFixed(1) : '—';
+    const ptsStr   = (!t.disabled && t.pts > 0)  ? t.pts.toFixed(1) : '—';
+    const rank     = rankMap[t.uid] || '—';
+    const rankClr  = t.disabled ? 'rgba(255,255,255,.2)' : mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--muted)';
+    const nameClr  = t.disabled ? 'rgba(255,255,255,.25)' : mine ? 'var(--accent)' : t.isRef ? 'var(--blue)' : 'var(--text)';
+    const nameFW   = mine || t.isRef ? '700' : '400';
+    const rowBg    = mine && !t.disabled ? 'rgba(232,184,75,.06)' : 'transparent';
+    const rowOp    = t.disabled ? 'opacity:0.35;' : '';
+    const eyeOpen  = !t.disabled;
+    const eyeTip   = t.disabled ? 'Aktiver skytter' : 'Deaktiver skytter';
+    const eyeSvg   = eyeOpen
+      ? '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>'
+      : '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+    return '<div style="display:grid;grid-template-columns:22px 16px 1fr auto auto auto;gap:4px;' +
+      'align-items:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.04);' +
+      'background:' + rowBg + ';' + rowOp + '">' +
+      '<button onclick="window.toggleShooterDisabled(\'' + escA(t.uid) + '\',\'' + escA(mid) + '\')" ' +
+        'title="' + eyeTip + '" ' +
+        'style="background:none;border:none;cursor:pointer;padding:2px;color:' + (eyeOpen ? 'var(--muted)' : 'rgba(255,255,255,.2)') + ';line-height:1;flex-shrink:0;">' +
+        eyeSvg +
+      '</button>' +
+      '<div style="font-weight:800;font-size:12px;color:' + rankClr + ';text-align:center;">' + rank + '</div>' +
+      '<div style="font-size:12px;font-weight:' + nameFW + ';color:' + nameClr + ';' +
+        'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">' +
+        escH(t.name) + (t.isRef ? '<span class="ref-badge">REF</span>' : '') +
+      '</div>' +
+      '<div style="font-size:12px;font-variant-numeric:tabular-nums;color:var(--text);' +
+        'text-align:right;padding-left:6px;white-space:nowrap;">' + ptsStr + '</div>' +
+      '<div style="font-size:12px;color:' + rankClr + ';' +
+        'text-align:right;padding-left:6px;white-space:nowrap;min-width:42px;">' + pct + '%</div>' +
+      '</div>';
+  }).join('');
+
+  // Header row
+  const header = '<div style="display:grid;grid-template-columns:22px 16px 1fr auto auto auto;gap:4px;' +
+    'padding:4px 4px 6px;border-bottom:1px solid var(--border);margin-bottom:2px;">' +
+    '<div></div>' +
+    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:center;">#</div>' +
+    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;">Navn</div>' +
+    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:right;padding-left:6px;">Pts</div>' +
+    '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;text-align:right;padding-left:6px;min-width:42px;">%</div>' +
+    '</div>';
+
+  return '<div style="font-size:12px;">' + header + rows + '</div>';
+}
+
+window.toggleRefInStandings = (mid) => {
+  window._refInStandings = window._refInStandings || {};
+  window._refInStandings[mid] = (window._refInStandings[mid] === false) ? true : false;
+  const btn = document.getElementById('refStandBtn-' + mid);
+  if (btn) btn.classList.toggle('on', window._refInStandings[mid] !== false);
+  renderDash();
+};
+
+window.openShooterModalForMatch = (matchId) => {
+  window._shooterModalMatchId = matchId;
+  window.openShooterModal();
+};
+
+// ── Render one shooter card ───────────────────────────
+function renderCard(s, match, stageDefs, rankMap) {
+  const uid     = s.uid;
+  const name    = s.name || uid;
+  const shooter = (match.shooters||[]).find(x => String(x.id)===uid) || { id:uid, stages:[] };
+  const pf      = (shooter.pf||shooter.powerFactor||'minor').toLowerCase();
+  const div     = shooter.division || s.division || '—';
+  const club    = shooter.club || s.club || '';
+
+  const done    = (shooter.stages||[]).filter(st => st.time>0);
+  const doneNums = done.map(st => Number(st.num||st.number));
+  const total   = stageDefs.length;
+  const pct     = total>0 ? Math.round(done.length/total*100) : 0;
+
+  // Accumulate
+  let totPts=0, totTime=0, totA=0, totC=0, totD=0, totMiss=0, totShots=0;
+  done.forEach(st => {
+    const p = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+    totPts  += p;
+    totTime += st.time;
+    totA    += st.a||0; totC += st.c||0; totD += st.d||0; totMiss += st.miss||0;
+    totShots += (st.a||0)+(st.c||0)+(st.d||0)+(st.miss||0);
+  });
+  const avgHF   = done.length>0 ? calcHF(totPts, totTime) : 0;
+  const aPct    = totShots>0 ? Math.round(totA/totShots*100) : 0;
+  const missPct = totShots>0 ? (totMiss/totShots*100).toFixed(1) : '0.0';
+  const rank    = rankMap[uid] || '—';
+
+  // Prognosis
+  const remaining   = total - done.length;
+  const avgPtsPerSt = done.length>0 ? totPts/done.length : 0;
+  const projTotal   = totPts + avgPtsPerSt*remaining;
+  const matchMax    = stageDefs.reduce((s,d) => s+stageMaxPts(d), 0);
+  const projPct     = matchMax>0 ? Math.min(100, projTotal/matchMax*100).toFixed(1) : '—';
+
+  // Delta vs leader
+  const totals    = calcMatchTotals(match, stageDefs);
+  const leaderPts = totals.length>0 ? totals[0].pts : 0;
+  const myTotPts  = (totals.find(t=>t.uid===uid)||{}).pts || 0;
+  const delta     = myTotPts - leaderPts;
+  const deltaStr  = done.length>0
+    ? (delta===0 ? 'LEDER' : (delta>0?'+':'')+delta.toFixed(1)+' pts')
+    : '—';
+
+  // Stage pills
+  const pills = stageDefs.map(sd => {
+    const n = Number(sd.number);
+    const isDone = doneNums.includes(n);
+    return `<div class="spill ${isDone?'done':'pending'} clickable"
+      onclick="window.toggleStageDetail('${escA(uid)}',${n},${JSON.stringify(isDone)})">${n}</div>`;
+  }).join('');
+
+  // HF chart SVG
+  const chartSvg = buildHFChart(done, stageDefs, pf, div);
+
+  // Ref shooters
+  const refRows = buildRefRows(uid, pf, div, avgHF, shooter, stageDefs);
+
+  // Coach tip
+  const tip = coachTip(aPct, avgHF, done.length);
+
+  // Stage select for result modal
+  const stageOpts = stageDefs.map(sd =>
+    `<option value="${sd.number}">${escH(sd.name||'Stage '+sd.number)}${doneNums.includes(Number(sd.number))?' ✓':''}</option>`
+  ).join('');
+
+  return `
+    <div class="scard" id="card-${escA(uid)}" style="${minimisedCards.has(uid)?'opacity:0.65;':''}">
+      <div class="scard-head">
+        <div>
+          <div class="scard-name">${escH(name)}</div>
+          <div class="scard-sub">${escH(club)}</div>
+          <div class="scard-badges">
+            <span class="badge badge-div">${escH(div)}</span>
+            <span class="badge badge-pf-${pf==='major'?'major':'minor'}">${pf.toUpperCase()}</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <div class="scard-rank">
+            <div class="scard-rank-num">${rank}</div>
+            <div class="scard-rank-lbl">Rang</div>
+            <div style="font-size:11px;color:${delta===0&&done.length>0?'var(--green)':delta<0?'var(--red)':'var(--muted)'};font-weight:700;margin-top:2px;">${escH(deltaStr)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body" style="${minimisedCards.has(uid)?'display:none;':''}">
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-val">${avgHF>0?avgHF.toFixed(2):'—'}</div>
+          <div class="stat-lbl">Avg HF</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val ${aPct>=85?'green':aPct>=70?'':'red'}">${done.length>0?aPct+'%':'—'}</div>
+          <div class="stat-lbl">A%</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val blue">${done.length}</div>
+          <div class="stat-lbl">Skutt</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val muted">${remaining}</div>
+          <div class="stat-lbl">Igjen</div>
+        </div>
+      </div>
+
+      <div class="prog-section">
+        <div class="prog-label"><span>Fremgang</span><strong>${pct}%</strong></div>
+        <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+      </div>
+
+      <div class="stages-section">
+        <div class="stages-lbl">Stages — klikk for detaljer</div>
+        <div class="stage-pills">${pills}</div>
+        <div id="sd-${escA(uid)}" class="stage-detail"></div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-lbl">
+          <span>HF per stage</span>
+          <div class="chart-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:var(--blue);"></div>Faktisk</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--accent);border-top:1px dashed var(--accent);"></div>Prognose</div>
+          </div>
+        </div>
+        <div class="chart-wrap">${chartSvg}</div>
+      </div>
+
+      <div class="prog2-section">
+        <div class="prog2-lbl">Prognose (inneværende match)</div>
+        <div class="prog2-grid">
+          <div class="prog2-item">
+            <div class="prog2-val">${avgHF>0?avgHF.toFixed(2):'—'}</div>
+            <div class="prog2-lbl2">Est. snitt-HF</div>
+          </div>
+          <div class="prog2-item">
+            <div class="prog2-val">${projPct!=='—'?projPct+'%':'—'}</div>
+            <div class="prog2-lbl2">Est. match-%</div>
+          </div>
+          <div class="prog2-item">
+            <div class="prog2-val">${done.length>0?Math.round(projTotal):'—'}</div>
+            <div class="prog2-lbl2">Est. totalpoeng</div>
+          </div>
+          <div class="prog2-item">
+            <div class="prog2-val" style="color:${parseFloat(missPct)>0?'var(--red)':'var(--green)'}">
+              ${missPct !== '0.0' ? missPct+'%' : '0'}
+            </div>
+            <div class="prog2-lbl2">Miss-rate</div>
+          </div>
+        </div>
+      </div>
+
+      ${refRows ? `
+      <div class="ref-section" id="ref-${escA(uid)}">
+        <button class="ref-toggle open" onclick="window.togRef('${escA(uid)}',this)">
+          <svg width="11" height="7" viewBox="0 0 11 7" fill="none">
+            <path d="M1 1l4.5 4.5L10 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Referanseskyttere
+        </button>
+        <div class="ref-list" id="reflist-${escA(uid)}">${refRows}</div>
+      </div>` : ''}
+
+      ${tip ? `<div class="coach-tip">${tip}</div>` : ''}
+
+      <div class="scard-foot">
+        <button class="btn btn-primary btn-sm"
+          onclick="window.openRes('${escA(uid)}','${escA(name)}','${escA(match.id)}')">
+          + Legg til resultat
+        </button>
+      </div>
+      </div><!-- end card-body -->
+    </div>`;
+}
+
+// ── HF chart ──────────────────────────────────────────
+function buildHFChart(done, stageDefs, pf, div) {
+  const W = 320, H = 80;
+  if (!stageDefs.length) return `<svg viewBox="0 0 ${W} ${H}"></svg>`;
+
+  // Actual HF per stage number
+  const hfMap = {};
+  done.forEach(st => {
+    const p = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+    hfMap[Number(st.num||st.number)] = calcHF(p, st.time);
+  });
+
+  const nums    = stageDefs.map(s => Number(s.number));
+  const actuals = nums.map(n => hfMap[n] ?? null);
+  const avgHF   = done.length > 0
+    ? done.reduce((sum, st) => {
+        const p = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+        return sum + calcHF(p, st.time);
+      }, 0) / done.length
+    : 0;
+
+  // Ref shooter avg HF for this division
+  const refs = allRefShooters.filter(r =>
+    (!r.division || r.division.toLowerCase() === (div||'').toLowerCase()) &&
+    !disabledShooters.has('ref_' + r.id)
+  ).slice(0,3);
+
+  const allVals = actuals.filter(v=>v!==null);
+  if (avgHF>0) allVals.push(avgHF);
+  refs.forEach(r => { if(r.mediumHF) allVals.push(r.mediumHF); });
+  const maxV = allVals.length ? Math.max(...allVals) * 1.15 : 10;
+  const minV = 0;
+
+  const xScale = (i) => nums.length > 1 ? (i/(nums.length-1))*(W-20)+10 : W/2;
+  const yScale = (v) => H - 4 - ((v-minV)/(maxV-minV||1))*(H-10);
+
+  // Actual line (blue) — only for done stages
+  let actualPath = '', actualDots = '';
+  let prevX = null, prevY = null;
+  nums.forEach((n,i) => {
+    const v = hfMap[n];
+    if (v == null) { prevX=null; prevY=null; return; }
+    const x = xScale(i), y = yScale(v);
+    if (prevX !== null) actualPath += ` L${x},${y}`;
+    else actualPath += `M${x},${y}`;
+    prevX=x; prevY=y;
+    actualDots += `<circle cx="${x}" cy="${y}" r="3" fill="var(--blue)" stroke="var(--bg)" stroke-width="1.5"/>`;
+  });
+
+  // Prognosis line (accent dashed) — full match
+  let progPath = '';
+  if (avgHF > 0) {
+    nums.forEach((n,i) => {
+      const x = xScale(i), y = yScale(avgHF);
+      progPath += i===0 ? `M${x},${y}` : ` L${x},${y}`;
+    });
+  }
+
+  // Ref lines (faint)
+  let refLines = '';
+  refs.forEach((r, ri) => {
+    const hf = r.mediumHF||r.shortHF||r.longHF||0;
+    if (!hf) return;
+    const y = yScale(hf);
+    const colors = ['rgba(240,112,48,.5)','rgba(74,158,255,.4)','rgba(76,175,125,.4)'];
+    refLines += `<line x1="10" y1="${y}" x2="${W-10}" y2="${y}" stroke="${colors[ri%3]}" stroke-width="1" stroke-dasharray="3,3"/>`;
+  });
+
+  // X axis labels (every 3rd stage)
+  let xLabels = '';
+  nums.forEach((n,i) => {
+    if (i%3===0 || i===nums.length-1) {
+      xLabels += `<text x="${xScale(i)}" y="${H+1}" text-anchor="middle" font-size="8" fill="rgba(138,147,161,.6)">${n}</text>`;
+    }
+  });
+
+  return `
+    <svg viewBox="0 0 ${W} ${H+10}" style="overflow:visible;">
+      ${refLines}
+      ${progPath ? `<path d="${progPath}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5,3" fill="none" opacity=".6"/>` : ''}
+      ${actualPath ? `<path d="${actualPath}" stroke="var(--blue)" stroke-width="2" fill="none"/>` : ''}
+      ${actualDots}
+      ${xLabels}
+    </svg>`;
+}
+
+// ── Ref rows ──────────────────────────────────────────
+function buildRefRows(uid, pf, div, shooterAvgHF, shooter, stageDefs) {
+  const refs = allRefShooters.filter(r =>
+    (!r.division || r.division.toLowerCase()===(div||'').toLowerCase()) &&
+    !disabledShooters.has('ref_' + r.id)
+  ).slice(0,4);
+  if (!refs.length || !shooterAvgHF) return '';
+
+  return refs.map(r => {
+    const refHF = r.mediumHF||r.shortHF||r.longHF||0;
+    const delta = shooterAvgHF - refHF;
+    const sign  = delta>=0?'+':'';
+    return `
+      <div class="ref-row">
+        <span class="ref-name">${escH(r.name||r.id)}</span>
+        <span class="ref-hf">${refHF.toFixed(2)} HF</span>
+        <span class="${delta>=0?'ref-delta-pos':'ref-delta-neg'}">${sign}${delta.toFixed(2)}</span>
+      </div>`;
+  }).join('');
+}
+
+// ── Toggle card minimise ─────────────────────────────
+window.toggleMinimise = (uid) => {
+  if (minimisedCards.has(uid)) {
+    minimisedCards.delete(uid);
+  } else {
+    minimisedCards.add(uid);
+  }
+  // Re-render just this card's body
+  const card = document.getElementById('card-' + uid);
+  if (!card) return;
+  const body = card.querySelector('.card-body');
+  const eyeBtn = card.querySelector('.eye-btn');
+  if (minimisedCards.has(uid)) {
+    if (body) body.style.display = 'none';
+    if (eyeBtn) eyeBtn.title = 'Vis skytter';
+    if (eyeBtn) eyeBtn.innerHTML = eyeIcon(false);
+    card.style.opacity = '0.6';
+  } else {
+    if (body) body.style.display = '';
+    if (eyeBtn) eyeBtn.title = 'Skjul skytter';
+    if (eyeBtn) eyeBtn.innerHTML = eyeIcon(true);
+    card.style.opacity = '1';
+  }
+};
+
+// ── Toggle shooter in/out of standings + ref comparisons ─
+window.toggleShooterDisabled = (uid, mid) => {
+  if (disabledShooters.has(uid)) {
+    disabledShooters.delete(uid);
+  } else {
+    disabledShooters.add(uid);
+  }
+  // Also dim/undim shooter card if it's a real shooter (not ref_)
+  if (!uid.startsWith('ref_')) {
+    const card = document.getElementById('card-' + uid);
+    if (card) {
+      card.style.opacity = disabledShooters.has(uid) ? '0.35' : '1';
+    }
+  }
+  // Re-render standings for this match only
+  renderDash();
+};
+
+function eyeIcon(open) {
+  return open
+    ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7s2-4 6-4 6 4 6 4-2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.5"/><line x1="2" y1="2" x2="12" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+}
+
+// ── Toggle ref per card ───────────────────────────────
+window.togRef = (uid, btn) => {
+  const list = document.getElementById('reflist-'+uid);
+  if (!list) return;
+  const isOpen = list.style.display !== 'none' && !list.classList.contains('hidden');
+  list.style.display = isOpen ? 'none' : 'grid';
+  btn.classList.toggle('open', !isOpen);
+};
+
+// ── Stage detail expand ──────────────────────────────
+window.toggleStageDetail = (uid, stageNum, isDone) => {
+  const detailEl = document.getElementById('sd-' + uid);
+  if (!detailEl) return;
+
+  // Toggle off if same stage clicked
+  if (detailEl.dataset.openStage === String(stageNum) && detailEl.classList.contains('open')) {
+    detailEl.classList.remove('open');
+    detailEl.dataset.openStage = '';
+    document.querySelectorAll(`#card-${uid} .spill`).forEach(p => p.classList.remove('active-detail'));
+    return;
+  }
+
+  // Highlight pill
+  document.querySelectorAll(`#card-${uid} .spill`).forEach(p => p.classList.remove('active-detail'));
+  event.currentTarget && event.currentTarget.classList.add('active-detail');
+
+  if (!isDone) {
+    detailEl.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:4px 0;">Stage ${stageNum} er ikke skutt ennå.</div>`;
+    detailEl.dataset.openStage = String(stageNum);
+    detailEl.classList.add('open');
+    return;
+  }
+
+  // Find shooter data — search across ALL matches for this uid
+  let match = null, shooter = null, st = null;
+  for (const m of Object.values(allMatchData)) {
+    const sh = (m.shooters||[]).find(s => String(s.id)===uid);
+    if (sh) {
+      const found = (sh.stages||[]).find(s => Number(s.num||s.number)===stageNum);
+      if (found) { match=m; shooter=sh; st=found; break; }
+      // Keep as fallback even if this stage not found
+      if (!shooter) { match=m; shooter=sh; }
+    }
+  }
+  if (!shooter) { detailEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Ingen data funnet.</div>'; detailEl.classList.add('open'); return; }
+  if (!st) { detailEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Stage ' + stageNum + ' er ikke skutt ennå.</div>'; detailEl.classList.add('open'); return; }
+
+  const pf   = (shooter.pf||shooter.powerFactor||'minor').toLowerCase();
+  const pts  = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+  const hf   = st.time>0 ? pts/st.time : 0;
+  const shots = (st.a||0)+(st.c||0)+(st.d||0)+(st.miss||0);
+  const aPct  = shots>0 ? Math.round((st.a||0)/shots*100) : 0;
+
+  // Stage metrics for rankings
+  const stageDef = getStageDefs(match).find(s => Number(s.number)===stageNum);
+  const metrics  = stageMetrics(match, stageNum);
+  const myRank   = metrics.findIndex(m => String(m.id)===uid) + 1;
+  const stagePts = metrics.length>0 && metrics[0].hf>0 ? (hf/metrics[0].hf*(stageMaxPts(stageDef||{}))).toFixed(1) : '—';
+
+  // Build ref section if toggle is on
+  let refSection = '';
+  if (refVisible && allRefShooters.length && stageDef) {
+    const shots   = (stageDef.paperTargets||0)*2 + (stageDef.poppers||0) + (stageDef.plates||0);
+    const maxPts  = stageMaxPts(stageDef);
+    const ct      = maxPts <= 60 ? 'short' : maxPts <= 120 ? 'medium' : 'long';
+    const refRows = allRefShooters
+      .filter(r => (!r.division || r.division.toLowerCase() === (shooter?.division||'').toLowerCase()) && !disabledShooters.has('ref_' + r.id))
+      .slice(0,4)
+      .map(r => {
+        const refHF   = r[ct+'HF'] || r.mediumHF || r.shortHF || r.longHF || 0;
+        if (!refHF) return '';
+        const expTime = shots > 0 && refHF > 0 ? (maxPts / refHF).toFixed(2) : '—';
+        const delta   = refHF > 0 ? (hf - refHF) : null;
+        const sign    = delta !== null ? (delta >= 0 ? '+' : '') : '';
+        const col     = delta !== null ? (delta >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--muted)';
+        return '<div class="sd-row">' +
+          '<span style="color:var(--blue);font-weight:700;">' + escH(r.name||r.id) + '</span>' +
+          '<span style="font-size:11px;">' +
+            '<span style="color:var(--accent);font-weight:700;">' + refHF.toFixed(2) + ' HF</span>' +
+            ' &nbsp;' + expTime + 's' +
+            (delta !== null ? ' &nbsp;<span style="color:'+col+';font-weight:700;">'+sign+delta.toFixed(2)+'</span>' : '') +
+          '</span>' +
+        '</div>';
+      }).filter(Boolean).join('');
+
+    if (refRows) {
+      refSection = '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">' +
+        '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px;">Referanseskyttere — ' + ct.toUpperCase() + '</div>' +
+        refRows + '</div>';
+    }
+  }
+
+  detailEl.innerHTML =
+    '<div style="font-size:11px;color:var(--accent);font-weight:700;margin-bottom:8px;">Stage ' + stageNum + (stageDef?.name?' — '+escH(stageDef.name):'') + '</div>' +
+    '<div class="sd-grid">' +
+      '<div class="sd-cell"><div class="sd-val">' + (st.time?.toFixed(2)||'—') + '</div><div class="sd-lbl">Tid (s)</div></div>' +
+      '<div class="sd-cell"><div class="sd-val" style="color:var(--accent);">' + hf.toFixed(2) + '</div><div class="sd-lbl">HF</div></div>' +
+      '<div class="sd-cell"><div class="sd-val">' + pts + '</div><div class="sd-lbl">Poeng</div></div>' +
+      '<div class="sd-cell"><div class="sd-val" style="color:' + (myRank===1?'var(--green)':'var(--text)') + ';">' + (myRank||'—') + '</div><div class="sd-lbl">Rang</div></div>' +
+    '</div>' +
+    '<div class="sd-row"><span style="color:var(--muted);">A / C / D</span><span style="font-weight:700;">' + (st.a||0) + ' / ' + (st.c||0) + ' / ' + (st.d||0) + '</span></div>' +
+    '<div class="sd-row"><span style="color:var(--muted);">Miss / NS / Proc</span><span style="font-weight:700;color:' + ((st.miss||0)>0?'var(--red)':'var(--text)') + ';">' + (st.miss||0) + ' / ' + (st.ns||0) + ' / ' + (st.proc||0) + '</span></div>' +
+    '<div class="sd-row"><span style="color:var(--muted);">A%</span><span style="font-weight:700;color:' + (aPct>=85?'var(--green)':aPct>=70?'var(--text)':'var(--red)') + ';">' + aPct + '%</span></div>' +
+    '<div class="sd-row"><span style="color:var(--muted);">Stage-poeng</span><span style="font-weight:700;color:var(--accent);">' + stagePts + '</span></div>' +
+    refSection;
+
+  detailEl.dataset.openStage = String(stageNum);
+  detailEl.classList.add('open');
+};
+
+// ── Stage metrics helper ──────────────────────────────
+function stageMetrics(match, stageNum) {
+  const results = [];
+  // Include ALL shooters (isMe + manual + regular)
+  (match.shooters||[]).forEach(sh => {
+    const st = (sh.stages||[]).find(s => Number(s.num||s.number)===stageNum && s.time>0);
+    if (!st) return;
+    const pf  = (sh.pf||sh.powerFactor||'minor').toLowerCase();
+    const pts = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+    const hf  = st.time>0 ? pts/st.time : 0;
+    results.push({ id: String(sh.id), hf, pts });
+  });
+  return results.sort((a,b) => b.hf-a.hf);
+}
+
+// stageMaxPts defined above
+
+// ── Coach tip ─────────────────────────────────────────
+function coachTip(aPct, avgHF, doneCount) {
+  if (!doneCount) return '';
+  if (aPct < 70)   return '🎯 A% under 70 — prioriter treff over tempo.';
+  if (aPct < 80)   return '📈 A% kan løftes. La siktet sette seg litt mer.';
+  if (aPct >= 90 && avgHF > 5) return '🔥 Solid — A% og HF er begge sterke.';
+  if (aPct >= 85)  return '✅ Bra treff. Hold tempoet gjennom gjenstående stages.';
+  return '⚡ Stol på baseline — skyt kontrollert.';
+}
+
+// ── Match totals (standings) — stage-normalised scoring (IPSC method) ──
+// Uses same method as appen: for each stage, best HF = 100%, others get proportional pts
+function calcMatchTotals(match, stageDefs) {
+  // Only use match.shooters[] as source — it is THE authoritative list.
+  // participants[] is only for access control, not for scoring.
+  // sh.id is the canonical identifier for each shooter.
+  const allMatchShooters = match.shooters || [];
+  const totals = {};
+
+  allMatchShooters.forEach(sh => {
+    const uid  = String(sh.id);
+    const name = [sh.firstName, sh.lastName].filter(Boolean).join(' ') || _userCache[uid]?.name || uid;
+    totals[uid] = { uid, name, stagePts: 0, rawPts: 0 };
+  });
+
+  // For each stage: normalise scores so best HF = stage max pts
+  stageDefs.forEach(sd => {
+    const stageNum = Number(sd.number);
+    const maxPts   = stageMaxPts(sd);
+
+    const stageResults = [];
+    allMatchShooters.forEach(sh => {
+      const uid = String(sh.id);
+      const st  = (sh.stages||[]).find(s => Number(s.num||s.number)===stageNum && s.time>0);
+      if (!st) return;
+      const pf  = (sh.pf||sh.powerFactor||'minor').toLowerCase();
+      const pts = calcPts(pf, st.a||0, st.c||0, st.d||0, st.miss||0, st.ns||0, st.proc||0);
+      const hf  = st.time > 0 ? pts / st.time : 0;
+      stageResults.push({ uid, hf, pts });
+    });
+
+    if (!stageResults.length) return;
+    const bestHF = Math.max(...stageResults.map(r => r.hf));
+    if (bestHF <= 0) return;
+
+    stageResults.forEach(r => {
+      if (!totals[r.uid]) return;
+      totals[r.uid].stagePts += (r.hf / bestHF) * maxPts;
+      totals[r.uid].rawPts  += r.pts;
+    });
+  });
+
+  return Object.values(totals)
+    .map(t => ({ ...t, pts: t.stagePts }))
+    .sort((a, b) => b.pts - a.pts);
+}
+
+// ── Get all match shooters (participants + shooters[]) ─
+// userCache filled lazily when names are missing
+const _userCache = {};
+
+async function resolveUserName(uid) {
+  if (_userCache[uid]) return _userCache[uid];
+  try {
+    const ud = await getDoc(doc(db, 'users', uid));
+    if (ud.exists()) {
+      const d = ud.data();
+      _userCache[uid] = {
+        name:     [d.firstName, d.lastName].filter(Boolean).join(' ') || d.email || uid,
+        division: d.division || '',
+        pf:       d.powerFactor || 'minor',
+        club:     d.club || ''
+      };
+    } else {
+      _userCache[uid] = { name: uid, division:'', pf:'minor', club:'' };
+    }
+  } catch {
+    _userCache[uid] = { name: uid, division:'', pf:'minor', club:'' };
+  }
+  return _userCache[uid];
+}
+
+function getMatchShooters(match) {
+  const participants = (match.participants||[]).map(String);
+  const shootersArr  = (match.shooters||[]).filter(s => !s.isMe);
+
+  const byUid = {};
+  shootersArr.forEach(s => { if(s.id) byUid[String(s.id)] = s; });
+
+  const seen = new Set();
+  const result = [];
+
+  // 1. All shooters in match.shooters[] (includes isMe and manual)
+  // Use shooters[] as primary source — it has names and division
+  const allSh = (match.shooters||[]);
+  allSh.forEach(s => {
+    const uid = String(s.id);
+    if (seen.has(uid)) return;
+    seen.add(uid);
+    const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || _userCache[uid]?.name || uid;
+    result.push({
+      uid,
+      name,
+      division: s.division || _userCache[uid]?.division || '',
+      pf:       s.pf || s.powerFactor || _userCache[uid]?.pf || 'minor',
+      club:     s.club || _userCache[uid]?.club || '',
+      isMe:     !!s.isMe
+    });
+  });
+
+  // 2. Participants not yet in shooters[] (joined but no results/entry)
+  participants.forEach(uid => {
+    if (seen.has(uid)) return;
+    seen.add(uid);
+    const cached = _userCache[uid];
+    result.push({
+      uid,
+      name:     cached?.name || uid,
+      division: cached?.division || '',
+      pf:       cached?.pf || 'minor',
+      club:     cached?.club || '',
+      isMe:     false
+    });
+  });
+
+  return result;
+}
+
+// Resolve unknown names after first render
+async function resolveUnknownNames(match) {
+  const participants = (match.participants||[]).map(String);
+  const shootersArr  = (match.shooters||[]).filter(s => !s.isMe);
+  const byUid = {};
+  shootersArr.forEach(s => { if(s.id) byUid[String(s.id)] = s; });
+
+  const unknowns = participants.filter(uid => !byUid[uid] && !_userCache[uid]);
+  if (!unknowns.length) return;
+
+  await Promise.all(unknowns.map(uid => resolveUserName(uid)));
+  renderDash(); // re-render with resolved names
+}
+
+function getStageDefs(match) {
+  if (!match?.stages) return [];
+  return match.stages
+    .filter(s => s && (s.number!=null||s.num!=null||s.name))
+    .map((s,i) => ({
+      number: s.number!=null ? s.number : s.num!=null ? s.num : i+1,
+      name:   s.name || 'Stage '+(s.number||s.num||i+1),
+      paperTargets: s.paperTargets||0, poppers: s.poppers||0, plates: s.plates||0,
+    }))
+    .sort((a,b) => a.number-b.number);
+}
+
+// ── Result modal ──────────────────────────────────────
+window.openRes = (uid, name, matchId) => {
+  const match = allMatchData[matchId];
+  if (!match) return;
+  resultTarget = { uid, name, matchId };
+
+  const stageDefs = getStageDefs(match);
+  const sh = (match.shooters||[]).find(s => String(s.id)===uid);
+  const doneNums = (sh?.stages||[]).filter(s=>s.time>0).map(s=>Number(s.num||s.number));
+
+  $('resModalTitle').textContent = 'Legg til resultat';
+  $('resModalSub').textContent   = name;
+  $('resError').style.display    = 'none';
+  $('resSuccess').style.display  = 'none';
+  $('resStage').innerHTML = stageDefs.length
+    ? stageDefs.map(sd =>
+        `<option value="${sd.number}">${escH(sd.name||'Stage '+sd.number)}${doneNums.includes(Number(sd.number))?' ✓':''}</option>`
+      ).join('')
+    : '<option value="1">Stage 1</option>';
+  ['resTime','resA','resC','resD','resMiss','resNS','resProc'].forEach(id => {
+    $(id).value = id==='resTime' ? '' : '0';
+  });
+  $('resCalc').textContent = '— / —';
+  $('resultModal').classList.add('open');
+};
+
+['resTime','resA','resC','resD','resMiss','resNS','resProc'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    if (!resultTarget) return;
+    const match = allMatchData[resultTarget.matchId];
+    const sh    = (match?.shooters||[]).find(s => String(s.id)===resultTarget.uid);
+    const pf    = sh?.pf||sh?.powerFactor||'minor';
+    const time  = parseFloat($('resTime').value)||0;
+    const a     = parseInt($('resA').value)||0;
+    const c     = parseInt($('resC').value)||0;
+    const d     = parseInt($('resD').value)||0;
+    const miss  = parseInt($('resMiss').value)||0;
+    const ns    = parseInt($('resNS').value)||0;
+    const proc  = parseInt($('resProc').value)||0;
+    const pts   = calcPts(pf, a, c, d, miss, ns, proc);
+    const hf    = time>0 ? (pts/time).toFixed(4) : '—';
+    $('resCalc').textContent = `${pts} pts / ${hf} HF`;
+  });
+});
+
+$('cancelResBtn').onclick = () => $('resultModal').classList.remove('open');
+$('resultModal').addEventListener('click', e => {
+  if (e.target===$('resultModal')) $('resultModal').classList.remove('open');
+});
+
+$('saveResBtn').onclick = async () => {
+  if (!resultTarget) return;
+  const { uid, matchId } = resultTarget;
+  const match = allMatchData[matchId];
+  if (!match) return;
+
+  const stageNum = parseInt($('resStage').value, 10);
+  const time     = parseFloat($('resTime').value);
+  const a        = parseInt($('resA').value)||0;
+  const c        = parseInt($('resC').value)||0;
+  const d        = parseInt($('resD').value)||0;
+  const miss     = parseInt($('resMiss').value)||0;
+  const ns       = parseInt($('resNS').value)||0;
+  const proc     = parseInt($('resProc').value)||0;
+
+  $('resError').style.display = 'none';
+  if (!stageNum || !time || time<=0) { showErr($('resError'),'Stage og tid er påkrevd.'); return; }
+
+  const shooters = JSON.parse(JSON.stringify(match.shooters||[]));
+  let sh = shooters.find(s => String(s.id)===uid);
+  if (!sh) {
+    // Create shooter entry
+    const participant = getMatchShooters(match).find(s => s.uid===uid);
+    sh = { id: uid, isMe: false,
+      firstName: participant?.name?.split(' ')[0]||'',
+      lastName:  participant?.name?.split(' ').slice(1).join(' ')||'',
+      division:  participant?.division||'', pf: participant?.pf||'minor',
+      club: participant?.club||'', stages: [] };
+    shooters.push(sh);
+  }
+
+  sh.stages = sh.stages||[];
+  const pf   = (sh.pf||'minor').toLowerCase();
+  const pts  = calcPts(pf, a, c, d, miss, ns, proc);
+  const hf   = time>0 ? pts/time : 0;
+  const sd   = getStageDefs(match).find(s => Number(s.number)===stageNum);
+
+  const entry = { num:stageNum, name:sd?.name||'Stage '+stageNum, time, a, c, d, miss, ns, proc, pts, hf, shots:a+c+d+miss, savedAt:Date.now() };
+  const idx   = sh.stages.findIndex(s => (s.num||s.number)===stageNum);
+  if (idx>=0) sh.stages[idx] = { ...sh.stages[idx], ...entry };
+  else sh.stages.push(entry);
+  sh.stages.sort((a,b) => (a.num||0)-(b.num||0));
+
+  try {
+    await updateDoc(doc(db, 'matches', String(matchId)), { shooters });
+    $('resSuccess').textContent = `✓ Lagret stage ${stageNum}`;
+    $('resSuccess').style.display = 'block';
+    setTimeout(() => { $('resultModal').classList.remove('open'); $('resSuccess').style.display='none'; }, 1400);
+  } catch(e) { showErr($('resError'), 'Kunne ikke lagre: '+e.message); }
+};
+
+// ── Add / Edit / Delete Shooter ──────────────────────
+window.openShooterModal = () => {
+  const matchId = window._shooterModalMatchId || Object.keys(allMatchData)[0];
+  const match = matchId ? allMatchData[matchId] : Object.values(allMatchData)[0];
+  if (!match) return;
+  window._shooterModalMatchId = String(match.id);
+  shooterEditId = null;
+  $('shooterModalTitle').textContent = 'Legg til skytter';
+  $('shooterModalSub').textContent = match.name || 'Matchen';
+  $('shFirstName').value=''; $('shLastName').value='';
+  $('shDivision').value='Classic'; $('shPF').value='minor'; $('shClub').value='';
+  $('shEditId').value='';
+  $('shooterError').style.display='none';
+  renderShooterList(match);
+  $('shooterModal').classList.add('open');
+};
+
+window.editShooterInModal = (id) => {
+  const match = Object.values(allMatchData)[0];
+  if (!match) return;
+  const sh = (match.shooters||[]).find(s => String(s.id)===String(id) && !s.isMe);
+  if (!sh) return;
+  shooterEditId = String(id);
+  $('shooterModalTitle').textContent = 'Rediger skytter';
+  $('shFirstName').value = sh.firstName||'';
+  $('shLastName').value  = sh.lastName||'';
+  $('shDivision').value  = sh.division||'Classic';
+  $('shPF').value        = sh.pf||sh.powerFactor||'minor';
+  $('shClub').value      = sh.club||'';
+  $('shEditId').value    = String(id);
+  $('shooterError').style.display='none';
+};
+
+window.deleteShooterFromModal = async (id) => {
+  if (!confirm('Slett denne skytteren?')) return;
+  const matchId = window._shooterModalMatchId || Object.keys(allMatchData)[0];
+  const match = matchId ? allMatchData[matchId] : Object.values(allMatchData)[0];
+  if (!match) return;
+  const shooters = (match.shooters||[]).filter(s => String(s.id)!==String(id));
+  try {
+    await updateDoc(doc(db, 'matches', String(match.id)), { shooters });
+  } catch(e) { alert('Feil: '+e.message); }
+};
+
+function renderShooterList(match) {
+  const listEl = $('shooterListEl');
+  const sec    = $('shooterListSection');
+  const others = (match.shooters||[]).filter(s => !s.isMe);
+  if (!others.length) { sec.style.display='none'; return; }
+  sec.style.display='block';
+  listEl.innerHTML = others.map(s => {
+    const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || String(s.id);
+    const meta = [s.division, (s.pf||'').toUpperCase(), s.club].filter(Boolean).join(' · ');
+    return `
+      <div class="shooter-list-item">
+        <div>
+          <div class="shooter-list-item-name">${escH(name)}</div>
+          <div class="shooter-list-item-meta">${escH(meta)}</div>
+        </div>
+        <div class="shooter-list-actions">
+          <button class="btn btn-sm btn-ghost" onclick="window.editShooterInModal('${escA(String(s.id))}')">Rediger</button>
+          <button class="btn btn-sm btn-danger" onclick="window.deleteShooterFromModal('${escA(String(s.id))}')">Slett</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+$('saveShooterBtn').onclick = async () => {
+  const matchId = window._shooterModalMatchId || Object.keys(allMatchData)[0];
+  const match = matchId ? allMatchData[matchId] : Object.values(allMatchData)[0];
+  if (!match) return;
+  const fn  = $('shFirstName').value.trim();
+  const ln  = $('shLastName').value.trim();
+  const div = $('shDivision').value;
+  const pf  = $('shPF').value;
+  const club= $('shClub').value.trim();
+  if (!fn && !ln) { showErr($('shooterError'), 'Fornavn eller etternavn er påkrevd'); return; }
+
+  const shooters = JSON.parse(JSON.stringify(match.shooters||[]));
+  const editId = $('shEditId').value;
+
+  if (editId) {
+    // Edit existing
+    const idx = shooters.findIndex(s => String(s.id)===editId);
+    if (idx>=0) { shooters[idx] = { ...shooters[idx], firstName:fn, lastName:ln, division:div, pf, club }; }
+  } else {
+    // Add new with unique id
+    const newId = 'manual_' + Date.now();
+    shooters.push({ id:newId, isMe:false, firstName:fn, lastName:ln, division:div, pf, club, stages:[] });
+  }
+
+  try {
+    await updateDoc(doc(db, 'matches', String(match.id)), { shooters });
+    $('shFirstName').value=''; $('shLastName').value=''; $('shClub').value='';
+    $('shEditId').value=''; shooterEditId=null;
+    $('shooterModalTitle').textContent='Legg til skytter';
+    $('shooterError').style.display='none';
+  } catch(e) { showErr($('shooterError'), 'Kunne ikke lagre: '+e.message); }
+};
+
+$('cancelShooterBtn').onclick = () => { $('shooterModal').classList.remove('open'); shooterEditId=null; };
+$('shooterModal').addEventListener('click', e => { if(e.target===$('shooterModal')) { $('shooterModal').classList.remove('open'); shooterEditId=null; } });
+
+// ── Helpers ───────────────────────────────────────────
+function showErr(el, msg) { el.textContent=msg; el.style.display='block'; }
+function escH(v) {
+  return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function escA(v) { return String(v??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+</script>
+</body>
+</html>

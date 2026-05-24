@@ -580,7 +580,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .standings-table,table{width:100%!important;}\
 /* HERO */\
 .home-hero{background:linear-gradient(135deg,rgba(15,22,35,0.98),rgba(13,15,18,0.98));border:1px solid rgba(59,130,246,0.15);border-radius:16px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden;}\
-.home-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 80% 40%,rgba(59,130,246,0.08),transparent 65%);pointer-events:none;}\
+.home-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 40%,rgba(59,130,246,0.08),transparent 65%);pointer-events:none;}\
 .home-hero-label{font-size:10px;font-weight:800;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}\
 .home-hero-title{font-size:24px;font-weight:900;letter-spacing:-0.01em;color:var(--text);margin-bottom:8px;}\
 .home-hero-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;}\

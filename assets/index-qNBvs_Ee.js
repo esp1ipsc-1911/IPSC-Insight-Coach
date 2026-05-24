@@ -129,24 +129,24 @@ e.innerHTML=`
 <style>
  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  :root {
-  --accent: #3b82f6; --accent2: #2563eb;
+  --accent: #e0b649; --accent2: #c49a30;
   --bg: #0d0f12; --card: #141820;
-  --border: rgba(255,255,255,0.07); --border-gold: rgba(59,130,246,0.25);
+  --border: rgba(255,255,255,0.07); --border-gold: rgba(224,182,73,0.25);
   --text: #f0f2f5; --muted: rgba(255,255,255,0.38);
  }
  html, body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; min-height: 100vh; }
  .login-page {
   min-height: 100vh; width: 100%;
   background: #0d0f12;
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 42.7 L30 60 L0 42.7 L0 17.3Z' fill='none' stroke='rgba(59,130,246,0.04)' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 42.7 L30 60 L0 42.7 L0 17.3Z' fill='none' stroke='rgba(224,182,73,0.04)' stroke-width='0.5'/%3E%3C/svg%3E");
   display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px;
  }
  .login-shell { width: 100%; max-width: 400px; }
  .login-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
- .login-logo { width: 54px; height: 54px; border-radius: 14px; background: linear-gradient(135deg,#1a1e26,#0d0f12); border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 0 0 1px rgba(59,130,246,0.12), 0 0 16px rgba(59,130,246,0.08); }
+ .login-logo { width: 54px; height: 54px; border-radius: 14px; background: linear-gradient(135deg,#1a1e26,#0d0f12); border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 0 0 1px rgba(224,182,73,0.12), 0 0 16px rgba(224,182,73,0.08); }
  .login-lang { display: flex; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
  .lang-btn { background: transparent; border: none; padding: 8px 14px; font-size: 17px; cursor: pointer; line-height: 1; transition: background 0.15s; }
- .lang-btn.active { background: rgba(59,130,246,0.15); }
+ .lang-btn.active { background: rgba(224,182,73,0.15); }
  .lang-btn:first-child { border-right: 1px solid var(--border); }
  .login-hero { margin-bottom: 24px; }
  .login-title { font-size: 44px; font-weight: 900; letter-spacing: -0.01em; line-height: 1; }
@@ -165,7 +165,7 @@ e.innerHTML=`
  .field-ico svg { width: 14px; height: 14px; stroke: rgba(255,255,255,0.25); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
  .field { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: var(--text); font-size: 15px; padding: 12px 14px 12px 40px; outline: none; transition: border-color 0.15s, background 0.15s; -webkit-appearance: none; }
  .field.no-ico { padding-left: 14px; }
- .field:focus { border-color: rgba(59,130,246,0.45); background: rgba(255,255,255,0.06); }
+ .field:focus { border-color: rgba(224,182,73,0.45); background: rgba(255,255,255,0.06); }
  .field::placeholder { color: rgba(255,255,255,0.18); }
  select.field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
  select.field option { background: #141820; color: var(--text); }
@@ -179,8 +179,8 @@ e.innerHTML=`
  .btn-primary { width: 100%; padding: 13px; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: #ffffff; border: none; border-radius: 10px; font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; margin-top: 6px; transition: opacity 0.15s; }
  .btn-primary:hover { opacity: 0.88; }
  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
- .btn-secondary { width: 100%; padding: 12px; background: transparent; color: var(--accent); border: 1px solid rgba(59,130,246,0.28); border-radius: 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
- .btn-secondary:hover { background: rgba(59,130,246,0.08); }
+ .btn-secondary { width: 100%; padding: 12px; background: transparent; color: var(--accent); border: 1px solid rgba(224,182,73,0.28); border-radius: 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+ .btn-secondary:hover { background: rgba(224,182,73,0.08); }
  .btn-ghost { width: 100%; padding: 10px; background: transparent; color: var(--muted); border: none; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; text-transform: uppercase; margin-top: 4px; }
  .or-row { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
  .or-row::before, .or-row::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -193,7 +193,7 @@ e.innerHTML=`
  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
  .pf-row { display: flex; gap: 8px; margin-top: 4px; }
  .pf-btn { flex: 1; padding: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; text-align: center; }
- .pf-btn.selected { background: var(--accent-fade,rgba(59,130,246,0.12)); border-color: var(--accent); color: var(--accent); }
+ .pf-btn.selected { background: var(--accent-fade,rgba(224,182,73,0.12)); border-color: var(--accent); color: var(--accent); }
  .gdpr-row { display: flex; align-items: flex-start; gap: 10px; margin: 12px 0; }
  .gdpr-row input[type=checkbox] { width: 17px; height: 17px; flex-shrink: 0; accent-color: var(--accent); margin-top: 2px; cursor: pointer; }
  .gdpr-row label { font-size: 12px; color: var(--muted); line-height: 1.5; cursor: pointer; }

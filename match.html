@@ -399,7 +399,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
       </div>
       <div>
         <!-- Rankings placeholder -->
-        <div class="dash-panel">
+        <div class="dash-panel" id="dp-rank">
           <div class="dp-head" onclick="toggleDP('dp-rank')">
             <div class="dp-hl"><span style="font-size:15px;">📊</span><span class="dp-title">Rankings</span></div>
             <span class="dp-arr" id="arr-dp-rank">▾</span>
@@ -407,7 +407,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
           <div class="dp-body" id="dpb-rank" style="display:none;"><div class="ne">Rankings coming soon</div></div>
         </div>
         <!-- Competitions in region -->
-        <div class="dash-panel">
+        <div class="dash-panel" id="dp-region">
           <div class="dp-head" onclick="toggleDP('dp-region')">
             <div class="dp-hl"><span style="font-size:15px;">📍</span><span class="dp-title">Competitions in Norway</span></div>
             <span class="dp-arr" id="arr-dp-region">▾</span>
@@ -415,7 +415,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
           <div class="dp-body" id="dpb-region" style="display:none;"><div id="region-list"><div class="ne">Loading…</div></div></div>
         </div>
         <!-- Shooter features -->
-        <div class="dash-panel">
+        <div class="dash-panel" id="dp-feat">
           <div class="dp-head" onclick="toggleDP('dp-feat')">
             <div class="dp-hl"><span style="font-size:15px;">⚡</span><span class="dp-title">Shooter features</span></div>
             <span class="dp-arr" id="arr-dp-feat">▾</span>
@@ -699,7 +699,7 @@ const canAdmin=r=>r==='owner'||r==='admin';
 const canStaff=r=>r==='owner'||r==='admin'||r==='staff';
 
 // expose globals
-Object.assign(window,{sv,toggleDD,closeAllDD,toggleDP,doCreateMatch,doFindSearch,saveStage,updStCalc,saveSquad,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,joinSquad,leaveSquad,runCompare,clearCompare,openOrg,goOrgBack,setOrgTab,editStage,delStage,editSquad,delSquad,openAddStage,openAddSquad,acceptInv,declineInv,setYear,openPubMatch,joinFromPub,updCMapMarker});
+Object.assign(window,{sv,toggleDD,closeAllDD,toggleDP,doCreateMatch,doFindSearch,saveStage,updStCalc,saveSquad,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,joinSquad,leaveSquad,showCompare,clearCmp,openOrg,goOrgBack,setOrgTab,editStage,delStage,editSquad,delSquad,openAddStage,openAddSquad,acceptInv,declineInv,setYear,openPubMatch,joinFromPub,updCMapMarker,pubTab,inviteRole,saveScore,saveSettings,delMatch});
 
 // ── AUTH ──
 onAuthStateChanged(auth,async user=>{
@@ -740,7 +740,8 @@ document.addEventListener('click',e=>{if(!e.target.closest('.ddw')&&!e.target.cl
 // ── PANEL TOGGLE ──
 function toggleDP(id){
   const body=$('dpb-'+id.replace('dp-',''));
-  const arr=$(id).querySelector('.dp-arr');
+  const panel=$(id);
+  const arr=panel?panel.querySelector('.dp-arr'):$('arr-'+id);
   if(!body)return;
   const open=body.style.display!=='none'&&body.style.display!=='';
   body.style.display=open?'none':'block';
@@ -979,7 +980,7 @@ function renderPubPage(m){
           ${!alreadyIn
             ?`<button class="bsm bgrn" onclick="joinFromPub('${m.id}')" style="width:auto;padding:8px 18px;font-size:12px;">✓ Register</button>`
             :`<span class="badge b-green" style="font-size:12px;padding:6px 12px;">✓ Registered</span>`}
-          ${alreadyIn&&!mySquad?`<button class="bsm bblue" onclick="pubTab('squads',document.querySelector('.chip:nth-child(4)'))" style="width:auto;padding:8px 18px;font-size:12px;">Choose Squad</button>`:''}
+          ${alreadyIn&&!mySquad?`<button class="bsm bblue" onclick="pubTab('squads',null)" style="width:auto;padding:8px 18px;font-size:12px;">Choose Squad</button>`:''}
           ${mySquad?`<span class="badge b-gold" style="font-size:12px;padding:6px 12px;">Squad ${mySquad.number}${mySquad.comment?' – '+mySquad.comment:''}</span>`:''}
         </div>
         <div id="pub-reg-msg" class="msg"></div>

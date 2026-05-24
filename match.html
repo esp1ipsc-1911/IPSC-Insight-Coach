@@ -7,173 +7,266 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --accent:#e0b649;--accent2:#c49a30;--accent-fade:rgba(224,182,73,0.12);--accent-glow:rgba(224,182,73,0.25);
+  --accent:#e0b649;--accent2:#c49a30;--af:rgba(224,182,73,0.12);--ag:rgba(224,182,73,0.25);
   --bg:#0d0f12;--bg2:#111418;--bg3:#161a1f;--card:#141820;--card2:#181d24;
-  --border:rgba(255,255,255,0.07);--border-gold:rgba(224,182,73,0.25);
+  --border:rgba(255,255,255,0.07);--bg:rgba(224,182,73,0.25);
   --text:#f0f2f5;--muted:rgba(255,255,255,0.38);--green:#4caf7d;--red:#ef4444;--blue:#3b82f6;
-  --radius:12px;--radius-sm:8px;
+  --r:12px;--rs:8px;
 }
-html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+html,body{background:#0d0f12;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+
+/* SPINNER */
 #gs{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
 #gs.show{display:flex;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spin{width:36px;height:36px;border:3px solid rgba(224,182,73,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spn{to{transform:rotate(360deg)}}
+.spin{width:36px;height:36px;border:3px solid rgba(224,182,73,0.2);border-top-color:var(--accent);border-radius:50%;animation:spn 0.7s linear infinite;}
+
 /* LOGIN */
-#ls{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;}
+#ls{display:none;position:fixed;inset:0;z-index:200;background:#0d0f12;overflow-y:auto;}
 #ls.show{display:flex;align-items:center;justify-content:center;padding:32px 20px;}
 .lbox{width:100%;max-width:380px;}
 .llogo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
-.licon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#1a1e26,#0d0f12);border:1px solid var(--border-gold);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.licon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#1a1e26,#0d0f12);border:1px solid rgba(224,182,73,0.25);display:flex;align-items:center;justify-content:center;font-size:22px;}
 .lb1{font-size:26px;font-weight:900;}.lb1 .w{color:var(--text);}.lb1 .g{color:var(--accent);}
 .lb2{font-size:9px;font-weight:700;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-top:3px;}
-.lcard{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:16px;padding:22px;}
-.sstrip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-left:2px solid #22c55e;border-radius:8px;padding:8px 12px;margin-bottom:16px;}
+.lcard{background:#141820;border:1px solid rgba(255,255,255,0.07);border-top:2px solid var(--accent);border-radius:16px;padding:22px;}
+.sstrip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-left:2px solid #22c55e;border-radius:8px;padding:8px 12px;margin-bottom:16px;}
 .sdot{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;flex-shrink:0;}
 .stxt{font-size:10px;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.5);text-transform:uppercase;}
+
 /* TOPBAR */
-.topbar{position:sticky;top:0;z-index:100;background:rgba(13,15,18,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:54px;}
-.tlogo{font-size:11px;font-weight:900;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;}
-.tright{display:flex;align-items:center;gap:10px;}
-.nav-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c0f;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(224,182,73,0.3);flex-shrink:0;overflow:hidden;cursor:pointer;}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(13,15,18,0.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;height:52px;padding:0 20px;gap:0;}
+.tlogo{font-size:13px;font-weight:900;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;margin-right:28px;flex-shrink:0;}
+.tnav{display:flex;align-items:center;gap:2px;flex:1;}
+.tnavbtn{background:transparent;border:none;color:var(--muted);font-size:12px;font-weight:600;padding:6px 13px;border-radius:7px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.tnavbtn:hover,.tnavbtn.active{background:rgba(255,255,255,0.06);color:var(--text);}
+.tnavbtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tright{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.bell-wrap{position:relative;cursor:pointer;}
+.bell-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;display:flex;align-items:center;transition:color 0.15s;}
+.bell-btn:hover{color:var(--accent);}
+.bell-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.bell-count{position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.nav-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c0f;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(224,182,73,0.3);flex-shrink:0;overflow:hidden;cursor:pointer;}
 .nav-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;cursor:pointer;transition:all 0.15s;}
-.btn-logout:hover{border-color:var(--red);color:var(--red);}
+.btn-out{background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;cursor:pointer;transition:all 0.15s;}
+.btn-out:hover{border-color:var(--red);color:var(--red);}
+
+/* DROPDOWN */
+.ddwrap{position:relative;}
+.ddmenu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:#181d24;border:1px solid rgba(255,255,255,0.1);border-radius:10px;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:500;overflow:hidden;}
+.ddmenu.show{display:block;}
+.dditem{display:block;width:100%;padding:10px 14px;background:transparent;border:none;color:var(--text);font-size:13px;font-weight:500;text-align:left;cursor:pointer;transition:background 0.12s;}
+.dditem:hover{background:rgba(255,255,255,0.06);}
+.ddsep{height:1px;background:rgba(255,255,255,0.07);margin:4px 0;}
+
+/* NOTIF DROPDOWN */
+.notif-drop{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#181d24;border:1px solid rgba(255,255,255,0.1);border-radius:10px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:500;overflow:hidden;}
+.notif-drop.show{display:block;}
+.notif-head{padding:10px 14px;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.07);}
+.notif-item{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.12s;}
+.notif-item:hover{background:rgba(255,255,255,0.04);}
+.notif-name{font-size:12px;font-weight:700;margin-bottom:2px;}
+.notif-sub{font-size:11px;color:var(--muted);}
+.notif-btns{display:flex;gap:6px;margin-top:7px;}
+.nibacc{background:var(--accent);color:#0a0c0f;border:none;border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;}
+.nibdec{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;}
+.notif-empty{padding:16px 14px;font-size:12px;color:var(--muted);text-align:center;}
+
 /* VIEWS */
 .view{display:none;}.view.active{display:block;}
-/* DASHBOARD */
-.dash{max-width:1100px;margin:0 auto;padding:20px 16px 60px;}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-@media(max-width:700px){.dash-grid{grid-template-columns:1fr;}}
-.dash-full{grid-column:1/-1;}
-/* PANEL */
-.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
-.phead{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
-.phead-left{display:flex;align-items:center;gap:8px;}
-.ptitle{font-size:10px;font-weight:800;letter-spacing:0.14em;color:var(--text);text-transform:uppercase;}
-.parr{font-size:10px;color:var(--muted);transition:transform 0.2s;}
-.pbody{padding:12px 14px;}
-/* MATCH ROW */
-.mrow{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:9px;margin-bottom:7px;cursor:pointer;transition:background 0.15s;}
-.mrow:hover{background:rgba(224,182,73,0.05);}
-.mrow.owner{border-left-color:var(--green);}
-.mrow-info{flex:1;min-width:0;}
-.mrow-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mrow-meta{font-size:11px;color:var(--muted);margin-top:2px;}
-.mrow-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+.page-sm{max-width:700px;margin:0 auto;padding:24px 20px 80px;}
+
+/* MATCH LIST TABLE */
+.mltable{width:100%;border-collapse:collapse;}
+.mltable th{font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.07);cursor:pointer;user-select:none;white-space:nowrap;}
+.mltable th:hover{color:var(--text);}
+.mltable td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;vertical-align:middle;}
+.mltable tr:hover td{background:rgba(255,255,255,0.02);}
+.mltable tr:last-child td{border-bottom:none;}
+.mchip{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.mchip:hover{background:rgba(59,130,246,0.25);}
+.mchip.owner{background:rgba(76,175,125,0.15);border-color:rgba(76,175,125,0.3);color:#86efac;}
+.yr-nav{display:flex;gap:6px;margin-bottom:20px;}
+.yr-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:7px;color:var(--muted);font-size:12px;font-weight:700;padding:6px 14px;cursor:pointer;transition:all 0.15s;}
+.yr-btn.active{background:rgba(224,182,73,0.12);border-color:rgba(224,182,73,0.3);color:var(--accent);}
+.yr-btn:hover{color:var(--text);}
+.section-title{font-size:20px;font-weight:900;margin-bottom:18px;letter-spacing:-0.01em;}
+
 /* BADGES */
-.badge{display:inline-flex;align-items:center;border-radius:6px;font-size:10px;font-weight:700;padding:2px 7px;letter-spacing:0.04em;}
-.bg-gold{background:var(--accent-fade);color:var(--accent);border:1px solid var(--border-gold);}
+.badge{display:inline-flex;align-items:center;border-radius:5px;font-size:10px;font-weight:700;padding:2px 7px;letter-spacing:0.04em;white-space:nowrap;}
+.bg-gold{background:rgba(224,182,73,0.12);color:var(--accent);border:1px solid rgba(224,182,73,0.25);}
 .bg-green{background:rgba(76,175,125,0.15);color:var(--green);border:1px solid rgba(76,175,125,0.3);}
-.bg-muted{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border);}
+.bg-muted{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.07);}
 .bg-red{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25);}
 .bg-blue{background:rgba(59,130,246,0.12);color:var(--blue);border:1px solid rgba(59,130,246,0.25);}
-/* INV */
-.invrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:rgba(224,182,73,0.04);border:1px solid var(--border-gold);border-radius:9px;margin-bottom:7px;}
-.invinfo{flex:1;min-width:0;}.invname{font-size:13px;font-weight:700;}.invsub{font-size:11px;color:var(--muted);}
-.invbtns{display:flex;gap:6px;flex-shrink:0;}
-.ibacc{background:var(--accent);color:#0a0c0f;border:none;border-radius:7px;padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;}
-.ibacc:hover{opacity:.85;}
-.ibdec{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;}
-.ibdec:hover{background:rgba(239,68,68,.12);color:var(--red);}
-/* DETAIL */
-.detail{max-width:900px;margin:0 auto;padding:16px 16px 80px;}
-.dback{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;margin-bottom:16px;padding:8px 0;}
-.dback:hover{color:var(--accent);}
-.dback svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
-.dname{font-size:22px;font-weight:900;letter-spacing:-0.01em;margin-bottom:6px;}
-.dmeta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
-.dmi{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
-.dmi svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-/* QUICK ACTIONS */
-.qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
-@media(max-width:600px){.qgrid{grid-template-columns:1fr 1fr;}}
-.qbtn{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:9px;padding:11px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;}
-.qbtn:hover{background:rgba(224,182,73,.06);border-color:var(--border-gold);}
-.qbtn svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
-.qt{font-size:12px;font-weight:700;color:var(--text);}
-.qs{font-size:10px;color:var(--muted);margin-top:1px;}
-/* DETAIL TABS */
-.dtabs{display:flex;gap:4px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:14px;overflow-x:auto;}
-.dtab{flex-shrink:0;padding:8px 13px;background:transparent;border:none;border-radius:7px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.dtab.active{background:var(--accent-fade);color:var(--accent);border:1px solid var(--border-gold);}
-.dsec{display:none;}.dsec.active{display:block;}
-/* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;position:relative;}
-.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:3px 0 0 3px;}
-.chead{padding:12px 16px 10px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.ctitle{font-size:10px;font-weight:700;letter-spacing:.13em;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
-.ctitle svg{width:13px;height:13px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
-.cbody{padding:14px 16px;}
+.bg-purple{background:rgba(168,85,247,0.12);color:#c4b5fd;border:1px solid rgba(168,85,247,0.25);}
+
+/* MATCH DETAIL HEADER */
+.dheader{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding:16px 20px;background:#141820;border:1px solid rgba(255,255,255,0.07);border-radius:12px;}
+.dheader-left{flex:1;min-width:0;}
+.dh-name{font-size:20px;font-weight:900;margin-bottom:6px;}
+.dh-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.dh-mi{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);}
+.dh-mi svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.dheader-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* CHIP TABS (like SSI division chips) */
+.chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.chip{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.chip:hover{background:rgba(59,130,246,0.25);}
+.chip.active{background:var(--green);border-color:var(--green);color:#000;}
+.chip.org{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:var(--text);}
+.chip.org:hover{background:rgba(255,255,255,0.12);}
+.chip.ret{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.3);color:var(--red);}
+
+/* ORGANIZER DROPDOWN */
+.org-wrap{position:relative;}
+.org-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.org-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* RESULTS TABLE */
+.rtbl{width:100%;border-collapse:collapse;}
+.rtbl th{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.07);cursor:pointer;user-select:none;white-space:nowrap;}
+.rtbl th:hover{color:var(--text);}
+.rtbl td{font-size:12px;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+.rtbl tr:hover td{background:rgba(255,255,255,0.02);}
+.rtbl tr:last-child td{border-bottom:none;}
+.rtbl .rank-1{color:#e0b649;font-weight:900;}
+.rtbl .rank-2{color:#c0c0c0;font-weight:800;}
+.rtbl .rank-3{color:#cd7f32;font-weight:700;}
+.rtbl .sel-row td{background:rgba(224,182,73,0.06);}
+.compare-cb{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
+
+/* STAGE SECTION */
+.stage-sec{margin-bottom:20px;}
+.stage-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.stage-lbl{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;}
+
 /* FORMS */
-.fg{margin-bottom:12px;}
-.fl{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block;}
-.fi{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);color:var(--text);font-size:14px;padding:10px 13px;outline:none;transition:border-color .15s,background .15s;-webkit-appearance:none;}
-.fi:focus{border-color:rgba(224,182,73,.45);background:rgba(255,255,255,.06);}
-.fi::placeholder{color:rgba(255,255,255,.18);}
+.fg{margin-bottom:13px;}
+.fl{font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block;}
+.fi{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);color:var(--text);font-size:14px;padding:10px 13px;outline:none;transition:border-color 0.15s,background 0.15s;-webkit-appearance:none;}
+.fi:focus{border-color:rgba(224,182,73,0.45);background:rgba(255,255,255,0.06);}
+.fi::placeholder{color:rgba(255,255,255,0.18);}
 select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
 select.fi option{background:#141820;color:var(--text);}
+textarea.fi{resize:vertical;min-height:80px;}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:480px){.frow{grid-template-columns:1fr;}}
-.trow{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;}
-.tl{font-size:13px;font-weight:600;}.ts{font-size:11px;color:var(--muted);margin-top:2px;}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+@media(max-width:560px){.frow,.frow3{grid-template-columns:1fr;}}
+.trow{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:var(--rs);padding:10px 13px;margin-bottom:10px;}
+.tl{font-size:13px;font-weight:600;}.ts2{font-size:11px;color:var(--muted);margin-top:2px;}
 .toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
 .toggle input{opacity:0;width:0;height:0;position:absolute;}
-.tslider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:22px;cursor:pointer;transition:background .2s;}
-.tslider::before{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;}
+.tslider{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:22px;cursor:pointer;transition:background 0.2s;}
+.tslider::before{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform 0.2s;}
 .toggle input:checked+.tslider{background:var(--accent);}
 .toggle input:checked+.tslider::before{transform:translateX(18px);}
+.cb-group{display:flex;flex-direction:column;gap:7px;}
+.cb-item{display:flex;align-items:center;gap:9px;font-size:13px;cursor:pointer;}
+.cb-item input{width:16px;height:16px;accent-color:var(--accent);}
+.adv-toggle{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px;}
+.adv-section{display:none;}
+.adv-section.show{display:block;}
+.form-section{background:#141820;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:18px;margin-bottom:14px;}
+.form-section-title{font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.07);}
+
 /* BUTTONS */
-.btn-p{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c0f;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:opacity .15s;}
-.btn-p:hover{opacity:.88;}.btn-p:disabled{opacity:.45;cursor:not-allowed;}
-.btn-s{width:100%;padding:10px;background:transparent;color:var(--accent);border:1px solid rgba(224,182,73,.28);border-radius:var(--radius-sm);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s;}
-.btn-s:hover{background:var(--accent-fade);}
-.btn-d{width:100%;padding:10px;background:transparent;color:var(--red);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius-sm);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s;}
-.btn-d:hover{background:rgba(239,68,68,.08);}
-.bsm{padding:5px 12px;font-size:10px;border-radius:7px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;transition:all .15s;}
+.btn-p{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c0f;border:none;border-radius:var(--rs);font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;transition:opacity 0.15s;}
+.btn-p:hover{opacity:0.88;}.btn-p:disabled{opacity:0.45;cursor:not-allowed;}
+.btn-s{padding:10px 18px;background:transparent;color:var(--accent);border:1px solid rgba(224,182,73,0.28);border-radius:var(--rs);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.15s;}
+.btn-s:hover{background:rgba(224,182,73,0.08);}
+.btn-d{padding:10px 18px;background:transparent;color:var(--red);border:1px solid rgba(239,68,68,0.3);border-radius:var(--rs);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.15s;}
+.btn-d:hover{background:rgba(239,68,68,0.08);}
+.bsm{padding:5px 12px;font-size:10px;border-radius:6px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.15s;}
 .bgold{background:var(--accent);color:#0a0c0f;}
-.bgh{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border);}
-.bgh:hover{background:rgba(255,255,255,.1);color:var(--text);}
-.bred{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);}
-.bred:hover{background:rgba(239,68,68,.2);}
+.bgh{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);}
+.bgh:hover{background:rgba(255,255,255,0.1);color:var(--text);}
+.bred{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25);}
+.bred:hover{background:rgba(239,68,68,0.2);}
+.bblue{background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);}
+.bblue:hover{background:rgba(59,130,246,0.25);}
+
+/* MSG */
 .msg{font-size:12px;min-height:16px;text-align:center;padding:5px 0;}
 .msg.err{color:var(--red);}.msg.ok{color:var(--green);}
+
 /* TABLE */
 .tbl{width:100%;border-collapse:collapse;}
-.tbl th{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
-.tbl td{font-size:13px;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+.tbl th{font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.07);}
+.tbl td{font-size:13px;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+.tbl tr:hover td{background:rgba(255,255,255,0.02);}
 .tbl tr:last-child td{border-bottom:none;}
-.tbl tr:hover td{background:rgba(255,255,255,.02);}
-/* SCORE */
+
+/* SCORE ENTRY */
 .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
-.scell{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;}
-.slbl{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.scell{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px;text-align:center;}
+.slbl{font-size:9px;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
 .sctr{display:flex;align-items:center;justify-content:center;gap:6px;}
 .sval{font-size:18px;font-weight:800;min-width:28px;text-align:center;}
-.sbtn{width:26px;height:26px;border-radius:6px;border:none;background:rgba(255,255,255,.08);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s;}
-.sbtn:hover{background:rgba(255,255,255,.14);}
-.acell{border-color:rgba(76,175,125,.3);}.acell .sval{color:var(--green);}
-.mcell{border-color:rgba(239,68,68,.3);}.mcell .sval{color:var(--red);}
-.hfbar{background:rgba(224,182,73,.08);border:1px solid var(--border-gold);border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
-.hflbl{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+.sbtn{width:26px;height:26px;border-radius:6px;border:none;background:rgba(255,255,255,0.08);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sbtn:hover{background:rgba(255,255,255,0.14);}
+.acell{border-color:rgba(76,175,125,0.3);}.acell .sval{color:var(--green);}
+.mcell{border-color:rgba(239,68,68,0.3);}.mcell .sval{color:var(--red);}
+.hfbar{background:rgba(224,182,73,0.08);border:1px solid rgba(224,182,73,0.25);border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.hflbl{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;}
 .hfval{font-size:20px;font-weight:900;color:var(--accent);}
-/* EMPTY */
-.empty{text-align:center;padding:32px 20px;}
-.empty-ico{font-size:30px;opacity:.3;margin-bottom:8px;}
-.empty-t{font-size:13px;font-weight:700;color:var(--muted);}
-.empty-s{font-size:11px;color:rgba(255,255,255,.2);margin-top:3px;}
+
+/* CARD */
+.card{background:#141820;border:1px solid rgba(255,255,255,0.07);border-radius:12px;margin-bottom:12px;overflow:hidden;position:relative;}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:3px 0 0 3px;}
+.chead{padding:12px 16px 10px;background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;}
+.ctitle{font-size:10px;font-weight:700;letter-spacing:0.13em;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.ctitle svg{width:13px;height:13px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.cbody{padding:14px 16px;}
+
+/* COMPARE */
+.compare-box{background:rgba(224,182,73,0.06);border:1px solid rgba(224,182,73,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.compare-info{font-size:12px;color:var(--muted);}
+.compare-info b{color:var(--accent);}
+
+/* PDF DOWNLOAD */
+.pdf-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.pdf-btn{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);color:#93c5fd;border-radius:6px;padding:6px 13px;font-size:11px;font-weight:700;cursor:pointer;transition:background 0.15s;}
+.pdf-btn:hover{background:rgba(59,130,246,0.22);}
+
 /* MODAL */
-.moverlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);overflow-y:auto;padding:30px 16px;}
+.moverlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);overflow-y:auto;padding:30px 16px;}
 .moverlay.show{display:block;}
-.mbox{max-width:480px;margin:0 auto;background:var(--card2);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:16px;padding:22px;}
-.mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.mtitle{font-size:14px;font-weight:800;}
+.mbox{max-width:560px;margin:0 auto;background:#181d24;border:1px solid rgba(255,255,255,0.1);border-top:2px solid var(--accent);border-radius:16px;padding:24px;}
+.mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.mtitle{font-size:15px;font-weight:800;}
 .mclose{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;}
-/* autofill */
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;}
+.empty-ico{font-size:36px;opacity:0.3;margin-bottom:10px;}
+.empty-t{font-size:14px;font-weight:700;color:var(--muted);}
+.empty-s{font-size:12px;color:rgba(255,255,255,0.2);margin-top:4px;}
+
+/* BACK */
+.back-btn{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;margin-bottom:16px;padding:6px 0;}
+.back-btn:hover{color:var(--accent);}
+.back-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ROLE ACCESS NOTICE */
+.access-notice{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:14px 16px;text-align:center;color:var(--red);font-size:13px;font-weight:600;}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-block{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:12px;text-align:center;}
+.stat-val{font-size:22px;font-weight:900;color:var(--accent);}
+.stat-lbl{font-size:9px;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-top:3px;}
+
 input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #141820 inset!important;-webkit-text-fill-color:#f0f2f5!important;caret-color:#f0f2f5!important;transition:background-color 9999s!important;}
 </style>
 </head>
 <body>
-
 <div id="gs"><div class="spin"></div></div>
 
 <!-- LOGIN -->
@@ -183,7 +276,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
       <div class="licon">🎯</div>
       <div><div class="lb1"><span class="w">INSIGHT</span><span class="g"> DYNAMICS</span></div><div class="lb2">Match Administration</div></div>
     </div>
-    <div class="sstrip"><div class="sdot"></div><span class="stxt">Sign in to manage matches</span></div>
+    <div class="sstrip"><div class="sdot"></div><span class="stxt">Sign in to continue</span></div>
     <div class="lcard">
       <div class="fg"><label class="fl">Email</label><input id="l-email" class="fi" type="email" placeholder="name@email.com" autocomplete="email"/></div>
       <div class="fg"><label class="fl">Password</label><input id="l-pw" class="fi" type="password" placeholder="Password" autocomplete="current-password"/></div>
@@ -195,230 +288,373 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 
 <!-- APP -->
 <div id="app" style="display:none;">
+  <!-- TOPBAR -->
   <div class="topbar">
-    <div class="tlogo">🎯 Insight · Match Admin</div>
+    <div class="tlogo">🎯 Insight</div>
+    <nav class="tnav">
+      <div class="ddwrap" id="dd-comp">
+        <button class="tnavbtn" onclick="toggleDD('dd-comp')">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Competitions <svg viewBox="0 0 24 24" style="width:10px;height:10px;"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="ddmenu" id="dd-comp-menu">
+          <button class="dditem" onclick="sv('my-comps');closeAllDD()">My Competitions</button>
+          <div class="ddsep"></div>
+          <button class="dditem" onclick="sv('my-comps');closeAllDD()">Results</button>
+          <button class="dditem" onclick="sv('my-comps');closeAllDD()">Standings</button>
+        </div>
+      </div>
+      <button class="tnavbtn" onclick="sv('create-match');closeAllDD()">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create Match
+      </button>
+    </nav>
     <div class="tright">
-      <div id="inv-badge" style="display:none;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:800;align-items:center;justify-content:center;cursor:pointer;"></div>
+      <div class="bell-wrap ddwrap" id="dd-notif">
+        <button class="bell-btn" onclick="toggleDD('dd-notif')">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </button>
+        <div class="bell-count" id="bell-count" style="display:none;"></div>
+        <div class="notif-drop" id="dd-notif-menu">
+          <div class="notif-head">Notifications & Invitations</div>
+          <div id="notif-list"><div class="notif-empty">No pending invitations</div></div>
+        </div>
+      </div>
       <div class="nav-av" id="top-av">–</div>
-      <button class="btn-logout" id="out-btn">Sign Out</button>
+      <button class="btn-out" id="out-btn">Sign Out</button>
     </div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div id="view-dashboard" class="view active">
-    <div class="dash">
-      <!-- Invitations -->
-      <div class="panel dash-full" style="margin-bottom:14px;">
-        <div class="phead" onclick="tp('inv-body','inv-arr')">
-          <div class="phead-left"><span style="font-size:15px;">🔔</span><span class="ptitle">Notifications &amp; Invitations</span></div>
-          <span class="parr" id="inv-arr">▾</span>
-        </div>
-        <div class="pbody" id="inv-body"><div id="inv-list"><div class="empty"><div class="empty-t">No pending invitations</div></div></div></div>
-      </div>
-      <!-- My Matches -->
-      <div class="panel dash-full">
-        <div class="phead" onclick="tp('ml-body','ml-arr')">
-          <div class="phead-left"><span style="font-size:15px;">🏆</span><span class="ptitle">My Matches</span></div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <button class="bsm bgold" onclick="event.stopPropagation();om('modal-create')" style="width:auto;">+ New Match</button>
-            <button class="bsm bgh" onclick="event.stopPropagation();om('modal-find')" style="width:auto;">Find by ID</button>
-            <span class="parr" id="ml-arr">▾</span>
-          </div>
-        </div>
-        <div class="pbody" id="ml-body"><div id="ml"></div></div>
+  <!-- MY COMPETITIONS VIEW -->
+  <div id="view-my-comps" class="view active">
+    <div class="page">
+      <div class="yr-nav" id="yr-nav"></div>
+      <div class="section-title" id="yr-title">My Competitions</div>
+      <div id="ml-container">
+        <div class="empty"><div class="spin" style="margin:0 auto 12px;"></div><div class="empty-t">Loading…</div></div>
       </div>
     </div>
   </div>
 
-  <!-- DETAIL -->
-  <div id="view-detail" class="view">
-    <div class="detail">
-      <div class="dback" onclick="sv('dashboard')">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back to Dashboard
-      </div>
-      <div class="dname" id="d-name"></div>
-      <div class="dmeta" id="d-meta"></div>
-      <div id="d-badges" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
-      <div class="qgrid" id="d-quick" style="display:none;">
-        <div class="qbtn" onclick="odt('ds');openAddStage()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><div><div class="qt">Add Stage</div><div class="qs">Create stage</div></div></div>
-        <div class="qbtn" onclick="odt('dc')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><div><div class="qt">Competitors</div><div class="qs">Manage registrations</div></div></div>
-        <div class="qbtn" onclick="odt('dsc')"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div><div class="qt">Enter Score</div><div class="qs">Add stage result</div></div></div>
-        <div class="qbtn" onclick="odt('da')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg><div><div class="qt">Admin</div><div class="qs">Settings &amp; roles</div></div></div>
-      </div>
-      <div class="dtabs">
-        <button class="dtab active" id="tab-do" onclick="odt('do')">Overview</button>
-        <button class="dtab" id="tab-ds" onclick="odt('ds')">Stages</button>
-        <button class="dtab" id="tab-dc" onclick="odt('dc')">Competitors</button>
-        <button class="dtab" id="tab-dsc" onclick="odt('dsc')">Scoring</button>
-        <button class="dtab" id="tab-dr" onclick="odt('dr')">Roles</button>
-        <button class="dtab" id="tab-da" onclick="odt('da')">Admin</button>
-      </div>
-      <div id="do" class="dsec active"><div id="ov-c"></div></div>
-      <div id="ds" class="dsec">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
-          <button class="bsm bgold" id="add-st-btn" onclick="openAddStage()" style="width:auto;">+ Add Stage</button>
-        </div>
-        <div id="sl"></div>
-      </div>
-      <div id="dc" class="dsec">
-        <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;">
-          <button class="bsm bgold" id="cf-all" onclick="setCF('all')" style="width:auto;">All</button>
-          <button class="bsm bgh" id="cf-approved" onclick="setCF('approved')" style="width:auto;">Approved</button>
-          <button class="bsm bgh" id="cf-pending" onclick="setCF('pending')" style="width:auto;">Pending</button>
-          <button class="bsm bgh" id="cf-waiting" onclick="setCF('waiting')" style="width:auto;">Waiting</button>
-        </div>
-        <div id="cl"></div>
-      </div>
-      <div id="dsc" class="dsec">
-        <div class="card">
-          <div class="chead"><div class="ctitle"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Enter Stage Result</div></div>
-          <div class="cbody">
-            <div class="frow">
-              <div class="fg"><label class="fl">Shooter</label><select id="sc-sh" class="fi" onchange="updHF()"><option value="">Select…</option></select></div>
-              <div class="fg"><label class="fl">Stage</label><select id="sc-st" class="fi"><option value="">Select…</option></select></div>
-            </div>
-            <div class="fg"><label class="fl">Time (s)</label><input id="sc-t" class="fi" type="number" step="0.01" placeholder="e.g. 12.45" oninput="updHF()"/></div>
-            <div class="sgrid">
-              <div class="scell acell"><div class="slbl">A</div><div class="sctr"><button class="sbtn" onclick="adj('sc-a',-1)">−</button><span class="sval" id="sc-a">0</span><button class="sbtn" onclick="adj('sc-a',1)">+</button></div></div>
-              <div class="scell"><div class="slbl">C</div><div class="sctr"><button class="sbtn" onclick="adj('sc-c',-1)">−</button><span class="sval" id="sc-c">0</span><button class="sbtn" onclick="adj('sc-c',1)">+</button></div></div>
-              <div class="scell"><div class="slbl">D</div><div class="sctr"><button class="sbtn" onclick="adj('sc-d',-1)">−</button><span class="sval" id="sc-d">0</span><button class="sbtn" onclick="adj('sc-d',1)">+</button></div></div>
-              <div class="scell mcell"><div class="slbl">Miss</div><div class="sctr"><button class="sbtn" onclick="adj('sc-m',-1)">−</button><span class="sval" id="sc-m">0</span><button class="sbtn" onclick="adj('sc-m',1)">+</button></div></div>
-              <div class="scell"><div class="slbl">NS</div><div class="sctr"><button class="sbtn" onclick="adj('sc-n',-1)">−</button><span class="sval" id="sc-n">0</span><button class="sbtn" onclick="adj('sc-n',1)">+</button></div></div>
-              <div class="scell"><div class="slbl">Proc</div><div class="sctr"><button class="sbtn" onclick="adj('sc-p',-1)">−</button><span class="sval" id="sc-p">0</span><button class="sbtn" onclick="adj('sc-p',1)">+</button></div></div>
-            </div>
-            <div class="hfbar">
-              <div class="hflbl">Points / HF</div>
-              <div style="display:flex;gap:14px;align-items:center;">
-                <span style="font-size:14px;font-weight:600;color:var(--muted);" id="sc-pts">0 pts</span>
-                <span class="hfval" id="sc-hf">0.0000</span>
-              </div>
-            </div>
-            <div id="sc-msg" class="msg" style="margin-top:6px;"></div>
-            <button class="btn-p" style="margin-top:8px;" onclick="saveScore()">Save Result</button>
+  <!-- CREATE MATCH VIEW -->
+  <div id="view-create-match" class="view">
+    <div class="page-sm">
+      <div class="back-btn" onclick="sv('my-comps')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</div>
+      <div class="section-title">Create IPSC Handgun Event</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">You are about to create a new match or training event.</p>
+
+      <div class="form-section">
+        <div class="form-section-title">Basic Information</div>
+        <div class="fg"><label class="fl">Event Name</label><input id="c-name" class="fi" type="text" placeholder="Event name"/></div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Location / Venue</label><input id="c-loc" class="fi" type="text" placeholder="Oslo Shooting Range"/></div>
+          <div class="fg"><label class="fl">Region</label>
+            <select id="c-region" class="fi"><option value="Norway">Norway</option><option value="Sweden">Sweden</option><option value="Denmark">Denmark</option><option value="Finland">Finland</option><option value="Other">Other</option></select>
           </div>
         </div>
-        <div class="card" style="margin-top:6px;">
-          <div class="chead"><div class="ctitle"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Standings</div></div>
-          <div class="cbody" id="st-out"><div class="empty"><div class="empty-t">No results yet</div></div></div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Start Date</label><input id="c-date" class="fi" type="date"/></div>
+          <div class="fg"><label class="fl">Start Time</label><input id="c-time" class="fi" type="time" value="10:00"/></div>
         </div>
+        <div class="fg"><label class="fl">Description</label><textarea id="c-desc" class="fi" placeholder="Description"></textarea></div>
       </div>
-      <div id="dr" class="dsec">
-        <div class="card">
-          <div class="chead"><div class="ctitle">Invite Staff</div></div>
-          <div class="cbody">
-            <div class="fg"><label class="fl">Search user</label><input id="r-srch" class="fi" type="text" placeholder="Name or email…" oninput="srchUsers(this.value)"/></div>
-            <div id="r-results" style="margin-bottom:10px;"></div>
-            <div class="fg"><label class="fl">Role</label>
-              <select id="r-role" class="fi"><option value="staff">Staff – enter scores &amp; manage competitors</option><option value="admin">Admin – full access</option></select>
-            </div>
-            <div id="r-msg" class="msg"></div>
+
+      <div class="form-section">
+        <div class="form-section-title">Divisions</div>
+        <div class="cb-group" id="div-checkboxes"></div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Event Settings</div>
+        <div class="fg"><label class="fl">Level</label>
+          <select id="c-level" class="fi"><option value="Level I">Level I</option><option value="Level II">Level II</option><option value="Level III">Level III</option><option value="Level IV">Level IV</option><option value="Level V">Level V</option></select>
+        </div>
+        <div class="fg"><label class="fl">Status</label>
+          <select id="c-status" class="fi"><option value="draft">Draft</option><option value="active" selected>Active</option></select>
+        </div>
+        <div class="fg"><label class="fl">Results are</label>
+          <select id="c-results" class="fi">
+            <option value="public">Results and scores shown to anyone</option>
+            <option value="scores_only">Scores shown to anyone, results only to organizers</option>
+            <option value="organizers_only" selected>Result and scores only shown to organizers</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Registration is</label>
+          <select id="c-reg" class="fi">
+            <option value="open_auto" selected>Open from reg-date, competitors approved direct</option>
+            <option value="open_manual">Open, required approval manually</option>
+            <option value="open_waiting">Open, all competitors placed on waiting list</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Max Competitors</label><input id="c-max" class="fi" type="number" min="1" placeholder="e.g. 45"/></div>
+        <div class="fg">
+          <div class="trow">
+            <div><div class="tl">Allow Public Search</div><div class="ts2">Visible in search by ID</div></div>
+            <label class="toggle"><input type="checkbox" id="c-pub" checked/><span class="tslider"></span></label>
           </div>
         </div>
-        <div class="card"><div class="chead"><div class="ctitle">Match Staff</div></div><div class="cbody" id="r-list"></div></div>
+        <div class="fg">
+          <div class="trow">
+            <div><div class="tl">Multiple Registrations Allowed</div><div class="ts2">Shoot in multiple divisions</div></div>
+            <label class="toggle"><input type="checkbox" id="c-multi"/><span class="tslider"></span></label>
+          </div>
+        </div>
       </div>
-      <div id="da" class="dsec">
-        <div class="card">
-          <div class="chead"><div class="ctitle">Match Settings</div></div>
-          <div class="cbody">
-            <div class="fg"><label class="fl">Match Name</label><input id="a-name" class="fi" type="text"/></div>
-            <div class="frow">
-              <div class="fg"><label class="fl">Location</label><input id="a-loc" class="fi" type="text"/></div>
-              <div class="fg"><label class="fl">Date</label><input id="a-date" class="fi" type="date"/></div>
-            </div>
-            <div class="frow">
-              <div class="fg"><label class="fl">Type</label>
-                <select id="a-type" class="fi"><option value="Training">Training</option><option value="Level 1">Level 1</option><option value="Level 2">Level 2</option><option value="Level 3">Level 3</option><option value="Level 4">Level 4</option><option value="Level 5">Level 5</option></select>
+
+      <button class="adv-toggle" onclick="toggleAdv()">Show/Hide Advanced Fields</button>
+      <div class="adv-section form-section" id="adv-sec">
+        <div class="form-section-title">Advanced Settings</div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Registration Starts</label><input id="c-regstart" class="fi" type="date"/></div>
+          <div class="fg"><label class="fl">Registration Closes</label><input id="c-regend" class="fi" type="date"/></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Ends Date</label><input id="c-enddate" class="fi" type="date"/></div>
+          <div class="fg"><label class="fl">Ends Time</label><input id="c-endtime" class="fi" type="time"/></div>
+        </div>
+        <div class="fg"><label class="fl">Web Page URL</label><input id="c-url" class="fi" type="text" placeholder="http://…"/></div>
+        <div class="fg"><label class="fl">Web Link Text</label><input id="c-urltext" class="fi" type="text" placeholder="Web link text"/></div>
+        <div class="fg"><label class="fl">Limit for Category Results</label><input id="c-catlimit" class="fi" type="number" value="5" min="1"/></div>
+        <div class="fg">
+          <div class="trow">
+            <div><div class="tl">Allow Teams</div><div class="ts2">Enable team support</div></div>
+            <label class="toggle"><input type="checkbox" id="c-teams"/><span class="tslider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div id="cm-msg" class="msg"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-p" id="cm-btn" onclick="submitCreate()" style="flex:1;">Create Match</button>
+        <button class="btn-s" onclick="sv('my-comps')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCH DETAIL VIEW -->
+  <div id="view-match-detail" class="view">
+    <div class="page">
+      <div class="back-btn" onclick="sv('my-comps')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>My Competitions</div>
+
+      <!-- Header like SSI -->
+      <div class="dheader">
+        <div class="dheader-left">
+          <div class="dh-name" id="dh-name"></div>
+          <div class="dh-meta" id="dh-meta"></div>
+        </div>
+        <div class="dheader-right" id="dh-badges"></div>
+      </div>
+
+      <!-- Organizer chip row (only for admin/staff) -->
+      <div id="org-chip-row" class="chip-row" style="display:none;">
+        <div class="org-wrap ddwrap" id="dd-org">
+          <button class="chip org org-btn" onclick="toggleDD('dd-org')">
+            <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+            Organizer ▾
+          </button>
+          <div class="ddmenu" id="dd-org-menu" style="min-width:180px;">
+            <button class="dditem" onclick="showOrgTab('stages');closeAllDD()">Stages</button>
+            <button class="dditem" onclick="showOrgTab('competitors');closeAllDD()">Competitors</button>
+            <button class="dditem" onclick="showOrgTab('scoring');closeAllDD()">Enter Scores</button>
+            <button class="dditem" id="dd-roles-item" onclick="showOrgTab('roles');closeAllDD()">Staff & Roles</button>
+            <div class="ddsep"></div>
+            <button class="dditem" id="dd-settings-item" onclick="showOrgTab('settings');closeAllDD()">Match Settings</button>
+          </div>
+        </div>
+        <button class="chip ret" onclick="sv('my-comps')">Return</button>
+      </div>
+
+      <!-- Result view: division chips + content -->
+      <div id="result-view">
+        <!-- Division filter chips -->
+        <div class="chip-row" id="div-chips"></div>
+        <!-- Stage results or match results -->
+        <div id="results-content"></div>
+        <!-- Compare bar -->
+        <div class="compare-box" id="compare-bar" style="display:none;">
+          <div class="compare-info">Comparing: <b id="compare-names"></b></div>
+          <div style="display:flex;gap:8px;">
+            <button class="bsm bblue" onclick="runCompare()">Compare</button>
+            <button class="bsm bgh" onclick="clearCompare()">Clear</button>
+          </div>
+        </div>
+        <!-- PDF downloads -->
+        <div class="pdf-row">
+          <span style="font-size:11px;color:var(--muted);align-self:center;">Download *.pdf:</span>
+          <button class="pdf-btn">Match Results</button>
+          <button class="pdf-btn">Combined Results</button>
+          <button class="pdf-btn">Division Stage Results</button>
+          <button class="pdf-btn">Category Stage Results</button>
+        </div>
+      </div>
+
+      <!-- ORG TABS (admin/staff only) -->
+      <div id="org-tabs" style="display:none;">
+        <!-- STAGES -->
+        <div id="otab-stages" class="otab" style="display:none;">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+            <button class="bsm bgold" onclick="openAddStage()" style="width:auto;">+ Add Stage</button>
+          </div>
+          <div id="stages-list"></div>
+        </div>
+
+        <!-- COMPETITORS -->
+        <div id="otab-competitors" class="otab" style="display:none;">
+          <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;">
+            <button class="bsm bgold" id="cf-all" onclick="setCF('all')" style="width:auto;">All</button>
+            <button class="bsm bgh" id="cf-approved" onclick="setCF('approved')" style="width:auto;">Approved</button>
+            <button class="bsm bgh" id="cf-pending" onclick="setCF('pending')" style="width:auto;">Pending</button>
+            <button class="bsm bgh" id="cf-waiting" onclick="setCF('waiting')" style="width:auto;">Waiting</button>
+          </div>
+          <div id="comp-list"></div>
+        </div>
+
+        <!-- SCORING -->
+        <div id="otab-scoring" class="otab" style="display:none;">
+          <div class="card">
+            <div class="chead"><div class="ctitle"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Enter Stage Result</div></div>
+            <div class="cbody">
+              <div class="frow">
+                <div class="fg"><label class="fl">Shooter</label><select id="sc-sh" class="fi" onchange="updHF()"><option value="">Select…</option></select></div>
+                <div class="fg"><label class="fl">Stage</label><select id="sc-st" class="fi"><option value="">Select…</option></select></div>
               </div>
-              <div class="fg"><label class="fl">Status</label>
-                <select id="a-status" class="fi"><option value="draft">Draft</option><option value="active">Active</option><option value="active_noedit">Active (no self-edit)</option><option value="preliminary">Preliminary</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+              <div class="fg"><label class="fl">Time (seconds)</label><input id="sc-t" class="fi" type="number" step="0.01" placeholder="e.g. 12.45" oninput="updHF()"/></div>
+              <div class="sgrid">
+                <div class="scell acell"><div class="slbl">A</div><div class="sctr"><button class="sbtn" onclick="adj('sc-a',-1)">−</button><span class="sval" id="sc-a">0</span><button class="sbtn" onclick="adj('sc-a',1)">+</button></div></div>
+                <div class="scell"><div class="slbl">C</div><div class="sctr"><button class="sbtn" onclick="adj('sc-c',-1)">−</button><span class="sval" id="sc-c">0</span><button class="sbtn" onclick="adj('sc-c',1)">+</button></div></div>
+                <div class="scell"><div class="slbl">D</div><div class="sctr"><button class="sbtn" onclick="adj('sc-d',-1)">−</button><span class="sval" id="sc-d">0</span><button class="sbtn" onclick="adj('sc-d',1)">+</button></div></div>
+                <div class="scell mcell"><div class="slbl">Miss</div><div class="sctr"><button class="sbtn" onclick="adj('sc-m',-1)">−</button><span class="sval" id="sc-m">0</span><button class="sbtn" onclick="adj('sc-m',1)">+</button></div></div>
+                <div class="scell"><div class="slbl">NS</div><div class="sctr"><button class="sbtn" onclick="adj('sc-n',-1)">−</button><span class="sval" id="sc-n">0</span><button class="sbtn" onclick="adj('sc-n',1)">+</button></div></div>
+                <div class="scell"><div class="slbl">Proc</div><div class="sctr"><button class="sbtn" onclick="adj('sc-p',-1)">−</button><span class="sval" id="sc-p">0</span><button class="sbtn" onclick="adj('sc-p',1)">+</button></div></div>
               </div>
+              <div class="hfbar">
+                <div class="hflbl">Points / HF</div>
+                <div style="display:flex;gap:14px;align-items:center;">
+                  <span style="font-size:14px;font-weight:600;color:var(--muted);" id="sc-pts">0 pts</span>
+                  <span class="hfval" id="sc-hf">0.0000</span>
+                </div>
+              </div>
+              <div id="sc-msg" class="msg" style="margin-top:6px;"></div>
+              <button class="btn-p" style="margin-top:8px;" onclick="saveScore()">Save Result</button>
             </div>
-            <div class="frow">
+          </div>
+        </div>
+
+        <!-- ROLES (admin only) -->
+        <div id="otab-roles" class="otab" style="display:none;">
+          <div class="card">
+            <div class="chead"><div class="ctitle">Invite Staff</div></div>
+            <div class="cbody">
+              <div class="fg"><label class="fl">Search user (name or email)</label><input id="r-srch" class="fi" type="text" placeholder="Name or email…" oninput="srchUsers(this.value)"/></div>
+              <div id="r-results" style="margin-bottom:10px;"></div>
+              <div class="fg"><label class="fl">Role</label>
+                <select id="r-role" class="fi"><option value="staff">Staff – enter scores &amp; manage competitors</option><option value="admin">Admin – full access</option></select>
+              </div>
+              <div id="r-msg" class="msg"></div>
+            </div>
+          </div>
+          <div class="card"><div class="chead"><div class="ctitle">Current Match Staff</div></div><div class="cbody" id="r-list"></div></div>
+        </div>
+
+        <!-- SETTINGS (admin only) -->
+        <div id="otab-settings" class="otab" style="display:none;">
+          <div class="card">
+            <div class="chead"><div class="ctitle">Match Settings</div></div>
+            <div class="cbody">
+              <div class="fg"><label class="fl">Match Name</label><input id="a-name" class="fi" type="text"/></div>
+              <div class="frow">
+                <div class="fg"><label class="fl">Location</label><input id="a-loc" class="fi" type="text"/></div>
+                <div class="fg"><label class="fl">Date</label><input id="a-date" class="fi" type="date"/></div>
+              </div>
+              <div class="frow">
+                <div class="fg"><label class="fl">Type</label>
+                  <select id="a-type" class="fi"><option>Training</option><option>Level I</option><option>Level II</option><option>Level III</option><option>Level IV</option><option>Level V</option></select>
+                </div>
+                <div class="fg"><label class="fl">Status</label>
+                  <select id="a-status" class="fi"><option value="draft">Draft</option><option value="active">Active</option><option value="active_noedit">Active (no self-edit)</option><option value="preliminary">Preliminary</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+                </div>
+              </div>
               <div class="fg"><label class="fl">Registration</label>
                 <select id="a-reg" class="fi"><option value="open_auto">Open – approved directly</option><option value="open_manual">Open – manual approval</option><option value="open_waiting">Open – waiting list</option><option value="closed">Closed</option></select>
               </div>
+              <div class="fg"><label class="fl">Results Visibility</label>
+                <select id="a-results" class="fi"><option value="public">Public – anyone</option><option value="scores_only">Scores public, results to organizers</option><option value="organizers_only">Organizers only</option></select>
+              </div>
               <div class="fg"><label class="fl">Max Competitors</label><input id="a-max" class="fi" type="number" min="1" placeholder="Unlimited"/></div>
-            </div>
-            <div class="fg">
-              <div class="trow">
-                <div><div class="tl">Searchable / Public</div><div class="ts">Allow search by ID</div></div>
-                <label class="toggle"><input type="checkbox" id="a-srch"/><span class="tslider"></span></label>
+              <div class="fg">
+                <div class="trow">
+                  <div><div class="tl">Searchable / Public</div><div class="ts2">Allow search by ID</div></div>
+                  <label class="toggle"><input type="checkbox" id="a-srch"/><span class="tslider"></span></label>
+                </div>
+              </div>
+              <div id="a-msg" class="msg"></div>
+              <div style="display:flex;gap:10px;">
+                <button class="btn-p" onclick="saveSettings()" style="flex:1;">Save Changes</button>
+                <button class="btn-d" onclick="delMatch()">Delete</button>
               </div>
             </div>
-            <div id="a-msg" class="msg"></div>
-            <button class="btn-p" onclick="saveAdmin()">Save Changes</button>
-            <div style="margin-top:10px;"><button class="btn-d" onclick="delMatch()">Delete Match</button></div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
+      </div><!-- /org-tabs -->
 
-<!-- MODALS -->
-<!-- Create -->
-<div id="modal-create" class="moverlay" onclick="if(event.target===this)cm('modal-create')">
-  <div class="mbox">
-    <div class="mhdr"><div class="mtitle">New Match</div><button class="mclose" onclick="cm('modal-create')">✕</button></div>
-    <div class="fg"><label class="fl">Match Name</label><input id="c-name" class="fi" type="text" placeholder="Bergen Open 2026"/></div>
-    <div class="frow">
-      <div class="fg"><label class="fl">Location</label><input id="c-loc" class="fi" type="text" placeholder="Oslo Range"/></div>
-      <div class="fg"><label class="fl">Date</label><input id="c-date" class="fi" type="date"/></div>
-    </div>
-    <div class="frow">
-      <div class="fg"><label class="fl">Type</label>
-        <select id="c-type" class="fi"><option value="Training">Training</option><option value="Level 1">Level 1</option><option value="Level 2">Level 2</option><option value="Level 3">Level 3</option><option value="Level 4">Level 4</option><option value="Level 5">Level 5</option></select>
+      <!-- COMPARE VIEW -->
+      <div id="compare-view" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-size:14px;font-weight:800;">Shooter Comparison</div>
+          <button class="bsm bgh" onclick="closeCompare()">← Back to Results</button>
+        </div>
+        <div id="compare-content"></div>
       </div>
-      <div class="fg"><label class="fl">Status</label>
-        <select id="c-status" class="fi"><option value="draft">Draft</option><option value="active" selected>Active</option></select>
-      </div>
+
     </div>
-    <div class="frow">
-      <div class="fg"><label class="fl">Planned Stages</label><input id="c-stages" class="fi" type="number" min="1" max="40" placeholder="6"/></div>
-      <div class="fg"><label class="fl">Max Competitors</label><input id="c-maxc" class="fi" type="number" min="1" placeholder="Unlimited"/></div>
-    </div>
-    <div class="fg"><div class="trow"><div><div class="tl">Allow public search</div><div class="ts">Others can find by ID</div></div><label class="toggle"><input type="checkbox" id="c-pub" checked/><span class="tslider"></span></label></div></div>
-    <div id="cm-msg" class="msg"></div>
-    <button class="btn-p" id="cm-btn" onclick="createMatch()">Create Match</button>
   </div>
-</div>
-<!-- Find -->
-<div id="modal-find" class="moverlay" onclick="if(event.target===this)cm('modal-find')">
-  <div class="mbox" style="max-width:420px;">
-    <div class="mhdr"><div class="mtitle">Find Match by ID</div><button class="mclose" onclick="cm('modal-find')">✕</button></div>
-    <div class="fg"><label class="fl">Match ID</label><input id="f-id" class="fi" type="text" placeholder="e.g. 12345"/></div>
-    <div id="fm-msg" class="msg"></div>
-    <button class="btn-p" onclick="findMatch()">Search</button>
-    <div id="fm-res" style="display:none;margin-top:12px;"></div>
-  </div>
-</div>
-<!-- Stage -->
-<div id="modal-stage" class="moverlay" onclick="if(event.target===this)cm('modal-stage')">
+
+</div><!-- /app -->
+
+<!-- STAGE MODAL -->
+<div id="modal-stage" class="moverlay" onclick="if(event.target===this)closeModal('modal-stage')">
   <div class="mbox" style="max-width:500px;">
-    <div class="mhdr"><div class="mtitle" id="st-modal-title">Add Stage</div><button class="mclose" onclick="cm('modal-stage')">✕</button></div>
+    <div class="mhdr"><div class="mtitle" id="st-title">Add Stage</div><button class="mclose" onclick="closeModal('modal-stage')">✕</button></div>
     <div class="frow">
-      <div class="fg"><label class="fl">Stage #</label><input id="st-num" class="fi" type="number" min="1" placeholder="1"/></div>
+      <div class="fg"><label class="fl">Stage #</label><input id="st-num" class="fi" type="number" min="1"/></div>
       <div class="fg"><label class="fl">Name</label><input id="st-name" class="fi" type="text" placeholder="Stage 1"/></div>
     </div>
     <div class="frow">
       <div class="fg"><label class="fl">Scoring</label><select id="st-sc" class="fi"><option value="comstock">Comstock</option><option value="virginia">Virginia Count</option><option value="fixedtime">Fixed Time</option></select></div>
-      <div class="fg"><label class="fl">Course</label><select id="st-co" class="fi"><option value="short">Short (≤60)</option><option value="medium">Medium (61–120)</option><option value="long">Long (&gt;120)</option></select></div>
+      <div class="fg"><label class="fl">Course</label><select id="st-co" class="fi"><option value="short">Short (≤60 pts)</option><option value="medium">Medium (61–120)</option><option value="long">Long (&gt;120)</option></select></div>
     </div>
     <div class="frow">
-      <div class="fg"><label class="fl">Paper Targets</label><input id="st-pp" class="fi" type="number" min="0" value="4" oninput="updStCalc()"/></div>
-      <div class="fg"><label class="fl">Poppers</label><input id="st-po" class="fi" type="number" min="0" value="2" oninput="updStCalc()"/></div>
+      <div class="fg"><label class="fl">Paper Targets</label><input id="st-pp" class="fi" type="number" min="0" value="4" oninput="updStC()"/></div>
+      <div class="fg"><label class="fl">Poppers</label><input id="st-po" class="fi" type="number" min="0" value="2" oninput="updStC()"/></div>
     </div>
     <div class="frow">
-      <div class="fg"><label class="fl">Plates</label><input id="st-pl" class="fi" type="number" min="0" value="0" oninput="updStCalc()"/></div>
+      <div class="fg"><label class="fl">Plates</label><input id="st-pl" class="fi" type="number" min="0" value="0" oninput="updStC()"/></div>
       <div class="fg"><label class="fl">No-Shoots</label><input id="st-ns" class="fi" type="number" min="0" value="0"/></div>
     </div>
-    <div class="fg"><label class="fl">Procedure (optional)</label><input id="st-proc" class="fi" type="text" placeholder="Stage description…"/></div>
-    <div class="fg"><div class="trow"><div><div class="tl">Included in results</div><div class="ts">Stage counts toward match score</div></div><label class="toggle"><input type="checkbox" id="st-inc" checked/><span class="tslider"></span></label></div></div>
-    <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:12px;font-size:12px;color:var(--muted);">
+    <div class="fg"><label class="fl">Procedure (optional)</label><input id="st-proc" class="fi" type="text" placeholder="Stage description"/></div>
+    <div class="fg">
+      <div class="trow" style="margin:0;">
+        <div><div class="tl">Included in results</div><div class="ts2">Stage counts toward match score</div></div>
+        <label class="toggle"><input type="checkbox" id="st-inc" checked/><span class="tslider"></span></label>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:9px 13px;margin:10px 0;font-size:12px;color:var(--muted);">
       Shots: <b id="st-shots" style="color:var(--text);">10</b> &nbsp;·&nbsp; Max pts: <b id="st-maxp" style="color:var(--accent);">50</b>
     </div>
     <div id="st-msg" class="msg"></div>
     <button class="btn-p" id="st-btn" onclick="saveStage()">Save Stage</button>
+  </div>
+</div>
+
+<!-- FIND MATCH MODAL -->
+<div id="modal-find" class="moverlay" onclick="if(event.target===this)closeModal('modal-find')">
+  <div class="mbox" style="max-width:420px;">
+    <div class="mhdr"><div class="mtitle">Find Match by ID</div><button class="mclose" onclick="closeModal('modal-find')">✕</button></div>
+    <div class="fg"><label class="fl">Match ID</label><input id="f-id" class="fi" type="text" placeholder="e.g. 12345"/></div>
+    <div id="fm-msg" class="msg"></div>
+    <button class="btn-p" onclick="findMatch()">Search</button>
+    <div id="fm-res" style="display:none;margin-top:12px;"></div>
   </div>
 </div>
 
@@ -432,8 +668,12 @@ const fbApp=initializeApp(FB);
 const auth=getAuth(fbApp);
 const db=getFirestore(fbApp);
 
-let CU=null,UP=null,matches=[],invitations=[],AM=null,CF='all',editSN=null,rSel=null;
-let munsub=null,iunsub=null,rTimer=null;
+const DIVISIONS=['Open','Standard','Standard Optics','Optics','Production','Revolver','Classic','Rimfire Open','Rimfire Standard','Rimfire Production','Rimfire Optics','Pistol Caliber Carbine','Production Optics','Production Optics Light','Pistol Caliber Carbine Optics','Pistol Caliber Carbine Iron','Custom'];
+const DEFAULT_DIVS=['Open','Standard','Optics','Production','Revolver','Classic','Production Optics'];
+
+let CU=null,UP=null,matches=[],invitations=[],AM=null,CF='all',editSN=null,rSel=null,rTimer=null;
+let munsub=null,iunsub=null,activeDiv='combined',compareSelected=new Set(),currentYear=new Date().getFullYear();
+let userRole='competitor'; // 'owner','admin','staff','competitor'
 
 const $=id=>document.getElementById(id);
 const spin=s=>$('gs').classList.toggle('show',s);
@@ -441,35 +681,46 @@ const fmtD=d=>{try{return new Date(d).toLocaleDateString('en-GB',{day:'numeric',
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const smsg=(id,t,tp='err')=>{const e=$(id);if(!e)return;e.textContent=t;e.className='msg '+(tp||'');};
 
-// expose globals
-Object.assign(window,{sv,om,cm,tp,odt,openAddStage,createMatch,findMatch,saveStage,saveScore,saveAdmin,delMatch,setCF,adj,updHF,updStCalc,srchUsers,inviteRole,removeRole,approveC,removeC,editStage,delStage,joinMatch,acceptInv,declineInv});
-
-// IPSC scoring
+// SCORING
 const PFS={major:{A:5,C:4,D:2,miss:-10,ns:-10,proc:-10},minor:{A:5,C:3,D:1,miss:-10,ns:-10,proc:-10}};
 const calcShots=s=>Math.max(0,(s.paperTargets||0)*2+(s.poppers||0)+(s.plates||0));
 const calcMax=s=>Math.max(0,(s.paperTargets||0)*10+(s.poppers||0)*5+(s.plates||0)*5);
 const calcPts=(pf,a,c,d,m,n,p)=>{const sc=PFS[(pf||'minor').toLowerCase()]||PFS.minor;return a*sc.A+c*sc.C+d*sc.D+m*sc.miss+n*sc.ns+p*sc.proc;};
 
+// ROLES
+function getRole(m){
+  if(!CU||!m)return'competitor';
+  if(m.ownerId===CU.uid)return'owner';
+  const mr=(m.matchRoles||[]).find(r=>r.uid===CU.uid);
+  if(mr)return mr.role; // 'admin' or 'staff'
+  if((m.participants||[]).includes(CU.uid))return'competitor';
+  return'none';
+}
+function canAdmin(role){return role==='owner'||role==='admin';}
+function canStaff(role){return role==='owner'||role==='admin'||role==='staff';}
+
+// expose globals
+Object.assign(window,{sv,toggleDD,closeAllDD,openAddStage,saveStage,updStC,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,findMatch,runCompare,clearCompare,closeCompare,showOrgTab,editStage,delStage,closeModal,toggleAdv,submitCreate,joinMatch,acceptInv,declineInv});
+
 // AUTH
 onAuthStateChanged(auth,async user=>{
   if(user){
     CU=user;
-    try{const sn=await getDoc(doc(db,'users',user.uid));UP=sn.exists()?{uid:user.uid,...sn.data()}:{uid:user.uid,email:user.email,firstName:user.email.split('@')[0],lastName:'',division:'',powerFactor:'minor'};}
+    try{const sn=await getDoc(doc(db,'users',user.uid));UP=sn.exists()?{uid:user.uid,...sn.data()}:{uid:user.uid,email:user.email,firstName:user.email.split('@')[0],lastName:'',powerFactor:'minor'};}
     catch{UP={uid:user.uid,email:user.email,firstName:user.email.split('@')[0],lastName:'',powerFactor:'minor'};}
     init();
   }else{
-    CU=null;UP=null;
-    $('ls').classList.add('show');$('app').style.display='none';
+    CU=null;UP=null;$('ls').classList.add('show');$('app').style.display='none';
     munsub&&(munsub(),munsub=null);iunsub&&(iunsub(),iunsub=null);
   }
 });
+
 $('l-btn').onclick=async()=>{
-  smsg('l-msg','');
-  const email=$('l-email').value.trim(),pw=$('l-pw').value;
+  smsg('l-msg','');const email=$('l-email').value.trim(),pw=$('l-pw').value;
   if(!email||!pw){smsg('l-msg','Enter email and password.');return;}
   $('l-btn').disabled=true;$('l-btn').textContent='Signing in…';
   try{await signInWithEmailAndPassword(auth,email,pw);}
-  catch(e){let m='Sign-in failed.';if(e.code==='auth/invalid-credential'||e.code==='auth/wrong-password')m='Invalid email or password.';smsg('l-msg',m);$('l-btn').disabled=false;$('l-btn').textContent='Sign In';}
+  catch(e){smsg('l-msg',e.code==='auth/invalid-credential'?'Invalid email or password.':'Sign-in failed.');$('l-btn').disabled=false;$('l-btn').textContent='Sign In';}
 };
 ['l-email','l-pw'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')$('l-btn').click();}));
 $('out-btn').onclick=()=>signOut(auth);
@@ -480,209 +731,249 @@ function init(){
   const ini=((fn[0]||'')+(ln[0]||'')).toUpperCase()||(UP.email||'?')[0].toUpperCase();
   if(UP.photoURL)$('top-av').innerHTML=`<img src="${UP.photoURL}" alt="av"/>`;else $('top-av').textContent=ini;
   $('c-date').value=new Date().toISOString().split('T')[0];
-  startML();startIL();updStCalc();
+  buildDivCheckboxes();
+  startML();startIL();
 }
 
+// DROPDOWNS
+function toggleDD(id){const m=$(id+'-menu');if(!m)return;const open=m.classList.contains('show');closeAllDD();if(!open)m.classList.add('show');}
+function closeAllDD(){document.querySelectorAll('.ddmenu,.notif-drop').forEach(m=>m.classList.remove('show'));}
+document.addEventListener('click',e=>{if(!e.target.closest('.ddwrap'))closeAllDD();});
+
+// VIEWS
+function sv(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const map={'my-comps':'view-my-comps','create-match':'view-create-match','match-detail':'view-match-detail'};
+  const vid=map[name]||'view-'+name;
+  $(vid)?.classList.add('active');
+  window.scrollTo(0,0);
+  // update nav
+  document.querySelectorAll('.tnavbtn').forEach(b=>b.classList.remove('active'));
+  if(name==='my-comps')document.querySelector('.tnavbtn')?.classList.add('active');
+}
+
+// YEAR NAV
+function buildYearNav(){
+  const years=[...new Set(matches.map(m=>{const d=m.date?new Date(m.date):(m.createdAt?.toDate?.()??null);return d?d.getFullYear():null;}).filter(Boolean))].sort((a,b)=>b-a);
+  if(!years.includes(currentYear)&&years.length>0)currentYear=years[0];
+  const el=$('yr-nav');
+  el.innerHTML=years.map(y=>`<button class="yr-btn ${y===currentYear?'active':''}" onclick="setYear(${y})">${y==='prev'?'‹ '+y:''}<span>${y}</span>${y==='next'?'›':''}</button>`).join('');
+  $('yr-title').textContent=currentYear+' Competitions';
+}
+window.setYear=y=>{currentYear=y;buildYearNav();renderML();};
+
+// LISTENERS
 function startML(){
   munsub&&munsub();
-  const q=query(collection(db,'matches'),where('participants','array-contains',CU.uid));
-  munsub=onSnapshot(q,sn=>{
+  munsub=onSnapshot(query(collection(db,'matches'),where('participants','array-contains',CU.uid)),sn=>{
     matches=[];sn.forEach(d=>matches.push({id:d.id,...d.data()}));
     matches.sort((a,b)=>{const da=a.date?new Date(a.date):(a.createdAt?.toDate?.()??new Date(0));const db2=b.date?new Date(b.date):(b.createdAt?.toDate?.()??new Date(0));return db2-da;});
-    renderML();
-    if(AM){const u=matches.find(m=>m.id===AM.id);if(u){AM=u;renderD();}}
+    buildYearNav();renderML();
+    if(AM){const u=matches.find(m=>m.id===AM.id);if(u){AM=u;userRole=getRole(u);renderDetail();}}
   });
 }
 function startIL(){
   iunsub&&iunsub();
-  const q=query(collection(db,'users',CU.uid,'invitations'),where('status','==','pending'));
-  iunsub=onSnapshot(q,sn=>{invitations=[];sn.forEach(d=>invitations.push({id:d.id,...d.data()}));renderInv();});
+  iunsub=onSnapshot(query(collection(db,'users',CU.uid,'invitations'),where('status','==','pending')),sn=>{
+    invitations=[];sn.forEach(d=>invitations.push({id:d.id,...d.data()}));
+    renderNotif();
+  });
 }
 
-// VIEWS
-function sv(name){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-'+name)?.classList.add('active');window.scrollTo(0,0);}
-function tp(bid,aid){const b=$(bid),a=$(aid);if(!b)return;const open=b.style.display!=='none';b.style.display=open?'none':'block';if(a)a.textContent=open?'▸':'▾';}
-function om(id){$(id)?.classList.add('show');}
-function cm(id){$(id)?.classList.remove('show');}
-function odt(id){
-  document.querySelectorAll('.dsec').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
-  $(id)?.classList.add('active');
-  $('tab-'+id)?.classList.add('active');
-}
-
-// RENDER MATCHES
+// MATCH LIST
 function renderML(){
-  const el=$('ml');
-  if(!matches.length){el.innerHTML='<div class="empty"><div class="empty-ico">🏆</div><div class="empty-t">No matches yet</div><div class="empty-s">Create or join a match</div></div>';return;}
-  const sc={'draft':'bg-muted','active':'bg-green','active_noedit':'bg-green','preliminary':'bg-gold','completed':'bg-blue','cancelled':'bg-red'};
-  el.innerHTML=matches.map(m=>{
-    const io=m.ownerId===CU.uid,sh=(m.shooters||[]).length,st=(m.stages||[]).filter(s=>s?.number!=null).length;
-    const status=m.status||'active';
-    return `<div class="mrow ${io?'owner':''}" onclick="openM('${m.id}')">
-      <div class="mrow-info">
-        <div class="mrow-name">${esc(m.name||'Unnamed')}</div>
-        <div class="mrow-meta">${m.date?fmtD(m.date)+' · ':''}${esc(m.location||'')}${m.location?' · ':''}${sh} shooters · ${st} stages · ID: ${m.id}</div>
-      </div>
-      <div class="mrow-right">
-        <span class="badge bg-gold">${esc(m.type||'')}</span>
-        <span class="badge ${sc[status]||'bg-muted'}" style="border:none;">${status.toUpperCase()}</span>
-      </div>
-    </div>`;
-  }).join('');
+  const el=$('ml-container');
+  const yr=matches.filter(m=>{const d=m.date?new Date(m.date):(m.createdAt?.toDate?.()??null);return d?d.getFullYear()===currentYear:true;});
+  if(!yr.length){el.innerHTML='<div class="empty"><div class="empty-ico">🏆</div><div class="empty-t">No competitions in '+currentYear+'</div><div class="empty-s"><button class="bsm bgold" onclick="sv(\'create-match\')" style="margin-top:10px;width:auto;">Create Match</button></div></div>';return;}
+  const stc={'draft':'bg-muted','active':'bg-green','active_noedit':'bg-green','preliminary':'bg-gold','completed':'bg-blue','cancelled':'bg-red'};
+  el.innerHTML=`<table class="mltable">
+    <thead><tr>
+      <th>Starts</th><th>Event</th><th>Status</th><th>Type</th><th>Role</th><th>Competitors</th>
+    </tr></thead>
+    <tbody>${yr.map(m=>{
+      const role=getRole(m),io=role==='owner',sh=(m.shooters||[]).length,max=m.maxCompetitors||0,st=m.status||'active';
+      const ds=m.date?new Date(m.date).toLocaleDateString('en-GB',{weekday:'short',year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+      const roleLabel={'owner':'admin','admin':'admin','staff':'staff','competitor':'competitor','none':'—'}[role]||'—';
+      return `<tr onclick="openM('${m.id}')" style="cursor:pointer;">
+        <td style="color:var(--muted);font-size:12px;white-space:nowrap;">${ds}</td>
+        <td><span class="mchip ${io?'owner':''}">${esc(m.name||'Unnamed')}</span></td>
+        <td><span class="badge ${stc[st]||'bg-muted'}">${st.charAt(0).toUpperCase()+st.slice(1)}</span></td>
+        <td style="color:var(--muted);font-size:12px;">${esc(m.type||'IPSC Handgun')}</td>
+        <td><span class="badge ${role==='owner'||role==='admin'?'bg-green':role==='staff'?'bg-gold':'bg-muted'}">${roleLabel}</span></td>
+        <td style="color:var(--muted);font-size:12px;">${sh}${max?'/'+max:''}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>
+  <div style="margin-top:16px;"><button class="bsm bblue" onclick="closeModal('modal-find');openModal('modal-find')" style="width:auto;">Find Match by ID</button></div>`;
 }
-window.openM=id=>{AM=matches.find(m=>m.id===id||m.id?.toString()===id.toString());if(!AM)return;editSN=null;sv('detail');odt('do');renderD();};
 
-// RENDER INVITATIONS
-function renderInv(){
-  const el=$('inv-list'),badge=$('inv-badge');
-  if(!invitations.length){el.innerHTML='<div class="empty"><div class="empty-t">No pending invitations</div></div>';badge.style.display='none';return;}
-  badge.style.display='flex';badge.textContent=invitations.length;
-  el.innerHTML=invitations.map(inv=>`<div class="invrow" id="iv-${esc(inv.id)}">
-    <div class="invinfo"><div class="invname">${esc(inv.matchName||'Match Invitation')}</div><div class="invsub">Invited by ${esc(inv.invitedBy||'a user')}</div></div>
-    <div class="invbtns">
-      <button class="ibacc" onclick="acceptInv('${esc(inv.matchId||inv.id)}')">Accept</button>
-      <button class="ibdec" onclick="declineInv('${esc(inv.matchId||inv.id)}')">Decline</button>
+window.openM=id=>{
+  AM=matches.find(m=>m.id===id||m.id?.toString()===id.toString());
+  if(!AM)return;
+  userRole=getRole(AM);editSN=null;activeDiv='combined';compareSelected.clear();
+  sv('match-detail');renderDetail();
+};
+
+// NOTIFICATIONS
+function renderNotif(){
+  const el=$('notif-list'),cnt=$('bell-count');
+  if(!invitations.length){el.innerHTML='<div class="notif-empty">No pending invitations</div>';cnt.style.display='none';return;}
+  cnt.style.display='flex';cnt.textContent=invitations.length;
+  el.innerHTML=invitations.map(inv=>`<div class="notif-item">
+    <div class="notif-name">${esc(inv.matchName||'Match Invitation')}</div>
+    <div class="notif-sub">Invited by ${esc(inv.invitedBy||'a user')}</div>
+    <div class="notif-btns">
+      <button class="nibacc" onclick="acceptInv('${esc(inv.matchId||inv.id)}')">Accept</button>
+      <button class="nibdec" onclick="declineInv('${esc(inv.matchId||inv.id)}')">Decline</button>
     </div>
   </div>`).join('');
 }
+
 async function acceptInv(mid){
-  spin(true);
+  spin(true);closeAllDD();
   try{
     const mRef=doc(db,'matches',mid.toString()),sn=await getDoc(mRef);if(!sn.exists()){spin(false);return;}
-    const md=sn.data(),exist=md.participants||[],alr=exist.includes(CU.uid);
-    if(!alr)await updateDoc(mRef,{participants:[...exist,CU.uid]});
-    const esh=md.shooters||[],alrS=esh.some(s=>s.uid===CU.uid||s.id===CU.uid);
-    const ns={id:CU.uid,isMe:false,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
-    await updateDoc(mRef,{shooters:alrS?esh:[...esh,ns],updatedAt:serverTimestamp()});
-    await updateDoc(doc(db,'users',CU.uid,'invitations',mid.toString()),{status:'accepted'});
-  }catch(e){console.error(e);}spin(false);
-}
-async function declineInv(mid){try{await updateDoc(doc(db,'users',CU.uid,'invitations',mid.toString()),{status:'declined'});}catch(e){console.error(e);}}
-
-// CREATE MATCH
-async function createMatch(){
-  smsg('cm-msg','');
-  const name=$('c-name').value.trim();if(!name){smsg('cm-msg','Match name required.');return;}
-  $('cm-btn').disabled=true;$('cm-btn').textContent='Creating…';spin(true);
-  try{
-    const mid=await nextMID();
-    const os={id:CU.uid,isMe:true,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
-    await setDoc(doc(db,'matches',mid.toString()),{id:mid,name,location:$('c-loc').value.trim(),date:$('c-date').value,type:$('c-type').value,status:$('c-status').value,plannedStages:parseInt($('c-stages').value)||0,maxCompetitors:parseInt($('c-maxc').value)||0,searchable:$('c-pub').checked,ownerId:CU.uid,participants:[CU.uid],shooters:[os],stages:[],registration:'open_auto',createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-    smsg('cm-msg','✓ Match created! ID: '+mid,'ok');
-    ['c-name','c-loc','c-stages','c-maxc'].forEach(i=>{const e=$(i);if(e)e.value='';});
-    setTimeout(()=>cm('modal-create'),1600);
-  }catch(e){smsg('cm-msg','Error: '+e.message);}
-  $('cm-btn').disabled=false;$('cm-btn').textContent='Create Match';spin(false);
-}
-async function nextMID(){
-  const cr=doc(db,'counters','matchId');
-  return runTransaction(db,async t=>{const sn=await t.get(cr);const n=sn.exists()?sn.data().value+1:1;t.set(cr,{value:n});return n;});
-}
-
-// FIND MATCH
-async function findMatch(){
-  smsg('fm-msg','');$('fm-res').style.display='none';
-  const raw=$('f-id').value.trim();if(!raw){smsg('fm-msg','Enter a match ID.');return;}
-  spin(true);
-  try{
-    const local=matches.find(m=>m.id&&m.id.toString()===raw);
-    if(local){renderFR(local,true);spin(false);return;}
-    const sn=await getDoc(doc(db,'matches',raw));
-    if(!sn.exists()){smsg('fm-msg','Match not found.');spin(false);return;}
-    const md={id:sn.id,...sn.data()};
-    if(!md.searchable){smsg('fm-msg','This match is private.');spin(false);return;}
-    renderFR(md,false);
-  }catch(e){smsg('fm-msg','Error: '+e.message);}
-  spin(false);
-}
-function renderFR(m,alrIn){
-  const el=$('fm-res');el.style.display='block';
-  el.innerHTML=`<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:14px;">
-    <div style="font-size:15px;font-weight:800;margin-bottom:5px;">${esc(m.name||'')}</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">${m.date?fmtD(m.date):''} ${m.location?'· '+esc(m.location):''} · ${(m.shooters||[]).length} shooters · ID: ${m.id}</div>
-    ${alrIn?'<span class="badge bg-green">✓ Already in this match</span>':`<div id="jmsg" class="msg"></div><button class="btn-p" onclick="joinMatch('${m.id}')">Join Match</button>`}
-  </div>`;
-}
-async function joinMatch(mid){
-  smsg('jmsg','');spin(true);
-  try{
-    const mRef=doc(db,'matches',mid.toString()),sn=await getDoc(mRef);if(!sn.exists()){smsg('jmsg','Not found.');spin(false);return;}
     const md=sn.data(),ex=md.participants||[];
     if(!ex.includes(CU.uid))await updateDoc(mRef,{participants:[...ex,CU.uid]});
     const esh=md.shooters||[],alr=esh.some(s=>s.uid===CU.uid||s.id===CU.uid);
     const ns={id:CU.uid,isMe:false,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
     await updateDoc(mRef,{shooters:alr?esh:[...esh,ns],updatedAt:serverTimestamp()});
-    smsg('jmsg','✓ Joined!','ok');setTimeout(()=>cm('modal-find'),1400);
-  }catch(e){smsg('jmsg','Error: '+e.message);}
-  spin(false);
+    await updateDoc(doc(db,'users',CU.uid,'invitations',mid.toString()),{status:'accepted'});
+  }catch(e){console.error(e);}spin(false);
 }
+async function declineInv(mid){try{await updateDoc(doc(db,'users',CU.uid,'invitations',mid.toString()),{status:'declined'});}catch(e){console.error(e);}}
 
-// RENDER DETAIL
-function renderD(){
-  if(!AM)return;const m=AM,io=m.ownerId===CU.uid;
-  $('d-name').textContent=m.name||'Unnamed';
+// DETAIL RENDER
+function renderDetail(){
+  if(!AM)return;const m=AM;
+  const role=userRole,isStaff=canStaff(role),isAdmin=canAdmin(role);
+
+  $('dh-name').textContent=m.name||'Unnamed';
   const ds=m.date?fmtD(m.date):'';
-  $('d-meta').innerHTML=[
-    m.location?`<div class="dmi"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(m.location)}</div>`:'',
-    ds?`<div class="dmi"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${ds}</div>`:'',
-    `<div class="dmi" style="font-size:10px;opacity:.4;">ID: ${m.id}</div>`
+  $('dh-meta').innerHTML=[
+    m.location?`<div class="dh-mi"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(m.location)}</div>`:'',
+    ds?`<div class="dh-mi"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${ds}</div>`:'',
+    `<div class="dh-mi" style="opacity:.4;">ID: ${m.id}</div>`
   ].join('');
-  const sc={'draft':'bg-muted','active':'bg-green','active_noedit':'bg-green','preliminary':'bg-gold','completed':'bg-blue','cancelled':'bg-red'};
+  const stc={'draft':'bg-muted','active':'bg-green','active_noedit':'bg-green','preliminary':'bg-gold','completed':'bg-blue','cancelled':'bg-red'};
   const st=m.status||'active';
-  $('d-badges').innerHTML=[
-    `<span class="badge bg-gold">${esc(m.type||'')}</span>`,
-    `<span class="badge ${sc[st]||'bg-muted'}">${st.toUpperCase()}</span>`,
-    io?'<span class="badge bg-green">Owner</span>':'',
-    m.searchable?'<span class="badge bg-muted">🔍 Public</span>':''
+  $('dh-badges').innerHTML=[
+    `<span class="badge bg-gold">${esc(m.type||'IPSC Handgun')}</span>`,
+    `<span class="badge ${stc[st]||'bg-muted'}">${st.toUpperCase()}</span>`,
+    isAdmin?'<span class="badge bg-green">Admin</span>':isStaff?'<span class="badge bg-gold">Staff</span>':'<span class="badge bg-muted">Competitor</span>',
+    m.searchable?'<span class="badge bg-muted">Public</span>':''
   ].join('');
-  $('d-quick').style.display=io?'grid':'none';
-  $('add-st-btn').style.display=io?'inline-block':'none';
-  renderOV();renderSL();renderCL();renderScSel();renderStOut();renderRoles();
-  if(io)fillAdmin();
+
+  // Organizer controls
+  $('org-chip-row').style.display=isStaff?'flex':'none';
+  if(isAdmin){
+    $('dd-roles-item').style.display='block';
+    $('dd-settings-item').style.display='block';
+  } else {
+    $('dd-roles-item').style.display='none';
+    $('dd-settings-item').style.display='none';
+  }
+
+  // Result view
+  $('result-view').style.display='block';
+  $('org-tabs').style.display='none';
+  $('compare-view').style.display='none';
+  document.querySelectorAll('.otab').forEach(t=>t.style.display='none');
+
+  buildDivChips();
+  renderResults('combined');
 }
 
-// OVERVIEW
-function renderOV(){
+function buildDivChips(){
   const m=AM;
   const stages=(m.stages||[]).filter(s=>s?.number!=null);
-  const shooters=m.shooters||[];
-  const res=shooters.reduce((a,sh)=>a+(sh.stages||[]).length,0);
-  $('ov-c').innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
-      ${[['Stages',stages.length],['Shooters',shooters.length],['Results',res]].map(([l,v])=>`
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center;">
-          <div style="font-size:22px;font-weight:900;color:var(--accent);">${v}</div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-top:3px;">${l}</div>
-        </div>`).join('')}
-    </div>
-    <div class="card"><div class="chead"><div class="ctitle">Live Standings</div></div><div class="cbody">${stTable(m)}</div></div>`;
+  const divs=m.divisions||DEFAULT_DIVS;
+  const el=$('div-chips');
+  const chips=['Combined',...divs,'Compare','Statistics'];
+  el.innerHTML=chips.map(d=>`<button class="chip ${d.toLowerCase()===activeDiv?'active':''}" onclick="selectDiv('${esc(d.toLowerCase())}')">${esc(d)}</button>`).join('');
 }
 
-function stTable(m){
-  const stages=(m.stages||[]).filter(s=>s?.number!=null);
-  if(!stages.length)return '<div class="empty"><div class="empty-t">No stages yet</div></div>';
-  const tot={};
-  (m.shooters||[]).forEach(sh=>{const nm=((sh.firstName||'')+(sh.lastName?' '+sh.lastName:'')).trim()||'Shooter';tot[sh.id]={nm,div:sh.division||'',sp:0,rp:0,n:0};});
-  stages.forEach(st=>{
-    const mets=stMets(m,st),topHF=mets.length?mets[0].hf:0,maxPts=calcMax(st);
-    mets.forEach(r=>{
-      if(!tot[r.id])tot[r.id]={nm:r.nm,div:'',sp:0,rp:0,n:0};
-      tot[r.id].sp+=topHF>0?r.hf/topHF*maxPts:0;tot[r.id].rp+=r.pts;tot[r.id].n++;
+window.selectDiv=d=>{
+  if(d==='statistics'){return;}
+  if(d==='compare'){showCompareMode();return;}
+  activeDiv=d;buildDivChips();renderResults(d);
+};
+
+function renderResults(div){
+  $('result-view').style.display='block';$('compare-view').style.display='none';
+  const m=AM;
+  const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));
+
+  if(div==='combined'||div==='stage results'||!m.divisions?.includes(div)){
+    // Stage results overview like SSI
+    const el=$('results-content');
+    if(!stages.length){el.innerHTML='<div class="empty"><div class="empty-ico">🎯</div><div class="empty-t">No stages yet</div></div>';return;}
+    el.innerHTML=`<div style="font-weight:700;font-size:14px;margin-bottom:12px;">Stage Results</div>`+
+    stages.map(s=>{
+      const mets=stMets(m,s);const topHF=mets.length?mets[0].hf:0;
+      return `<div class="stage-sec">
+        <div class="stage-head">
+          <span class="stage-lbl">${s.number}. ${esc(s.name||'Stage '+s.number)}, ${s.course?s.course.charAt(0).toUpperCase()+s.course.slice(1):'Short'}</span>
+        </div>
+        ${mets.length?`<table class="rtbl"><thead><tr>
+          <th>#</th><th>Match%</th><th>Match Pts</th><th>First name</th><th>Last name</th><th>DIV</th><th>CAT</th><th>Time</th><th>HF</th>
+        </tr></thead><tbody>
+          ${mets.map((r,i)=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}">
+            <td class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${i+1}</td>
+            <td style="color:var(--accent);font-weight:700;">${topHF>0?(r.hf/topHF*100).toFixed(2):'0.00'}%</td>
+            <td>${r.pts}</td>
+            <td style="font-weight:600;">${esc(r.fn)}</td>
+            <td>${esc(r.ln)}</td>
+            <td style="color:var(--muted);font-size:11px;">${esc(r.div||'—')}</td>
+            <td style="color:var(--muted);font-size:11px;">${esc(r.cat||'—')}</td>
+            <td style="color:var(--muted);">${r.time.toFixed(2)}s</td>
+            <td style="color:var(--accent);font-weight:700;">${r.hf.toFixed(4)}</td>
+          </tr>`).join('')}
+        </tbody></table>`:'<div style="font-size:12px;color:var(--muted);padding:8px 0;">No results yet for this stage</div>'}
+      </div>`;
+    }).join('');
+  } else {
+    // Division match results
+    renderDivResults(div);
+  }
+}
+
+function renderDivResults(div){
+  const m=AM;
+  const shooters=(m.shooters||[]).filter(s=>(s.division||'').toLowerCase()===div.toLowerCase()||(s.division||'')==div);
+  const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false);
+  // Calc totals
+  const tot=shooters.map(sh=>{
+    let sp=0,rp=0,n=0;
+    stages.forEach(stage=>{
+      const mets=stMets(m,stage);const topHF=mets.length?mets[0].hf:0;
+      const r=mets.find(x=>x.id===sh.id);
+      if(!r)return;
+      sp+=topHF>0?r.hf/topHF*calcMax(stage):0;rp+=r.pts;n++;
     });
-  });
-  const srt=Object.values(tot).sort((a,b)=>b.sp-a.sp);
-  if(!srt.length)return '<div class="empty"><div class="empty-t">No results yet</div></div>';
-  const top=srt[0].sp||1;
-  return `<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Div</th><th>Stages</th><th>%</th></tr></thead><tbody>
-    ${srt.map((r,i)=>`<tr>
-      <td style="font-weight:800;color:${i===0?'#e0b649':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text)'}">${i+1}</td>
-      <td style="font-weight:600;">${esc(r.nm)}</td>
-      <td style="color:var(--muted);font-size:11px;">${esc(r.div)}</td>
-      <td>${r.n}</td>
-      <td style="color:var(--accent);font-weight:700;">${(r.sp/top*100).toFixed(2)}%</td>
+    return{id:sh.id,fn:sh.firstName||'',ln:sh.lastName||'',div:sh.division||'',cat:sh.category||'',reg:sh.region||'',cls:sh.classification||'',ics:sh.ics||'',club:sh.club||'',sp,rp,n};
+  }).sort((a,b)=>b.sp-a.sp);
+  const topPts=tot.length?tot[0].sp||1:1;
+  $('results-content').innerHTML=tot.length?`<table class="rtbl"><thead><tr>
+    <th>#</th><th>Match%</th><th>Match Pts</th><th>First name</th><th>Last name</th><th>DIV</th><th>CAT</th><th>REG</th><th>CLS</th><th>ICS</th><th>Club</th>
+    ${compareSelected.size>0?'<th>Compare</th>':''}
+  </tr></thead><tbody>
+    ${tot.map((r,i)=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}">
+      <td class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}" style="font-weight:800;">${i+1}</td>
+      <td style="color:var(--accent);font-weight:700;">${(r.sp/topPts*100).toFixed(2)}%</td>
+      <td style="font-weight:600;">${r.sp.toFixed(4)}</td>
+      <td style="font-weight:600;">${esc(r.fn)}</td>
+      <td>${esc(r.ln)}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.div||'—')}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.cat||'—')}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.reg||'—')}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.cls||'—')}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.ics||'—')}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.club||'—')}</td>
     </tr>`).join('')}
-  </tbody></table>`;
+  </tbody></table>
+  <button class="bred" style="margin-top:12px;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(239,68,68,0.3);">View All DQ'd Competitors</button>`
+  :'<div class="empty"><div class="empty-t">No results for this division</div></div>';
 }
 
 function stMets(m,stage){
@@ -691,42 +982,105 @@ function stMets(m,stage){
     const r=(sh.stages||[]).find(s=>String(s.num||s.number)===String(stage.number)&&s.time>0);
     if(!r)return;
     const pts=calcPts(sh.pf||'minor',r.a||0,r.c||0,r.d||0,r.miss||0,r.ns||0,r.proc||0);
-    res.push({id:sh.id,nm:((sh.firstName||'')+(sh.lastName?' '+sh.lastName:'')).trim()||'Shooter',pts,hf:r.time>0?pts/r.time:0,time:r.time});
+    res.push({id:sh.id,fn:sh.firstName||'',ln:sh.lastName||'',div:sh.division||'',cat:sh.category||'',pts,hf:r.time>0?pts/r.time:0,time:r.time});
   });
   return res.sort((a,b)=>b.hf-a.hf);
 }
 
+// COMPARE
+function showCompareMode(){
+  $('compare-bar').style.display='flex';
+  // Add checkboxes to result rows — rebuild with compare mode
+  activeDiv=activeDiv==='combined'?'combined':activeDiv;
+  buildDivChips();renderResults(activeDiv);
+  // Add checkboxes after render
+  addCompareCheckboxes();
+}
+function addCompareCheckboxes(){
+  document.querySelectorAll('.rtbl tbody tr').forEach((tr,i)=>{
+    const idCell=tr.querySelector('td:nth-child(4)');if(!idCell)return;
+    // inject checkbox as first td
+    const td=document.createElement('td');
+    td.innerHTML=`<input type="checkbox" class="compare-cb" ${compareSelected.has(tr.dataset.id)?'checked':''} onchange="toggleCompare(this,'${tr.dataset.id||i}')">`;
+    tr.prepend(td);
+  });
+}
+window.toggleCompare=(el,id)=>{if(el.checked)compareSelected.add(id);else compareSelected.delete(id);const n=$('compare-names');if(n)n.textContent=compareSelected.size+' shooter(s) selected';};
+function runCompare(){
+  if(compareSelected.size<2){alert('Select at least 2 shooters to compare.');return;}
+  $('result-view').style.display='none';$('compare-view').style.display='block';
+  const m=AM,stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));
+  const shooters=(m.shooters||[]).filter(s=>compareSelected.has(s.id)||compareSelected.has(s.uid));
+  const html=`<table class="rtbl"><thead><tr>
+    <th>Stage</th>${shooters.map(s=>`<th>${esc(s.firstName||'')} ${esc(s.lastName||'')}<br><span style="font-size:9px;color:var(--muted);">${esc(s.division||'')}</span></th>`).join('')}
+  </tr></thead><tbody>
+    ${stages.map(st=>`<tr>
+      <td style="font-weight:700;">${st.number}. ${esc(st.name||'Stage '+st.number)}<br><span style="font-size:10px;color:var(--muted);">${esc(st.course||'')}</span></td>
+      ${shooters.map(sh=>{
+        const r=(sh.stages||[]).find(s=>String(s.num||s.number)===String(st.number)&&s.time>0);
+        if(!r)return`<td style="color:var(--muted);">—</td>`;
+        const pts=calcPts(sh.pf||'minor',r.a||0,r.c||0,r.d||0,r.miss||0,r.ns||0,r.proc||0);
+        const hf=r.time>0?pts/r.time:0;
+        const mets=stMets(m,st),topHF=mets.length?mets[0].hf:0;
+        const pct=topHF>0?hf/topHF*100:0;
+        return`<td><div style="font-size:14px;font-weight:800;color:var(--accent);">${hf.toFixed(4)}</div><div style="font-size:11px;color:var(--muted);">${r.time.toFixed(2)}s · ${pts}pts</div><div style="font-size:11px;color:var(--green);">${pct.toFixed(1)}%</div></td>`;
+      }).join('')}
+    </tr>`).join('')}
+    <tr style="border-top:2px solid rgba(255,255,255,0.1);">
+      <td style="font-weight:800;">TOTAL</td>
+      ${shooters.map(sh=>{
+        let tsp=0,tpts=0,tn=0;
+        stages.forEach(st=>{const mets=stMets(m,st);const topHF=mets.length?mets[0].hf:0;const r=mets.find(x=>x.id===sh.id);if(!r)return;tsp+=topHF>0?r.hf/topHF*calcMax(st):0;tpts+=r.pts;tn++;});
+        return`<td><div style="font-size:14px;font-weight:900;color:var(--accent);">${tsp.toFixed(2)} pts</div><div style="font-size:11px;color:var(--muted);">${tn} stages</div></td>`;
+      }).join('')}
+    </tr>
+  </tbody></table>`;
+  $('compare-content').innerHTML=html;
+}
+function clearCompare(){compareSelected.clear();$('compare-bar').style.display='none';renderResults(activeDiv);}
+function closeCompare(){$('result-view').style.display='block';$('compare-view').style.display='none';}
+
+// ORG TABS
+function showOrgTab(tab){
+  if(!canStaff(userRole)){return;}
+  if((tab==='roles'||tab==='settings')&&!canAdmin(userRole)){
+    $('org-tabs').style.display='block';$('result-view').style.display='none';
+    document.querySelectorAll('.otab').forEach(t=>t.style.display='none');
+    $('otab-'+tab).style.display='block';
+    $('otab-'+tab).innerHTML='<div class="access-notice">Only admins can access this section.</div>';return;
+  }
+  $('result-view').style.display='none';$('org-tabs').style.display='block';
+  document.querySelectorAll('.otab').forEach(t=>t.style.display='none');
+  $('otab-'+tab).style.display='block';
+  if(tab==='stages')renderStages();
+  else if(tab==='competitors')renderComps();
+  else if(tab==='scoring')renderScSel();
+  else if(tab==='roles')renderRoles();
+  else if(tab==='settings')fillSettings();
+}
+
 // STAGES
-function renderSL(){
-  const el=$('sl'),m=AM;
+function renderStages(){
+  const el=$('stages-list'),m=AM;
   const stages=(m.stages||[]).filter(s=>s?.number!=null).sort((a,b)=>(a.number||0)-(b.number||0));
-  const io=m.ownerId===CU.uid;
   if(!stages.length){el.innerHTML='<div class="empty"><div class="empty-ico">🎯</div><div class="empty-t">No stages yet</div></div>';return;}
   el.innerHTML=stages.map(s=>{
     const shots=calcShots(s),mp=calcMax(s),mets=stMets(m,s),topHF=mets.length?mets[0].hf:0;
-    return `<div class="card">
+    return`<div class="card">
       <div class="chead">
-        <div class="ctitle">Stage ${s.number}${s.name?' · '+esc(s.name):''}</div>
-        <div style="display:flex;gap:6px;align-items:center;">
+        <div class="ctitle">Stage ${s.number}${s.name?' · '+esc(s.name):''} <span style="font-size:9px;color:var(--muted);font-weight:400;">${s.course||''} · ${shots} shots · max ${mp}</span></div>
+        <div style="display:flex;gap:6px;">
           ${!s.included?'<span class="badge bg-muted">Excluded</span>':''}
-          ${io?`<button class="bsm bgh" onclick="editStage(${s.number})" style="width:auto;">Edit</button><button class="bsm bred" onclick="delStage(${s.number})" style="width:auto;">Delete</button>`:''}
+          <button class="bsm bgh" onclick="editStage(${s.number})" style="width:auto;">Edit</button>
+          <button class="bsm bred" onclick="delStage(${s.number})" style="width:auto;">Delete</button>
         </div>
       </div>
       <div class="cbody">
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-          ${[['Paper',s.paperTargets||0],['Poppers',s.poppers||0],['Plates',s.plates||0],['No-Shoots',s.noShoots||0]].map(([l,v])=>`<span style="font-size:11px;color:var(--muted);">${l}: <b style="color:var(--text);">${v}</b></span>`).join('')}
-          <span style="font-size:11px;color:var(--muted);">Shots: <b style="color:var(--accent);">${shots}</b></span>
-          <span style="font-size:11px;color:var(--muted);">Max: <b style="color:var(--accent);">${mp}</b></span>
-          <span style="font-size:11px;color:var(--muted);">Scoring: <b>${esc(s.scoring||'comstock')}</b></span>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;color:var(--muted);">
+          Paper: <b style="color:var(--text);">${s.paperTargets||0}</b> · Poppers: <b style="color:var(--text);">${s.poppers||0}</b> · Plates: <b style="color:var(--text);">${s.plates||0}</b> · No-Shoots: <b style="color:var(--text);">${s.noShoots||0}</b>
         </div>
         ${mets.length?`<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Time</th><th>Pts</th><th>HF</th><th>%</th></tr></thead><tbody>
-          ${mets.map((r,i)=>`<tr>
-            <td style="font-weight:800;color:${i===0?'#e0b649':'var(--text)'}">${i+1}</td>
-            <td style="font-weight:600;">${esc(r.nm)}</td>
-            <td>${r.time.toFixed(2)}s</td><td>${r.pts}</td>
-            <td style="color:var(--accent);font-weight:700;">${r.hf.toFixed(4)}</td>
-            <td style="color:var(--muted);">${topHF>0?(r.hf/topHF*100).toFixed(2):0}%</td>
-          </tr>`).join('')}
+          ${mets.map((r,i)=>`<tr><td style="font-weight:800;color:${i===0?'#e0b649':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text)'}">${i+1}</td><td style="font-weight:600;">${esc(r.fn)} ${esc(r.ln)}</td><td>${r.time.toFixed(2)}s</td><td>${r.pts}</td><td style="color:var(--accent);font-weight:700;">${r.hf.toFixed(4)}</td><td style="color:var(--muted);">${topHF>0?(r.hf/topHF*100).toFixed(2):0}%</td></tr>`).join('')}
         </tbody></table>`:'<div style="font-size:12px;color:var(--muted);">No results yet</div>'}
       </div>
     </div>`;
@@ -734,86 +1088,86 @@ function renderSL(){
 }
 
 function openAddStage(){
-  editSN=null;$('st-modal-title').textContent='Add Stage';$('st-btn').textContent='Save Stage';
+  editSN=null;$('st-title').textContent='Add Stage';$('st-btn').textContent='Save Stage';
   const m=AM,ex=(m.stages||[]).filter(s=>s?.number!=null).map(s=>s.number);
   let n=1;while(ex.includes(n))n++;
   $('st-num').value=n;$('st-name').value='';$('st-sc').value='comstock';$('st-co').value='short';
   $('st-pp').value=4;$('st-po').value=2;$('st-pl').value=0;$('st-ns').value=0;$('st-proc').value='';$('st-inc').checked=true;
-  updStCalc();om('modal-stage');
+  updStC();openModal('modal-stage');
 }
 function editStage(num){
   const s=(AM.stages||[]).find(s=>s.number==num);if(!s)return;
-  editSN=num;$('st-modal-title').textContent='Edit Stage '+num;$('st-btn').textContent='Update Stage';
+  editSN=num;$('st-title').textContent='Edit Stage '+num;$('st-btn').textContent='Update Stage';
   $('st-num').value=s.number;$('st-name').value=s.name||'';$('st-sc').value=s.scoring||'comstock';$('st-co').value=s.course||'short';
   $('st-pp').value=s.paperTargets||0;$('st-po').value=s.poppers||0;$('st-pl').value=s.plates||0;$('st-ns').value=s.noShoots||0;
   $('st-proc').value=s.procedure||'';$('st-inc').checked=s.included!==false;
-  updStCalc();om('modal-stage');
+  updStC();openModal('modal-stage');
 }
 async function delStage(num){
   if(!confirm('Delete Stage '+num+'?'))return;
   const stages=(AM.stages||[]).filter(s=>s.number!==num);
-  spin(true);try{await updateDoc(doc(db,'matches',AM.id.toString()),{stages,updatedAt:serverTimestamp()});AM={...AM,stages};renderSL();renderOV();renderScSel();renderStOut();}catch(e){alert(e.message);}spin(false);
+  spin(true);try{await updateDoc(doc(db,'matches',AM.id.toString()),{stages,updatedAt:serverTimestamp()});AM={...AM,stages};renderStages();}catch(e){alert(e.message);}spin(false);
 }
 async function saveStage(){
   smsg('st-msg','');
   const num=parseInt($('st-num').value);if(!num||num<1){smsg('st-msg','Valid stage number required.');return;}
-  if(AM.ownerId!==CU.uid){smsg('st-msg','Only the owner can manage stages.');return;}
   const sd={number:num,name:$('st-name').value.trim(),scoring:$('st-sc').value,course:$('st-co').value,paperTargets:parseInt($('st-pp').value)||0,poppers:parseInt($('st-po').value)||0,plates:parseInt($('st-pl').value)||0,noShoots:parseInt($('st-ns').value)||0,procedure:$('st-proc').value.trim(),included:$('st-inc').checked};
   const stages=[...(AM.stages||[])];const idx=stages.findIndex(s=>s.number===num);
   if(idx>=0)stages[idx]={...stages[idx],...sd};else stages.push(sd);
   stages.sort((a,b)=>(a.number||0)-(b.number||0));
   $('st-btn').disabled=true;$('st-btn').textContent='Saving…';spin(true);
-  try{await updateDoc(doc(db,'matches',AM.id.toString()),{stages,updatedAt:serverTimestamp()});AM={...AM,stages};smsg('st-msg','✓ Saved','ok');renderSL();renderOV();renderScSel();setTimeout(()=>cm('modal-stage'),1000);}
+  try{await updateDoc(doc(db,'matches',AM.id.toString()),{stages,updatedAt:serverTimestamp()});AM={...AM,stages};smsg('st-msg','✓ Saved','ok');renderStages();setTimeout(()=>closeModal('modal-stage'),1000);}
   catch(e){smsg('st-msg','Error: '+e.message);}
   $('st-btn').disabled=false;$('st-btn').textContent=editSN?'Update Stage':'Save Stage';spin(false);
 }
-function updStCalc(){const p=parseInt($('st-pp')?.value)||0,po=parseInt($('st-po')?.value)||0,pl=parseInt($('st-pl')?.value)||0;const sh=p*2+po+pl,mp=p*10+po*5+pl*5;if($('st-shots'))$('st-shots').textContent=sh;if($('st-maxp'))$('st-maxp').textContent=mp;}
+function updStC(){const p=parseInt($('st-pp')?.value)||0,po=parseInt($('st-po')?.value)||0,pl=parseInt($('st-pl')?.value)||0;if($('st-shots'))$('st-shots').textContent=p*2+po+pl;if($('st-maxp'))$('st-maxp').textContent=p*10+po*5+pl*5;}
 
 // COMPETITORS
-function renderCL(){
-  const el=$('cl'),m=AM,io=m.ownerId===CU.uid;
+function renderComps(){
+  const el=$('comp-list'),m=AM;
   let sh=(m.shooters||[]);
-  if(CF!=='all'){const sta=CF;sh=sh.filter(s=>(s.status||(s.uid===CU.uid?'approved':'approved'))===sta);}
+  if(CF!=='all'){sh=sh.filter(s=>(s.status||'approved')===CF);}
   if(!sh.length){el.innerHTML='<div class="empty"><div class="empty-t">No competitors</div></div>';return;}
-  const sc2={'approved':'bg-green','pending':'bg-gold','waiting':'bg-muted','declined':'bg-red'};
-  el.innerHTML=`<table class="tbl"><thead><tr><th>Name</th><th>Division</th><th>PF</th><th>Stages</th><th>Status</th>${io?'<th>Actions</th>':''}</tr></thead><tbody>
-    ${sh.map(s=>{
+  const sc={'approved':'bg-green','pending':'bg-gold','waiting':'bg-muted','declined':'bg-red'};
+  el.innerHTML=`<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Division</th><th>PF</th><th>CAT</th><th>Stages</th><th>Paid</th><th>Status</th><th></th></tr></thead><tbody>
+    ${sh.map((s,i)=>{
       const nm=((s.firstName||'')+(s.lastName?' '+s.lastName:'')).trim()||'Shooter';
-      const st=s.status||(s.uid===CU.uid?'approved':'approved');
-      return `<tr>
-        <td style="font-weight:600;">${esc(nm)}${s.uid===CU.uid?' <span style="font-size:10px;color:var(--accent);">(you)</span>':''}</td>
+      const st=s.status||'approved';
+      return`<tr>
+        <td style="color:var(--muted);">${s.number||i+1}</td>
+        <td style="font-weight:600;">${esc(nm)}${s.uid===CU.uid?' <span style="color:var(--accent);font-size:10px;">(you)</span>':''}</td>
         <td style="color:var(--muted);font-size:12px;">${esc(s.division||'—')}</td>
         <td style="font-size:11px;">${(s.pf||'minor').toUpperCase()}</td>
+        <td style="color:var(--muted);font-size:11px;">${esc(s.category||'—')}</td>
         <td>${(s.stages||[]).length}</td>
-        <td><span class="badge ${sc2[st]||'bg-muted'}">${st.toUpperCase()}</span></td>
-        ${io?`<td style="display:flex;gap:5px;">
+        <td><span class="badge ${s.paid?'bg-green':'bg-muted'}">${s.paid?'Paid':'Unpaid'}</span></td>
+        <td><span class="badge ${sc[st]||'bg-muted'}">${st.toUpperCase()}</span></td>
+        <td style="display:flex;gap:5px;">
           ${st==='pending'?`<button class="bsm bgold" onclick="approveC('${s.uid||s.id}')" style="width:auto;">✓</button>`:''}
           ${(s.uid||s.id)!==CU.uid&&(s.uid||s.id)!==m.ownerId?`<button class="bsm bred" onclick="removeC('${s.uid||s.id}')" style="width:auto;">✕</button>`:''}
-        </td>`:''}
+        </td>
       </tr>`;
     }).join('')}
   </tbody></table>`;
 }
-function setCF(f){CF=f;['all','approved','pending','waiting'].forEach(id=>{const b=$('cf-'+id);if(b)b.className='bsm '+(f===id?'bgold':'bgh');});renderCL();}
-async function approveC(uid){const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,status:'approved'}:s);try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,updatedAt:serverTimestamp()});AM={...AM,shooters:sh};renderCL();}catch(e){alert(e.message);}}
-async function removeC(uid){if(!confirm('Remove this competitor?'))return;const sh=(AM.shooters||[]).filter(s=>s.uid!==uid&&s.id!==uid);const pa=(AM.participants||[]).filter(p=>p!==uid);try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,participants:pa,updatedAt:serverTimestamp()});AM={...AM,shooters:sh,participants:pa};renderCL();renderOV();}catch(e){alert(e.message);}}
+function setCF(f){CF=f;['all','approved','pending','waiting'].forEach(id=>{const b=$('cf-'+id);if(b)b.className='bsm '+(f===id?'bgold':'bgh');});renderComps();}
+async function approveC(uid){const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,status:'approved'}:s);try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,updatedAt:serverTimestamp()});AM={...AM,shooters:sh};renderComps();}catch(e){alert(e.message);}}
+async function removeC(uid){if(!confirm('Remove this competitor?'))return;const sh=(AM.shooters||[]).filter(s=>s.uid!==uid&&s.id!==uid);const pa=(AM.participants||[]).filter(p=>p!==uid);try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,participants:pa,updatedAt:serverTimestamp()});AM={...AM,shooters:sh,participants:pa};renderComps();}catch(e){alert(e.message);}}
 
 // SCORING
 function renderScSel(){
-  const sh=$('sc-sh'),st=$('sc-st');if(!sh||!st)return;
-  const psh=sh.value,pst=st.value;
+  const sh=$('sc-sh'),st=$('sc-st');if(!sh||!st||!AM)return;
   sh.innerHTML='<option value="">Select shooter…</option>'+(AM.shooters||[]).map(s=>`<option value="${esc(s.uid||s.id)}">${esc(((s.firstName||'')+(s.lastName?' '+s.lastName:'')).trim()||'Shooter')}</option>`).join('');
   const stgs=(AM.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));
   st.innerHTML='<option value="">Select stage…</option>'+stgs.map(s=>`<option value="${s.number}">Stage ${s.number}${s.name?' – '+esc(s.name):''}</option>`).join('');
-  if(psh)sh.value=psh;if(pst)st.value=pst;
+  updHF();
 }
-function renderStOut(){const el=$('st-out');if(!el||!AM)return;el.innerHTML=stTable(AM);}
 function adj(id,d){const e=$(id);if(!e)return;e.textContent=Math.max(0,(parseInt(e.textContent)||0)+d);updHF();}
 function updHF(){
-  const a=parseInt($('sc-a')?.textContent)||0,c=parseInt($('sc-c')?.textContent)||0,d=parseInt($('sc-d')?.textContent)||0,m=parseInt($('sc-m')?.textContent)||0,n=parseInt($('sc-n')?.textContent)||0,p2=parseInt($('sc-p')?.textContent)||0;
+  const a=parseInt($('sc-a')?.textContent)||0,c=parseInt($('sc-c')?.textContent)||0,d=parseInt($('sc-d')?.textContent)||0,m=parseInt($('sc-m')?.textContent)||0,n=parseInt($('sc-n')?.textContent)||0,p=parseInt($('sc-p')?.textContent)||0;
   const t=parseFloat($('sc-t')?.value)||0;
   let pf='minor';const shv=$('sc-sh')?.value;if(shv&&AM){const sh=(AM.shooters||[]).find(s=>(s.uid||s.id)===shv);if(sh)pf=sh.pf||'minor';}
-  const pts=calcPts(pf,a,c,d,m,n,p2);const hf=t>0?pts/t:0;
+  const pts=calcPts(pf,a,c,d,m,n,p),hf=t>0?pts/t:0;
   if($('sc-pts'))$('sc-pts').textContent=pts+' pts';if($('sc-hf'))$('sc-hf').textContent=hf.toFixed(4);
 }
 async function saveScore(){
@@ -828,15 +1182,11 @@ async function saveScore(){
     if((s.uid||s.id)!==shId)return s;
     const stgs=[...(s.stages||[])];const idx=stgs.findIndex(x=>(x.num||x.number)===stNum);
     if(idx>=0)stgs[idx]={...stgs[idx],...sr};else stgs.push(sr);
-    return {...s,stages:stgs};
+    return{...s,stages:stgs};
   });
   spin(true);
-  try{
-    await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:newSh,updatedAt:serverTimestamp()});
-    AM={...AM,shooters:newSh};smsg('sc-msg','✓ Result saved!','ok');
-    ['sc-a','sc-c','sc-d','sc-m','sc-n','sc-p'].forEach(id=>{const e=$(id);if(e)e.textContent='0';});
-    $('sc-t').value='';updHF();renderStOut();renderSL();renderOV();
-  }catch(e){smsg('sc-msg','Error: '+e.message);}
+  try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:newSh,updatedAt:serverTimestamp()});AM={...AM,shooters:newSh};smsg('sc-msg','✓ Result saved!','ok');['sc-a','sc-c','sc-d','sc-m','sc-n','sc-p'].forEach(id=>{const e=$(id);if(e)e.textContent='0';});$('sc-t').value='';updHF();}
+  catch(e){smsg('sc-msg','Error: '+e.message);}
   spin(false);
 }
 
@@ -846,7 +1196,7 @@ function renderRoles(){
   const roles=AM.matchRoles||[];
   if(!roles.length){el.innerHTML='<div class="empty"><div class="empty-t">No staff assigned</div></div>';return;}
   el.innerHTML=`<table class="tbl"><thead><tr><th>Name</th><th>Role</th><th></th></tr></thead><tbody>
-    ${roles.map(r=>`<tr><td>${esc(r.name||r.email||'Unknown')}</td><td><span class="badge bg-gold">${esc(r.role||'staff')}</span></td><td><button class="bsm bred" onclick="removeRole('${esc(r.uid)}')" style="width:auto;">Remove</button></td></tr>`).join('')}
+    ${roles.map(r=>`<tr><td>${esc(r.name||'Unknown')}</td><td><span class="badge bg-gold">${esc(r.role||'staff')}</span></td><td><button class="bsm bred" onclick="removeRole('${esc(r.uid)}')" style="width:auto;">Remove</button></td></tr>`).join('')}
   </tbody></table>`;
 }
 async function srchUsers(val){
@@ -858,14 +1208,13 @@ async function srchUsers(val){
       const t=val.toLowerCase().trim(),end=t.slice(0,-1)+String.fromCharCode(t.charCodeAt(t.length-1)+1);
       const seen=new Set(),res=[];
       const [es,fs]=await Promise.all([getDocs(query(collection(db,'users'),where('email','>=',t),where('email','<',end))),getDocs(query(collection(db,'users'),where('firstName','>=',t.charAt(0).toUpperCase()+t.slice(1)),where('firstName','<',end.charAt(0).toUpperCase()+end.slice(1))))]);
-      const add=sn=>sn.forEach(d=>{if(d.id===CU.uid||seen.has(d.id))return;seen.add(d.id);const r=d.data();res.push({uid:d.id,email:r.email,name:((r.firstName||'')+' '+(r.lastName||'')).trim()||r.email});});
-      add(es);add(fs);
+      [es,fs].forEach(sn=>sn.forEach(d=>{if(d.id===CU.uid||seen.has(d.id))return;seen.add(d.id);const r=d.data();res.push({uid:d.id,email:r.email,name:((r.firstName||'')+' '+(r.lastName||'')).trim()||r.email});}));
       if(!res.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:5px 0;">No users found</div>';return;}
-      el.innerHTML=res.slice(0,5).map(u=>`<div onclick="selRoleUser('${u.uid}','${esc(u.name)}')" style="padding:8px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;margin-bottom:4px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='rgba(224,182,73,.08)'" onmouseout="this.style.background='rgba(255,255,255,.03)'"><b>${esc(u.name)}</b><span style="color:var(--muted);font-size:11px;margin-left:8px;">${esc(u.email)}</span></div>`).join('');
+      el.innerHTML=res.slice(0,5).map(u=>`<div onclick="selU('${u.uid}','${esc(u.name)}')" style="padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;margin-bottom:4px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='rgba(224,182,73,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'"><b>${esc(u.name)}</b><span style="color:var(--muted);font-size:11px;margin-left:8px;">${esc(u.email)}</span></div>`).join('');
     }catch{el.innerHTML='';}
   },350);
 }
-window.selRoleUser=(uid,nm)=>{rSel={uid,nm};$('r-srch').value=nm;$('r-results').innerHTML=`<div style="font-size:12px;color:var(--green);padding:4px 0;">✓ ${esc(nm)} — <button onclick="inviteRole()" class="bsm bgold" style="width:auto;">Invite</button></div>`;};
+window.selU=(uid,nm)=>{rSel={uid,nm};$('r-srch').value=nm;$('r-results').innerHTML=`<div style="font-size:12px;color:var(--green);padding:4px 0;">✓ ${esc(nm)} — <button onclick="inviteRole()" class="bsm bgold" style="width:auto;">Invite</button></div>`;};
 async function inviteRole(){
   if(!rSel){smsg('r-msg','Select a user first.');return;}
   const m=AM,role=$('r-role').value,roles=[...(m.matchRoles||[])];
@@ -881,20 +1230,68 @@ async function inviteRole(){
 }
 async function removeRole(uid){if(!confirm('Remove from match staff?'))return;const roles=(AM.matchRoles||[]).filter(r=>r.uid!==uid);try{await updateDoc(doc(db,'matches',AM.id.toString()),{matchRoles:roles,updatedAt:serverTimestamp()});AM={...AM,matchRoles:roles};renderRoles();}catch(e){alert(e.message);}}
 
-// ADMIN
-function fillAdmin(){const m=AM;$('a-name').value=m.name||'';$('a-loc').value=m.location||'';$('a-date').value=m.date||'';$('a-type').value=m.type||'Training';$('a-status').value=m.status||'active';$('a-reg').value=m.registration||'open_auto';$('a-max').value=m.maxCompetitors||'';$('a-srch').checked=m.searchable!==false;smsg('a-msg','');}
-async function saveAdmin(){
-  smsg('a-msg','');if(AM.ownerId!==CU.uid){smsg('a-msg','Only the owner can edit settings.');return;}
+// SETTINGS
+function fillSettings(){const m=AM;$('a-name').value=m.name||'';$('a-loc').value=m.location||'';$('a-date').value=m.date||'';$('a-type').value=m.type||'Training';$('a-status').value=m.status||'active';$('a-reg').value=m.registration||'open_auto';$('a-results').value=m.resultsVisibility||'organizers_only';$('a-max').value=m.maxCompetitors||'';$('a-srch').checked=m.searchable!==false;smsg('a-msg','');}
+async function saveSettings(){
+  smsg('a-msg','');if(!canAdmin(userRole)){smsg('a-msg','Only admins can edit settings.');return;}
   spin(true);
-  try{
-    const up={name:$('a-name').value.trim(),location:$('a-loc').value.trim(),date:$('a-date').value,type:$('a-type').value,status:$('a-status').value,registration:$('a-reg').value,maxCompetitors:parseInt($('a-max').value)||0,searchable:$('a-srch').checked,updatedAt:serverTimestamp()};
-    await updateDoc(doc(db,'matches',AM.id.toString()),up);AM={...AM,...up};smsg('a-msg','✓ Saved','ok');renderD();
-  }catch(e){smsg('a-msg','Error: '+e.message);}spin(false);
+  try{const up={name:$('a-name').value.trim(),location:$('a-loc').value.trim(),date:$('a-date').value,type:$('a-type').value,status:$('a-status').value,registration:$('a-reg').value,resultsVisibility:$('a-results').value,maxCompetitors:parseInt($('a-max').value)||0,searchable:$('a-srch').checked,updatedAt:serverTimestamp()};await updateDoc(doc(db,'matches',AM.id.toString()),up);AM={...AM,...up};smsg('a-msg','✓ Saved','ok');renderDetail();}
+  catch(e){smsg('a-msg','Error: '+e.message);}spin(false);
 }
 async function delMatch(){
-  if(AM.ownerId!==CU.uid){alert('Only the owner can delete this match.');return;}
+  if(!canAdmin(userRole)){alert('Only admins can delete this match.');return;}
   if(!confirm(`Delete "${AM.name}"? This cannot be undone.`))return;
-  spin(true);try{await deleteDoc(doc(db,'matches',AM.id.toString()));sv('dashboard');AM=null;}catch(e){alert(e.message);}spin(false);
+  spin(true);try{await deleteDoc(doc(db,'matches',AM.id.toString()));sv('my-comps');AM=null;}catch(e){alert(e.message);}spin(false);
+}
+
+// CREATE MATCH
+function buildDivCheckboxes(){$('div-checkboxes').innerHTML=DIVISIONS.map(d=>`<label class="cb-item"><input type="checkbox" ${DEFAULT_DIVS.includes(d)?'checked':''} value="${esc(d)}"/> ${esc(d)}</label>`).join('');}
+function toggleAdv(){$('adv-sec').classList.toggle('show');}
+async function submitCreate(){
+  smsg('cm-msg','');const name=$('c-name').value.trim();if(!name){smsg('cm-msg','Event name required.');return;}
+  const divs=[...$('div-checkboxes').querySelectorAll('input:checked')].map(i=>i.value);
+  $('cm-btn').disabled=true;$('cm-btn').textContent='Creating…';spin(true);
+  try{
+    const mid=await nextMID();
+    const os={id:CU.uid,isMe:true,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||divs[0]||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
+    await setDoc(doc(db,'matches',mid.toString()),{id:mid,name,location:$('c-loc').value.trim(),region:$('c-region').value,date:$('c-date').value,time:$('c-time').value,description:$('c-desc').value.trim(),level:$('c-level').value,type:'IPSC Handgun',status:$('c-status').value,resultsVisibility:$('c-results').value,registration:$('c-reg').value,maxCompetitors:parseInt($('c-max').value)||0,searchable:$('c-pub').checked,multipleRegistrations:$('c-multi').checked,divisions:divs,ownerId:CU.uid,participants:[CU.uid],shooters:[os],stages:[],matchRoles:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    smsg('cm-msg','✓ Match created! ID: '+mid,'ok');setTimeout(()=>{sv('my-comps');$('c-name').value='';},1500);
+  }catch(e){smsg('cm-msg','Error: '+e.message);}
+  $('cm-btn').disabled=false;$('cm-btn').textContent='Create Match';spin(false);
+}
+async function nextMID(){const cr=doc(db,'counters','matchId');return runTransaction(db,async t=>{const sn=await t.get(cr);const n=sn.exists()?sn.data().value+1:1;t.set(cr,{value:n});return n;});}
+
+// FIND MATCH
+function openModal(id){$(id)?.classList.add('show');}
+function closeModal(id){$(id)?.classList.remove('show');}
+async function findMatch(){
+  smsg('fm-msg','');$('fm-res').style.display='none';
+  const raw=$('f-id').value.trim();if(!raw){smsg('fm-msg','Enter a match ID.');return;}
+  spin(true);
+  try{
+    const local=matches.find(m=>m.id&&m.id.toString()===raw);
+    if(local){$('fm-res').style.display='block';$('fm-res').innerHTML=`<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:14px;"><b>${esc(local.name)}</b><div style="margin:5px 0;font-size:11px;color:var(--muted);">Already in this match.</div><button class="bsm bgold" onclick="openM('${local.id}');closeModal('modal-find')" style="width:auto;">Open Match</button></div>`;spin(false);return;}
+    const sn=await getDoc(doc(db,'matches',raw));
+    if(!sn.exists()){smsg('fm-msg','Match not found.');spin(false);return;}
+    const md={id:sn.id,...sn.data()};
+    if(!md.searchable){smsg('fm-msg','This match is private.');spin(false);return;}
+    $('fm-res').style.display='block';
+    $('fm-res').innerHTML=`<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:14px;"><b>${esc(md.name||'')}</b><div style="font-size:11px;color:var(--muted);margin:5px 0;">${md.date?fmtD(md.date):''} ${md.location?'· '+esc(md.location):''} · ${(md.shooters||[]).length} shooters</div><div id="jmsg" class="msg"></div><button class="bsm bgold" onclick="joinMatch('${md.id}')" style="width:auto;">Join Match</button></div>`;
+  }catch(e){smsg('fm-msg','Error: '+e.message);}
+  spin(false);
+}
+async function joinMatch(mid){
+  smsg('jmsg','');spin(true);
+  try{
+    const mRef=doc(db,'matches',mid.toString()),sn=await getDoc(mRef);if(!sn.exists()){smsg('jmsg','Not found.');spin(false);return;}
+    const md=sn.data(),ex=md.participants||[];
+    if(!ex.includes(CU.uid))await updateDoc(mRef,{participants:[...ex,CU.uid]});
+    const esh=md.shooters||[],alr=esh.some(s=>s.uid===CU.uid||s.id===CU.uid);
+    const ns={id:CU.uid,isMe:false,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
+    await updateDoc(mRef,{shooters:alr?esh:[...esh,ns],updatedAt:serverTimestamp()});
+    smsg('jmsg','✓ Joined!','ok');setTimeout(()=>closeModal('modal-find'),1400);
+  }catch(e){smsg('jmsg','Error: '+e.message);}
+  spin(false);
 }
 </script>
 </body>

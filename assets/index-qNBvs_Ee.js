@@ -3202,15 +3202,30 @@ function _geoRender(data,prefix){
   var res=document.getElementById(prefix+"-match-geo-results");
   if(!res)return;
   if(!data||!data.length){res.innerHTML="";return;}
-  var html='<div style="position:absolute;z-index:999;width:100%;background:var(--card);border:1px solid rgba(255,255,255,0.15);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.4);max-height:200px;overflow-y:auto;margin-top:2px;">';
+  var wrap=document.createElement("div");
+  wrap.style.cssText="position:absolute;z-index:999;width:100%;background:var(--card);border:1px solid rgba(255,255,255,0.15);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.4);max-height:200px;overflow-y:auto;margin-top:2px;";
   data.forEach(function(item){
     var name=item.display_name||"";
     var short=(item.name&&item.name.length>0)?item.name:(name.split(",")[0]||name);
-    html+='<div onclick="_geoSelect(''+prefix+'',''+short.replace(/'/g,"\\'")+'','+item.lat+','+item.lon+')" style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">'+short+'<span style="font-size:11px;color:var(--muted);margin-left:8px;">'+name.split(",").slice(1,3).join(",").trim()+'</span></div>';
+    var sub=name.split(",").slice(1,3).join(",").trim();
+    var div=document.createElement("div");
+    div.style.cssText="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);";
+    div.setAttribute("data-geo-prefix",prefix);
+    div.setAttribute("data-geo-name",short);
+    div.setAttribute("data-geo-lat",item.lat);
+    div.setAttribute("data-geo-lng",item.lon);
+    div.innerHTML=short+(sub?'<span style="font-size:11px;color:var(--muted);margin-left:8px;">'+sub+'</span>':"");
+    div.addEventListener("mouseover",function(){this.style.background="var(--bg3)";});
+    div.addEventListener("mouseout",function(){this.style.background="";});
+    div.addEventListener("click",function(){
+      _geoSelect(this.getAttribute("data-geo-prefix"),this.getAttribute("data-geo-name"),parseFloat(this.getAttribute("data-geo-lat")),parseFloat(this.getAttribute("data-geo-lng")));
+    });
+    wrap.appendChild(div);
   });
-  html+="</div>";
-  res.innerHTML=html;
+  res.innerHTML="";
+  res.appendChild(wrap);
 }
+
 function _geoSelect(prefix,name,lat,lng){
   var inp=document.getElementById(prefix+"-match-location");
   if(inp)inp.value=name;

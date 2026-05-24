@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Match Admin · Insight Dynamics</title>
+<title>Insight Dynamics · Match Platform</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -315,6 +317,25 @@ textarea.fi{resize:vertical;min-height:80px;}
 .flow-note{background:rgba(224,182,73,.07);border:1px solid rgba(224,182,73,.22);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--muted);line-height:1.5;}
 .flow-note b{color:var(--accent)}
 .reg-state{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+
+
+/* INSIGHT PLATFORM VISUAL SYSTEM - DISTINCT FROM SSI */
+:root{--accent:#38bdf8;--accent2:#f97316;--af:rgba(56,189,248,.10);--ag:rgba(56,189,248,.26);--bg:#080b12;--bg2:#0d1320;--bg3:#121a2a;--card:#0f1726;--card2:#131e31;--border:rgba(148,163,184,.16);--text:#f8fafc;--muted:rgba(226,232,240,.58);--green:#22c55e;--red:#f43f5e;--blue:#38bdf8;--orange:#f97316;--purple:#a78bfa;--r:18px;--rs:12px;}
+html,body{background:radial-gradient(circle at 14% 0%,rgba(56,189,248,.18),transparent 32%),radial-gradient(circle at 90% 12%,rgba(249,115,22,.12),transparent 30%),linear-gradient(180deg,#080b12,#0b1020 52%,#080b12);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}
+.topbar{height:68px;padding:0 24px;background:rgba(8,11,18,.82);border-bottom:1px solid rgba(148,163,184,.14);box-shadow:0 10px 34px rgba(0,0,0,.22);}.tlogo{font-size:15px;letter-spacing:.06em;color:#fff;margin-right:30px;display:flex;align-items:center;gap:8px;}.tlogo::after{content:'MATCH OPS';font-size:9px;color:var(--accent);border:1px solid rgba(56,189,248,.28);background:rgba(56,189,248,.08);padding:3px 6px;border-radius:999px;letter-spacing:.12em;}.tnav{gap:6px}.tnavbtn{font-size:13px;font-weight:750;border:1px solid transparent;border-radius:999px;padding:8px 13px;color:rgba(226,232,240,.72)}.tnavbtn:hover,.tnavbtn.active{background:rgba(56,189,248,.10);border-color:rgba(56,189,248,.22);color:#e0f2fe;}
+.ddmenu,.notif-drop{background:#0f1726;border:1px solid rgba(148,163,184,.18);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.55)}.dditem:hover{background:rgba(56,189,248,.10)}.nav-av{background:linear-gradient(135deg,#38bdf8,#f97316);box-shadow:0 0 0 3px rgba(56,189,248,.14)}.btn-out{border-radius:999px;border-color:rgba(148,163,184,.18);letter-spacing:.05em}
+.page{max-width:1220px}.page-sm{max-width:760px}.section-title{font-size:28px;letter-spacing:-.04em;margin-bottom:18px;}.section-title::after{content:'';display:block;width:72px;height:3px;border-radius:999px;margin-top:9px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.card,.form-section,.csec,.admin-card,.mini-match{background:linear-gradient(180deg,rgba(15,23,38,.96),rgba(11,17,30,.96));border:1px solid rgba(148,163,184,.15);border-radius:18px;box-shadow:0 16px 46px rgba(0,0,0,.18)}.card::before{display:none}.chead{background:rgba(15,23,42,.72);border-bottom:1px solid rgba(148,163,184,.14);padding:15px 18px}.cbody{padding:18px}.ctitle,.form-section-title,.csec-h span{color:#bae6fd;letter-spacing:.10em}.form-section{padding:22px;margin-bottom:18px}
+.fi{background:rgba(15,23,42,.78);border-color:rgba(148,163,184,.16);border-radius:12px}.fi:focus{border-color:rgba(56,189,248,.52);box-shadow:0 0 0 3px rgba(56,189,248,.10)}.btn-p,.bgold{background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#06111d}.btn-s{color:#bae6fd;border-color:rgba(56,189,248,.32);border-radius:999px}.btn-s:hover{background:rgba(56,189,248,.10)}.bblue{background:rgba(56,189,248,.13);border-color:rgba(56,189,248,.28);color:#bae6fd}.bgh{border-color:rgba(148,163,184,.18)}.badge{border-radius:999px;padding:3px 9px}.bg-gold{background:rgba(249,115,22,.12);color:#fdba74;border-color:rgba(249,115,22,.28)}.bg-blue{background:rgba(56,189,248,.12);color:#bae6fd;border-color:rgba(56,189,248,.28)}
+.dheader{position:relative;overflow:hidden;padding:28px 30px;border-radius:24px;background:linear-gradient(135deg,rgba(15,23,38,.98),rgba(19,30,49,.95));border:1px solid rgba(148,163,184,.16);box-shadow:0 20px 70px rgba(0,0,0,.24)}.dheader::before{content:'';position:absolute;inset:-80px -40px auto auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.22),transparent 70%)}.dh-name{font-size:30px;letter-spacing:-.05em}.dh-meta{gap:14px}.dh-mi{font-size:12px;color:rgba(226,232,240,.62)}
+.match-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;background:rgba(15,23,42,.45);padding:8px;border:1px solid rgba(148,163,184,.14);border-radius:18px;margin-bottom:20px;}.mtab{border-radius:12px;padding:11px 10px;background:transparent;border:1px solid transparent;color:rgba(226,232,240,.62)}.mtab:hover{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.18)}.mtab.active{background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(249,115,22,.10));border-color:rgba(56,189,248,.35);color:#fff}.mtab.staff-only{color:#fed7aa}
+.chip-row{gap:8px}.chip{border-radius:999px;background:rgba(15,23,42,.84);border-color:rgba(148,163,184,.18);color:rgba(226,232,240,.70)}.chip.active{background:linear-gradient(135deg,#38bdf8,#0ea5e9);border-color:transparent;color:#06111d}.chip.org{color:#fed7aa;background:rgba(249,115,22,.11);border-color:rgba(249,115,22,.22)}
+.dash-grid{grid-template-columns:repeat(4,1fr);gap:14px}.dash-card{background:linear-gradient(135deg,rgba(15,23,38,.94),rgba(17,30,48,.94));border:1px solid rgba(148,163,184,.14);border-radius:22px;padding:20px;min-height:112px}.dash-num{color:#e0f2fe}.dash-lbl{color:rgba(226,232,240,.55)}.flow-note{background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(249,115,22,.06));border-color:rgba(56,189,248,.20);color:rgba(226,232,240,.70)}.flow-note b{color:#bae6fd}
+.mapbox{height:420px;background:#0b1220;border-color:rgba(148,163,184,.16);border-radius:22px;box-shadow:0 18px 60px rgba(0,0,0,.22)}.mapbox:before{display:none}.find-layout{grid-template-columns:1.15fr .85fr;align-items:start}.searchbar{grid-template-columns:1.4fr .8fr .7fr auto}.mini-list{max-height:430px;overflow:auto;padding-right:4px}.mini-match{border-radius:16px;transition:.16s}.mini-match:hover{transform:translateY(-1px);border-color:rgba(56,189,248,.32)}
+.live-board{display:grid;grid-template-columns:1fr 280px;gap:14px;margin-bottom:16px}.live-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.live-pill{background:rgba(15,23,42,.75);border:1px solid rgba(148,163,184,.14);border-radius:16px;padding:13px}.live-pill b{display:block;font-size:22px}.live-pill span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.live-tag{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.25);color:#86efac;font-size:11px;font-weight:800;padding:5px 9px;letter-spacing:.08em;text-transform:uppercase}.progress-shell{height:7px;background:rgba(148,163,184,.12);border-radius:999px;overflow:hidden}.progress-bar{height:100%;background:linear-gradient(90deg,#38bdf8,#f97316);border-radius:999px}
+@media(max-width:900px){.match-tabs{grid-template-columns:repeat(2,1fr)}.live-board,.find-layout{grid-template-columns:1fr}.searchbar{grid-template-columns:1fr}.dash-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.dash-grid{grid-template-columns:1fr}.section-title{font-size:24px}.dheader{padding:22px}.dh-name{font-size:24px}}
+.leaflet-container{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:#0b1220}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0f1726;color:#f8fafc;border:1px solid rgba(148,163,184,.16)}.leaflet-control-attribution{background:rgba(15,23,42,.72)!important;color:rgba(226,232,240,.65)!important}.leaflet-control-attribution a{color:#bae6fd!important}
+
 input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #141820 inset!important;-webkit-text-fill-color:#f0f2f5!important;caret-color:#f0f2f5!important;transition:background-color 9999s!important;}
 </style>
 </head>
@@ -351,7 +372,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
       <div class="ddwrap" id="dd-comp">
         <button class="tnavbtn" id="top-comp-btn" onclick="toggleDD('dd-comp')">
           <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Competitions <svg viewBox="0 0 24 24" style="width:10px;height:10px;"><polyline points="6 9 12 15 18 9"/></svg>
+          Matches <svg viewBox="0 0 24 24" style="width:10px;height:10px;"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="ddmenu" id="dd-comp-menu">
           <button class="dditem" onclick="sv('my-comps');closeAllDD()">My Matches</button>
@@ -398,7 +419,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   <div id="view-dashboard" class="view active">
     <div class="page">
       <div class="section-title">Dashboard</div>
-      <div class="flow-note"><b>Skytterflyt:</b> finn en match, les informasjonen, meld deg på og skyt. Arrangør- og adminverktøy vises bare når brukeren har rett rolle.</div>
+      <div class="flow-note"><b>Shooter first:</b> find a match, review the match page, register, shoot, and follow live standings. Organizer and admin tools appear only when your role allows them.</div>
       <div class="quick-row">
         <button class="bsm bblue" onclick="sv('find-matches')" style="width:auto;">Find Matches</button>
         <button class="bsm bgh" onclick="sv('my-comps')" style="width:auto;">My Matches</button>
@@ -406,7 +427,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
         <button class="bsm bgh system-admin-action" onclick="sv('admin-console')" style="width:auto;">Admin Console</button>
       </div>
       <div class="dash-grid" id="dash-grid"></div>
-      <div class="csec open" id="dash-upcoming"><button class="csec-h" onclick="toggleCsec('dash-upcoming')"><span>Upcoming competitions</span><b class="caret">›</b></button><div class="csec-b" id="dash-upcoming-body"></div></div>
+      <div class="csec open" id="dash-upcoming"><button class="csec-h" onclick="toggleCsec('dash-upcoming')"><span>Upcoming Matches</span><b class="caret">›</b></button><div class="csec-b" id="dash-upcoming-body"></div></div>
       <div class="csec open" id="dash-staff"><button class="csec-h" onclick="toggleCsec('dash-staff')"><span>Organizer responsibilities</span><b class="caret">›</b></button><div class="csec-b" id="dash-staff-body"></div></div>
       <div class="csec" id="dash-recent"><button class="csec-h" onclick="toggleCsec('dash-recent')"><span>Recent activity</span><b class="caret">›</b></button><div class="csec-b" id="dash-recent-body"></div></div>
     </div>
@@ -434,7 +455,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
         <button class="btn-s" onclick="openModal('modal-find')">Find by ID</button>
       </div>
       <div class="find-layout">
-        <div><div class="mapbox"><div class="pin">📍</div><div class="mapcap">Map placeholder · connect location coordinates later if needed.</div></div></div>
+        <div><div class="mapbox" id="find-map"></div><div class="role-hint">Map pins use match latitude/longitude when available and regional fallback coordinates otherwise.</div></div>
         <div class="mini-list" id="find-list"></div>
       </div>
     </div>
@@ -444,7 +465,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   <div id="view-create-match" class="view">
     <div class="page-sm">
       <div class="back-btn" onclick="sv('my-comps')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</div>
-      <div class="section-title">Create IPSC Handgun Event</div>
+      <div class="section-title">Create IPSC Handgun Match</div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Create a match as organizer. The creator becomes match owner, but is not automatically registered as a shooter.</p>
       <div id="create-access-note" class="access-notice" style="display:none;margin-bottom:14px;">You do not have organizer access to create matches.</div>
 
@@ -486,9 +507,9 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
         </div>
         <div class="fg"><label class="fl">Registration is</label>
           <select id="c-reg" class="fi">
-            <option value="open_auto" selected>Open from reg-date, competitors approved direct</option>
-            <option value="open_manual">Open, required approval manually</option>
-            <option value="open_waiting">Open, all competitors placed on waiting list</option>
+            <option value="open_auto" selected>Open automatically; competitors are approved immediately</option>
+            <option value="open_manual">Open, manual approval required</option>
+            <option value="open_waiting">Open, all competitors join the waitlist</option>
             <option value="closed">Closed</option>
           </select>
         </div>
@@ -518,7 +539,11 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
           <div class="fg"><label class="fl">Ends Date</label><input id="c-enddate" class="fi" type="date"/></div>
           <div class="fg"><label class="fl">Ends Time</label><input id="c-endtime" class="fi" type="time"/></div>
         </div>
-        <div class="fg"><label class="fl">Web Page URL</label><input id="c-url" class="fi" type="text" placeholder="http://…"/></div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Latitude</label><input id="c-lat" class="fi" type="number" step="0.000001" placeholder="59.9139"/></div>
+          <div class="fg"><label class="fl">Longitude</label><input id="c-lng" class="fi" type="number" step="0.000001" placeholder="10.7522"/></div>
+        </div>
+        <div class="fg"><label class="fl">Web Page URL</label><input id="c-url" class="fi" type="text" placeholder="https://…"/></div>
         <div class="fg"><label class="fl">Web Link Text</label><input id="c-urltext" class="fi" type="text" placeholder="Web link text"/></div>
         <div class="fg"><label class="fl">Limit for Category Results</label><input id="c-catlimit" class="fi" type="number" value="5" min="1"/></div>
         <div class="fg">
@@ -542,7 +567,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     <div class="page">
       <div class="back-btn" onclick="sv('my-comps')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>My Matches</div>
 
-      <!-- Header like SSI -->
+      <!-- Match hero header -->
       <div class="dheader">
         <div class="dheader-left">
           <div class="dh-name" id="dh-name"></div>
@@ -703,7 +728,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
               <div class="fg"><label class="fl">Max Competitors</label><input id="a-max" class="fi" type="number" min="1" placeholder="Unlimited"/></div>
               <div class="fg">
                 <div class="trow">
-                  <div><div class="tl">Searchable / Public</div><div class="ts2">Allow search by ID</div></div>
+                  <div><div class="tl">Public Search</div><div class="ts2">Allow this match to appear in Find Matches and ID search</div></div>
                   <label class="toggle"><input type="checkbox" id="a-srch"/><span class="tslider"></span></label>
                 </div>
               </div>
@@ -735,7 +760,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     <div class="page">
       <div class="section-title">Admin Console</div>
       <div id="admin-access-note" class="access-notice" style="display:none;margin-bottom:14px;">This console is only available to system administrators.</div>
-      <div class="flow-note"><b>Systemnivå:</b> Dette er adskilt fra matchens Organizer-fane. Her skal globale innstillinger, brukere, klubber og maler ligge.</div>
+      <div class="flow-note"><b>System level:</b> This area is separate from each match Organizer Workspace. Use it for global users, clubs, templates, diagnostics, and platform settings.</div>
       <div class="admin-grid" id="admin-console-grid"></div>
       <div class="card"><div class="chead"><div class="ctitle">Console</div></div><div class="cbody" id="admin-console-body"></div></div>
     </div>
@@ -803,7 +828,8 @@ const DIVISIONS=['Open','Standard','Standard Optics','Optics','Production','Revo
 const DEFAULT_DIVS=['Open','Standard','Optics','Production','Revolver','Classic','Production Optics'];
 
 let CU=null,UP=null,matches=[],publicMatches=[],invitations=[],AM=null,CF='all',editSN=null,rSel=null,rTimer=null;
-let munsub=null,pmunsub=null,iunsub=null,activeDiv='combined',compareSelected=new Set(),currentYear=new Date().getFullYear();
+let munsub=null,pmunsub=null,iunsub=null,activeDiv='live',compareSelected=new Set(),currentYear=new Date().getFullYear();
+let findMap=null,findMarkers=null;
 let userRole='competitor'; // 'owner','admin','staff','competitor'
 
 const $=id=>document.getElementById(id);
@@ -852,7 +878,7 @@ function configureNavPermissions(){
 }
 
 // expose globals
-Object.assign(window,{sv,toggleDD,closeAllDD,openAddStage,saveStage,updStC,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,findMatch,runCompare,clearCompare,closeCompare,showOrgTab,editStage,delStage,closeModal,openModal,toggleAdv,submitCreate,joinMatch,acceptInv,declineInv,showPublicTab,toggleCsec,renderFindMatches});
+Object.assign(window,{sv,toggleDD,closeAllDD,openAddStage,saveStage,updStC,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,findMatch,runCompare,clearCompare,closeCompare,showOrgTab,editStage,delStage,closeModal,openModal,toggleAdv,submitCreate,joinMatch,acceptInv,declineInv,showPublicTab,toggleCsec,renderFindMatches,centerFindMap});
 
 // AUTH
 onAuthStateChanged(auth,async user=>{
@@ -909,7 +935,7 @@ function sv(name){
   if(name==='find-matches')$('top-find-btn')?.classList.add('active');
   if(name==='create-match')$('top-create-btn')?.classList.add('active');
   if(name==='admin-console')$('top-admin-btn')?.classList.add('active');
-  if(name==='find-matches')renderFindMatches();
+  if(name==='find-matches'){renderFindMatches();setTimeout(initFindMap,0);}
   if(name==='dashboard')renderDashboard();
   if(name==='admin-console')renderAdminConsole();
 }
@@ -920,7 +946,7 @@ function buildYearNav(){
   if(!years.includes(currentYear)&&years.length>0)currentYear=years[0];
   const el=$('yr-nav');
   el.innerHTML=years.map(y=>`<button class="yr-btn ${y===currentYear?'active':''}" onclick="setYear(${y})">${y==='prev'?'‹ '+y:''}<span>${y}</span>${y==='next'?'›':''}</button>`).join('');
-  $('yr-title').textContent=currentYear+' Competitions';
+  $('yr-title').textContent=currentYear+' Matches';
 }
 window.setYear=y=>{currentYear=y;buildYearNav();renderML();renderDashboard();renderFindYearOptions();};
 
@@ -975,23 +1001,69 @@ function renderFindYearOptions(){
   const years=[...new Set(allVisibleMatches().map(m=>m.date?new Date(m.date).getFullYear():null).filter(Boolean))].sort((a,b)=>b-a);
   y.innerHTML='<option value="">All years</option>'+years.map(v=>`<option ${String(v)===cur?'selected':''}>${v}</option>`).join('');
 }
+const REGION_COORDS={Norway:[60.472,8.4689],Sweden:[60.1282,18.6435],Denmark:[56.2639,9.5018],Finland:[61.9241,25.7482],Other:[59.9139,10.7522]};
+function getMatchCoords(m){
+  const lat=parseFloat(m.latitude??m.lat??m.locationLat??m.geoLat);
+  const lng=parseFloat(m.longitude??m.lng??m.locationLng??m.geoLng);
+  if(Number.isFinite(lat)&&Number.isFinite(lng))return [lat,lng,true];
+  const fb=REGION_COORDS[m.region]||REGION_COORDS.Other;
+  return [fb[0],fb[1],false];
+}
+function initFindMap(){
+  const el=$('find-map');
+  if(!el||typeof L==='undefined')return;
+  if(!findMap){
+    findMap=L.map('find-map',{scrollWheelZoom:false}).setView([60.472,8.4689],5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(findMap);
+    findMarkers=L.layerGroup().addTo(findMap);
+  }
+  setTimeout(()=>findMap.invalidateSize(),50);
+  updateFindMapMarkers();
+}
+function updateFindMapMarkers(list){
+  if(!findMap||!findMarkers)return;
+  findMarkers.clearLayers();
+  const items=list||filteredFindMatches();
+  const bounds=[];
+  items.forEach(m=>{
+    const [lat,lng,exact]=getMatchCoords(m);bounds.push([lat,lng]);
+    const rs=registrationState(m);
+    const marker=L.marker([lat,lng]).addTo(findMarkers);
+    marker.bindPopup(`<b>${esc(m.name||'Unnamed Match')}</b><br>${esc(m.location||m.region||'Location not set')}<br><span>${esc(rs.label)}${exact?'':' · regional pin'}</span><br><button onclick="openM('${String(m.id)}')" style="margin-top:8px;border:0;border-radius:8px;padding:6px 10px;background:#38bdf8;color:#06111d;font-weight:800;cursor:pointer;">Open Match</button>`);
+  });
+  if(bounds.length)findMap.fitBounds(bounds,{padding:[32,32],maxZoom:10});
+}
+function centerFindMap(mid){
+  const m=allVisibleMatches().find(x=>String(x.id)===String(mid));
+  if(!m){openM(mid);return;}
+  initFindMap();
+  const [lat,lng]=getMatchCoords(m);
+  if(findMap)findMap.setView([lat,lng],9);
+}
+function filteredFindMatches(){
+  const q=($('fm-q')?.value||'').toLowerCase().trim(),reg=$('fm-region')?.value||'',yr=$('fm-year')?.value||'';
+  return allVisibleMatches().filter(m=>{
+    if(m.searchable===false&&!matches.find(x=>String(x.id)===String(m.id)))return false;
+    const blob=[m.name,m.location,m.region,m.id,m.level,m.type].join(' ').toLowerCase();
+    if(q&&!blob.includes(q))return false;
+    if(reg&&m.region!==reg)return false;
+    if(yr){const d=m.date?new Date(m.date):null;if(!d||String(d.getFullYear())!==String(yr))return false;}
+    return true;
+  });
+}
 function renderFindMatches(){
   if(!$('find-list'))return;renderFindYearOptions();
-  const q=($('fm-q')?.value||'').trim().toLowerCase(),reg=$('fm-region')?.value||'',yr=$('fm-year')?.value||'';
-  let res=allVisibleMatches().filter(m=>{
-    if(m.searchable===false&&!((m.participants||[]).includes(CU?.uid)))return false;
-    const text=[m.id,m.name,m.location,m.region,m.type,m.level].join(' ').toLowerCase();
-    const y=m.date?String(new Date(m.date).getFullYear()):'';
-    return (!q||text.includes(q))&&(!reg||m.region===reg)&&(!yr||y===yr);
-  });
-  $('find-list').innerHTML=res.length?res.map(m=>miniMatch(m)).join(''):'<div class="empty"><div class="empty-ico">🔎</div><div class="empty-t">No matches found</div><div class="empty-s">Use Find by ID for private or invitation-only matches.</div></div>';
+  const list=filteredFindMatches();
+  if(!list.length){$('find-list').innerHTML='<div class="empty"><div class="empty-t">No matches found</div><div class="empty-s">Try another search, region, year, or match ID.</div></div>';updateFindMapMarkers([]);return;}
+  $('find-list').innerHTML=list.map(m=>{const rs=registrationState(m);const [lat,lng,exact]=getMatchCoords(m);return `<div class="mini-match"><div><b>${esc(m.name||'Unnamed Match')}</b><span>${m.date?fmtD(m.date):'No date'} · ${esc(m.location||m.region||'Location not set')} · ${(m.shooters||[]).length}${m.maxCompetitors?'/'+m.maxCompetitors:''} competitors</span><span>${exact?'Exact map pin':'Regional map pin'} · ${esc(m.level||m.type||'IPSC')}</span></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;"><span class="badge ${rs.cls}">${esc(rs.label)}</span><button class="bsm bgh" onclick="centerFindMap('${m.id}')" style="width:auto;">Map</button><button class="bsm bblue" onclick="openM('${m.id}')" style="width:auto;">Open</button></div></div>`;}).join('');
+  updateFindMapMarkers(list);
 }
 
 // MATCH LIST
 function renderML(){
   const el=$('ml-container');
   const yr=matches.filter(m=>{const d=m.date?new Date(m.date):(m.createdAt?.toDate?.()??null);return d?d.getFullYear()===currentYear:true;});
-  if(!yr.length){el.innerHTML='<div class="empty"><div class="empty-ico">🏆</div><div class="empty-t">No competitions in '+currentYear+'</div><div class="empty-s"><button class="bsm bgold" onclick="sv(\'create-match\')" style="margin-top:10px;width:auto;">Create Match</button></div></div>';return;}
+  if(!yr.length){el.innerHTML='<div class="empty"><div class="empty-ico">🏆</div><div class="empty-t">No matches in '+currentYear+'</div><div class="empty-s"><button class="bsm bgold" onclick="sv(\'create-match\')" style="margin-top:10px;width:auto;">Create Match</button></div></div>';return;}
   const stc={'draft':'bg-muted','active':'bg-green','active_noedit':'bg-green','preliminary':'bg-gold','completed':'bg-blue','cancelled':'bg-red'};
   el.innerHTML=`<table class="mltable">
     <thead><tr>
@@ -1019,7 +1091,7 @@ window.openM=async id=>{
   if(!AM){spin(true);try{const sn=await getDoc(doc(db,'matches',id.toString()));if(sn.exists())AM={id:sn.id,...sn.data()};}catch(e){console.error(e);}spin(false);}
   if(!AM)return;
   if(AM.searchable===false&&!((AM.participants||[]).includes(CU?.uid))&&!canStaff(getRole(AM))){alert('This match is private.');return;}
-  userRole=getRole(AM);editSN=null;activeDiv='combined';compareSelected.clear();
+  userRole=getRole(AM);editSN=null;activeDiv='live';compareSelected.clear();
   sv('match-detail');renderDetail();
 };
 
@@ -1116,96 +1188,30 @@ function renderSquads(){
 
 function buildDivChips(){
   const m=AM;
-  const stages=(m.stages||[]).filter(s=>s?.number!=null);
   const divs=m.divisions||DEFAULT_DIVS;
+  const chips=['live',...divs.map(d=>d.toLowerCase()),'stages','compare'];
+  const labels=['Live Standings',...divs,'Stage Results','Compare'];
+  if(!chips.includes(activeDiv))activeDiv='live';
   const el=$('div-chips');
-  const chips=['combined',...divs.map(d=>d.toLowerCase()),'compare'];
-  const labels=['Combined',...divs,'Compare'];
   el.innerHTML=chips.map((d,i)=>`<button class="chip ${d===activeDiv?'active':''}" onclick="selectDiv('${esc(d)}')">${esc(labels[i])}</button>`).join('');
 }
-
-window.selectDiv=d=>{
-  if(d==='statistics'){return;}
-  if(d==='compare'){showCompareMode();return;}
-  activeDiv=d;buildDivChips();renderResults(d);
-};
-
-function renderResults(div){
-  $('result-view').style.display='block';$('compare-view').style.display='none';
-  const m=AM;
-  const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));
-
-  if(div==='combined'||div==='stage results'||!m.divisions?.includes(div)){
-    // Stage results overview like SSI
-    const el=$('results-content');
-    if(!stages.length){el.innerHTML='<div class="empty"><div class="empty-ico">🎯</div><div class="empty-t">No stages yet</div></div>';return;}
-    el.innerHTML=`<div style="font-weight:700;font-size:14px;margin-bottom:12px;">Stage Results</div>`+
-    stages.map(s=>{
-      const mets=stMets(m,s);const topHF=mets.length?mets[0].hf:0;
-      return `<div class="stage-sec">
-        <div class="stage-head">
-          <span class="stage-lbl">${s.number}. ${esc(s.name||'Stage '+s.number)}, ${s.course?s.course.charAt(0).toUpperCase()+s.course.slice(1):'Short'}</span>
-        </div>
-        ${mets.length?`<table class="rtbl"><thead><tr>
-          <th>#</th><th>Match%</th><th>Match Pts</th><th>First name</th><th>Last name</th><th>DIV</th><th>CAT</th><th>Time</th><th>HF</th>
-        </tr></thead><tbody>
-          ${mets.map((r,i)=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}">
-            <td class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${i+1}</td>
-            <td style="color:var(--accent);font-weight:700;">${topHF>0?(r.hf/topHF*100).toFixed(2):'0.00'}%</td>
-            <td>${r.pts}</td>
-            <td style="font-weight:600;">${esc(r.fn)}</td>
-            <td>${esc(r.ln)}</td>
-            <td style="color:var(--muted);font-size:11px;">${esc(r.div||'—')}</td>
-            <td style="color:var(--muted);font-size:11px;">${esc(r.cat||'—')}</td>
-            <td style="color:var(--muted);">${r.time.toFixed(2)}s</td>
-            <td style="color:var(--accent);font-weight:700;">${r.hf.toFixed(4)}</td>
-          </tr>`).join('')}
-        </tbody></table>`:'<div style="font-size:12px;color:var(--muted);padding:8px 0;">No results yet for this stage</div>'}
-      </div>`;
-    }).join('');
-  } else {
-    // Division match results
-    renderDivResults(div);
-  }
+window.selectDiv=d=>{if(d==='compare'){showCompareMode();return;}activeDiv=d;buildDivChips();renderResults(d);};
+function calculateStandings(div='live'){
+  const m=AM;const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));
+  const onlyDivision=div&&div!=='live'&&div!=='stages';
+  const shooters=(m.shooters||[]).filter(s=>{if((s.status||'approved')!=='approved')return false;if(!onlyDivision)return true;return (s.division||'').toLowerCase()===div.toLowerCase();});
+  const rows=shooters.map(sh=>{let matchPoints=0,rawPoints=0,completed=0,totalTime=0;stages.forEach(stage=>{const mets=stMets(m,stage).filter(r=>!onlyDivision||(r.div||'').toLowerCase()===div.toLowerCase());const topHF=mets.length?mets[0].hf:0;const r=mets.find(x=>String(x.id)===String(sh.uid||sh.id));if(!r)return;const stageMax=calcMax(stage);matchPoints+=topHF>0?(r.hf/topHF)*stageMax:0;rawPoints+=r.pts;totalTime+=r.time;completed++;});return{id:sh.uid||sh.id,name:(((sh.firstName||'')+' '+(sh.lastName||'')).trim()||'Shooter'),div:sh.division||'',cat:sh.category||'',club:sh.club||'',pf:sh.pf||'minor',matchPoints,rawPoints,totalTime,completed,totalStages:stages.length};}).filter(r=>r.completed>0).sort((a,b)=>b.matchPoints-a.matchPoints);
+  const top=rows.length?(rows[0].matchPoints||1):1;return rows.map((r,i)=>({...r,rank:i+1,percent:top>0?(r.matchPoints/top*100):0}));
 }
-
-function renderDivResults(div){
-  const m=AM;
-  const shooters=(m.shooters||[]).filter(s=>(s.division||'').toLowerCase()===div.toLowerCase()||(s.division||'')==div);
-  const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false);
-  // Calc totals
-  const tot=shooters.map(sh=>{
-    let sp=0,rp=0,n=0;
-    stages.forEach(stage=>{
-      const mets=stMets(m,stage);const topHF=mets.length?mets[0].hf:0;
-      const r=mets.find(x=>x.id===sh.id);
-      if(!r)return;
-      sp+=topHF>0?r.hf/topHF*calcMax(stage):0;rp+=r.pts;n++;
-    });
-    return{id:sh.id,fn:sh.firstName||'',ln:sh.lastName||'',div:sh.division||'',cat:sh.category||'',reg:sh.region||'',cls:sh.classification||'',ics:sh.ics||'',club:sh.club||'',sp,rp,n};
-  }).sort((a,b)=>b.sp-a.sp);
-  const topPts=tot.length?tot[0].sp||1:1;
-  $('results-content').innerHTML=tot.length?`<table class="rtbl"><thead><tr>
-    <th>#</th><th>Match%</th><th>Match Pts</th><th>First name</th><th>Last name</th><th>DIV</th><th>CAT</th><th>REG</th><th>CLS</th><th>ICS</th><th>Club</th>
-    ${compareSelected.size>0?'<th>Compare</th>':''}
-  </tr></thead><tbody>
-    ${tot.map((r,i)=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}">
-      <td class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}" style="font-weight:800;">${i+1}</td>
-      <td style="color:var(--accent);font-weight:700;">${(r.sp/topPts*100).toFixed(2)}%</td>
-      <td style="font-weight:600;">${r.sp.toFixed(4)}</td>
-      <td style="font-weight:600;">${esc(r.fn)}</td>
-      <td>${esc(r.ln)}</td>
-      <td style="color:var(--muted);font-size:11px;">${esc(r.div||'—')}</td>
-      <td style="color:var(--muted);font-size:11px;">${esc(r.cat||'—')}</td>
-      <td style="color:var(--muted);font-size:11px;">${esc(r.reg||'—')}</td>
-      <td style="color:var(--muted);font-size:11px;">${esc(r.cls||'—')}</td>
-      <td style="color:var(--muted);font-size:11px;">${esc(r.ics||'—')}</td>
-      <td style="color:var(--muted);font-size:11px;">${esc(r.club||'—')}</td>
-    </tr>`).join('')}
-  </tbody></table>
-  <button class="bred" style="margin-top:12px;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(239,68,68,0.3);">View All DQ'd Competitors</button>`
-  :'<div class="empty"><div class="empty-t">No results for this division</div></div>';
+function renderResults(div){$('result-view').style.display='block';$('compare-view').style.display='none';if(div==='stages')return renderStageResultsOverview();return renderLiveStandings(div||'live');}
+function renderLiveStandings(div='live'){
+  const m=AM;const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false);const rows=calculateStandings(div);const label=div==='live'?'Overall':((m.divisions||[]).find(d=>d.toLowerCase()===String(div).toLowerCase())||'Division');
+  const scoredStages=new Set();(m.shooters||[]).forEach(sh=>(sh.stages||[]).forEach(r=>{if(r.time>0)scoredStages.add(String(r.num||r.number));}));const last=latestScoreTime(m);
+  $('results-content').innerHTML=`<div class="live-board"><div class="card"><div class="chead"><div class="ctitle"><span class="live-tag">● Live</span> ${esc(label)} Standings</div></div><div class="cbody">${rows.length?standingsTable(rows):'<div class="empty"><div class="empty-t">No live scores yet</div><div class="empty-s">Scores will appear here as soon as staff enter stage results.</div></div>'}</div></div><div class="card"><div class="chead"><div class="ctitle">Match Pulse</div></div><div class="cbody"><div class="live-summary"><div class="live-pill"><b>${rows.length}</b><span>Ranked shooters</span></div><div class="live-pill"><b>${scoredStages.size}/${stages.length}</b><span>Stages with scores</span></div><div class="live-pill"><b>${(m.shooters||[]).filter(s=>(s.status||'approved')==='approved').length}</b><span>Approved competitors</span></div><div class="live-pill"><b>${last}</b><span>Last update</span></div></div><div style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.5;">Live standings are recalculated from saved stage scores whenever the match document updates.</div></div></div></div>`;
 }
+function standingsTable(rows){return `<table class="rtbl"><thead><tr><th>#</th><th>Shooter</th><th>Division</th><th>Category</th><th>Match %</th><th>Match Points</th><th>Stages</th><th>Total Time</th></tr></thead><tbody>${rows.map(r=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}"><td class="${r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':''}" style="font-weight:900;">${r.rank}</td><td><b>${esc(r.name)}</b><div class="progress-shell" style="margin-top:6px;"><div class="progress-bar" style="width:${Math.max(0,Math.min(100,r.percent)).toFixed(2)}%"></div></div></td><td>${esc(r.div||'—')}</td><td>${esc(r.cat||'—')}</td><td style="font-weight:900;color:var(--accent);">${r.percent.toFixed(2)}%</td><td>${r.matchPoints.toFixed(4)}</td><td>${r.completed}/${r.totalStages}</td><td>${r.totalTime.toFixed(2)}s</td></tr>`).join('')}</tbody></table>`;}
+function latestScoreTime(m){let t=0;(m.shooters||[]).forEach(sh=>(sh.stages||[]).forEach(r=>{if(r.savedAt)t=Math.max(t,r.savedAt);}));if(!t)return '—';try{return new Date(t).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});}catch{return '—';}}
+function renderStageResultsOverview(){const m=AM;const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));const el=$('results-content');if(!stages.length){el.innerHTML='<div class="empty"><div class="empty-ico">🎯</div><div class="empty-t">No stages yet</div></div>';return;}el.innerHTML=`<div class="card"><div class="chead"><div class="ctitle">Stage Results</div></div><div class="cbody" style="padding-bottom:4px;color:var(--muted);font-size:12px;">Stage results remain available separately from live match standings.</div></div>`+stages.map(s=>{const mets=stMets(m,s);const topHF=mets.length?mets[0].hf:0;return `<div class="stage-sec card"><div class="chead"><div class="ctitle">Stage ${s.number}${s.name?' · '+esc(s.name):''}</div><span class="badge bg-blue">${calcMax(s)} pts</span></div><div class="cbody">${mets.length?`<table class="rtbl"><thead><tr><th>#</th><th>Stage %</th><th>Points</th><th>Shooter</th><th>Division</th><th>Category</th><th>Time</th><th>Hit Factor</th></tr></thead><tbody>${mets.map((r,i)=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}"><td class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${i+1}</td><td style="color:var(--accent);font-weight:700;">${topHF>0?(r.hf/topHF*100).toFixed(2):'0.00'}%</td><td>${r.pts}</td><td style="font-weight:600;">${esc((r.fn+' '+r.ln).trim()||'Shooter')}</td><td style="color:var(--muted);font-size:11px;">${esc(r.div||'—')}</td><td style="color:var(--muted);font-size:11px;">${esc(r.cat||'—')}</td><td style="color:var(--muted);">${r.time.toFixed(2)}s</td><td style="color:var(--accent);font-weight:700;">${r.hf.toFixed(4)}</td></tr>`).join('')}</tbody></table>`:'<div style="font-size:12px;color:var(--muted);padding:8px 0;">No results yet for this stage</div>'}</div></div>`;}).join('');}
 
 function stMets(m,stage){
   const res=[];
@@ -1213,7 +1219,7 @@ function stMets(m,stage){
     const r=(sh.stages||[]).find(s=>String(s.num||s.number)===String(stage.number)&&s.time>0);
     if(!r)return;
     const pts=calcPts(sh.pf||'minor',r.a||0,r.c||0,r.d||0,r.miss||0,r.ns||0,r.proc||0);
-    res.push({id:sh.id,fn:sh.firstName||'',ln:sh.lastName||'',div:sh.division||'',cat:sh.category||'',pts,hf:r.time>0?pts/r.time:0,time:r.time});
+    res.push({id:sh.uid||sh.id,fn:sh.firstName||'',ln:sh.lastName||'',div:sh.division||'',cat:sh.category||'',pts,hf:r.time>0?pts/r.time:0,time:r.time});
   });
   return res.sort((a,b)=>b.hf-a.hf);
 }
@@ -1484,7 +1490,7 @@ async function submitCreate(){
   $('cm-btn').disabled=true;$('cm-btn').textContent='Creating…';spin(true);
   try{
     const mid=await nextMID();
-    await setDoc(doc(db,'matches',mid.toString()),{id:mid,name,location:$('c-loc').value.trim(),region:$('c-region').value,date:$('c-date').value,time:$('c-time').value,description:$('c-desc').value.trim(),level:$('c-level').value,type:'IPSC Handgun',status:$('c-status').value,resultsVisibility:$('c-results').value,registration:$('c-reg').value,maxCompetitors:parseInt($('c-max').value)||0,searchable:$('c-pub').checked,multipleRegistrations:$('c-multi').checked,registrationStarts:$('c-regstart').value,registrationCloses:$('c-regend').value,endDate:$('c-enddate').value,endTime:$('c-endtime').value,webUrl:$('c-url').value.trim(),webLinkText:$('c-urltext').value.trim(),categoryLimit:parseInt($('c-catlimit').value)||5,allowTeams:$('c-teams').checked,divisions:divs,ownerId:CU.uid,participants:[CU.uid],shooters:[],stages:[],matchRoles:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    await setDoc(doc(db,'matches',mid.toString()),{id:mid,name,location:$('c-loc').value.trim(),region:$('c-region').value,date:$('c-date').value,time:$('c-time').value,description:$('c-desc').value.trim(),level:$('c-level').value,type:'IPSC Handgun',status:$('c-status').value,resultsVisibility:$('c-results').value,registration:$('c-reg').value,maxCompetitors:parseInt($('c-max').value)||0,searchable:$('c-pub').checked,multipleRegistrations:$('c-multi').checked,registrationStarts:$('c-regstart').value,registrationCloses:$('c-regend').value,endDate:$('c-enddate').value,endTime:$('c-endtime').value,latitude:parseFloat($('c-lat')?.value)||null,longitude:parseFloat($('c-lng')?.value)||null,webUrl:$('c-url').value.trim(),webLinkText:$('c-urltext').value.trim(),categoryLimit:parseInt($('c-catlimit').value)||5,allowTeams:$('c-teams').checked,divisions:divs,ownerId:CU.uid,participants:[CU.uid],shooters:[],stages:[],matchRoles:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
     smsg('cm-msg','✓ Match created! ID: '+mid,'ok');setTimeout(()=>{sv('my-comps');$('c-name').value='';},1500);
   }catch(e){smsg('cm-msg','Error: '+e.message);}
   $('cm-btn').disabled=false;$('cm-btn').textContent='Create Match';spin(false);
@@ -1534,7 +1540,7 @@ function renderAdminConsole(){
   const grid=$('admin-console-grid'),body=$('admin-console-body'); if(!grid||!body)return;
   const visible=allVisibleMatches().length,owned=matches.filter(m=>canAdmin(getRole(m))).length,staff=matches.filter(m=>canStaff(getRole(m))).length;
   grid.innerHTML=`<div class="admin-card"><h3>Users</h3><p>Global user and role administration belongs here. The current file only contains the UI placeholder.</p></div><div class="admin-card"><h3>Matches</h3><p>${visible} visible matches, ${owned} owned/admin matches and ${staff} staff-related matches in the current client state.</p></div><div class="admin-card"><h3>System settings</h3><p>Clubs, regions, standard divisions and templates should be managed here, separate from one match.</p></div>`;
-  body.innerHTML=locked?'<div class="access-notice">No system-admin access for this user.</div>':`<table class="tbl"><thead><tr><th>Area</th><th>Status</th><th>Next implementation</th></tr></thead><tbody><tr><td>Users</td><td><span class="badge bg-gold">Planned</span></td><td>Search users, assign global organizer/systemAdmin roles</td></tr><tr><td>Clubs / Regions</td><td><span class="badge bg-gold">Planned</span></td><td>Maintain official selectable values</td></tr><tr><td>Templates</td><td><span class="badge bg-gold">Planned</span></td><td>Reusable match and stage setup</td></tr></tbody></table>`;
+  body.innerHTML=locked?'<div class="access-notice">No system-admin access for this user.</div>':`<table class="tbl"><thead><tr><th>Area</th><th>Status</th><th>Next implementation</th></tr></thead><tbody><tr><td>Users</td><td><span class="badge bg-gold">Console Stub</span></td><td>Search users and assign global organizer or system administrator roles</td></tr><tr><td>Clubs / Regions</td><td><span class="badge bg-gold">Console Stub</span></td><td>Maintain official selectable values and regional defaults for match maps</td></tr><tr><td>Templates</td><td><span class="badge bg-gold">Console Stub</span></td><td>Reusable match and stage setup</td></tr></tbody></table>`;
 }
 </script>
 </body>

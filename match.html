@@ -404,6 +404,74 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 @media(min-width:769px){
   .mlt-cards{display:none;}
 }
+
+/* ── MATCH CALENDAR + MOBILE BOTTOM NAV UPDATE ── */
+.cal-page{max-width:980px;}
+.month-calendar{background:#f7f7f5;color:#111;border-radius:0;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.08);}
+.month-calendar-head{height:78px;background:#3f3f3f;color:#fff;display:grid;grid-template-columns:70px 1fr 70px;align-items:center;padding:0 10px;}
+.cal-month-title{text-align:right;font-size:34px;font-weight:900;letter-spacing:.01em;padding-right:20px;}
+.cal-arrow{width:44px;height:44px;border:none;border-radius:12px;background:rgba(255,255,255,0.06);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .15s;}
+.cal-arrow:hover{background:rgba(255,255,255,0.14);transform:translateY(-1px);}
+.cal-arrow svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;}
+.cal-weekdays{display:grid;grid-template-columns:90px repeat(7,1fr);align-items:center;background:#fff;padding:18px 18px 10px;gap:0;}
+.cal-weekdays div{font-size:25px;font-weight:900;text-align:center;color:#333;font-family:Georgia,'Times New Roman',serif;}
+.cal-weekdays .cal-week-label{color:#bfbfbf;text-align:left;padding-left:4px;}
+.cal-weekdays .cal-sunday{color:#222;}
+.cal-days{display:grid;grid-template-columns:90px repeat(7,1fr);padding:0 18px 18px;background:#fff;}
+.cal-week-cell{height:58px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#7e7e7e;font-style:italic;font-family:Georgia,'Times New Roman',serif;}
+.cal-day-cell{height:58px;display:flex;align-items:center;justify-content:center;position:relative;font-size:25px;font-weight:900;color:#000;font-family:Georgia,'Times New Roman',serif;cursor:default;}
+.cal-day-cell.is-empty{cursor:default;}
+.cal-row-shade{background:#f3efd6;}
+.cal-day-cell.is-sunday{color:#f00;}
+.cal-day-cell.is-today .cal-day-number{outline:2px solid #333;outline-offset:4px;border-radius:999px;}
+.cal-day-cell.has-match{cursor:pointer;}
+.cal-day-cell.has-match .cal-day-number{position:relative;z-index:1;}
+.cal-day-cell.has-match::before{content:'';position:absolute;inset:9px 12px;border-radius:12px;background:rgba(59,130,246,.16);border:2px solid rgba(59,130,246,.55);}
+.cal-day-cell.has-match.is-sunday::before{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.10);}
+.cal-match-dot{position:absolute;right:13px;top:9px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#3b82f6;color:#fff;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+.cal-day-cell:hover::before{background:rgba(59,130,246,.24);}
+.cal-match-panel{background:var(--card);border:1px solid var(--br);border-radius:var(--r);margin-top:18px;padding:16px;}
+.cal-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.cal-panel-title{font-size:14px;font-weight:900;}
+.cal-panel-sub{font-size:12px;color:var(--mt);margin-top:3px;}
+.cal-date-list-title{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ac);margin:2px 0 10px;}
+.cal-match-item{display:flex;align-items:center;gap:12px;padding:11px 13px;background:rgba(255,255,255,.03);border:1px solid var(--br);border-left:3px solid var(--ac);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:background .15s,transform .15s;}
+.cal-match-item:hover{background:rgba(59,130,246,.08);transform:translateY(-1px);}
+.cal-date-badge{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:7px 10px;text-align:center;min-width:54px;flex-shrink:0;}
+.cal-date-day{font-size:18px;font-weight:900;color:var(--ac);}
+.cal-date-month{font-size:9px;font-weight:800;color:var(--mt);letter-spacing:.08em;text-transform:uppercase;}
+.cal-match-main{flex:1;min-width:0;}
+.cal-match-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-match-meta{font-size:11px;color:var(--mt);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.mobile-bottom-nav{display:none;}
+@media(max-width:768px){
+  html,body{padding-bottom:76px;}
+  .mob-menu-btn,.mob-drawer{display:none!important;}
+  .topbar{height:50px;padding:0 12px;}
+  .topbar .tnav{display:none!important;}
+  .topbar .tright{gap:8px;}
+  .mobile-bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:450;background:rgba(15,18,23,.97);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.10);box-shadow:0 -14px 34px rgba(0,0,0,.38);padding:7px 6px calc(7px + env(safe-area-inset-bottom));}
+  .mbn-item{background:transparent;border:none;color:rgba(255,255,255,.42);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
+  .mbn-item svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2.15;stroke-linecap:round;stroke-linejoin:round;opacity:.92;}
+  .mbn-item.active{color:#3b82f6;}
+  .mbn-item.active::before{content:'';position:absolute;top:0;width:34px;height:3px;background:#3b82f6;border-radius:0 0 3px 3px;}
+  .page,.page-sm,.page-md{padding-bottom:96px;}
+  .cal-page{padding-left:0;padding-right:0;}
+  .month-calendar{border-left:none;border-right:none;box-shadow:none;}
+  .month-calendar-head{height:64px;grid-template-columns:54px 1fr 54px;padding:0 6px;}
+  .cal-month-title{font-size:25px;text-align:center;padding-right:0;}
+  .cal-arrow{width:40px;height:40px;border-radius:10px;}
+  .cal-weekdays{grid-template-columns:48px repeat(7,1fr);padding:13px 7px 7px;}
+  .cal-weekdays div{font-size:15px;}
+  .cal-days{grid-template-columns:48px repeat(7,1fr);padding:0 7px 12px;}
+  .cal-week-cell{height:44px;font-size:16px;}
+  .cal-day-cell{height:44px;font-size:18px;}
+  .cal-day-cell.has-match::before{inset:6px 3px;border-radius:9px;border-width:1.5px;}
+  .cal-match-dot{right:2px;top:3px;min-width:15px;height:15px;font-size:9px;padding:0 4px;}
+  .cal-match-panel{margin:12px 12px 0;}
+}
+
 </style>
 </head>
 <body>
@@ -448,6 +516,9 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     </div>
     <button class="tnb" id="tnb-find" onclick="sv('find-matches')">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Matches
+    </button>
+    <button class="tnb" id="tnb-calendar" onclick="sv('calendar')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
     </button>
     <button class="tnb" id="tnb-create" onclick="sv('create-match')">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Match
@@ -505,6 +576,30 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     </div>
   </div>
 </div>
+
+<!-- MOBILE BOTTOM NAVIGATION -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Primary mobile navigation">
+  <button class="mbn-item" id="mbn-dashboard" onclick="sv('dashboard')" aria-label="Home">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10.5z"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="mbn-item" id="mbn-my-comps" onclick="sv('my-comps')" aria-label="My Matches">
+    <svg viewBox="0 0 24 24"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/></svg>
+    <span>Matches</span>
+  </button>
+  <button class="mbn-item" id="mbn-find-matches" onclick="sv('find-matches')" aria-label="Find Matches">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16" y2="16"/><path d="M11 7v4l3 2"/></svg>
+    <span>Find</span>
+  </button>
+  <button class="mbn-item" id="mbn-calendar" onclick="sv('calendar')" aria-label="Calendar">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Calendar</span>
+  </button>
+  <button class="mbn-item" id="mbn-create-match" onclick="sv('create-match')" aria-label="Create Match">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <span>Create</span>
+  </button>
+</nav>
 
 <!-- DASHBOARD -->
 <div id="view-dashboard" class="view active">
@@ -708,34 +803,42 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 
 <!-- CALENDAR VIEW -->
 <div id="view-calendar" class="view">
-  <div class="page">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-      <div class="sec-title" id="cal-title" style="margin:0;">May 2026</div>
-      <div style="display:flex;gap:8px;">
-        <button class="bsm bgh" onclick="calNav(-1)" style="width:auto;padding:8px 14px;">← Prev</button>
-        <button class="bsm bgh" onclick="calToday()" style="width:auto;padding:8px 14px;">Today</button>
-        <button class="bsm bgh" onclick="calNav(1)" style="width:auto;padding:8px 14px;">Next →</button>
+  <div class="page cal-page">
+    <section class="month-calendar" aria-label="Match calendar">
+      <div class="month-calendar-head">
+        <button class="cal-arrow" onclick="calNav(-1)" aria-label="Previous month">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="cal-month-title" id="cal-title">May 2026</div>
+        <button class="cal-arrow" onclick="calNav(1)" aria-label="Next month">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
-    </div>
-    <!-- Calendar grid -->
-    <div id="cal-grid" style="background:var(--card);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;">
-      <!-- Day headers -->
-      <div style="display:grid;grid-template-columns:repeat(7,1fr);background:rgba(255,255,255,0.03);border-bottom:1px solid var(--br);">
-        <div style="padding:8px;text-align:center;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);">Mon</div>
-        <div style="padding:8px;text-align:center;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);">Tue</div>
-        <div style="padding:8px;text-align:center;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);">Wed</div>
-        <div style="padding:8px;text-align:center;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);">Thu</div>
-        <div style="padding:8px;text-align:center;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);">Fri</div>
-        <div style="padding:8px;text-align:center;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);">Sat</div>
-        <div style="padding:8px;text-align:center;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);">Sun</div>
+
+      <div class="cal-weekdays">
+        <div class="cal-week-label">Week</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+        <div class="cal-sunday">Sun</div>
       </div>
-      <div id="cal-days" style="display:grid;grid-template-columns:repeat(7,1fr);"></div>
-    </div>
-    <!-- Upcoming matches list below calendar -->
-    <div style="margin-top:20px;">
-      <div style="font-size:14px;font-weight:800;margin-bottom:12px;">Upcoming Matches</div>
+
+      <div id="cal-days" class="cal-days"></div>
+    </section>
+
+    <section class="cal-match-panel">
+      <div class="cal-panel-head">
+        <div>
+          <div class="cal-panel-title">Upcoming Matches</div>
+          <div class="cal-panel-sub">Tap a marked date in the calendar or select a match below.</div>
+        </div>
+        <button class="bsm bgh" onclick="calToday()" style="width:auto;">Today</button>
+      </div>
       <div id="cal-upcoming"></div>
-    </div>
+    </section>
   </div>
 </div>
 
@@ -908,7 +1011,7 @@ function initApp(){
   const ini=((fn[0]||'')+(ln[0]||'')).toUpperCase()||(UP.email||'?')[0].toUpperCase();
   if(UP.photoURL)$('top-av').innerHTML=`<img src="${UP.photoURL}" alt="av"/>`;else $('top-av').textContent=ini;
   $('c-date').value=new Date().toISOString().split('T')[0];
-  buildDivCbs();startML();startIL();loadRegionMatches();
+  buildDivCbs();startML();startIL();loadRegionMatches();setActiveNav('dashboard');if(typeof updateMobUser==='function')setTimeout(updateMobUser,50);
 }
 
 // ── DROPDOWNS ──
@@ -928,19 +1031,27 @@ function toggleDP(id){
 }
 
 // ── VIEW SWITCHER ──
+function setActiveNav(name){
+  document.querySelectorAll('.tnb,.mbn-item,.mob-nav-item').forEach(b=>b.classList.remove('active'));
+  const top={'dashboard':'tnb-dash','my-comps':'tnb-comp','find-matches':'tnb-find','calendar':'tnb-calendar','create-match':'tnb-create'};
+  const bottom={'dashboard':'mbn-dashboard','my-comps':'mbn-my-comps','find-matches':'mbn-find-matches','calendar':'mbn-calendar','create-match':'mbn-create-match'};
+  if(top[name])$(top[name])?.classList.add('active');
+  if(bottom[name])$(bottom[name])?.classList.add('active');
+}
+
 function sv(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   const el=$('view-'+name);if(el)el.classList.add('active');
   window.scrollTo(0,0);
-  // nav active
-  document.querySelectorAll('.tnb').forEach(b=>b.classList.remove('active'));
-  const nb={'dashboard':'tnb-dash','my-comps':'tnb-comp','find-matches':'tnb-find','create-match':'tnb-create'};
-  if(nb[name])$(nb[name])?.classList.add('active');
-  // init maps on demand
+  setActiveNav(name);
+  // init maps and data on demand
   if(name==='find-matches')setTimeout(initFindMap,100);
   if(name==='create-match')setTimeout(initCreateMap,100);
+  if(name==='calendar'){
+    if(!calMatches.length)loadCalMatches();
+    else renderCal();
+  }
 }
-
 // ── LISTENERS ──
 function startML(){
   munsub&&munsub();
@@ -2118,116 +2229,125 @@ async function loadCalMatches(){
   }catch(e){console.error(e);}
 }
 
+function isoWeekNumber(dt){
+  const d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));
+  const day=d.getUTCDay()||7;
+  d.setUTCDate(d.getUTCDate()+4-day);
+  const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d-yearStart)/86400000)+1)/7);
+}
+
+function matchesForDate(y,m,d){
+  return calMatches.filter(match=>{
+    if(!match.date)return false;
+    const dt=new Date(match.date);
+    return dt.getFullYear()===y&&dt.getMonth()===m&&dt.getDate()===d;
+  });
+}
+
 function renderCal(){
   const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const title=document.getElementById('cal-title');
   if(title)title.textContent=monthNames[calMonth]+' '+calYear;
 
   const el=document.getElementById('cal-days');if(!el)return;
-
-  // First day of month (Mon=0)
   const firstDay=new Date(calYear,calMonth,1);
-  let startDow=firstDay.getDay()-1;if(startDow<0)startDow=6;
   const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  let startDow=firstDay.getDay()-1;if(startDow<0)startDow=6; // Monday = 0
   const today=new Date();
 
-  // Build map of dates with matches
-  const matchDates={};
-  calMatches.forEach(m=>{
-    if(!m.date)return;
-    const d=new Date(m.date);
-    if(d.getFullYear()===calYear&&d.getMonth()===calMonth){
-      const key=d.getDate();
-      if(!matchDates[key])matchDates[key]=[];
-      matchDates[key].push(m);
-    }
-  });
-
-  let cells='';
-  // Empty cells for days before month starts
-  for(let i=0;i<startDow;i++){
-    cells+=`<div style="min-height:70px;padding:6px;border-right:1px solid var(--br);border-bottom:1px solid var(--br);background:rgba(0,0,0,0.1);"></div>`;
-  }
-  // Days
-  for(let d=1;d<=daysInMonth;d++){
-    const isToday=d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
-    const dayMatches=matchDates[d]||[];
-    const col=(startDow+d-1)%7;
-    const borderRight=col===6?'none':'1px solid var(--br)';
-    cells+=`<div style="min-height:70px;padding:6px;border-right:${borderRight};border-bottom:1px solid var(--br);cursor:${dayMatches.length?'pointer':'default'};" onclick="${dayMatches.length?`showCalDay(${d})`:''}">
-      <div style="font-size:12px;font-weight:${isToday?900:600};color:${isToday?'var(--ac)':'var(--tx)'};background:${isToday?'rgba(59,130,246,0.15)':'transparent'};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:3px;">${d}</div>
-      ${dayMatches.slice(0,2).map(m=>`<div onclick="event.stopPropagation();openPubMatch('${m.id}')" style="font-size:10px;font-weight:600;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;border-radius:4px;padding:2px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;">${esc(m.name||'')}</div>`).join('')}
-      ${dayMatches.length>2?`<div style="font-size:9px;color:var(--mt);">+${dayMatches.length-2} more</div>`:''}
-    </div>`;
-  }
-  // Fill remaining cells to complete grid
   const totalCells=startDow+daysInMonth;
-  const remaining=(7-totalCells%7)%7;
-  for(let i=0;i<remaining;i++){
-    cells+=`<div style="min-height:70px;padding:6px;border-right:${i<remaining-1?'1px solid var(--br)':'none'};border-bottom:1px solid var(--br);background:rgba(0,0,0,0.1);"></div>`;
-  }
-  el.innerHTML=cells;
+  const weekRows=Math.ceil(totalCells/7);
+  let html='';
 
-  // Upcoming matches list
+  for(let row=0;row<weekRows;row++){
+    const mondayDate=new Date(calYear,calMonth,1-startDow+(row*7));
+    const week=isoWeekNumber(mondayDate);
+    const shade=row%2===0?' cal-row-shade':'';
+    html+=`<div class="cal-week-cell${shade}">${week}</div>`;
+
+    for(let col=0;col<7;col++){
+      const dayNumber=row*7+col-startDow+1;
+      const isInMonth=dayNumber>=1&&dayNumber<=daysInMonth;
+      const isSunday=col===6;
+      if(!isInMonth){
+        html+=`<div class="cal-day-cell is-empty${shade}"></div>`;
+        continue;
+      }
+
+      const dayMatches=matchesForDate(calYear,calMonth,dayNumber);
+      const isToday=dayNumber===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
+      const classes=[
+        'cal-day-cell',
+        shade.trim(),
+        isSunday?'is-sunday':'',
+        isToday?'is-today':'',
+        dayMatches.length?'has-match':''
+      ].filter(Boolean).join(' ');
+      const click=dayMatches.length?` onclick="showCalDay(${dayNumber})"`:'';
+      const titleAttr=dayMatches.length?` title="${esc(dayMatches.map(m=>m.name||'Match').join(', '))}"`:'';
+      html+=`<div class="${classes}"${click}${titleAttr}>
+        <span class="cal-day-number">${dayNumber}</span>
+        ${dayMatches.length?`<span class="cal-match-dot">${dayMatches.length}</span>`:''}
+      </div>`;
+    }
+  }
+
+  el.innerHTML=html;
   renderCalUpcoming();
+  setActiveNav('calendar');
 }
 
 window.showCalDay=function(d){
-  const matchDates={};
-  calMatches.forEach(m=>{
-    if(!m.date)return;
-    const dt=new Date(m.date);
-    if(dt.getFullYear()===calYear&&dt.getMonth()===calMonth){
-      const key=dt.getDate();
-      if(!matchDates[key])matchDates[key]=[];
-      matchDates[key].push(m);
-    }
-  });
-  const dayMatches=matchDates[d]||[];
+  const dayMatches=matchesForDate(calYear,calMonth,d);
   if(dayMatches.length===1){openPubMatch(dayMatches[0].id);return;}
-  // Show a quick list
-  const names=dayMatches.map(m=>m.name||'Match').join(', ');
-  alert(`Matches on this day: ${names}`);
+  renderCalMatchList(dayMatches,`Matches on ${new Date(calYear,calMonth,d).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`);
 };
+
+function renderCalMatchList(list,title){
+  const el=document.getElementById('cal-upcoming');if(!el)return;
+  if(!list.length){el.innerHTML='<div class="empty"><div class="et">No matches on this date</div></div>';return;}
+  el.innerHTML=`<div class="cal-date-list-title">${esc(title||'Matches')}</div>`+list.map(m=>calMatchItem(m)).join('');
+}
+
+function calMatchItem(m){
+  const dateObj=new Date(m.date);
+  const day=isNaN(dateObj)?'–':dateObj.getDate();
+  const mon=isNaN(dateObj)?'':dateObj.toLocaleDateString('en-US',{month:'short'});
+  const meta=[
+    m.location||'Location not set',
+    m.level||m.type||'',
+    (m.shooters||[]).length?`${(m.shooters||[]).length} competitors`:''
+  ].filter(Boolean).join(' · ');
+  return `<div class="cal-match-item" onclick="openPubMatch('${m.id}')">
+    <div class="cal-date-badge"><div class="cal-date-day">${day}</div><div class="cal-date-month">${esc(mon)}</div></div>
+    <div class="cal-match-main">
+      <div class="cal-match-name">${esc(m.name||'Untitled Match')}</div>
+      <div class="cal-match-meta">${esc(meta)}</div>
+    </div>
+    <span class="badge b-blue">${esc(m.status||'active')}</span>
+  </div>`;
+}
 
 function renderCalUpcoming(){
   const el=document.getElementById('cal-upcoming');if(!el)return;
+  const firstOfMonth=new Date(calYear,calMonth,1);
+  const lastOfMonth=new Date(calYear,calMonth+1,0,23,59,59);
+  const inMonth=calMatches
+    .filter(m=>m.date&&new Date(m.date)>=firstOfMonth&&new Date(m.date)<=lastOfMonth)
+    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(inMonth.length){renderCalMatchList(inMonth,`Matches in ${document.getElementById('cal-title')?.textContent||'this month'}`);return;}
+
   const now=new Date();
   const upcoming=calMatches
     .filter(m=>m.date&&new Date(m.date)>=now)
     .sort((a,b)=>new Date(a.date)-new Date(b.date))
     .slice(0,8);
   if(!upcoming.length){el.innerHTML='<div class="empty"><div class="et">No upcoming matches</div></div>';return;}
-  el.innerHTML=upcoming.map(m=>`<div onclick="openPubMatch('${m.id}')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--br);border-left:3px solid var(--ac);border-radius:9px;margin-bottom:7px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(59,130,246,0.05)'" onmouseout="this.style.background='var(--card)'">
-    <div style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:7px;padding:6px 10px;text-align:center;flex-shrink:0;min-width:48px;">
-      <div style="font-size:16px;font-weight:900;color:var(--ac);">${new Date(m.date).getDate()}</div>
-      <div style="font-size:9px;font-weight:700;color:var(--mt);text-transform:uppercase;">${new Date(m.date).toLocaleDateString('en-GB',{month:'short'})}</div>
-    </div>
-    <div style="flex:1;min-width:0;">
-      <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(m.name||'')}</div>
-      <div style="font-size:11px;color:var(--mt);">${esc(m.location||'')} ${m.level?'· '+esc(m.level):''}</div>
-    </div>
-    <div>
-      <span class="badge b-blue">${(m.shooters||[]).length} competitors</span>
-    </div>
-  </div>`).join('');
+  renderCalMatchList(upcoming,'Upcoming Matches');
 }
 
 // Init calendar when switching to it
-const _origSv=sv;
-window.sv=function(name){
-  _origSv(name);
-  if(name==='calendar'){
-    if(!calMatches.length)loadCalMatches();
-    else renderCal();
-  }
-  if(name==='find-matches'){
-    setTimeout(initFindMap,100);
-    loadAllPublicMatches();
-  }
-  // Update nav active on mobile
-  document.querySelectorAll('.mob-nav-item').forEach(b=>b.classList.remove('active'));
-};
 window.calNav=window.calNav;
 window.calToday=window.calToday;
 window.showCalDay=window.showCalDay;

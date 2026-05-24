@@ -296,7 +296,9 @@ textarea.fi{resize:vertical;min-height:80px;}
 .mapbox{height:240px;background:radial-gradient(circle at 30% 30%,rgba(59,130,246,.18),transparent 35%),linear-gradient(135deg,#0f1720,#17202b);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden;}
 .mapbox:before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:32px 32px;}
 .pin{position:absolute;left:50%;top:48%;transform:translate(-50%,-100%);font-size:28px;filter:drop-shadow(0 6px 12px rgba(0,0,0,.5));}
-.mapcap{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 11px;font-size:12px;color:var(--muted);backdrop-filter:blur(6px);}
+.mapwrap{position:relative;}
+.mapcap{position:absolute;left:12px;right:12px;bottom:12px;z-index:500;background:rgba(0,0,0,.56);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 11px;font-size:12px;color:var(--muted);backdrop-filter:blur(6px);}
+.detail-map{min-height:420px;}
 .searchbar{display:grid;grid-template-columns:1.2fr .8fr .8fr auto;gap:10px;margin-bottom:14px;}
 @media(max-width:760px){.searchbar{grid-template-columns:1fr}}
 .find-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -465,24 +467,51 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   <div id="view-create-match" class="view">
     <div class="page-sm">
       <div class="back-btn" onclick="sv('my-comps')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</div>
-      <div class="section-title">Create IPSC Handgun Match</div>
+      <div class="section-title">Create IPSC Match</div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Create a match as organizer. The creator becomes match owner, but is not automatically registered as a shooter.</p>
       <div id="create-access-note" class="access-notice" style="display:none;margin-bottom:14px;">You do not have organizer access to create matches.</div>
 
       <div class="form-section">
-        <div class="form-section-title">Basic Information</div>
-        <div class="fg"><label class="fl">Event Name</label><input id="c-name" class="fi" type="text" placeholder="Event name"/></div>
+        <div class="form-section-title">Match Identity</div>
+        <div class="fg"><label class="fl">Match Name</label><input id="c-name" class="fi" type="text" placeholder="e.g. Oslo Open 2026"/></div>
         <div class="frow">
-          <div class="fg"><label class="fl">Location / Venue</label><input id="c-loc" class="fi" type="text" placeholder="Oslo Shooting Range"/></div>
-          <div class="fg"><label class="fl">Region</label>
-            <select id="c-region" class="fi"><option value="Norway">Norway</option><option value="Sweden">Sweden</option><option value="Denmark">Denmark</option><option value="Finland">Finland</option><option value="Other">Other</option></select>
+          <div class="fg"><label class="fl">Match Level</label>
+            <select id="c-level" class="fi"><option value="Level I">Level I</option><option value="Level II">Level II</option><option value="Level III">Level III</option><option value="Level IV">Level IV</option><option value="Level V">Level V</option></select>
           </div>
+          <div class="fg"><label class="fl">Discipline</label><input class="fi" type="text" value="IPSC" disabled/></div>
         </div>
+        <div class="fg"><label class="fl">Description</label><textarea id="c-desc" class="fi" placeholder="Give shooters the essential match information, range details, equipment notes, and any special instructions."></textarea></div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Official Match Website</label><input id="c-url" class="fi" type="url" placeholder="https://…"/></div>
+          <div class="fg"><label class="fl">Website Link Text</label><input id="c-urltext" class="fi" type="text" placeholder="Match website"/></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Date &amp; Schedule</div>
         <div class="frow">
           <div class="fg"><label class="fl">Start Date</label><input id="c-date" class="fi" type="date"/></div>
           <div class="fg"><label class="fl">Start Time</label><input id="c-time" class="fi" type="time" value="10:00"/></div>
         </div>
-        <div class="fg"><label class="fl">Description</label><textarea id="c-desc" class="fi" placeholder="Description"></textarea></div>
+        <div class="frow">
+          <div class="fg"><label class="fl">End Date</label><input id="c-enddate" class="fi" type="date"/></div>
+          <div class="fg"><label class="fl">End Time</label><input id="c-endtime" class="fi" type="time"/></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Venue &amp; Map</div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Venue / Range</label><input id="c-loc" class="fi" type="text" placeholder="Oslo Shooting Range"/></div>
+          <div class="fg"><label class="fl">Country / Region</label>
+            <select id="c-region" class="fi"><option value="Norway">Norway</option><option value="Sweden">Sweden</option><option value="Denmark">Denmark</option><option value="Finland">Finland</option><option value="Other">Other</option></select>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Latitude</label><input id="c-lat" class="fi" type="number" step="0.000001" placeholder="59.913900"/></div>
+          <div class="fg"><label class="fl">Longitude</label><input id="c-lng" class="fi" type="number" step="0.000001" placeholder="10.752200"/></div>
+        </div>
+        <div class="role-hint">Coordinates place the match pin on the Find Matches map. If left blank, the app uses a regional fallback location.</div>
       </div>
 
       <div class="form-section">
@@ -491,65 +520,58 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
       </div>
 
       <div class="form-section">
-        <div class="form-section-title">Event Settings</div>
-        <div class="fg"><label class="fl">Level</label>
-          <select id="c-level" class="fi"><option value="Level I">Level I</option><option value="Level II">Level II</option><option value="Level III">Level III</option><option value="Level IV">Level IV</option><option value="Level V">Level V</option></select>
-        </div>
-        <div class="fg"><label class="fl">Status</label>
-          <select id="c-status" class="fi"><option value="draft">Draft</option><option value="active" selected>Active</option></select>
-        </div>
-        <div class="fg"><label class="fl">Results are</label>
-          <select id="c-results" class="fi">
-            <option value="public">Results and scores shown to anyone</option>
-            <option value="scores_only">Scores shown to anyone, results only to organizers</option>
-            <option value="organizers_only" selected>Result and scores only shown to organizers</option>
-          </select>
-        </div>
-        <div class="fg"><label class="fl">Registration is</label>
+        <div class="form-section-title">Registration</div>
+        <div class="fg"><label class="fl">Registration Mode</label>
           <select id="c-reg" class="fi">
-            <option value="open_auto" selected>Open automatically; competitors are approved immediately</option>
-            <option value="open_manual">Open, manual approval required</option>
-            <option value="open_waiting">Open, all competitors join the waitlist</option>
+            <option value="open_auto" selected>Open — approve automatically</option>
+            <option value="open_manual">Open — manual approval required</option>
+            <option value="open_waiting">Open — add everyone to the waitlist</option>
             <option value="closed">Closed</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Max Competitors</label><input id="c-max" class="fi" type="number" min="1" placeholder="e.g. 45"/></div>
-        <div class="fg">
-          <div class="trow">
-            <div><div class="tl">Allow Public Search</div><div class="ts2">Visible in search by ID</div></div>
-            <label class="toggle"><input type="checkbox" id="c-pub" checked/><span class="tslider"></span></label>
-          </div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Registration Opens</label><input id="c-regstart" class="fi" type="date"/></div>
+          <div class="fg"><label class="fl">Registration Closes</label><input id="c-regend" class="fi" type="date"/></div>
         </div>
-        <div class="fg">
-          <div class="trow">
-            <div><div class="tl">Multiple Registrations Allowed</div><div class="ts2">Shoot in multiple divisions</div></div>
-            <label class="toggle"><input type="checkbox" id="c-multi"/><span class="tslider"></span></label>
+        <div class="frow">
+          <div class="fg"><label class="fl">Maximum Competitors</label><input id="c-max" class="fi" type="number" min="1" placeholder="Leave blank for unlimited"/></div>
+          <div class="fg">
+            <label class="fl">Multiple Entries</label>
+            <div class="trow" style="margin:0;">
+              <div><div class="tl">Allow Multiple Registrations</div><div class="ts2">Shoot in more than one division</div></div>
+              <label class="toggle"><input type="checkbox" id="c-multi"/><span class="tslider"></span></label>
+            </div>
           </div>
         </div>
       </div>
 
-      <button class="adv-toggle" onclick="toggleAdv()">Show/Hide Advanced Fields</button>
-      <div class="adv-section form-section" id="adv-sec">
-        <div class="form-section-title">Advanced Settings</div>
+      <div class="form-section">
+        <div class="form-section-title">Publishing</div>
         <div class="frow">
-          <div class="fg"><label class="fl">Registration Starts</label><input id="c-regstart" class="fi" type="date"/></div>
-          <div class="fg"><label class="fl">Registration Closes</label><input id="c-regend" class="fi" type="date"/></div>
+          <div class="fg"><label class="fl">Match Status</label>
+            <select id="c-status" class="fi"><option value="draft">Draft</option><option value="active" selected>Active</option><option value="preliminary">Preliminary</option><option value="completed">Completed</option><option value="cancelled">Canceled</option></select>
+          </div>
+          <div class="fg">
+            <label class="fl">Search Visibility</label>
+            <div class="trow" style="margin:0;">
+              <div><div class="tl">Publicly Searchable</div><div class="ts2">Show this match in Find Matches and ID search</div></div>
+              <label class="toggle"><input type="checkbox" id="c-pub" checked/><span class="tslider"></span></label>
+            </div>
+          </div>
         </div>
+        <div class="role-hint">Results and live standings are always public for published matches.</div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Optional Match Features</div>
         <div class="frow">
-          <div class="fg"><label class="fl">Ends Date</label><input id="c-enddate" class="fi" type="date"/></div>
-          <div class="fg"><label class="fl">Ends Time</label><input id="c-endtime" class="fi" type="time"/></div>
-        </div>
-        <div class="frow">
-          <div class="fg"><label class="fl">Latitude</label><input id="c-lat" class="fi" type="number" step="0.000001" placeholder="59.9139"/></div>
-          <div class="fg"><label class="fl">Longitude</label><input id="c-lng" class="fi" type="number" step="0.000001" placeholder="10.7522"/></div>
-        </div>
-        <div class="fg"><label class="fl">Web Page URL</label><input id="c-url" class="fi" type="text" placeholder="https://…"/></div>
-        <div class="fg"><label class="fl">Web Link Text</label><input id="c-urltext" class="fi" type="text" placeholder="Web link text"/></div>
-        <div class="fg"><label class="fl">Limit for Category Results</label><input id="c-catlimit" class="fi" type="number" value="5" min="1"/></div>
-        <div class="fg">
-          <div class="trow">
-            <div><div class="tl">Allow Teams</div><div class="ts2">Enable team support</div></div>
-            <label class="toggle"><input type="checkbox" id="c-teams"/><span class="tslider"></span></label>
+          <div class="fg"><label class="fl">Category Result Limit</label><input id="c-catlimit" class="fi" type="number" value="5" min="1"/></div>
+          <div class="fg">
+            <label class="fl">Teams</label>
+            <div class="trow" style="margin:0;">
+              <div><div class="tl">Allow Teams</div><div class="ts2">Enable team support for this match</div></div>
+              <label class="toggle"><input type="checkbox" id="c-teams"/><span class="tslider"></span></label>
+            </div>
           </div>
         </div>
       </div>
@@ -722,9 +744,6 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
               <div class="fg"><label class="fl">Registration</label>
                 <select id="a-reg" class="fi"><option value="open_auto">Open – approved directly</option><option value="open_manual">Open – manual approval</option><option value="open_waiting">Open – waiting list</option><option value="closed">Closed</option></select>
               </div>
-              <div class="fg"><label class="fl">Results Visibility</label>
-                <select id="a-results" class="fi"><option value="public">Public – anyone</option><option value="scores_only">Scores public, results to organizers</option><option value="organizers_only">Organizers only</option></select>
-              </div>
               <div class="fg"><label class="fl">Max Competitors</label><input id="a-max" class="fi" type="number" min="1" placeholder="Unlimited"/></div>
               <div class="fg">
                 <div class="trow">
@@ -824,12 +843,12 @@ const fbApp=initializeApp(FB);
 const auth=getAuth(fbApp);
 const db=getFirestore(fbApp);
 
-const DIVISIONS=['Open','Standard','Standard Optics','Optics','Production','Revolver','Classic','Rimfire Open','Rimfire Standard','Rimfire Production','Rimfire Optics','Pistol Caliber Carbine','Production Optics','Production Optics Light','Pistol Caliber Carbine Optics','Pistol Caliber Carbine Iron','Custom'];
-const DEFAULT_DIVS=['Open','Standard','Optics','Production','Revolver','Classic','Production Optics'];
+const DIVISIONS=['Open','Standard','Classic','Production','Production Optics','Optics','Revolver','Pistol Caliber Carbine'];
+const DEFAULT_DIVS=['Open','Standard','Classic','Production','Production Optics','Optics','Revolver','Pistol Caliber Carbine'];
 
 let CU=null,UP=null,matches=[],publicMatches=[],invitations=[],AM=null,CF='all',editSN=null,rSel=null,rTimer=null;
 let munsub=null,pmunsub=null,iunsub=null,activeDiv='live',compareSelected=new Set(),currentYear=new Date().getFullYear();
-let findMap=null,findMarkers=null;
+let findMap=null,findMarkers=null,detailMap=null,detailMarker=null;
 let userRole='competitor'; // 'owner','admin','staff','competitor'
 
 const $=id=>document.getElementById(id);
@@ -1040,6 +1059,23 @@ function centerFindMap(mid){
   const [lat,lng]=getMatchCoords(m);
   if(findMap)findMap.setView([lat,lng],9);
 }
+
+function initDetailMap(){
+  const el=$('detail-map');
+  if(!el||!AM)return;
+  if(typeof L==='undefined'){
+    el.innerHTML='<div class="empty"><div class="empty-t">Map service unavailable</div><div class="empty-s">The interactive map library did not load.</div></div>';
+    return;
+  }
+  if(detailMap){try{detailMap.remove();}catch(e){}detailMap=null;detailMarker=null;}
+  const [lat,lng,exact]=getMatchCoords(AM);
+  detailMap=L.map('detail-map',{scrollWheelZoom:false}).setView([lat,lng],exact?12:6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(detailMap);
+  detailMarker=L.marker([lat,lng]).addTo(detailMap);
+  detailMarker.bindPopup(`<b>${esc(AM.name||'Unnamed Match')}</b><br>${esc(AM.location||AM.region||'Location not set')}<br>${exact?'Exact venue pin':'Regional fallback pin'}`);
+  setTimeout(()=>detailMap&&detailMap.invalidateSize(),80);
+}
+
 function filteredFindMatches(){
   const q=($('fm-q')?.value||'').toLowerCase().trim(),reg=$('fm-region')?.value||'',yr=$('fm-year')?.value||'';
   return allVisibleMatches().filter(m=>{
@@ -1164,13 +1200,14 @@ function showPublicTab(tab){
   if(tab==='results'){$('result-view').style.display='block';$('result-view').classList.add('active');buildDivChips();renderResults(activeDiv||'combined');return;}
   if(tab==='organizer'){$('org-tabs').style.display='block';$('org-tabs').classList.add('active');showOrgTab(canAdmin(userRole)?'stages':'competitors');return;}
   const p=$('panel-'+tab);if(p){p.style.display='block';p.classList.add('active');}
+  if(tab==='info')setTimeout(initDetailMap,60);
 }
 
 function renderInfoPanel(){
   const m=AM,stages=(m.stages||[]).filter(s=>s?.number!=null),shooters=m.shooters||[],max=m.maxCompetitors||0;
   const rs=registrationState(m);
   const joinBtn=rs.canJoin?`<button class="bsm bgold" onclick="joinMatch('${m.id}')" style="width:auto;">${rs.key==='open_waiting'?'Join waiting list':rs.key==='open_manual'?'Request registration':'Register'}</button>`:'';
-  $('panel-info').innerHTML=`<div class="stats-grid"><div class="stat-block"><div class="stat-val">${shooters.length}</div><div class="stat-lbl">Competitors</div></div><div class="stat-block"><div class="stat-val">${stages.length}</div><div class="stat-lbl">Stages</div></div><div class="stat-block"><div class="stat-val">${m.divisions?.length||0}</div><div class="stat-lbl">Divisions</div></div><div class="stat-block"><div class="stat-val">${max||'∞'}</div><div class="stat-lbl">Capacity</div></div></div><div class="info-grid"><div class="card"><div class="chead"><div class="ctitle">Match information</div></div><div class="cbody"><div class="kpi-list"><div class="kpi"><b>${esc(m.name||'Unnamed')}</b><span>${esc(m.level||m.type||'IPSC Handgun')}</span></div><div class="kpi"><b>${m.date?fmtD(m.date):'No date'}</b><span>${esc(m.time||'')}</span></div><div class="kpi"><b>${esc(m.registration||'open_auto')}</b><span>Registration setting</span></div></div><p style="font-size:13px;color:var(--muted);line-height:1.55;margin-top:14px;">${esc(m.description||'No description has been added yet.')}</p><div class="reg-state"><span class="badge ${rs.cls}">${esc(rs.label)}</span>${joinBtn}</div></div></div><div class="mapbox"><div class="pin">📍</div><div class="mapcap"><b style="color:var(--text);">${esc(m.location||'Venue not set')}</b><br>${esc(m.region||'')}</div></div></div>`;
+  $('panel-info').innerHTML=`<div class="stats-grid"><div class="stat-block"><div class="stat-val">${shooters.length}</div><div class="stat-lbl">Competitors</div></div><div class="stat-block"><div class="stat-val">${stages.length}</div><div class="stat-lbl">Stages</div></div><div class="stat-block"><div class="stat-val">${m.divisions?.length||0}</div><div class="stat-lbl">Divisions</div></div><div class="stat-block"><div class="stat-val">${max||'∞'}</div><div class="stat-lbl">Capacity</div></div></div><div class="info-grid"><div class="card"><div class="chead"><div class="ctitle">Match information</div></div><div class="cbody"><div class="kpi-list"><div class="kpi"><b>${esc(m.name||'Unnamed')}</b><span>${esc(m.level||m.type||'IPSC Handgun')}</span></div><div class="kpi"><b>${m.date?fmtD(m.date):'No date'}</b><span>${esc(m.time||'')}</span></div><div class="kpi"><b>${esc(m.registration||'open_auto')}</b><span>Registration setting</span></div></div><p style="font-size:13px;color:var(--muted);line-height:1.55;margin-top:14px;">${esc(m.description||'No description has been added yet.')}</p><div class="reg-state"><span class="badge ${rs.cls}">${esc(rs.label)}</span>${joinBtn}</div></div></div><div class="mapwrap"><div class="mapbox detail-map" id="detail-map"></div><div class="mapcap"><b style="color:var(--text);">${esc(m.location||'Venue not set')}</b><br>${esc(m.region||'Regional fallback map pin')}</div></div></div>`;
 }
 function renderPublicStages(){
   const stages=(AM.stages||[]).filter(s=>s?.number!=null).sort((a,b)=>(a.number||0)-(b.number||0));
@@ -1468,11 +1505,11 @@ async function inviteRole(){
 async function removeRole(uid){if(!confirm('Remove from match staff?'))return;const roles=(AM.matchRoles||[]).filter(r=>r.uid!==uid);try{await updateDoc(doc(db,'matches',AM.id.toString()),{matchRoles:roles,updatedAt:serverTimestamp()});AM={...AM,matchRoles:roles};renderRoles();}catch(e){alert(e.message);}}
 
 // SETTINGS
-function fillSettings(){const m=AM;$('a-name').value=m.name||'';$('a-loc').value=m.location||'';$('a-date').value=m.date||'';$('a-type').value=m.type||'Training';$('a-status').value=m.status||'active';$('a-reg').value=m.registration||'open_auto';$('a-results').value=m.resultsVisibility||'organizers_only';$('a-max').value=m.maxCompetitors||'';$('a-srch').checked=m.searchable!==false;smsg('a-msg','');}
+function fillSettings(){const m=AM;$('a-name').value=m.name||'';$('a-loc').value=m.location||'';$('a-date').value=m.date||'';$('a-type').value=m.type||'IPSC';$('a-status').value=m.status||'active';$('a-reg').value=m.registration||'open_auto';$('a-max').value=m.maxCompetitors||'';$('a-srch').checked=m.searchable!==false;smsg('a-msg','');}
 async function saveSettings(){
   smsg('a-msg','');if(!canAdmin(userRole)){smsg('a-msg','Only admins can edit settings.');return;}
   spin(true);
-  try{const up={name:$('a-name').value.trim(),location:$('a-loc').value.trim(),date:$('a-date').value,type:$('a-type').value,status:$('a-status').value,registration:$('a-reg').value,resultsVisibility:$('a-results').value,maxCompetitors:parseInt($('a-max').value)||0,searchable:$('a-srch').checked,updatedAt:serverTimestamp()};await updateDoc(doc(db,'matches',AM.id.toString()),up);AM={...AM,...up};smsg('a-msg','✓ Saved','ok');renderDetail();}
+  try{const up={name:$('a-name').value.trim(),location:$('a-loc').value.trim(),date:$('a-date').value,type:$('a-type').value,status:$('a-status').value,registration:$('a-reg').value,resultsVisibility:'public',maxCompetitors:parseInt($('a-max').value)||0,searchable:$('a-srch').checked,updatedAt:serverTimestamp()};await updateDoc(doc(db,'matches',AM.id.toString()),up);AM={...AM,...up};smsg('a-msg','✓ Saved','ok');renderDetail();}
   catch(e){smsg('a-msg','Error: '+e.message);}spin(false);
 }
 async function delMatch(){
@@ -1483,14 +1520,14 @@ async function delMatch(){
 
 // CREATE MATCH
 function buildDivCheckboxes(){$('div-checkboxes').innerHTML=DIVISIONS.map(d=>`<label class="cb-item"><input type="checkbox" ${DEFAULT_DIVS.includes(d)?'checked':''} value="${esc(d)}"/> ${esc(d)}</label>`).join('');}
-function toggleAdv(){$('adv-sec').classList.toggle('show');}
+function toggleAdv(){const sec=$('adv-sec');if(sec)sec.classList.toggle('show');}
 async function submitCreate(){
-  smsg('cm-msg','');if(!canCreateMatch()){smsg('cm-msg','You do not have organizer access to create matches.');return;}const name=$('c-name').value.trim();if(!name){smsg('cm-msg','Event name required.');return;}
+  smsg('cm-msg','');if(!canCreateMatch()){smsg('cm-msg','You do not have organizer access to create matches.');return;}const name=$('c-name').value.trim();if(!name){smsg('cm-msg','Match name required.');return;}
   const divs=[...$('div-checkboxes').querySelectorAll('input:checked')].map(i=>i.value);
   $('cm-btn').disabled=true;$('cm-btn').textContent='Creating…';spin(true);
   try{
     const mid=await nextMID();
-    await setDoc(doc(db,'matches',mid.toString()),{id:mid,name,location:$('c-loc').value.trim(),region:$('c-region').value,date:$('c-date').value,time:$('c-time').value,description:$('c-desc').value.trim(),level:$('c-level').value,type:'IPSC Handgun',status:$('c-status').value,resultsVisibility:$('c-results').value,registration:$('c-reg').value,maxCompetitors:parseInt($('c-max').value)||0,searchable:$('c-pub').checked,multipleRegistrations:$('c-multi').checked,registrationStarts:$('c-regstart').value,registrationCloses:$('c-regend').value,endDate:$('c-enddate').value,endTime:$('c-endtime').value,latitude:parseFloat($('c-lat')?.value)||null,longitude:parseFloat($('c-lng')?.value)||null,webUrl:$('c-url').value.trim(),webLinkText:$('c-urltext').value.trim(),categoryLimit:parseInt($('c-catlimit').value)||5,allowTeams:$('c-teams').checked,divisions:divs,ownerId:CU.uid,participants:[CU.uid],shooters:[],stages:[],matchRoles:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    await setDoc(doc(db,'matches',mid.toString()),{id:mid,name,location:$('c-loc').value.trim(),region:$('c-region').value,date:$('c-date').value,time:$('c-time').value,description:$('c-desc').value.trim(),level:$('c-level').value,type:'IPSC',status:$('c-status').value,resultsVisibility:'public',registration:$('c-reg').value,maxCompetitors:parseInt($('c-max').value)||0,searchable:$('c-pub').checked,multipleRegistrations:$('c-multi').checked,registrationStarts:$('c-regstart').value,registrationCloses:$('c-regend').value,endDate:$('c-enddate').value,endTime:$('c-endtime').value,latitude:parseFloat($('c-lat')?.value)||null,longitude:parseFloat($('c-lng')?.value)||null,webUrl:$('c-url').value.trim(),webLinkText:$('c-urltext').value.trim(),categoryLimit:parseInt($('c-catlimit').value)||5,allowTeams:$('c-teams').checked,divisions:divs,ownerId:CU.uid,participants:[CU.uid],shooters:[],stages:[],matchRoles:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
     smsg('cm-msg','✓ Match created! ID: '+mid,'ok');setTimeout(()=>{sv('my-comps');$('c-name').value='';},1500);
   }catch(e){smsg('cm-msg','Error: '+e.message);}
   $('cm-btn').disabled=false;$('cm-btn').textContent='Create Match';spin(false);

@@ -405,72 +405,76 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   .mlt-cards{display:none;}
 }
 
-/* ── MATCH CALENDAR + MOBILE BOTTOM NAV UPDATE ── */
-.cal-page{max-width:980px;}
-.month-calendar{background:#f7f7f5;color:#111;border-radius:0;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.08);}
-.month-calendar-head{height:78px;background:#3f3f3f;color:#fff;display:grid;grid-template-columns:70px 1fr 70px;align-items:center;padding:0 10px;}
-.cal-month-title{text-align:right;font-size:34px;font-weight:900;letter-spacing:.01em;padding-right:20px;}
-.cal-arrow{width:44px;height:44px;border:none;border-radius:12px;background:rgba(255,255,255,0.06);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .15s;}
-.cal-arrow:hover{background:rgba(255,255,255,0.14);transform:translateY(-1px);}
-.cal-arrow svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;}
-.cal-weekdays{display:grid;grid-template-columns:90px repeat(7,1fr);align-items:center;background:#fff;padding:18px 18px 10px;gap:0;}
-.cal-weekdays div{font-size:25px;font-weight:900;text-align:center;color:#333;font-family:Georgia,'Times New Roman',serif;}
-.cal-weekdays .cal-week-label{color:#bfbfbf;text-align:left;padding-left:4px;}
-.cal-weekdays .cal-sunday{color:#222;}
-.cal-days{display:grid;grid-template-columns:90px repeat(7,1fr);padding:0 18px 18px;background:#fff;}
-.cal-week-cell{height:58px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#7e7e7e;font-style:italic;font-family:Georgia,'Times New Roman',serif;}
-.cal-day-cell{height:58px;display:flex;align-items:center;justify-content:center;position:relative;font-size:25px;font-weight:900;color:#000;font-family:Georgia,'Times New Roman',serif;cursor:default;}
-.cal-day-cell.is-empty{cursor:default;}
-.cal-row-shade{background:#f3efd6;}
-.cal-day-cell.is-sunday{color:#f00;}
-.cal-day-cell.is-today .cal-day-number{outline:2px solid #333;outline-offset:4px;border-radius:999px;}
-.cal-day-cell.has-match{cursor:pointer;}
-.cal-day-cell.has-match .cal-day-number{position:relative;z-index:1;}
-.cal-day-cell.has-match::before{content:'';position:absolute;inset:9px 12px;border-radius:12px;background:rgba(59,130,246,.16);border:2px solid rgba(59,130,246,.55);}
-.cal-day-cell.has-match.is-sunday::before{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.10);}
-.cal-match-dot{position:absolute;right:13px;top:9px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#3b82f6;color:#fff;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.18);}
-.cal-day-cell:hover::before{background:rgba(59,130,246,.24);}
-.cal-match-panel{background:var(--card);border:1px solid var(--br);border-radius:var(--r);margin-top:18px;padding:16px;}
-.cal-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
-.cal-panel-title{font-size:14px;font-weight:900;}
-.cal-panel-sub{font-size:12px;color:var(--mt);margin-top:3px;}
-.cal-date-list-title{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ac);margin:2px 0 10px;}
-.cal-match-item{display:flex;align-items:center;gap:12px;padding:11px 13px;background:rgba(255,255,255,.03);border:1px solid var(--br);border-left:3px solid var(--ac);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:background .15s,transform .15s;}
-.cal-match-item:hover{background:rgba(59,130,246,.08);transform:translateY(-1px);}
-.cal-date-badge{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:7px 10px;text-align:center;min-width:54px;flex-shrink:0;}
-.cal-date-day{font-size:18px;font-weight:900;color:var(--ac);}
-.cal-date-month{font-size:9px;font-weight:800;color:var(--mt);letter-spacing:.08em;text-transform:uppercase;}
-.cal-match-main{flex:1;min-width:0;}
-.cal-match-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cal-match-meta{font-size:11px;color:var(--mt);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-.mobile-bottom-nav{display:none;}
-@media(max-width:768px){
-  html,body{padding-bottom:76px;}
-  .mob-menu-btn,.mob-drawer{display:none!important;}
-  .topbar{height:50px;padding:0 12px;}
-  .topbar .tnav{display:none!important;}
-  .topbar .tright{gap:8px;}
-  .mobile-bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:450;background:rgba(15,18,23,.97);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.10);box-shadow:0 -14px 34px rgba(0,0,0,.38);padding:7px 6px calc(7px + env(safe-area-inset-bottom));}
-  .mbn-item{background:transparent;border:none;color:rgba(255,255,255,.42);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
-  .mbn-item svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2.15;stroke-linecap:round;stroke-linejoin:round;opacity:.92;}
-  .mbn-item.active{color:#3b82f6;}
-  .mbn-item.active::before{content:'';position:absolute;top:0;width:34px;height:3px;background:#3b82f6;border-radius:0 0 3px 3px;}
-  .page,.page-sm,.page-md{padding-bottom:96px;}
-  .cal-page{padding-left:0;padding-right:0;}
-  .month-calendar{border-left:none;border-right:none;box-shadow:none;}
-  .month-calendar-head{height:64px;grid-template-columns:54px 1fr 54px;padding:0 6px;}
-  .cal-month-title{font-size:25px;text-align:center;padding-right:0;}
-  .cal-arrow{width:40px;height:40px;border-radius:10px;}
-  .cal-weekdays{grid-template-columns:48px repeat(7,1fr);padding:13px 7px 7px;}
-  .cal-weekdays div{font-size:15px;}
-  .cal-days{grid-template-columns:48px repeat(7,1fr);padding:0 7px 12px;}
-  .cal-week-cell{height:44px;font-size:16px;}
-  .cal-day-cell{height:44px;font-size:18px;}
-  .cal-day-cell.has-match::before{inset:6px 3px;border-radius:9px;border-width:1.5px;}
-  .cal-match-dot{right:2px;top:3px;min-width:15px;height:15px;font-size:9px;padding:0 4px;}
-  .cal-match-panel{margin:12px 12px 0;}
-}
+/* ─────────────────────────────────────────────
+   PROFESSIONAL APP SHELL / HOME / EXPLORE
+   Login keeps its existing gold styling; these rules target the app only.
+───────────────────────────────────────────── */
+:root{--surface:#0f1724;--surface2:#121b2a;--line:rgba(148,163,184,.16);--soft:rgba(59,130,246,.10);--soft2:rgba(59,130,246,.18);--orange:#fb923c;}
+.topbar{height:60px;padding:0 24px;background:rgba(8,12,19,.88);border-bottom:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.22);}
+.tlogo{font-size:12px;color:#dbeafe;letter-spacing:.16em;margin-right:34px;}
+.tnb{height:36px;padding:0 14px;border-radius:12px;color:rgba(226,232,240,.62);font-size:12px;letter-spacing:.02em;}
+.tnb:hover,.tnb.active{background:rgba(59,130,246,.12);color:#eaf3ff;border:1px solid rgba(59,130,246,.18);}
+.nav-av{background:linear-gradient(135deg,#2563eb,#38bdf8);box-shadow:0 0 0 2px rgba(56,189,248,.16);}
+.btn-out{border-color:rgba(148,163,184,.18);border-radius:10px;color:rgba(226,232,240,.55);}
+.prof-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(17,24,39,.95),rgba(15,23,42,.88));border:1px solid var(--line);border-radius:24px;padding:28px;margin-bottom:18px;box-shadow:0 24px 70px rgba(0,0,0,.28);}
+.prof-hero:before{content:'';position:absolute;inset:-40%;background:radial-gradient(circle at 20% 20%,rgba(56,189,248,.18),transparent 28%),radial-gradient(circle at 90% 45%,rgba(251,146,60,.16),transparent 22%);pointer-events:none;}
+.prof-hero>*{position:relative;z-index:1;}
+.prof-kicker{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#7dd3fc;margin-bottom:10px;}
+.prof-title{font-size:32px;font-weight:950;letter-spacing:-.04em;line-height:1.05;margin-bottom:8px;}
+.prof-sub{max-width:700px;color:rgba(226,232,240,.62);font-size:14px;line-height:1.6;}
+.prof-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+.action-primary,.action-secondary{border:none;border-radius:14px;padding:11px 16px;font-size:11px;font-weight:900;letter-spacing:.10em;text-transform:uppercase;cursor:pointer;transition:.16s ease;}
+.action-primary{background:linear-gradient(135deg,#38bdf8,#2563eb);color:white;box-shadow:0 12px 30px rgba(37,99,235,.28);}
+.action-primary:hover{transform:translateY(-1px);filter:brightness(1.06);}
+.action-secondary{background:rgba(148,163,184,.10);border:1px solid var(--line);color:#dbeafe;}
+.action-secondary:hover{background:rgba(59,130,246,.13);}
+.home-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:18px;align-items:start;}
+.home-card{background:linear-gradient(180deg,rgba(18,27,42,.98),rgba(11,18,30,.98));border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.18);}
+.home-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);}
+.home-card-title{font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;color:#bfdbfe;}
+.home-card-body{padding:16px 18px;}
+.home-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.metric{background:rgba(148,163,184,.06);border:1px solid var(--line);border-radius:16px;padding:14px;min-height:84px;}
+.metric-value{font-size:28px;font-weight:950;letter-spacing:-.04em;color:#38bdf8;line-height:1;}
+.metric-label{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,232,240,.46);margin-top:8px;line-height:1.4;}
+.smart-list{display:flex;flex-direction:column;gap:10px;}
+.smart-item{display:flex;align-items:center;gap:12px;background:rgba(148,163,184,.055);border:1px solid var(--line);border-radius:16px;padding:12px;cursor:pointer;transition:.16s ease;}
+.smart-item:hover{background:rgba(59,130,246,.11);border-color:rgba(59,130,246,.28);transform:translateY(-1px);}
+.smart-date{width:52px;min-width:52px;height:52px;border-radius:14px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.smart-day{font-size:19px;font-weight:950;color:#7dd3fc;line-height:1;}
+.smart-mon{font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:rgba(226,232,240,.5);margin-top:3px;}
+.smart-main{flex:1;min-width:0;}
+.smart-name{font-size:14px;font-weight:850;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.smart-meta{font-size:12px;color:rgba(226,232,240,.45);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;border:1px solid var(--line);background:rgba(148,163,184,.08);font-size:10px;font-weight:900;color:rgba(226,232,240,.72);white-space:nowrap;}
+.pill.green{color:#86efac;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.22);}.pill.blue{color:#93c5fd;background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.22);}.pill.orange{color:#fdba74;background:rgba(251,146,60,.12);border-color:rgba(251,146,60,.22);}
+.empty-pro{border:1px dashed rgba(148,163,184,.20);border-radius:16px;padding:22px;text-align:center;color:rgba(226,232,240,.46);font-size:13px;}
+.explore-shell{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start;}
+.explore-toolbar{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(170px,.65fr) minmax(150px,.55fr) auto;gap:10px;margin-bottom:14px;}
+.find-map-wrap{height:460px;border-radius:20px;border:1px solid var(--line);box-shadow:0 18px 55px rgba(0,0,0,.20);}
+.explore-calendar{background:linear-gradient(180deg,rgba(18,27,42,.98),rgba(11,18,30,.98));border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.18);}
+.cal-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border-bottom:1px solid var(--line);background:rgba(59,130,246,.045);}
+.cal-title{font-size:17px;font-weight:950;letter-spacing:-.02em;color:#f8fafc;}
+.cal-controls{display:flex;gap:6px;}
+.cal-icon-btn{width:34px;height:34px;border-radius:12px;border:1px solid var(--line);background:rgba(148,163,184,.08);color:#dbeafe;font-size:15px;font-weight:900;cursor:pointer;}
+.cal-icon-btn:hover{background:rgba(59,130,246,.13);}
+.cal-grid{display:grid;grid-template-columns:44px repeat(7,1fr);}
+.cal-head,.week-head{padding:9px 5px;text-align:center;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;color:rgba(226,232,240,.42);border-bottom:1px solid var(--line);background:rgba(148,163,184,.035);}
+.week-cell{min-height:68px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:rgba(226,232,240,.30);font-style:italic;background:rgba(148,163,184,.025);}
+.cal-cell{min-height:68px;padding:8px 6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);cursor:default;position:relative;background:rgba(2,6,23,.18);}
+.cal-cell:nth-child(8n){border-right:none;}
+.cal-cell.muted{background:rgba(2,6,23,.32);opacity:.42;}
+.cal-cell.has-match{cursor:pointer;background:linear-gradient(180deg,rgba(59,130,246,.10),rgba(15,23,42,.10));}
+.cal-cell.has-match:hover{background:rgba(59,130,246,.15);}
+.cal-date{width:28px;height:28px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#e2e8f0;}
+.cal-date.today{background:rgba(56,189,248,.16);color:#7dd3fc;border:1px solid rgba(56,189,248,.28);}
+.cal-dot-row{display:flex;gap:3px;margin-top:8px;flex-wrap:wrap;}
+.cal-dot{width:7px;height:7px;border-radius:50%;background:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.10);}
+.cal-match-label{margin-top:5px;font-size:9px;line-height:1.15;color:#93c5fd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.explore-list{margin-top:14px;}
+.bottom-nav{display:none;}
+@media(max-width:900px){.home-grid,.explore-shell{grid-template-columns:1fr}.home-metrics{grid-template-columns:repeat(2,1fr)}.explore-toolbar{grid-template-columns:1fr}.find-map-wrap{height:320px}.explore-calendar{margin-top:14px}.prof-title{font-size:26px}.topbar .tnav{display:none}.topbar{padding:0 14px}.tright .btn-out{display:none}.page,.page-sm,.page-md{padding-bottom:92px}.bottom-nav{position:fixed;left:0;right:0;bottom:0;height:72px;background:rgba(9,13,21,.96);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:350;box-shadow:0 -12px 40px rgba(0,0,0,.30)}.bottom-nav button{background:none;border:none;color:rgba(226,232,240,.46);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.bottom-nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.bottom-nav button.active,.bottom-nav button:hover{color:#60a5fa}.mob-drawer,.mob-menu-btn{display:none!important}.cal-grid{grid-template-columns:34px repeat(7,1fr)}.cal-head,.week-head{font-size:8px;padding:8px 2px}.week-cell,.cal-cell{min-height:54px}.cal-cell{padding:6px 3px}.cal-date{width:24px;height:24px;font-size:12px}.cal-match-label{display:none}.smart-item{align-items:flex-start}.pill{display:none}}
 
 </style>
 </head>
@@ -494,31 +498,16 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 <!-- APP -->
 <div id="app" style="display:none;">
 <div class="topbar">
-  <button class="mob-menu-btn" id="mob-btn" onclick="openMobMenu()">
-    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-  </button>
-  <div class="tlogo" onclick="sv('dashboard')">🎯 Insight</div>
+  <div class="tlogo" onclick="sv('dashboard')">INSIGHT DYNAMICS</div>
   <nav class="tnav">
     <button class="tnb" id="tnb-dash" onclick="sv('dashboard')">
       <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>Home
     </button>
-    <div class="ddw" id="dd-comp">
-      <button class="tnb" id="tnb-comp" onclick="toggleDD('dd-comp')">
-        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        Competitions <svg viewBox="0 0 24 24" style="width:9px;height:9px;margin-left:2px;"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="ddm" id="dd-comp-menu">
-        <button class="ddi" onclick="sv('my-comps');closeAllDD()">My Competitions</button>
-        <div class="dds"></div>
-        <button class="ddi" onclick="sv('my-comps');closeAllDD()">Results</button>
-        <button class="ddi" onclick="sv('my-comps');closeAllDD()">Standings</button>
-      </div>
-    </div>
     <button class="tnb" id="tnb-find" onclick="sv('find-matches')">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Matches
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Explore
     </button>
-    <button class="tnb" id="tnb-calendar" onclick="sv('calendar')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
+    <button class="tnb" id="tnb-comp" onclick="sv('my-comps')">
+      <svg viewBox="0 0 24 24"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>My Matches
     </button>
     <button class="tnb" id="tnb-create" onclick="sv('create-match')">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Match
@@ -540,121 +529,53 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   </div>
 </div>
 
-<!-- MOBILE DRAWER -->
-<div class="mob-drawer" id="mob-drawer">
-  <div class="mob-overlay" onclick="closeMobMenu()"></div>
-  <div class="mob-panel">
-    <div class="mob-panel-head">
-      <span class="mob-brand">🎯 Insight</span>
-      <button class="mob-close" onclick="closeMobMenu()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="mob-nav-items">
-      <button class="mob-nav-item" onclick="mobNav('dashboard')">
-        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>Home
-      </button>
-      <button class="mob-nav-item" onclick="mobNav('my-comps')">
-        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>My Competitions
-      </button>
-      <button class="mob-nav-item" onclick="mobNav('find-matches')">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Matches
-      </button>
-      <button class="mob-nav-item" onclick="mobNav('calendar')">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
-      </button>
-      <div class="mob-nav-sep"></div>
-      <button class="mob-nav-item" onclick="mobNav('create-match')">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Match
-      </button>
-      <div class="mob-nav-sep"></div>
-      <button class="mob-nav-item" onclick="signOut(auth);closeMobMenu()" style="color:var(--rd);">
-        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
-      </button>
-    </div>
-    <div class="mob-nav-user">
-      <div class="mob-nav-av" id="mob-av">–</div>
-      <div><div class="mob-nav-name" id="mob-name">–</div><div class="mob-nav-email" id="mob-email">–</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- MOBILE BOTTOM NAVIGATION -->
-<nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Primary mobile navigation">
-  <button class="mbn-item" id="mbn-dashboard" onclick="sv('dashboard')" aria-label="Home">
-    <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10.5z"/></svg>
-    <span>Home</span>
-  </button>
-  <button class="mbn-item" id="mbn-my-comps" onclick="sv('my-comps')" aria-label="My Matches">
-    <svg viewBox="0 0 24 24"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/></svg>
-    <span>Matches</span>
-  </button>
-  <button class="mbn-item" id="mbn-find-matches" onclick="sv('find-matches')" aria-label="Find Matches">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16" y2="16"/><path d="M11 7v4l3 2"/></svg>
-    <span>Find</span>
-  </button>
-  <button class="mbn-item" id="mbn-calendar" onclick="sv('calendar')" aria-label="Calendar">
-    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    <span>Calendar</span>
-  </button>
-  <button class="mbn-item" id="mbn-create-match" onclick="sv('create-match')" aria-label="Create Match">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-    <span>Create</span>
-  </button>
+<nav class="bottom-nav" id="bottom-nav">
+  <button id="bn-dash" onclick="sv('dashboard')"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg><span>Home</span></button>
+  <button id="bn-find" onclick="sv('find-matches')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Explore</span></button>
+  <button id="bn-matches" onclick="sv('my-comps')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Matches</span></button>
+  <button id="bn-create" onclick="sv('create-match')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Create</span></button>
+  <button id="bn-profile" onclick="toggleDD('dd-notif')"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></button>
 </nav>
 
 <!-- DASHBOARD -->
 <div id="view-dashboard" class="view active">
   <div class="page">
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;">
-      <div>
-        <!-- Notifications panel -->
-        <div class="dash-panel" id="dp-notif">
-          <div class="dp-head" onclick="toggleDP('dp-notif')">
-            <div class="dp-hl"><span style="font-size:15px;">🔔</span><span class="dp-title">Notifications</span></div>
-            <span class="dp-arr">▾</span>
-          </div>
-          <div class="dp-body" id="dpb-notif"><div class="ne">No notifications</div></div>
-        </div>
-        <!-- Registrations & Results -->
-        <div class="dash-panel" id="dp-rr">
-          <div class="dp-head" onclick="toggleDP('dp-rr')">
-            <div class="dp-hl"><span style="font-size:15px;">🏅</span><span class="dp-title">Registrations &amp; Results</span></div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <button class="bsm bgh" onclick="event.stopPropagation();sv('my-comps')" style="width:auto;">More Results</button>
-              <span class="dp-arr">▾</span>
-            </div>
-          </div>
-          <div class="dp-body" id="dpb-rr"><div class="empty"><div class="spin" style="margin:0 auto 10px;"></div><div class="et">Loading…</div></div></div>
-        </div>
+    <section class="prof-hero">
+      <div class="prof-kicker">Match operations dashboard</div>
+      <div class="prof-title" id="home-welcome">Welcome back</div>
+      <div class="prof-sub">A focused command center for your upcoming matches, registrations, live results, and organizer responsibilities.</div>
+      <div class="prof-actions">
+        <button class="action-primary" onclick="sv('find-matches')">Explore Matches</button>
+        <button class="action-secondary" onclick="sv('my-comps')">My Matches</button>
+        <button class="action-secondary" onclick="sv('create-match')">Create Match</button>
       </div>
-      <div>
-        <!-- Rankings placeholder -->
-        <div class="dash-panel" id="dp-rank">
-          <div class="dp-head" onclick="toggleDP('dp-rank')">
-            <div class="dp-hl"><span style="font-size:15px;">📊</span><span class="dp-title">Rankings</span></div>
-            <span class="dp-arr" id="arr-dp-rank">▾</span>
-          </div>
-          <div class="dp-body" id="dpb-rank" style="display:none;"><div class="ne">Rankings coming soon</div></div>
-        </div>
-        <!-- Competitions in region -->
-        <div class="dash-panel" id="dp-region">
-          <div class="dp-head" onclick="toggleDP('dp-region')">
-            <div class="dp-hl"><span style="font-size:15px;">📍</span><span class="dp-title">Competitions in Norway</span></div>
-            <span class="dp-arr" id="arr-dp-region">▾</span>
-          </div>
-          <div class="dp-body" id="dpb-region" style="display:none;"><div id="region-list"><div class="ne">Loading…</div></div></div>
-        </div>
-        <!-- Shooter features -->
-        <div class="dash-panel" id="dp-feat">
-          <div class="dp-head" onclick="toggleDP('dp-feat')">
-            <div class="dp-hl"><span style="font-size:15px;">⚡</span><span class="dp-title">Shooter features</span></div>
-            <span class="dp-arr" id="arr-dp-feat">▾</span>
-          </div>
-          <div class="dp-body" id="dpb-feat" style="display:none;">
-            <div style="font-size:12px;color:var(--mt);line-height:1.7;">Register for matches · Choose squads · View live results · Compare with other shooters · Track your performance over time</div>
-          </div>
-        </div>
+    </section>
+
+    <section class="home-metrics">
+      <div class="metric"><div class="metric-value" id="hm-upcoming">0</div><div class="metric-label">Upcoming Matches</div></div>
+      <div class="metric"><div class="metric-value" id="hm-results">0</div><div class="metric-label">Matches with Scores</div></div>
+      <div class="metric"><div class="metric-value" id="hm-invites">0</div><div class="metric-label">Pending Invites</div></div>
+      <div class="metric"><div class="metric-value" id="hm-organizer">0</div><div class="metric-label">Organizer Roles</div></div>
+    </section>
+
+    <section class="home-grid">
+      <div class="home-card">
+        <div class="home-card-head"><div class="home-card-title">Upcoming Match Schedule</div><button class="bsm bgh" onclick="sv('find-matches')">Explore</button></div>
+        <div class="home-card-body"><div class="smart-list" id="home-upcoming"><div class="empty-pro">No upcoming matches yet.</div></div></div>
       </div>
-    </div>
+      <div class="home-card">
+        <div class="home-card-head"><div class="home-card-title">Needs Attention</div><span class="pill orange" id="home-attn-pill">0 items</span></div>
+        <div class="home-card-body"><div class="smart-list" id="home-actions"><div class="empty-pro">Nothing needs your attention right now.</div></div></div>
+      </div>
+      <div class="home-card">
+        <div class="home-card-head"><div class="home-card-title">Recent Results</div><button class="bsm bgh" onclick="sv('my-comps')">View All</button></div>
+        <div class="home-card-body"><div class="smart-list" id="home-results"><div class="empty-pro">No results available yet.</div></div></div>
+      </div>
+      <div class="home-card">
+        <div class="home-card-head"><div class="home-card-title">Organizer Workspace</div><span class="pill blue">Staff tools</span></div>
+        <div class="home-card-body"><div class="smart-list" id="home-org"><div class="empty-pro">No organizer tasks assigned.</div></div></div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -662,42 +583,71 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 <div id="view-my-comps" class="view">
   <div class="page">
     <div class="yr-nav" id="yr-nav"></div>
-    <div class="sec-title" id="yr-title">My Competitions</div>
+    <div class="sec-title" id="yr-title">My Matches</div>
     <div id="ml-cont"><div class="empty"><div class="spin" style="margin:0 auto 12px;"></div><div class="et">Loading…</div></div></div>
     <div id="ml-cards" class="mlt-cards"></div>
   </div>
 </div>
 
-<!-- FIND MATCHES -->
+<!-- EXPLORE MATCHES -->
 <div id="view-find-matches" class="view">
   <div class="page">
-    <div class="sec-title">Find Matches</div>
-    <p style="font-size:13px;color:var(--mt);margin-bottom:14px;">Click a marker on the map to view match details. Search by ID below.</p>
-    <div class="find-map-wrap" id="find-map"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-bottom:12px;">
-      <input id="find-q" class="fi" type="text" placeholder="Search by name or location…"/>
-      <input id="find-id" class="fi" type="text" placeholder="Search by Match ID…"/>
-      <button class="bsm bgold" onclick="doFindSearch()" style="width:auto;padding:10px 18px;">Search</button>
-    </div>
-    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-      <select id="find-region" class="fi" style="max-width:200px;">
+    <section class="prof-hero" style="padding:24px;margin-bottom:16px;">
+      <div class="prof-kicker">Explore matches</div>
+      <div class="prof-title" style="font-size:28px;">Search, map, and calendar in one place</div>
+      <div class="prof-sub">Find upcoming matches by name, location, date, region, level, or Match ID. Dates with matches are highlighted in the calendar.</div>
+    </section>
+
+    <div class="explore-toolbar">
+      <input id="find-q" class="fi" type="text" placeholder="Search by match name or venue…" oninput="filterExploreMatches()"/>
+      <select id="find-region" class="fi" onchange="filterExploreMatches()">
         <option value="">All Regions</option>
         <option value="Norway">Norway</option>
         <option value="Sweden">Sweden</option>
         <option value="Denmark">Denmark</option>
         <option value="Finland">Finland</option>
+        <option value="Other">Other</option>
       </select>
-      <select id="find-type" class="fi" style="max-width:180px;">
-        <option value="">All Types</option>
+      <select id="find-type" class="fi" onchange="filterExploreMatches()">
+        <option value="">All Levels</option>
         <option value="Level I">Level I</option>
         <option value="Level II">Level II</option>
         <option value="Level III">Level III</option>
         <option value="Training">Training</option>
       </select>
+      <button class="action-primary" onclick="doFindSearch()">Find ID</button>
     </div>
-    <div id="find-all-list" style="margin-bottom:16px;"></div>
-    <div id="find-msg" class="msg"></div>
-    <div id="find-results"></div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:16px;">
+      <input id="find-id" class="fi" type="text" placeholder="Search by Match ID…"/>
+      <button class="action-secondary" onclick="loadAllPublicMatches()">Refresh</button>
+    </div>
+
+    <section class="explore-shell">
+      <div>
+        <div class="find-map-wrap" id="find-map"></div>
+        <div class="explore-list" id="find-all-list"><div class="empty-pro">Loading matches…</div></div>
+        <div id="find-msg" class="msg"></div>
+        <div id="find-results"></div>
+      </div>
+      <aside class="explore-calendar">
+        <div class="cal-header">
+          <div>
+            <div class="cal-title" id="cal-title">Calendar</div>
+            <div style="font-size:11px;color:var(--mt);margin-top:3px;">Click a highlighted day to open matches.</div>
+          </div>
+          <div class="cal-controls">
+            <button class="cal-icon-btn" onclick="calNav(-1)" title="Previous month">‹</button>
+            <button class="cal-icon-btn" onclick="calToday()" title="Today">•</button>
+            <button class="cal-icon-btn" onclick="calNav(1)" title="Next month">›</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="cal-grid">
+          <div class="week-head">Wk</div>
+          <div class="cal-head">Mon</div><div class="cal-head">Tue</div><div class="cal-head">Wed</div><div class="cal-head">Thu</div><div class="cal-head">Fri</div><div class="cal-head">Sat</div><div class="cal-head">Sun</div>
+          <div id="cal-days" style="display:contents;"></div>
+        </div>
+      </aside>
+    </section>
   </div>
 </div>
 
@@ -705,8 +655,8 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 <div id="view-create-match" class="view">
   <div class="page-sm">
     <div class="back" onclick="sv('dashboard')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</div>
-    <div class="sec-title">Create IPSC Handgun Event</div>
-    <p style="font-size:13px;color:var(--mt);margin-bottom:20px;">You are about to create a new match or training event.</p>
+    <div class="sec-title">Create IPSC Match</div>
+    <p style="font-size:13px;color:var(--mt);margin-bottom:20px;">Set up the public match page, registration, divisions, venue, and organizer controls.</p>
 
     <div class="fsec">
       <div class="fsec-title">Basic Information</div>
@@ -801,46 +751,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   </div>
 </div>
 
-<!-- CALENDAR VIEW -->
-<div id="view-calendar" class="view">
-  <div class="page cal-page">
-    <section class="month-calendar" aria-label="Match calendar">
-      <div class="month-calendar-head">
-        <button class="cal-arrow" onclick="calNav(-1)" aria-label="Previous month">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="cal-month-title" id="cal-title">May 2026</div>
-        <button class="cal-arrow" onclick="calNav(1)" aria-label="Next month">
-          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
-
-      <div class="cal-weekdays">
-        <div class="cal-week-label">Week</div>
-        <div>Mon</div>
-        <div>Tue</div>
-        <div>Wed</div>
-        <div>Thu</div>
-        <div>Fri</div>
-        <div>Sat</div>
-        <div class="cal-sunday">Sun</div>
-      </div>
-
-      <div id="cal-days" class="cal-days"></div>
-    </section>
-
-    <section class="cal-match-panel">
-      <div class="cal-panel-head">
-        <div>
-          <div class="cal-panel-title">Upcoming Matches</div>
-          <div class="cal-panel-sub">Tap a marked date in the calendar or select a match below.</div>
-        </div>
-        <button class="bsm bgh" onclick="calToday()" style="width:auto;">Today</button>
-      </div>
-      <div id="cal-upcoming"></div>
-    </section>
-  </div>
-</div>
+<!-- CALENDAR VIEW merged into Explore -->
 
 <!-- ORGANIZER VIEW -->
 <div id="view-organizer" class="view">
@@ -1011,7 +922,7 @@ function initApp(){
   const ini=((fn[0]||'')+(ln[0]||'')).toUpperCase()||(UP.email||'?')[0].toUpperCase();
   if(UP.photoURL)$('top-av').innerHTML=`<img src="${UP.photoURL}" alt="av"/>`;else $('top-av').textContent=ini;
   $('c-date').value=new Date().toISOString().split('T')[0];
-  buildDivCbs();startML();startIL();loadRegionMatches();setActiveNav('dashboard');if(typeof updateMobUser==='function')setTimeout(updateMobUser,50);
+  buildDivCbs();startML();startIL();loadRegionMatches();renderHome();setActiveNav('dashboard');
 }
 
 // ── DROPDOWNS ──
@@ -1031,34 +942,26 @@ function toggleDP(id){
 }
 
 // ── VIEW SWITCHER ──
-function setActiveNav(name){
-  document.querySelectorAll('.tnb,.mbn-item,.mob-nav-item').forEach(b=>b.classList.remove('active'));
-  const top={'dashboard':'tnb-dash','my-comps':'tnb-comp','find-matches':'tnb-find','calendar':'tnb-calendar','create-match':'tnb-create'};
-  const bottom={'dashboard':'mbn-dashboard','my-comps':'mbn-my-comps','find-matches':'mbn-find-matches','calendar':'mbn-calendar','create-match':'mbn-create-match'};
-  if(top[name])$(top[name])?.classList.add('active');
-  if(bottom[name])$(bottom[name])?.classList.add('active');
-}
-
 function sv(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   const el=$('view-'+name);if(el)el.classList.add('active');
   window.scrollTo(0,0);
-  setActiveNav(name);
-  // init maps and data on demand
+  // nav active
+  document.querySelectorAll('.tnb').forEach(b=>b.classList.remove('active'));
+  const nb={'dashboard':'tnb-dash','my-comps':'tnb-comp','find-matches':'tnb-find','create-match':'tnb-create'};
+  if(nb[name])$(nb[name])?.classList.add('active');
+  // init maps on demand
   if(name==='find-matches')setTimeout(initFindMap,100);
   if(name==='create-match')setTimeout(initCreateMap,100);
-  if(name==='calendar'){
-    if(!calMatches.length)loadCalMatches();
-    else renderCal();
-  }
 }
+
 // ── LISTENERS ──
 function startML(){
   munsub&&munsub();
   munsub=onSnapshot(query(collection(db,'matches'),where('participants','array-contains',CU.uid)),sn=>{
     matches=[];sn.forEach(d=>matches.push({id:d.id,...d.data()}));
     matches.sort((a,b)=>{const da=a.date?new Date(a.date):(a.createdAt?.toDate?.()??new Date(0));const db2=b.date?new Date(b.date):(b.createdAt?.toDate?.()??new Date(0));return db2-da;});
-    buildYrNav();renderML();renderDashRR();
+    buildYrNav();renderML();renderDashRR();renderHome();
     if(AM){const u=matches.find(m=>m.id===AM.id);if(u){AM=u;userRole=getRole(u);}}
   });
 }
@@ -1066,7 +969,7 @@ function startIL(){
   iunsub&&iunsub();
   iunsub=onSnapshot(query(collection(db,'users',CU.uid,'invitations'),where('status','==','pending')),sn=>{
     invitations=[];sn.forEach(d=>invitations.push({id:d.id,...d.data()}));
-    renderNotif();renderDashNotif();
+    renderNotif();renderDashNotif();renderHome();
   });
 }
 
@@ -1115,7 +1018,7 @@ function renderDashNotif(){
 
 function renderDashRR(){
   const el=$('dpb-rr');
-  if(!matches.length){el.innerHTML='<div class="ne">No registrations yet. <button class="bsm bgold" onclick="sv(\'find-matches\')" style="width:auto;margin-left:8px;">Find Matches</button></div>';return;}
+  if(!matches.length){el.innerHTML='<div class="ne">No registrations yet. <button class="bsm bgold" onclick="sv(\'find-matches\')" style="width:auto;margin-left:8px;">Explore</button></div>';return;}
   const recent=matches.slice(0,8);
   el.innerHTML=recent.map(m=>{
     const myShooter=(m.shooters||[]).find(s=>s.uid===CU.uid||s.id===CU.uid||(s.isMe));
@@ -1170,7 +1073,7 @@ function buildYrNav(){
   const yrs=[...new Set(matches.map(m=>{const d=m.date?new Date(m.date):(m.createdAt?.toDate?.()??null);return d?d.getFullYear():null;}).filter(Boolean))].sort((a,b)=>b-a);
   if(!yrs.includes(currentYear)&&yrs.length>0)currentYear=yrs[0];
   $('yr-nav').innerHTML=yrs.map(y=>`<button class="yr-btn ${y===currentYear?'active':''}" onclick="setYear(${y})">${y}</button>`).join('');
-  $('yr-title').textContent=currentYear+' Competitions';
+  $('yr-title').textContent=currentYear+' Matches';
 }
 function setYear(y){currentYear=y;buildYrNav();renderML();}
 
@@ -1178,7 +1081,7 @@ function setYear(y){currentYear=y;buildYrNav();renderML();}
 function renderML(){
   const el=$('ml-cont');
   const yr=matches.filter(m=>{const d=m.date?new Date(m.date):(m.createdAt?.toDate?.()??null);return d?d.getFullYear()===currentYear:true;});
-  if(!yr.length){el.innerHTML=`<div class="empty"><div class="ei">🏆</div><div class="et">No competitions in ${currentYear}</div><div class="es"><button class="bsm bgold" onclick="sv('find-matches')" style="margin-top:10px;width:auto;">Find Matches</button> <button class="bsm bgh" onclick="sv('create-match')" style="margin-top:10px;width:auto;">Create Match</button></div></div>`;return;}
+  if(!yr.length){el.innerHTML=`<div class="empty"><div class="ei">🏆</div><div class="et">No matches in ${currentYear}</div><div class="es"><button class="bsm bgold" onclick="sv('find-matches')" style="margin-top:10px;width:auto;">Explore</button> <button class="bsm bgh" onclick="sv('create-match')" style="margin-top:10px;width:auto;">Create Match</button></div></div>`;return;}
   const stcol={'draft':'b-muted','active':'b-green','active_noedit':'b-green','preliminary':'b-gold','completed':'b-blue','cancelled':'b-red'};
   el.innerHTML=`<table class="mlt"><thead><tr>
     <th>Starts</th><th>Event</th><th>Status</th><th>Type</th><th>Role</th><th>Competitors</th>
@@ -2121,20 +2024,26 @@ async function initFindMap(){
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(fMapInst);
   loadFindMarkers();
 }
-async function loadFindMarkers(){
+async function loadFindMarkers(ms){
   if(!fMapInst)return;
   fMarkers.forEach(m=>fMapInst.removeLayer(m));fMarkers=[];
   try{
-    const q=query(collection(db,'matches'),where('searchable','==',true));
-    const sn=await getDocs(q);
-    sn.forEach(d=>{
-      const m={id:d.id,...d.data()};if(!m.lat||!m.lng)return;
+    let source=Array.isArray(ms)?ms:(allPublicMatches&&allPublicMatches.length?allPublicMatches:[]);
+    if(!source.length){
+      const q=query(collection(db,'matches'),where('searchable','==',true));
+      const sn=await getDocs(q);source=[];sn.forEach(d=>source.push({id:d.id,...d.data()}));
+    }
+    const bounds=[];
+    source.forEach(m=>{
+      if(!m.lat||!m.lng)return;
       const icon=L.divIcon({className:'',html:'<div class="m-pin"></div>',iconSize:[12,12],iconAnchor:[6,6]});
       const marker=L.marker([m.lat,m.lng],{icon}).addTo(fMapInst);
       const sh=(m.shooters||[]).length,max=m.maxCompetitors||0;
-      marker.bindPopup(`<div style="min-width:180px;font-family:sans-serif;"><b style="font-size:13px;">${esc(m.name||'')}</b><br><span style="font-size:11px;color:#888;">${m.date?fmtD(m.date):''} · ${esc(m.location||'')}</span><br><span style="font-size:11px;color:#888;">${sh}${max?'/'+max:''} competitors · ID: ${m.id}</span><br><button onclick="openPubMatch('${m.id}')" style="margin-top:7px;background:#e0b649;border:none;border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;width:100%;">View Match</button></div>`);
-      fMarkers.push(marker);
+      marker.bindPopup(`<div style="min-width:190px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><b style="font-size:13px;color:#0f172a;">${esc(m.name||'')}</b><br><span style="font-size:11px;color:#64748b;">${m.date?fmtD(m.date):''} · ${esc(m.location||'')}</span><br><span style="font-size:11px;color:#64748b;">${sh}${max?'/'+max:''} competitors · ID: ${m.id}</span><br><button onclick="openPubMatch('${m.id}')" style="margin-top:8px;background:#2563eb;color:white;border:none;border-radius:8px;padding:7px 12px;font-size:11px;font-weight:800;cursor:pointer;width:100%;">View Match</button></div>`);
+      fMarkers.push(marker);bounds.push([m.lat,m.lng]);
     });
+    if(bounds.length>1)fMapInst.fitBounds(bounds,{padding:[30,30]});
+    else if(bounds.length===1)fMapInst.setView(bounds[0],9);
   }catch(e){console.error(e);}
 }
 
@@ -2171,7 +2080,7 @@ const _origInitApp=initApp;
 // We'll call updateMobUser inside init
 const _origInit=initApp;
 
-// ── MOBILE CARD LIST for My Competitions ──
+// ── MOBILE CARD LIST for My Matches ──
 function renderMLCards(){
   const el=document.getElementById('ml-cards');if(!el)return;
   const yr=matches.filter(m=>{const d=m.date?new Date(m.date):(m.createdAt?.toDate?.()??null);return d?d.getFullYear()===currentYear:true;});
@@ -2229,125 +2138,111 @@ async function loadCalMatches(){
   }catch(e){console.error(e);}
 }
 
-function isoWeekNumber(dt){
-  const d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));
-  const day=d.getUTCDay()||7;
-  d.setUTCDate(d.getUTCDate()+4-day);
-  const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
-  return Math.ceil((((d-yearStart)/86400000)+1)/7);
-}
-
-function matchesForDate(y,m,d){
-  return calMatches.filter(match=>{
-    if(!match.date)return false;
-    const dt=new Date(match.date);
-    return dt.getFullYear()===y&&dt.getMonth()===m&&dt.getDate()===d;
-  });
-}
-
 function renderCal(){
   const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const title=document.getElementById('cal-title');
   if(title)title.textContent=monthNames[calMonth]+' '+calYear;
-
   const el=document.getElementById('cal-days');if(!el)return;
-  const firstDay=new Date(calYear,calMonth,1);
+
+  const first=new Date(calYear,calMonth,1);
+  let startDow=first.getDay()-1;if(startDow<0)startDow=6;
   const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
-  let startDow=firstDay.getDay()-1;if(startDow<0)startDow=6; // Monday = 0
+  const prevDays=new Date(calYear,calMonth,0).getDate();
   const today=new Date();
-
-  const totalCells=startDow+daysInMonth;
-  const weekRows=Math.ceil(totalCells/7);
-  let html='';
-
-  for(let row=0;row<weekRows;row++){
-    const mondayDate=new Date(calYear,calMonth,1-startDow+(row*7));
-    const week=isoWeekNumber(mondayDate);
-    const shade=row%2===0?' cal-row-shade':'';
-    html+=`<div class="cal-week-cell${shade}">${week}</div>`;
-
+  const matchDates={};
+  calMatches.forEach(m=>{
+    if(!m.date)return;
+    const d=new Date(m.date);
+    if(d.getFullYear()===calYear&&d.getMonth()===calMonth){
+      const key=d.getDate();
+      (matchDates[key]||(matchDates[key]=[])).push(m);
+    }
+  });
+  const total=42;
+  let cells='';
+  for(let row=0;row<6;row++){
+    const mondayOffset=row*7-startDow+1;
+    const mondayDate=new Date(calYear,calMonth,mondayOffset);
+    cells+=`<div class="week-cell">${isoWeek(mondayDate)}</div>`;
     for(let col=0;col<7;col++){
-      const dayNumber=row*7+col-startDow+1;
-      const isInMonth=dayNumber>=1&&dayNumber<=daysInMonth;
-      const isSunday=col===6;
-      if(!isInMonth){
-        html+=`<div class="cal-day-cell is-empty${shade}"></div>`;
-        continue;
-      }
-
-      const dayMatches=matchesForDate(calYear,calMonth,dayNumber);
-      const isToday=dayNumber===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
-      const classes=[
-        'cal-day-cell',
-        shade.trim(),
-        isSunday?'is-sunday':'',
-        isToday?'is-today':'',
-        dayMatches.length?'has-match':''
-      ].filter(Boolean).join(' ');
-      const click=dayMatches.length?` onclick="showCalDay(${dayNumber})"`:'';
-      const titleAttr=dayMatches.length?` title="${esc(dayMatches.map(m=>m.name||'Match').join(', '))}"`:'';
-      html+=`<div class="${classes}"${click}${titleAttr}>
-        <span class="cal-day-number">${dayNumber}</span>
-        ${dayMatches.length?`<span class="cal-match-dot">${dayMatches.length}</span>`:''}
+      const n=row*7+col-startDow+1;
+      const inMonth=n>=1&&n<=daysInMonth;
+      const display=inMonth?n:(n<1?prevDays+n:n-daysInMonth);
+      const dayMatches=inMonth?(matchDates[n]||[]):[];
+      const isToday=inMonth&&n===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
+      const cls=['cal-cell'];
+      if(!inMonth)cls.push('muted');
+      if(dayMatches.length)cls.push('has-match');
+      cells+=`<div class="${cls.join(' ')}" ${dayMatches.length?`onclick="showCalDay(${n})"`:''}>
+        <div class="cal-date ${isToday?'today':''}">${display}</div>
+        ${dayMatches.length?`<div class="cal-dot-row">${dayMatches.slice(0,3).map(()=>'<span class="cal-dot"></span>').join('')}</div>`:''}
+        ${dayMatches.slice(0,1).map(m=>`<div class="cal-match-label">${esc(m.name||'Match')}</div>`).join('')}
       </div>`;
     }
   }
-
-  el.innerHTML=html;
+  el.innerHTML=cells;
   renderCalUpcoming();
-  setActiveNav('calendar');
+}
+function isoWeek(d){
+  const date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const dayNum=date.getUTCDay()||7;
+  date.setUTCDate(date.getUTCDate()+4-dayNum);
+  const yearStart=new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date-yearStart)/86400000)+1)/7);
 }
 
 window.showCalDay=function(d){
-  const dayMatches=matchesForDate(calYear,calMonth,d);
+  const matchDates={};
+  calMatches.forEach(m=>{
+    if(!m.date)return;
+    const dt=new Date(m.date);
+    if(dt.getFullYear()===calYear&&dt.getMonth()===calMonth){
+      const key=dt.getDate();
+      if(!matchDates[key])matchDates[key]=[];
+      matchDates[key].push(m);
+    }
+  });
+  const dayMatches=matchDates[d]||[];
   if(dayMatches.length===1){openPubMatch(dayMatches[0].id);return;}
-  renderCalMatchList(dayMatches,`Matches on ${new Date(calYear,calMonth,d).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`);
+  // Show a quick list
+  const names=dayMatches.map(m=>m.name||'Match').join(', ');
+  alert(`Matches on this day: ${names}`);
 };
-
-function renderCalMatchList(list,title){
-  const el=document.getElementById('cal-upcoming');if(!el)return;
-  if(!list.length){el.innerHTML='<div class="empty"><div class="et">No matches on this date</div></div>';return;}
-  el.innerHTML=`<div class="cal-date-list-title">${esc(title||'Matches')}</div>`+list.map(m=>calMatchItem(m)).join('');
-}
-
-function calMatchItem(m){
-  const dateObj=new Date(m.date);
-  const day=isNaN(dateObj)?'–':dateObj.getDate();
-  const mon=isNaN(dateObj)?'':dateObj.toLocaleDateString('en-US',{month:'short'});
-  const meta=[
-    m.location||'Location not set',
-    m.level||m.type||'',
-    (m.shooters||[]).length?`${(m.shooters||[]).length} competitors`:''
-  ].filter(Boolean).join(' · ');
-  return `<div class="cal-match-item" onclick="openPubMatch('${m.id}')">
-    <div class="cal-date-badge"><div class="cal-date-day">${day}</div><div class="cal-date-month">${esc(mon)}</div></div>
-    <div class="cal-match-main">
-      <div class="cal-match-name">${esc(m.name||'Untitled Match')}</div>
-      <div class="cal-match-meta">${esc(meta)}</div>
-    </div>
-    <span class="badge b-blue">${esc(m.status||'active')}</span>
-  </div>`;
-}
 
 function renderCalUpcoming(){
   const el=document.getElementById('cal-upcoming');if(!el)return;
-  const firstOfMonth=new Date(calYear,calMonth,1);
-  const lastOfMonth=new Date(calYear,calMonth+1,0,23,59,59);
-  const inMonth=calMatches
-    .filter(m=>m.date&&new Date(m.date)>=firstOfMonth&&new Date(m.date)<=lastOfMonth)
-    .sort((a,b)=>new Date(a.date)-new Date(b.date));
-  if(inMonth.length){renderCalMatchList(inMonth,`Matches in ${document.getElementById('cal-title')?.textContent||'this month'}`);return;}
-
   const now=new Date();
   const upcoming=calMatches
     .filter(m=>m.date&&new Date(m.date)>=now)
     .sort((a,b)=>new Date(a.date)-new Date(b.date))
     .slice(0,8);
   if(!upcoming.length){el.innerHTML='<div class="empty"><div class="et">No upcoming matches</div></div>';return;}
-  renderCalMatchList(upcoming,'Upcoming Matches');
+  el.innerHTML=upcoming.map(m=>`<div onclick="openPubMatch('${m.id}')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--br);border-left:3px solid var(--ac);border-radius:9px;margin-bottom:7px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(59,130,246,0.05)'" onmouseout="this.style.background='var(--card)'">
+    <div style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:7px;padding:6px 10px;text-align:center;flex-shrink:0;min-width:48px;">
+      <div style="font-size:16px;font-weight:900;color:var(--ac);">${new Date(m.date).getDate()}</div>
+      <div style="font-size:9px;font-weight:700;color:var(--mt);text-transform:uppercase;">${new Date(m.date).toLocaleDateString('en-GB',{month:'short'})}</div>
+    </div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(m.name||'')}</div>
+      <div style="font-size:11px;color:var(--mt);">${esc(m.location||'')} ${m.level?'· '+esc(m.level):''}</div>
+    </div>
+    <div>
+      <span class="badge b-blue">${(m.shooters||[]).length} competitors</span>
+    </div>
+  </div>`).join('');
 }
 
 // Init calendar when switching to it
+const _origSv=sv;
+window.sv=function(name){
+  if(name==='calendar')name='find-matches';
+  _origSv(name);
+  if(name==='find-matches'){
+    setTimeout(initFindMap,100);
+    loadAllPublicMatches();
+  }
+  setActiveNav(name);
+};
 window.calNav=window.calNav;
 window.calToday=window.calToday;
 window.showCalDay=window.showCalDay;
@@ -2356,37 +2251,34 @@ window.showCalDay=window.showCalDay;
 let allPublicMatches=[];
 async function loadAllPublicMatches(){
   const listEl=document.getElementById('find-all-list');
-  if(listEl)listEl.innerHTML='<div style="font-size:12px;color:var(--mt);">Loading matches…</div>';
+  if(listEl)listEl.innerHTML='<div class="empty-pro">Loading matches…</div>';
   try{
     const sn=await getDocs(query(collection(db,'matches'),where('searchable','==',true)));
     allPublicMatches=[];sn.forEach(d=>allPublicMatches.push({id:d.id,...d.data()}));
+    matches.forEach(m=>{if(!allPublicMatches.find(x=>x.id===m.id))allPublicMatches.push(m);});
     allPublicMatches.sort((a,b)=>(a.date||'')>(b.date||'')?1:-1);
-    renderPublicMatchList(allPublicMatches);
-    // Refresh map markers
-    if(fMapInst)loadFindMarkers();
-  }catch(e){if(listEl)listEl.innerHTML='';}
+    calMatches=[...allPublicMatches];
+    filterExploreMatches();
+    renderCal();
+  }catch(e){if(listEl)listEl.innerHTML='<div class="empty-pro">Unable to load public matches.</div>';}
 }
 
 function renderPublicMatchList(ms){
   const el=document.getElementById('find-all-list');if(!el)return;
-  if(!ms.length){el.innerHTML='<div class="empty"><div class="et">No public matches found</div></div>';return;}
-  const hdr='<div style="font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);margin-bottom:10px;">All Public Matches ('+ms.length+')</div>';
-  el.innerHTML=hdr+ms.map(function(m){
+  if(!ms.length){el.innerHTML='<div class="empty-pro">No public matches match your filters.</div>';loadFindMarkers([]);return;}
+  const hdr='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="home-card-title">Match List</div><span class="pill blue">'+ms.length+' matches</span></div>';
+  el.innerHTML=hdr+'<div class="smart-list">'+ms.map(function(m){
     var sh=(m.shooters||[]).length,mx=m.maxCompetitors||0,alr=(m.participants||[]).includes(CU&&CU.uid||'');
-    var ds=m.date?fmtD(m.date):'';
-    var regBtn=alr
-      ?'<span class="badge b-green">✓ Registered</span>'
-      :'<button class="bsm bgold" onclick="event.stopPropagation();quickJoin(this)" data-mid="'+m.id+'" style="width:auto;">Register</button>';
-    var divTxt=(m.divisions||[]).length?'<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:3px;">'+(m.divisions||[]).join(' · ')+'</div>':'';
-    return '<div style="background:var(--card);border:1px solid var(--br);border-left:3px solid var(--ac);border-radius:10px;padding:13px 15px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openPubMatch(\''+m.id+'\')">'
-      +'<div style="flex:1;min-width:0;">'
-      +'<div style="font-size:13px;font-weight:700;margin-bottom:3px;">'+esc(m.name||'')+'</div>'
-      +'<div style="font-size:11px;color:var(--mt);">'+ds+(m.location?' · '+esc(m.location):'')+(m.region?' · '+esc(m.region):'')+(m.level?' · '+esc(m.level):'')+(sh?' · '+sh+(mx?'/'+mx:'')+' competitors':'')+'</div>'
-      +divTxt
-      +'</div>'
-      +'<div style="flex-shrink:0;">'+regBtn+'</div>'
-      +'</div>';
-  }).join('');
+    var d=m.date?new Date(m.date):null;
+    var day=d&&!isNaN(d)?d.getDate():'–';
+    var mon=d&&!isNaN(d)?d.toLocaleDateString('en-US',{month:'short'}):'';
+    var regBtn=alr?'<span class="pill green">Registered</span>':'<button class="bsm bgold" onclick="event.stopPropagation();quickJoin(this)" data-mid="'+m.id+'" style="width:auto;">Register</button>';
+    return '<div class="smart-item" onclick="openPubMatch(\''+m.id+'\')">'
+      +'<div class="smart-date"><div class="smart-day">'+day+'</div><div class="smart-mon">'+mon+'</div></div>'
+      +'<div class="smart-main"><div class="smart-name">'+esc(m.name||'Unnamed Match')+'</div><div class="smart-meta">'+(m.location?esc(m.location)+' · ':'')+(m.region?esc(m.region)+' · ':'')+esc(m.level||m.type||'IPSC')+'</div></div>'
+      +'<span class="pill blue">'+sh+(mx?'/'+mx:'')+'</span>'+regBtn+'</div>';
+  }).join('')+'</div>';
+  loadFindMarkers(ms);
 }
 
 // ── ENHANCED FIND SEARCH with location/name ──
@@ -2431,6 +2323,62 @@ window.initApp=function(){
   __origInit();
   setTimeout(updateMobUser,100);
 };
+
+
+function filterExploreMatches(){
+  const q=(document.getElementById('find-q')?.value||'').trim().toLowerCase();
+  const region=document.getElementById('find-region')?.value||'';
+  const type=document.getElementById('find-type')?.value||'';
+  let filtered=[...(allPublicMatches||[])];
+  if(q)filtered=filtered.filter(m=>(m.name||'').toLowerCase().includes(q)||(m.location||'').toLowerCase().includes(q)||(m.club||'').toLowerCase().includes(q)||(m.description||'').toLowerCase().includes(q));
+  if(region)filtered=filtered.filter(m=>(m.region||'')===region);
+  if(type)filtered=filtered.filter(m=>(m.level||m.type||'')===type);
+  renderPublicMatchList(filtered);
+}
+window.filterExploreMatches=filterExploreMatches;
+window.loadAllPublicMatches=loadAllPublicMatches;
+
+function setActiveNav(name){
+  const top={'dashboard':'tnb-dash','find-matches':'tnb-find','my-comps':'tnb-comp','create-match':'tnb-create'};
+  document.querySelectorAll('.tnb').forEach(b=>b.classList.remove('active'));
+  if(top[name])document.getElementById(top[name])?.classList.add('active');
+  const bottom={'dashboard':'bn-dash','find-matches':'bn-find','my-comps':'bn-matches','create-match':'bn-create'};
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));
+  if(bottom[name])document.getElementById(bottom[name])?.classList.add('active');
+}
+
+function renderHome(){
+  const name=((UP?.firstName||'')+' '+(UP?.lastName||'')).trim()||UP?.email?.split('@')[0]||'Shooter';
+  const w=document.getElementById('home-welcome');if(w)w.textContent='Welcome back, '+name;
+  const now=new Date();
+  const upcoming=(matches||[]).filter(m=>m.date&&new Date(m.date)>=new Date(now.getFullYear(),now.getMonth(),now.getDate())).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const withScores=(matches||[]).filter(m=>(m.stages||[]).some(st=>(st.results||[]).length)).length;
+  const org=(matches||[]).filter(m=>canStaff(getRole(m))).length;
+  const inv=(invitations||[]).length;
+  const set=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};
+  set('hm-upcoming',upcoming.length);set('hm-results',withScores);set('hm-invites',inv);set('hm-organizer',org);
+  const pill=document.getElementById('home-attn-pill');if(pill)pill.textContent=(inv+org)+' items';
+  const listItem=m=>{const d=m.date?new Date(m.date):null;const day=d&&!isNaN(d)?d.getDate():'–';const mon=d&&!isNaN(d)?d.toLocaleDateString('en-US',{month:'short'}):'';return `<div class="smart-item" onclick="openPubMatch('${m.id}')"><div class="smart-date"><div class="smart-day">${day}</div><div class="smart-mon">${mon}</div></div><div class="smart-main"><div class="smart-name">${esc(m.name||'Unnamed Match')}</div><div class="smart-meta">${m.location?esc(m.location)+' · ':''}${esc(m.level||m.type||'IPSC')}</div></div><span class="pill ${canStaff(getRole(m))?'orange':'blue'}">${canStaff(getRole(m))?'Organizer':'Shooter'}</span></div>`;};
+  const upEl=document.getElementById('home-upcoming');if(upEl)upEl.innerHTML=upcoming.length?upcoming.slice(0,5).map(listItem).join(''):'<div class="empty-pro">No upcoming matches yet. Explore public matches to register.</div>';
+  const actionEl=document.getElementById('home-actions');
+  if(actionEl){
+    const parts=[];
+    (invitations||[]).slice(0,3).forEach(inv=>parts.push(`<div class="smart-item"><div class="smart-date"><div class="smart-day">!</div><div class="smart-mon">Invite</div></div><div class="smart-main"><div class="smart-name">${esc(inv.matchName||'Match Invitation')}</div><div class="smart-meta">Respond to this invitation.</div></div><button class="bsm bgrn" onclick="acceptInv('${esc(inv.matchId||inv.id)}')">Accept</button></div>`));
+    (matches||[]).filter(m=>canStaff(getRole(m))).slice(0,2).forEach(m=>parts.push(`<div class="smart-item" onclick="openOrg('${m.id}')"><div class="smart-date"><div class="smart-day">Ops</div><div class="smart-mon">Task</div></div><div class="smart-main"><div class="smart-name">${esc(m.name||'Match')}</div><div class="smart-meta">Open organizer workspace.</div></div><span class="pill orange">Manage</span></div>`));
+    actionEl.innerHTML=parts.length?parts.join(''):'<div class="empty-pro">Nothing needs your attention right now.</div>';
+  }
+  const resEl=document.getElementById('home-results');
+  if(resEl){
+    const scored=(matches||[]).filter(m=>(m.stages||[]).some(st=>(st.results||[]).length));
+    resEl.innerHTML=scored.length?scored.slice(0,4).map(listItem).join(''):'<div class="empty-pro">No results available yet.</div>';
+  }
+  const orgEl=document.getElementById('home-org');
+  if(orgEl){
+    const orgs=(matches||[]).filter(m=>canStaff(getRole(m)));
+    orgEl.innerHTML=orgs.length?orgs.slice(0,4).map(m=>`<div class="smart-item" onclick="openOrg('${m.id}')"><div class="smart-date"><div class="smart-day">${(m.shooters||[]).length}</div><div class="smart-mon">Shoots</div></div><div class="smart-main"><div class="smart-name">${esc(m.name||'Match')}</div><div class="smart-meta">${(m.stages||[]).length} stages · ${esc(getRole(m)).toUpperCase()}</div></div><span class="pill orange">Open</span></div>`).join(''):'<div class="empty-pro">No organizer tasks assigned.</div>';
+  }
+}
+window.renderHome=renderHome;
 
 // Update sv nav map
 const _svNavMap={'dashboard':'tnb-dash','my-comps':'tnb-comp','find-matches':'tnb-find','calendar':'tnb-calendar','create-match':'tnb-create'};

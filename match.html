@@ -512,6 +512,9 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     <button class="tnb" id="tnb-create" onclick="sv('create-match')">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Match
     </button>
+    <button class="tnb" id="tnb-profile" onclick="sv('profile')">
+      <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>Profile
+    </button>
   </nav>
   <div class="tright">
     <div class="bell-w ddw" id="dd-notif">
@@ -534,7 +537,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   <button id="bn-find" onclick="sv('find-matches')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Explore</span></button>
   <button id="bn-matches" onclick="sv('my-comps')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Matches</span></button>
   <button id="bn-create" onclick="sv('create-match')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Create</span></button>
-  <button id="bn-profile" onclick="toggleDD('dd-notif')"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></button>
+  <button id="bn-profile" onclick="sv('profile')"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></button>
 </nav>
 
 <!-- DASHBOARD -->
@@ -743,6 +746,37 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   </div>
 </div>
 
+
+<!-- PROFILE / MY SETTINGS -->
+<div id="view-profile" class="view">
+  <div class="page-md">
+    <section class="prof-hero" style="padding:24px;margin-bottom:16px;">
+      <div class="prof-kicker">Shooter profile</div>
+      <div class="prof-title" style="font-size:28px;">My Settings</div>
+      <div class="prof-sub">Manage personal details, default match data, shooter aliases, and privacy visibility used during registration and results.</div>
+    </section>
+    <div class="fsec"><div class="fsec-title">Identity</div>
+      <div class="fr2"><div class="fg"><label class="fl">First name</label><input id="p-first" class="fi" type="text"/></div><div class="fg"><label class="fl">Last name</label><input id="p-last" class="fi" type="text"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Email</label><input id="p-email" class="fi" type="email" disabled/></div><div class="fg"><label class="fl">Phone</label><input id="p-phone" class="fi" type="tel"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Club</label><input id="p-club" class="fi" type="text"/></div><div class="fg"><label class="fl">Region / Country</label><input id="p-region" class="fi" type="text"/></div></div>
+    </div>
+    <div class="fsec"><div class="fsec-title">Competition defaults</div>
+      <div class="fr3"><div class="fg"><label class="fl">Division</label><select id="p-division" class="fi"></select></div><div class="fg"><label class="fl">Category</label><input id="p-category" class="fi" type="text" placeholder="Senior, Lady, Junior…"/></div><div class="fg"><label class="fl">Power factor</label><select id="p-pf" class="fi"><option value="minor">Minor</option><option value="major">Major</option></select></div></div>
+      <div class="fr3"><div class="fg"><label class="fl">Classification</label><input id="p-classification" class="fi" type="text" placeholder="A, B, C, GM…"/></div><div class="fg"><label class="fl">Language / locale</label><input id="p-locale" class="fi" type="text" placeholder="en-GB, nb-NO…"/></div><div class="fg"><label class="fl">Currency</label><input id="p-currency" class="fi" type="text" placeholder="NOK"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Timezone</label><input id="p-tz" class="fi" type="text" placeholder="Europe/Oslo"/></div><div class="fg"><label class="fl">Gender</label><input id="p-gender" class="fi" type="text"/></div></div>
+    </div>
+    <div class="fsec"><div class="fsec-title">Shooter IDs and aliases</div>
+      <div class="fr3"><div class="fg"><label class="fl">IPSC Alias</label><input id="p-ipsc" class="fi" type="text"/></div><div class="fg"><label class="fl">USPSA Number</label><input id="p-uspsa" class="fi" type="text"/></div><div class="fg"><label class="fl">IDPA Number</label><input id="p-idpa" class="fi" type="text"/></div></div>
+      <div class="fr3"><div class="fg"><label class="fl">WA1500 ID</label><input id="p-wa1500" class="fi" type="text"/></div><div class="fg"><label class="fl">SASS Alias</label><input id="p-sass-alias" class="fi" type="text"/></div><div class="fg"><label class="fl">SASS Number</label><input id="p-sass" class="fi" type="text"/></div></div>
+    </div>
+    <div class="fsec"><div class="fsec-title">Privacy</div>
+      <div class="fg"><label class="fl">Visibility</label><select id="p-privacy" class="fi"><option value="public">Public – visible and searchable</option><option value="restricted">Restricted – visible to organizers, limited public info</option><option value="private">Private – not searchable publicly</option><option value="secret">Secret – name hidden in public results</option></select></div>
+      <div style="font-size:12px;color:var(--mt);line-height:1.6;">Secret competitors are shown as “NotKnown” in public competitor and result views. Organizers still see the operational data they need.</div>
+    </div>
+    <div id="p-msg" class="msg"></div><button class="btn-p" onclick="saveProfile()">Save Profile</button>
+  </div>
+</div>
+
 <!-- PUBLIC MATCH PAGE -->
 <div id="view-match-pub" class="view">
   <div class="page">
@@ -885,6 +919,13 @@ window.closeMO=closeMO;
 const calcShots=s=>Math.max(0,(s.paperTargets||0)*2+(s.poppers||0)+(s.plates||0)+(s.frangible||0));
 const calcMax=s=>Math.max(0,(s.paperTargets||0)*10+(s.poppers||0)*5+(s.plates||0)*5+(s.frangible||0)*5);
 const calcPts=(pf,a,c,d,m,n,p)=>{const sc=PFS[(pf||'minor').toLowerCase()]||PFS.minor;return a*sc.A+c*sc.C+d*sc.D+m*sc.miss+n*sc.ns+p*sc.proc;};
+const activeShooters=m=>(m?.shooters||[]).filter(s=>!['deleted','declined'].includes((s.status||'approved').toLowerCase()));
+const isMatchLocked=m=>['preliminary','completed'].includes((m?.status||'').toLowerCase());
+const nextStartNo=m=>{const nums=(m?.shooters||[]).map(s=>parseInt(s.startNo||s.startNumber||0)).filter(Boolean);let n=1;while(nums.includes(n))n++;return n;};
+const privacyLevel=s=>(s?.privacyLevel||s?.privacy||'public').toLowerCase();
+function shooterName(s,{publicView=false}={}){if(!s)return'Shooter';if(publicView&&privacyLevel(s)==='secret')return'NotKnown';return ((s.firstName||'')+(s.lastName?' '+s.lastName:'')).trim()||s.ipscAlias||'Shooter';}
+function buildShooterFromProfile(m={},extra={}){return {id:CU.uid,isMe:!!extra.isMe,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',email:UP.email||CU.email||'',phone:UP.phone||'',club:UP.club||'',region:UP.region||UP.country||'',division:UP.division||extra.division||(m.divisions&&m.divisions[0])||'Standard',category:UP.category||'',classification:UP.classification||'',pf:(UP.powerFactor||UP.pf||'minor').toLowerCase(),ipscAlias:UP.ipscAlias||'',uspsaNumber:UP.uspsaNumber||'',idpaNumber:UP.idpaNumber||'',wa1500Id:UP.wa1500Id||'',sassAlias:UP.sassAlias||'',sassNumber:UP.sassNumber||'',privacyLevel:UP.privacyLevel||'public',startNo:extra.startNo||nextStartNo(m),internalCode:extra.internalCode||'',organizerComment:extra.organizerComment||'',paid:!!extra.paid,stages:extra.stages||[],status:extra.status||'approved'};}
+
 
 // ROLES
 const getRole=m=>{if(!CU||!m)return'competitor';if(m.ownerId===CU.uid)return'owner';const mr=(m.matchRoles||[]).find(r=>r.uid===CU.uid);if(mr)return mr.role;if((m.participants||[]).includes(CU.uid))return'competitor';return'none';};
@@ -892,7 +933,7 @@ const canAdmin=r=>r==='owner'||r==='admin';
 const canStaff=r=>r==='owner'||r==='admin'||r==='staff';
 
 // expose globals
-Object.assign(window,{sv,toggleDD,closeAllDD,toggleDP,doCreateMatch,doFindSearch,saveStage,updStCalc,saveSquad,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,joinSquad,leaveSquad,showCompare,clearCmp,openOrg,goOrgBack,setOrgTab,editStage,delStage,editSquad,delSquad,openAddStage,openAddSquad,acceptInv,declineInv,setYear,openPubMatch,joinFromPub,updCMapMarker,pubTab,inviteRole,saveScore,saveSettings,delMatch});
+Object.assign(window,{sv,toggleDD,closeAllDD,toggleDP,doCreateMatch,doFindSearch,saveStage,updStCalc,saveSquad,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,restoreC,editCompetitor,joinSquad,leaveSquad,showCompare,clearCmp,openOrg,goOrgBack,setOrgTab,editStage,delStage,editSquad,delSquad,openAddStage,openAddSquad,acceptInv,declineInv,setYear,openPubMatch,joinFromPub,updCMapMarker,pubTab,saveProfile,verifyMyScore,showDQList,markDQ});
 
 // ── AUTH ──
 onAuthStateChanged(auth,async user=>{
@@ -915,6 +956,7 @@ $('l-btn').onclick=async()=>{
 };
 ['l-email','l-pw'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')$('l-btn').click();}));
 $('out-btn').onclick=()=>signOut(auth);
+$('top-av').onclick=()=>sv('profile');
 
 function initApp(){
   $('ls').classList.remove('show');$('app').style.display='block';
@@ -924,6 +966,11 @@ function initApp(){
   $('c-date').value=new Date().toISOString().split('T')[0];
   buildDivCbs();startML();startIL();loadRegionMatches();renderHome();setActiveNav('dashboard');
 }
+
+
+// ── PROFILE / MY SETTINGS ──
+function renderProfile(){if(!UP)return;const divSel=$('p-division');if(divSel)divSel.innerHTML=IPSC_DIVS.map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join('');const set=(id,v)=>{const e=$(id);if(e)e.value=v||'';};set('p-first',UP.firstName);set('p-last',UP.lastName);set('p-email',UP.email||CU?.email);set('p-phone',UP.phone);set('p-club',UP.club);set('p-region',UP.region||UP.country);set('p-division',UP.division||'Standard');set('p-category',UP.category);set('p-pf',(UP.powerFactor||UP.pf||'minor').toLowerCase());set('p-classification',UP.classification);set('p-locale',UP.locale||UP.language);set('p-currency',UP.currency||'NOK');set('p-tz',UP.timezone||'Europe/Oslo');set('p-gender',UP.gender);set('p-ipsc',UP.ipscAlias);set('p-uspsa',UP.uspsaNumber);set('p-idpa',UP.idpaNumber);set('p-wa1500',UP.wa1500Id);set('p-sass-alias',UP.sassAlias);set('p-sass',UP.sassNumber);set('p-privacy',UP.privacyLevel||'public');smsg('p-msg','');}
+async function saveProfile(){smsg('p-msg','');const data={email:CU.email||$('p-email')?.value||'',firstName:$('p-first').value.trim(),lastName:$('p-last').value.trim(),phone:$('p-phone').value.trim(),club:$('p-club').value.trim(),region:$('p-region').value.trim(),division:$('p-division').value,category:$('p-category').value.trim(),powerFactor:$('p-pf').value,classification:$('p-classification').value.trim(),locale:$('p-locale').value.trim(),currency:$('p-currency').value.trim(),timezone:$('p-tz').value.trim(),gender:$('p-gender').value.trim(),ipscAlias:$('p-ipsc').value.trim(),uspsaNumber:$('p-uspsa').value.trim(),idpaNumber:$('p-idpa').value.trim(),wa1500Id:$('p-wa1500').value.trim(),sassAlias:$('p-sass-alias').value.trim(),sassNumber:$('p-sass').value.trim(),privacyLevel:$('p-privacy').value,updatedAt:serverTimestamp()};if(!data.firstName){smsg('p-msg','First name is required.');return;}spin(true);try{await setDoc(doc(db,'users',CU.uid),data,{merge:true});UP={...UP,...data};smsg('p-msg','✓ Profile saved','ok');initApp();sv('profile');}catch(e){smsg('p-msg','Error: '+e.message);}spin(false);}
 
 // ── DROPDOWNS ──
 function toggleDD(id){const m=$(id+'-menu');if(!m)return;const open=m.classList.contains('show');closeAllDD();if(!open)m.classList.add('show');}
@@ -948,11 +995,13 @@ function sv(name){
   window.scrollTo(0,0);
   // nav active
   document.querySelectorAll('.tnb').forEach(b=>b.classList.remove('active'));
-  const nb={'dashboard':'tnb-dash','my-comps':'tnb-comp','find-matches':'tnb-find','create-match':'tnb-create'};
+  const nb={'dashboard':'tnb-dash','my-comps':'tnb-comp','find-matches':'tnb-find','create-match':'tnb-create','profile':'tnb-profile'};
   if(nb[name])$(nb[name])?.classList.add('active');
   // init maps on demand
   if(name==='find-matches')setTimeout(initFindMap,100);
   if(name==='create-match')setTimeout(initCreateMap,100);
+  if(name==='profile')renderProfile();
+  setActiveNav(name);
 }
 
 // ── LISTENERS ──
@@ -995,7 +1044,7 @@ async function acceptInv(mid){
     const md=sn.data(),ex=md.participants||[];
     if(!ex.includes(CU.uid))await updateDoc(mRef,{participants:[...ex,CU.uid]});
     const esh=md.shooters||[],alr=esh.some(s=>s.uid===CU.uid||s.id===CU.uid);
-    const ns={id:CU.uid,isMe:false,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
+    const ns=buildShooterFromProfile(md,{isMe:false,status:'approved'});
     await updateDoc(mRef,{shooters:alr?esh:[...esh,ns],updatedAt:serverTimestamp()});
     await updateDoc(doc(db,'users',CU.uid,'invitations',mid.toString()),{status:'accepted'});
   }catch(e){console.error(e);}spin(false);
@@ -1088,7 +1137,7 @@ function renderML(){
   </tr></thead><tbody>
     ${yr.map(m=>{
       const role=getRole(m),io=role==='owner'||role==='admin',st=m.status||'active';
-      const sh=(m.shooters||[]).length,max=m.maxCompetitors||0;
+      const sh=activeShooters(m).length,max=m.maxCompetitors||0;
       const ds=m.date?fmtDT(m.date):'—';
       const rLabel={'owner':'admin','admin':'admin','staff':'staff','competitor':'competitor','none':'—'}[role]||'—';
       const rBadge={'owner':'b-green','admin':'b-green','staff':'b-gold','competitor':'b-muted','none':'b-muted'}[role]||'b-muted';
@@ -1118,10 +1167,14 @@ async function openPubMatch(mid){
   }catch(e){console.error(e);}spin(false);
 }
 
+
+function myVerificationHTML(m){const me=(m.shooters||[]).find(s=>s.uid===CU?.uid||s.id===CU?.uid);if(!me)return'';const scored=(me.stages||[]).filter(r=>r&&r.time>0).sort((a,b)=>(a.num||a.number||0)-(b.num||b.number||0));if(!scored.length)return'';return `<div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;margin-bottom:12px;"><div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mt);margin-bottom:8px;">My score verification</div>${scored.map(r=>{const n=r.num||r.number;const st=r.verificationRevoked?'changed after verification':(r.verifiedByShooter?'verified':'unverified');const cls=r.verificationRevoked?'b-red':(r.verifiedByShooter?'b-green':'b-muted');return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--br);padding:8px 0;"><div style="font-size:12px;">Stage ${n} · ${Number(r.time||0).toFixed(2)}s · ${Number(r.pts||0)} pts <span class="badge ${cls}" style="margin-left:6px;">${st}</span></div><button class="bsm bgrn" onclick="verifyMyScore('${m.id}',${n})" style="width:auto;" ${r.verifiedByShooter&&!r.verificationRevoked?'disabled':''}>Verify</button></div>`;}).join('')}</div>`;}
+async function verifyMyScore(mid,stageNum){const mRef=doc(db,'matches',mid.toString());spin(true);try{const sn=await getDoc(mRef);if(!sn.exists())return;const m={id:sn.id,...sn.data()};const shooters=(m.shooters||[]).map(s=>{if(!(s.uid===CU.uid||s.id===CU.uid))return s;const stages=(s.stages||[]).map(r=>String(r.num||r.number)===String(stageNum)?{...r,verifiedByShooter:true,verifiedAt:Date.now(),verificationRevoked:false,changedAfterVerification:false}:r);return{...s,stages};});await updateDoc(mRef,{shooters,updatedAt:serverTimestamp()});AM={...m,shooters};renderPubPage(AM);}catch(e){alert(e.message);}spin(false);}
+
 function renderPubPage(m){
   const el=$('pub-content');if(!el)return;
   const role=userRole,isStaff=canStaff(role),isAdmin=canAdmin(role);
-  const sh=(m.shooters||[]).length,max=m.maxCompetitors||0;
+  const sh=activeShooters(m).length,max=m.maxCompetitors||0;
   const stages=(m.stages||[]).filter(s=>s?.number!=null);
   const divs=(m.divisions||[]).join(', ');
   const alreadyIn=(m.participants||[]).includes(CU?.uid||'');
@@ -1177,6 +1230,7 @@ function renderPubPage(m){
           ${mySquad?`<span class="badge b-gold" style="font-size:12px;padding:6px 12px;">Squad ${mySquad.number}${mySquad.comment?' – '+mySquad.comment:''}</span>`:''}
         </div>
         <div id="pub-reg-msg" class="msg"></div>
+        ${alreadyIn?myVerificationHTML(m):''}
 
         <div style="background:rgba(255,255,255,0.03);border:1px solid var(--br);border-radius:10px;margin-bottom:12px;">
           <div style="padding:12px 14px;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);border-bottom:1px solid var(--br);">Match Information</div>
@@ -1212,12 +1266,12 @@ function renderPubPage(m){
 
       <!-- COMPETITORS TAB -->
       <div id="pubt-competitors" style="display:none;" id="pubt-comp-wrap">
-        ${(m.shooters||[]).length?`<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Division</th><th>CAT</th><th>Region</th><th>Status</th></tr></thead><tbody>
-          ${(m.shooters||[]).map((s,i)=>{
-            const nm=((s.firstName||'')+(s.lastName?' '+s.lastName:'')).trim()||'Shooter';
+        ${activeShooters(m).length?`<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Division</th><th>CAT</th><th>Region</th><th>Status</th></tr></thead><tbody>
+          ${activeShooters(m).map((s,i)=>{
+            const nm=shooterName(s,{publicView:true});
             const sta=s.status||'approved';
-            const sc={'approved':'b-green','pending':'b-gold','waiting':'b-muted','declined':'b-red'};
-            return`<tr><td style="color:var(--mt);">${i+1}</td><td style="font-weight:600;">${esc(nm)}${s.uid===CU?.uid?' <span style="color:var(--ac);font-size:10px;">(you)</span>':''}</td><td style="color:var(--mt);font-size:12px;">${esc(s.division||'—')}</td><td style="color:var(--mt);font-size:11px;">${esc(s.category||'—')}</td><td style="color:var(--mt);font-size:11px;">${esc(s.region||s.regionFlag||'—')}</td><td><span class="badge ${sc[sta]||'b-muted'}">${sta.toUpperCase()}</span></td></tr>`;
+            const sc={'approved':'b-green','pending':'b-gold','waiting':'b-muted','declined':'b-red','dq':'b-red','deleted':'b-muted'};
+            return`<tr><td style="color:var(--mt);">${s.startNo||i+1}</td><td style="font-weight:600;">${esc(nm)}${s.uid===CU?.uid?' <span style="color:var(--ac);font-size:10px;">(you)</span>':''}</td><td style="color:var(--mt);font-size:12px;">${esc(s.division||'—')}</td><td style="color:var(--mt);font-size:11px;">${esc(s.category||'—')}</td><td style="color:var(--mt);font-size:11px;">${esc(privacyLevel(s)==='restricted'?'—':(s.region||s.regionFlag||'—'))}</td><td><span class="badge ${sc[sta]||'b-muted'}">${sta.toUpperCase()}</span></td></tr>`;
           }).join('')}
         </tbody></table>`:'<div class="empty"><div class="et">No competitors yet</div></div>'}
       </div>
@@ -1286,7 +1340,7 @@ async function joinFromPub(mid){
     const md=sn.data(),ex=md.participants||[];
     if(!ex.includes(CU.uid))await updateDoc(mRef,{participants:[...ex,CU.uid]});
     const esh=md.shooters||[],alr=esh.some(s=>s.uid===CU.uid||s.id===CU.uid);
-    const ns={id:CU.uid,isMe:false,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[],status:'approved'};
+    const ns=buildShooterFromProfile(md,{isMe:false,status:'approved'});
     await updateDoc(mRef,{shooters:alr?esh:[...esh,ns],updatedAt:serverTimestamp()});
     smsg('pub-reg-msg','✓ You have registered for this match!','ok');
     AM={...AM,shooters:alr?esh:[...esh,ns],participants:[...(AM.participants||[]),CU.uid]};
@@ -1400,12 +1454,12 @@ function renderPubDivResults(m,div){
       <div style="display:flex;gap:8px;"><button class="bsm bgold" onclick="showCompare(AM)">Compare</button><button class="bsm bgh" onclick="clearCmp()">Clear</button></div>
     </div>
     <div class="pdf-row">
-      <span style="font-size:11px;color:var(--mt);align-self:center;">Download *.pdf:</span>
-      <button class="pdf-btn">Match Results</button>
-      <button class="pdf-btn">Combined Results</button>
-      <button class="pdf-btn">Division Stage Results</button>
-      <button class="pdf-btn">Category Stage Results</button>
-      <button class="pdf-btn">Combined Stage Results</button>
+      <span style="font-size:11px;color:var(--mt);align-self:center;">PDF export:</span>
+      <button class="pdf-btn" onclick="alert('PDF export coming soon')">Match Results</button>
+      <button class="pdf-btn" onclick="alert('PDF export coming soon')">Combined Results</button>
+      <button class="pdf-btn" onclick="alert('PDF export coming soon')">Division Stage Results</button>
+      <button class="pdf-btn" onclick="alert('PDF export coming soon')">Category Stage Results</button>
+      <button class="pdf-btn" onclick="alert('PDF export coming soon')">Combined Stage Results</button>
     </div>
     <button class="dq-btn" onclick="alert('DQ list coming soon')">View All DQ\'d Competitors</button>`;
   } else {
@@ -1440,9 +1494,9 @@ function renderPubDivResults(m,div){
       <div style="display:flex;gap:8px;"><button class="bsm bgold" onclick="showCompare(AM)">Compare</button><button class="bsm bgh" onclick="clearCmp()">Clear</button></div>
     </div>
     <div class="pdf-row">
-      <span style="font-size:11px;color:var(--mt);align-self:center;">Download *.pdf:</span>
-      <button class="pdf-btn">Match Results</button><button class="pdf-btn">Combined Results</button>
-      <button class="pdf-btn">Division Stage Results</button><button class="pdf-btn">Category Stage Results</button>
+      <span style="font-size:11px;color:var(--mt);align-self:center;">PDF export:</span>
+      <button class="pdf-btn" onclick="alert('PDF export coming soon')">Match Results</button><button class="pdf-btn" onclick="alert('PDF export coming soon')">Combined Results</button>
+      <button class="pdf-btn" onclick="alert('PDF export coming soon')">Division Stage Results</button><button class="pdf-btn" onclick="alert('PDF export coming soon')">Category Stage Results</button>
     </div>
     <button class="dq-btn">View All DQ\'d Competitors</button>`
     :'<div class="empty"><div class="et">No results for this division</div></div>';
@@ -1499,6 +1553,8 @@ function showCompare(m){
   $('compare-content').innerHTML=html;openMO('mo-compare');
 }
 
+function showDQList(m){const dqs=(m?.shooters||[]).filter(s=>(s.status||'').toLowerCase()==='dq');alert(dqs.length?dqs.map(s=>shooterName(s)).join('\n'):'No DQ competitors.');}
+
 // LIVE VIEW
 function renderLive(m){
   const el=$('pub-live-wrap');if(!el)return;
@@ -1524,10 +1580,11 @@ function renderLive(m){
 function stMets(m,stage){
   const res=[];
   (m.shooters||[]).forEach(sh=>{
-    const r=(sh.stages||[]).find(s=>String(s.num||s.number)===String(stage.number)&&s.time>0);
+    const st=(sh.status||'approved').toLowerCase();if(st!=='approved')return;
+    const r=(sh.stages||[]).find(s=>String(s.num||s.number)===String(stage.number)&&s.time>0&&!s.dq);
     if(!r)return;
     const pts=calcPts(sh.pf||'minor',r.a||0,r.c||0,r.d||0,r.miss||0,r.ns||0,r.proc||0);
-    res.push({id:sh.id,fn:sh.firstName||'',ln:sh.lastName||'',div:sh.division||'',cat:sh.category||'',pts,hf:r.time>0?pts/r.time:0,time:r.time});
+    const pubName=shooterName(sh,{publicView:true}).split(' ');res.push({id:sh.id,fn:pubName[0]||'',ln:pubName.slice(1).join(' '),div:sh.division||'',cat:sh.category||'',pts,hf:r.time>0?pts/r.time:0,time:r.time});
   });
   return res.sort((a,b)=>b.hf-a.hf);
 }
@@ -1641,41 +1698,22 @@ function updStCalc(){const p=parseInt($('st-pp')?.value)||0,po=parseInt($('st-po
 // ── ORG: COMPETITORS ──
 function renderOrgComps(){
   const el=$('otab-competitors'),m=AM;
-  let sh=(m.shooters||[]);
+  let sh=[...(m.shooters||[])];
   if(CF!=='all')sh=sh.filter(s=>(s.status||'approved')===CF);
-  const stcol={'approved':'b-green','pending':'b-gold','waiting':'b-muted','declined':'b-red'};
+  const stcol={'approved':'b-green','pending':'b-gold','waiting':'b-muted','declined':'b-red','deleted':'b-muted','dq':'b-red'};
   el.innerHTML=`<div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;">
-    <button class="bsm ${CF==='all'?'bgold':'bgh'}" id="cf-all" onclick="setCF('all')" style="width:auto;">All</button>
-    <button class="bsm ${CF==='approved'?'bgold':'bgh'}" id="cf-approved" onclick="setCF('approved')" style="width:auto;">Approved</button>
-    <button class="bsm ${CF==='pending'?'bgold':'bgh'}" id="cf-pending" onclick="setCF('pending')" style="width:auto;">Pending</button>
-    <button class="bsm ${CF==='waiting'?'bgold':'bgh'}" id="cf-waiting" onclick="setCF('waiting')" style="width:auto;">Waiting</button>
+    <button class="bsm ${CF==='all'?'bgold':'bgh'}" onclick="setCF('all')" style="width:auto;">All</button><button class="bsm ${CF==='approved'?'bgold':'bgh'}" onclick="setCF('approved')" style="width:auto;">Approved</button><button class="bsm ${CF==='pending'?'bgold':'bgh'}" onclick="setCF('pending')" style="width:auto;">Pending</button><button class="bsm ${CF==='waiting'?'bgold':'bgh'}" onclick="setCF('waiting')" style="width:auto;">Waiting</button><button class="bsm ${CF==='deleted'?'bgold':'bgh'}" onclick="setCF('deleted')" style="width:auto;">Deleted</button><button class="bsm ${CF==='dq'?'bgold':'bgh'}" onclick="setCF('dq')" style="width:auto;">DQ</button>
   </div>
-  ${sh.length?`<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Division</th><th>PF</th><th>CAT</th><th>Squad</th><th>Stages</th><th>Paid</th><th>Status</th><th></th></tr></thead><tbody>
-    ${sh.map((s,i)=>{
-      const nm=((s.firstName||'')+(s.lastName?' '+s.lastName:'')).trim()||'Shooter';
-      const st=s.status||'approved';
-      const mySquad=(m.squads||[]).find(sq=>(sq.members||[]).includes(s.uid||s.id));
-      return`<tr>
-        <td style="color:var(--mt);">${i+1}</td>
-        <td style="font-weight:600;">${esc(nm)}${(s.uid||s.id)===CU?.uid?' <span style="color:var(--ac);font-size:10px;">(you)</span>':''}</td>
-        <td style="color:var(--mt);font-size:12px;">${esc(s.division||'—')}</td>
-        <td style="font-size:11px;">${(s.pf||'minor').toUpperCase()}</td>
-        <td style="color:var(--mt);font-size:11px;">${esc(s.category||'—')}</td>
-        <td style="color:var(--mt);font-size:11px;">${mySquad?'Squad '+mySquad.number:'—'}</td>
-        <td>${(s.stages||[]).length}</td>
-        <td><span class="badge ${s.paid?'b-green':'b-muted'}">${s.paid?'Paid':'Unpaid'}</span></td>
-        <td><span class="badge ${stcol[st]||'b-muted'}">${st.toUpperCase()}</span></td>
-        <td style="display:flex;gap:5px;">
-          ${st==='pending'?`<button class="bsm bgold" onclick="approveC('${s.uid||s.id}')" style="width:auto;">✓</button>`:''}
-          ${(s.uid||s.id)!==CU.uid&&(s.uid||s.id)!==m.ownerId?`<button class="bsm bred" onclick="removeC('${s.uid||s.id}')" style="width:auto;">✕</button>`:''}
-        </td>
-      </tr>`;
-    }).join('')}
-  </tbody></table>`:'<div class="empty"><div class="et">No competitors</div></div>'}`;
+  ${sh.length?`<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Division</th><th>PF</th><th>CAT</th><th>CLS</th><th>Code</th><th>Squad</th><th>Stages</th><th>Paid</th><th>Status</th><th></th></tr></thead><tbody>${sh.map((s,i)=>{const nm=shooterName(s);const st=s.status||'approved';const mySquad=(m.squads||[]).find(sq=>(sq.members||[]).includes(s.uid||s.id));return`<tr title="${esc(s.organizerComment||'')}"><td style="color:var(--mt);">${s.startNo||i+1}</td><td style="font-weight:600;">${esc(nm)}${(s.uid||s.id)===CU?.uid?' <span style="color:var(--ac);font-size:10px;">(you)</span>':''}</td><td style="color:var(--mt);font-size:12px;">${esc(s.division||'—')}</td><td style="font-size:11px;">${(s.pf||'minor').toUpperCase()}</td><td style="color:var(--mt);font-size:11px;">${esc(s.category||'—')}</td><td style="color:var(--mt);font-size:11px;">${esc(s.classification||'—')}</td><td style="color:var(--mt);font-size:11px;">${esc(s.internalCode||'—')}</td><td style="color:var(--mt);font-size:11px;">${mySquad?'Squad '+mySquad.number:'—'}</td><td>${(s.stages||[]).length}</td><td><span class="badge ${s.paid?'b-green':'b-muted'}">${s.paid?'Paid':'Unpaid'}</span></td><td><span class="badge ${stcol[st]||'b-muted'}">${st.toUpperCase()}</span></td><td style="display:flex;gap:5px;flex-wrap:wrap;"><button class="bsm bgh" onclick="editCompetitor('${s.uid||s.id}')" style="width:auto;">Edit</button>${st==='pending'?`<button class="bsm bgold" onclick="approveC('${s.uid||s.id}')" style="width:auto;">✓</button>`:''}${st==='deleted'?`<button class="bsm bgrn" onclick="restoreC('${s.uid||s.id}')" style="width:auto;">Restore</button>`:''}${st!=='dq'?`<button class="bsm bred" onclick="markDQ('${s.uid||s.id}')" style="width:auto;">DQ</button>`:''}${(s.uid||s.id)!==CU.uid&&(s.uid||s.id)!==m.ownerId&&st!=='deleted'?`<button class="bsm bred" onclick="removeC('${s.uid||s.id}')" style="width:auto;">✕</button>`:''}</td></tr>`;}).join('')}</tbody></table>`:'<div class="empty"><div class="et">No competitors</div></div>'}`;
 }
 function setCF(f){CF=f;renderOrgComps();}
-async function approveC(uid){const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,status:'approved'}:s);try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,updatedAt:serverTimestamp()});AM={...AM,shooters:sh};renderOrgComps();}catch(e){alert(e.message);}}
-async function removeC(uid){if(!confirm('Remove?'))return;const sh=(AM.shooters||[]).filter(s=>s.uid!==uid&&s.id!==uid);const pa=(AM.participants||[]).filter(p=>p!==uid);try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,participants:pa,updatedAt:serverTimestamp()});AM={...AM,shooters:sh,participants:pa};renderOrgComps();}catch(e){alert(e.message);}}
+async function updateShooterList(sh,extra={}){await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,...extra,updatedAt:serverTimestamp()});AM={...AM,shooters:sh,...extra};renderOrgComps();}
+async function approveC(uid){const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,status:'approved'}:s);try{await updateShooterList(sh);}catch(e){alert(e.message);}}
+async function restoreC(uid){const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,status:'approved'}:s);const pa=[...(AM.participants||[])];if(!pa.includes(uid))pa.push(uid);try{await updateShooterList(sh,{participants:pa});}catch(e){alert(e.message);}}
+async function removeC(uid){if(!confirm('Mark competitor as deleted? Historical data and scores are kept.'))return;const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,status:'deleted',deletedAt:Date.now()}:s);const pa=(AM.participants||[]).filter(p=>p!==uid);try{await updateShooterList(sh,{participants:pa});}catch(e){alert(e.message);}}
+async function markDQ(uid){if(!confirm('Mark competitor as DQ?'))return;const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,status:'dq',dqAt:Date.now()}:s);try{await updateShooterList(sh);}catch(e){alert(e.message);}}
+async function editCompetitor(uid){const s0=(AM.shooters||[]).find(s=>s.uid===uid||s.id===uid);if(!s0)return;const startNo=prompt('Start number',s0.startNo||s0.startNumber||'')??s0.startNo;const classification=prompt('Classification',s0.classification||'')??s0.classification;const internalCode=prompt('Internal code (VIP, Staff, Sponsor)',s0.internalCode||'')??s0.internalCode;const organizerComment=prompt('Organizer comment',s0.organizerComment||'')??s0.organizerComment;const paid=confirm('Mark as paid? Press Cancel for unpaid.');const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,startNo:startNo?parseInt(startNo)||startNo:'',classification:classification||'',internalCode:internalCode||'',organizerComment:organizerComment||'',paid}:s);try{await updateShooterList(sh);}catch(e){alert(e.message);}}
+
 
 // ── ORG: SQUADS ──
 function renderOrgSquads(){
@@ -1734,6 +1772,7 @@ async function saveSquad(){
 // ── ORG: SCORING ──
 function renderOrgScoring(){
   const el=$('otab-scoring');
+  if(isMatchLocked(AM)){el.innerHTML=`<div class="access-notice">This match is ${esc(AM.status)}. Results are locked. Change status back to Active to edit scores.</div>`;return;}
   el.innerHTML=`<div class="card">
     <div class="chead"><div class="ctitle"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--ac);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Enter Stage Result</div></div>
     <div class="cbody">
@@ -1750,6 +1789,7 @@ function renderOrgScoring(){
         <div class="scell"><div class="slbl">NS</div><div class="sctr"><button class="sbtn" onclick="adj('sc-n',-1)">−</button><span class="sval" id="sc-n">0</span><button class="sbtn" onclick="adj('sc-n',1)">+</button></div></div>
         <div class="scell"><div class="slbl">Proc</div><div class="sctr"><button class="sbtn" onclick="adj('sc-p',-1)">−</button><span class="sval" id="sc-p">0</span><button class="sbtn" onclick="adj('sc-p',1)">+</button></div></div>
       </div>
+      <div class="trow"><div><div class="tl">Match DQ</div><div class="ts">Marks competitor DQ and excludes them from results</div></div><label class="toggle"><input type="checkbox" id="sc-dq"/><span class="tsldr"></span></label></div>
       <div class="hfbar"><div class="hflbl">Points / HF</div><div style="display:flex;gap:14px;align-items:center;"><span style="font-size:14px;font-weight:600;color:var(--mt);" id="sc-pts">0 pts</span><span class="hfval" id="sc-hf">0.0000</span></div></div>
       <div id="sc-msg" class="msg" style="margin-top:6px;"></div>
       <button class="btn-p" style="margin-top:8px;" onclick="saveScore()">Save Result</button>
@@ -1772,20 +1812,22 @@ function updHF(){
 }
 async function saveScore(){
   smsg('sc-msg','');
+  if(isMatchLocked(AM)){smsg('sc-msg','This match is locked. Change status back to Active before editing scores.');return;}
   const shId=$('sc-sh').value,stNum=parseInt($('sc-st').value),t=parseFloat($('sc-t').value);
   if(!shId){smsg('sc-msg','Select a shooter.');return;}if(!stNum){smsg('sc-msg','Select a stage.');return;}if(!t||t<=0){smsg('sc-msg','Enter a valid time.');return;}
   const sh=(AM.shooters||[]).find(s=>(s.uid||s.id)===shId);if(!sh){smsg('sc-msg','Shooter not found.');return;}
   const a=parseInt($('sc-a').textContent)||0,c=parseInt($('sc-c').textContent)||0,d=parseInt($('sc-d').textContent)||0,ms=parseInt($('sc-m').textContent)||0,ns=parseInt($('sc-n').textContent)||0,pr=parseInt($('sc-p').textContent)||0;
-  const pts=calcPts(sh.pf||'minor',a,c,d,ms,ns,pr),hf=pts/t;
-  const sr={num:stNum,time:t,pts,hf,a,c,d,miss:ms,ns,proc:pr,savedAt:Date.now()};
+  const dq=$('sc-dq')?.checked||false;
+  const pts=dq?0:calcPts(sh.pf||'minor',a,c,d,ms,ns,pr),hf=dq?0:pts/t;
+  const sr={num:stNum,time:t,pts,hf,a,c,d,miss:ms,ns,proc:pr,dq,savedAt:Date.now(),savedBy:CU.uid};
   const newSh=(AM.shooters||[]).map(s=>{
     if((s.uid||s.id)!==shId)return s;
     const stgs=[...(s.stages||[])];const idx=stgs.findIndex(x=>(x.num||x.number)===stNum);
-    if(idx>=0)stgs[idx]={...stgs[idx],...sr};else stgs.push(sr);
-    return{...s,stages:stgs};
+    if(idx>=0){const wasVerified=!!stgs[idx].verifiedByShooter&&!stgs[idx].verificationRevoked;stgs[idx]={...stgs[idx],...sr,verifiedByShooter:wasVerified?false:stgs[idx].verifiedByShooter,verificationRevoked:wasVerified,changedAfterVerification:wasVerified};}else stgs.push(sr);
+    return{...s,stages:stgs,status:dq?'dq':(s.status||'approved')};
   });
   spin(true);
-  try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:newSh,updatedAt:serverTimestamp()});AM={...AM,shooters:newSh};smsg('sc-msg','✓ Result saved!','ok');['sc-a','sc-c','sc-d','sc-m','sc-n','sc-p'].forEach(id=>{const e=$(id);if(e)e.textContent='0';});$('sc-t').value='';updHF();}
+  try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:newSh,updatedAt:serverTimestamp()});AM={...AM,shooters:newSh};smsg('sc-msg','✓ Result saved!','ok');['sc-a','sc-c','sc-d','sc-m','sc-n','sc-p'].forEach(id=>{const e=$(id);if(e)e.textContent='0';});$('sc-t').value='';if($('sc-dq'))$('sc-dq').checked=false;updHF();renderOrgScoring();}
   catch(e){smsg('sc-msg','Error: '+e.message);}
   spin(false);
 }
@@ -1853,6 +1895,7 @@ async function removeRole(uid){if(!confirm('Remove from staff?'))return;const ro
 function renderOrgSettings(){
   const m=AM,el=$('otab-settings');
   el.innerHTML=`<div class="card"><div class="chead"><div class="ctitle">Match Settings</div></div><div class="cbody">
+    <div style="background:rgba(224,182,73,0.09);border:1px solid rgba(224,182,73,0.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--mt);">When status is Preliminary or Completed, stage scores are locked from normal editing.</div>
     <div class="fg"><label class="fl">Match Name</label><input id="a-name" class="fi" type="text" value="${esc(m.name||'')}"/></div>
     <div class="fr2">
       <div class="fg"><label class="fl">Location</label><input id="a-loc" class="fi" type="text" value="${esc(m.location||'')}"/></div>
@@ -1905,7 +1948,7 @@ function renderOrgSettings(){
 async function saveSettings(){
   smsg('a-msg','');if(!canAdmin(userRole)){smsg('a-msg','Only admins can edit settings.');return;}
   spin(true);
-  try{const up={name:$('a-name').value.trim(),location:$('a-loc').value.trim(),club:$('a-club').value.trim(),date:$('a-date').value,time:$('a-time').value,type:$('a-type').value,status:$('a-status').value,registration:$('a-reg').value,maxCompetitors:parseInt($('a-max').value)||0,region:$('a-region').value.trim(),searchable:$('a-srch').checked,updatedAt:serverTimestamp()};await updateDoc(doc(db,'matches',AM.id.toString()),up);AM={...AM,...up};smsg('a-msg','✓ Saved','ok');$('org-match-name').textContent=AM.name;}
+  try{const oldStatus=AM.status||'active';const newStatus=$('a-status').value;const up={name:$('a-name').value.trim(),location:$('a-loc').value.trim(),club:$('a-club').value.trim(),date:$('a-date').value,time:$('a-time').value,type:$('a-type').value,status:newStatus,registration:$('a-reg').value,maxCompetitors:parseInt($('a-max').value)||0,region:$('a-region').value.trim(),searchable:$('a-srch').checked,updatedAt:serverTimestamp()};if(['preliminary','completed'].includes(newStatus)&&oldStatus!==newStatus){up.resultsLockedAt=Date.now();up.resultsLockedBy=CU.uid;}await updateDoc(doc(db,'matches',AM.id.toString()),up);AM={...AM,...up};smsg('a-msg','✓ Saved'+(['preliminary','completed'].includes(newStatus)?' – results locked':''),'ok');$('org-match-name').textContent=AM.name;renderOrgScoring();}
   catch(e){smsg('a-msg','Error: '+e.message);}spin(false);
 }
 async function delMatch(){
@@ -1929,7 +1972,7 @@ async function doCreateMatch(){
   $('cm-btn').disabled=true;$('cm-btn').textContent='Creating…';spin(true);
   try{
     const mid=await nextMID();
-    const os={id:CU.uid,isMe:true,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||divs[0]||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[],status:'approved'};
+    const os=buildShooterFromProfile({divisions:divs},{isMe:true,status:'approved',division:divs[0],startNo:1});
     await setDoc(doc(db,'matches',mid.toString()),{
       id:mid,name,location:loc,club:$('c-club').value.trim(),region:$('c-region').value,lat,lng,
       date:$('c-date').value,time:$('c-time').value,
@@ -1976,7 +2019,7 @@ async function doFindSearch(){
   }catch(e){smsg('find-msg','Error: '+e.message);}spin(false);
 }
 function findCardHTML(m){
-  const sh=(m.shooters||[]).length,max=m.maxCompetitors||0,alr=(m.participants||[]).includes(CU?.uid||'');
+  const sh=activeShooters(m).length,max=m.maxCompetitors||0,alr=(m.participants||[]).includes(CU?.uid||'');
   return`<div style="background:var(--card);border:1px solid var(--br);border-left:3px solid var(--ac);border-radius:12px;padding:16px;margin-bottom:10px;">
     <div style="font-size:16px;font-weight:800;margin-bottom:5px;">${esc(m.name||'')}</div>
     <div style="font-size:12px;color:var(--mt);margin-bottom:10px;">${m.date?fmtD(m.date):''} ${m.location?'· '+esc(m.location):''} · ${esc(m.level||'')} · ${sh}${max?'/'+max:''} competitors</div>
@@ -1996,7 +2039,7 @@ window.quickJoin=async function(el_or_mid){
     const md=sn.data(),ex=md.participants||[];
     if(!ex.includes(CU.uid))await updateDoc(mRef,{participants:[...ex,CU.uid]});
     const esh=md.shooters||[],alr=esh.some(s=>s.uid===CU.uid||s.id===CU.uid);
-    const ns={id:CU.uid,isMe:false,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[],status:'approved'};
+    const ns=buildShooterFromProfile(md,{isMe:false,status:'approved'});
     await updateDoc(mRef,{shooters:alr?esh:[...esh,ns],updatedAt:serverTimestamp()});
     openPubMatch(mid);
   }catch(e){alert(e.message);}spin(false);
@@ -2038,7 +2081,7 @@ async function loadFindMarkers(ms){
       if(!m.lat||!m.lng)return;
       const icon=L.divIcon({className:'',html:'<div class="m-pin"></div>',iconSize:[12,12],iconAnchor:[6,6]});
       const marker=L.marker([m.lat,m.lng],{icon}).addTo(fMapInst);
-      const sh=(m.shooters||[]).length,max=m.maxCompetitors||0;
+      const sh=activeShooters(m).length,max=m.maxCompetitors||0;
       marker.bindPopup(`<div style="min-width:190px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><b style="font-size:13px;color:#0f172a;">${esc(m.name||'')}</b><br><span style="font-size:11px;color:#64748b;">${m.date?fmtD(m.date):''} · ${esc(m.location||'')}</span><br><span style="font-size:11px;color:#64748b;">${sh}${max?'/'+max:''} competitors · ID: ${m.id}</span><br><button onclick="openPubMatch('${m.id}')" style="margin-top:8px;background:#2563eb;color:white;border:none;border-radius:8px;padding:7px 12px;font-size:11px;font-weight:800;cursor:pointer;width:100%;">View Match</button></div>`);
       fMarkers.push(marker);bounds.push([m.lat,m.lng]);
     });
@@ -2088,7 +2131,7 @@ function renderMLCards(){
   const stcol={'draft':'b-muted','active':'b-green','active_noedit':'b-green','preliminary':'b-gold','completed':'b-blue','cancelled':'b-red'};
   el.innerHTML=yr.map(m=>{
     const role=getRole(m),io=role==='owner'||role==='admin',st=m.status||'active';
-    const sh=(m.shooters||[]).length,max=m.maxCompetitors||0;
+    const sh=activeShooters(m).length,max=m.maxCompetitors||0;
     const ds=m.date?fmtD(m.date):'—';
     const rLabel={'owner':'admin','admin':'admin','staff':'staff','competitor':'competitor','none':'—'}[role]||'—';
     const rBadge={'owner':'b-green','admin':'b-green','staff':'b-gold','competitor':'b-muted','none':'b-muted'}[role]||'b-muted';
@@ -2339,10 +2382,10 @@ window.filterExploreMatches=filterExploreMatches;
 window.loadAllPublicMatches=loadAllPublicMatches;
 
 function setActiveNav(name){
-  const top={'dashboard':'tnb-dash','find-matches':'tnb-find','my-comps':'tnb-comp','create-match':'tnb-create'};
+  const top={'dashboard':'tnb-dash','find-matches':'tnb-find','my-comps':'tnb-comp','create-match':'tnb-create','profile':'tnb-profile'};
   document.querySelectorAll('.tnb').forEach(b=>b.classList.remove('active'));
   if(top[name])document.getElementById(top[name])?.classList.add('active');
-  const bottom={'dashboard':'bn-dash','find-matches':'bn-find','my-comps':'bn-matches','create-match':'bn-create'};
+  const bottom={'dashboard':'bn-dash','find-matches':'bn-find','my-comps':'bn-matches','create-match':'bn-create','profile':'bn-profile'};
   document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));
   if(bottom[name])document.getElementById(bottom[name])?.classList.add('active');
 }

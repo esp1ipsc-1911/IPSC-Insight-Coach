@@ -3,822 +3,898 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Matches · Insight Dynamics</title>
+<title>Match Admin · Insight Dynamics</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --accent:#e0b649;--accent2:#c49a30;--accent-fade:rgba(224,182,73,0.12);--accent-glow:rgba(224,182,73,0.25);
   --bg:#0d0f12;--bg2:#111418;--bg3:#161a1f;--card:#141820;--card2:#181d24;
   --border:rgba(255,255,255,0.07);--border-gold:rgba(224,182,73,0.25);
-  --text:#f0f2f5;--muted:rgba(255,255,255,0.38);--green:#4caf7d;--red:#ef4444;
+  --text:#f0f2f5;--muted:rgba(255,255,255,0.38);--green:#4caf7d;--red:#ef4444;--blue:#3b82f6;
   --radius:12px;--radius-sm:8px;
 }
 html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
-
-/* ── TOPBAR ── */
-.topbar{
-  position:sticky;top:0;z-index:100;
-  background:rgba(13,15,18,0.92);backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;height:56px;
-}
-.topbar-logo{font-size:12px;font-weight:900;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;}
-.topbar-user{display:flex;align-items:center;gap:10px;}
-.nav-avatar{
-  width:34px;height:34px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#0a0c0f;font-weight:800;font-size:12px;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 0 2px rgba(224,182,73,0.3);
-  flex-shrink:0;overflow:hidden;
-}
-.nav-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:8px;
-  color:var(--muted);font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
-  padding:6px 12px;cursor:pointer;transition:all 0.15s;}
-.btn-logout:hover{border-color:var(--red);color:var(--red);}
-
-/* ── LAYOUT ── */
-.page{max-width:960px;margin:0 auto;padding:24px 16px 80px;}
-.page-header{margin-bottom:24px;}
-.page-title{font-size:22px;font-weight:900;letter-spacing:-0.01em;}
-.page-sub{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:0.04em;}
-
-/* ── TABS ── */
-.tabs{display:flex;gap:6px;margin-bottom:20px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:4px;}
-.tab-btn{
-  flex:1;padding:9px 12px;background:transparent;border:none;border-radius:7px;
-  color:var(--muted);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
-  cursor:pointer;transition:all 0.18s;
-}
-.tab-btn.active{background:var(--accent-fade);color:var(--accent);border:1px solid var(--border-gold);}
-
-/* ── SECTION ── */
-.section{display:none;}.section.active{display:block;}
-
-/* ── CARDS ── */
-.card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-  margin-bottom:10px;overflow:hidden;position:relative;
-}
-.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:3px 0 0 3px;}
-.card-header{padding:14px 16px 12px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.card-title{font-size:10px;font-weight:700;letter-spacing:0.13em;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
-.card-title svg{width:13px;height:13px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
-.card-body{padding:16px;}
-
-/* ── MATCH LIST ITEM ── */
-.match-item{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-  border-left:3px solid var(--accent);margin-bottom:10px;padding:14px 16px;
-  position:relative;cursor:pointer;transition:border-color 0.15s,background 0.15s;
-}
-.match-item:hover{background:rgba(224,182,73,0.04);border-color:rgba(224,182,73,0.35);}
-.match-item.owner-match{border-left-color:#4caf7d;}
-.match-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
-.match-name{font-size:15px;font-weight:700;}
-.match-badges{display:flex;gap:6px;flex-wrap:wrap;}
-.badge{display:inline-flex;align-items:center;border-radius:6px;font-size:10px;font-weight:700;padding:3px 8px;letter-spacing:0.05em;}
-.badge-gold{background:var(--accent-fade);color:var(--accent);border:1px solid var(--border-gold);}
-.badge-green{background:rgba(76,175,125,0.15);color:var(--green);border:1px solid rgba(76,175,125,0.3);}
-.badge-muted{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border);}
-.match-meta{display:flex;gap:14px;flex-wrap:wrap;}
-.match-meta-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
-.match-meta-item svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
-.empty-state{text-align:center;padding:48px 20px;}
-.empty-icon{font-size:36px;margin-bottom:12px;opacity:0.4;}
-.empty-title{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:6px;}
-.empty-sub{font-size:12px;color:rgba(255,255,255,0.22);}
-
-/* ── FORM ── */
-.field-group{margin-bottom:14px;}
-.field-lbl{font-size:10px;font-weight:700;letter-spacing:0.13em;color:var(--muted);text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
-.field-lbl svg{width:11px;height:11px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.field-input{
-  width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
-  border-radius:var(--radius-sm);color:var(--text);font-size:14px;
-  padding:11px 14px;outline:none;transition:border-color 0.15s,background 0.15s;
-  -webkit-appearance:none;
-}
-.field-input:focus{border-color:rgba(224,182,73,0.45);background:rgba(255,255,255,0.06);}
-.field-input::placeholder{color:rgba(255,255,255,0.18);}
-select.field-input{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;
-}
-select.field-input option{background:#141820;color:var(--text);}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;}
-.toggle-label{font-size:13px;font-weight:600;}
-.toggle-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-.toggle{position:relative;width:42px;height:24px;flex-shrink:0;}
-.toggle input{opacity:0;width:0;height:0;position:absolute;}
-.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:24px;cursor:pointer;transition:background 0.2s;}
-.toggle-slider::before{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform 0.2s;}
-.toggle input:checked+.toggle-slider{background:var(--accent);}
-.toggle input:checked+.toggle-slider::before{transform:translateX(18px);}
-
-/* ── BUTTONS ── */
-.btn-primary{
-  width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#0a0c0f;border:none;border-radius:var(--radius-sm);
-  font-size:12px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;
-  cursor:pointer;transition:opacity 0.15s;margin-top:4px;
-}
-.btn-primary:hover{opacity:0.88;}
-.btn-primary:disabled{opacity:0.45;cursor:not-allowed;}
-.btn-secondary{
-  width:100%;padding:11px;background:transparent;
-  color:var(--accent);border:1px solid rgba(224,182,73,0.28);border-radius:var(--radius-sm);
-  font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
-  cursor:pointer;transition:background 0.15s;
-}
-.btn-secondary:hover{background:var(--accent-fade);}
-.btn-danger{
-  width:100%;padding:11px;background:transparent;
-  color:var(--red);border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);
-  font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
-  cursor:pointer;transition:background 0.15s;
-}
-.btn-danger:hover{background:rgba(239,68,68,0.08);}
-
-/* ── MESSAGE / ERROR ── */
-.msg{font-size:12px;font-weight:500;min-height:16px;text-align:center;padding:8px 0;}
-.msg.error{color:var(--red);}
-.msg.success{color:var(--green);}
-
-/* ── SEARCH RESULT ── */
-.search-result-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:12px;display:none;}
-.search-result-box.visible{display:block;}
-.search-result-name{font-size:16px;font-weight:800;margin-bottom:8px;}
-.search-result-meta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
-
-/* ── SPINNER ── */
-#global-spinner{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
-#global-spinner.show{display:flex;}
+#gs{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
+#gs.show{display:flex;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spinner-ring{width:40px;height:40px;border:3px solid rgba(224,182,73,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;}
-
-/* ── LOGIN SCREEN ── */
-#login-screen{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;padding:40px 20px;}
-#login-screen.show{display:flex;align-items:center;justify-content:center;}
-.login-box{width:100%;max-width:380px;}
-.login-logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
-.login-logo-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#1a1e26,#0d0f12);border:1px solid var(--border-gold);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 0 1px rgba(224,182,73,0.12),0 0 16px rgba(224,182,73,0.08);}
-.login-title-block .t1{font-size:28px;font-weight:900;letter-spacing:-0.01em;}
-.login-title-block .t1 .w{color:var(--text);}
-.login-title-block .t1 .g{color:var(--accent);}
-.login-title-block .t2{font-size:9px;font-weight:700;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-top:4px;}
-.login-card{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:16px;padding:22px;}
-
-/* ── INVITE BADGE INLINE ── */
-.inv-banner{
-  background:rgba(224,182,73,0.06);border:1px solid var(--border-gold);
-  border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-}
-.inv-info{flex:1;min-width:0;}
-.inv-title{font-size:13px;font-weight:700;margin-bottom:3px;}
-.inv-sub{font-size:11px;color:var(--muted);}
-.inv-actions{display:flex;gap:8px;flex-shrink:0;}
-.inv-btn{padding:6px 13px;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.15s;}
-.inv-btn-accept{background:var(--accent);color:#0a0c0f;}
-.inv-btn-accept:hover{opacity:0.85;}
-.inv-btn-decline{background:rgba(255,255,255,0.06);color:var(--muted);}
-.inv-btn-decline:hover{background:rgba(239,68,68,0.12);color:var(--red);}
-
-/* ── STATUS STRIP ── */
-.status-strip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-left:2px solid #22c55e;border-radius:8px;padding:8px 12px;margin-bottom:18px;}
-.status-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;flex-shrink:0;}
-.status-text{font-size:10px;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.5);text-transform:uppercase;}
-
-/* ── SEPARATOR ── */
-.separator{display:flex;align-items:center;gap:12px;margin:14px 0;}
-.separator::before,.separator::after{content:'';flex:1;height:1px;background:var(--border);}
-.separator-text{font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;}
-
-/* autofill fix */
-input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{
-  -webkit-box-shadow:0 0 0 100px #141820 inset!important;
-  -webkit-text-fill-color:#f0f2f5!important;caret-color:#f0f2f5!important;
-  transition:background-color 9999s!important;
-}
-@media(max-width:500px){
-  .form-row{grid-template-columns:1fr;}
-}
+.spin{width:36px;height:36px;border:3px solid rgba(224,182,73,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;}
+/* LOGIN */
+#ls{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;}
+#ls.show{display:flex;align-items:center;justify-content:center;padding:32px 20px;}
+.lbox{width:100%;max-width:380px;}
+.llogo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.licon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#1a1e26,#0d0f12);border:1px solid var(--border-gold);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.lb1{font-size:26px;font-weight:900;}.lb1 .w{color:var(--text);}.lb1 .g{color:var(--accent);}
+.lb2{font-size:9px;font-weight:700;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-top:3px;}
+.lcard{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:16px;padding:22px;}
+.sstrip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-left:2px solid #22c55e;border-radius:8px;padding:8px 12px;margin-bottom:16px;}
+.sdot{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;flex-shrink:0;}
+.stxt{font-size:10px;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.5);text-transform:uppercase;}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(13,15,18,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:54px;}
+.tlogo{font-size:11px;font-weight:900;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;}
+.tright{display:flex;align-items:center;gap:10px;}
+.nav-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c0f;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(224,182,73,0.3);flex-shrink:0;overflow:hidden;cursor:pointer;}
+.nav-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;cursor:pointer;transition:all 0.15s;}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
+/* VIEWS */
+.view{display:none;}.view.active{display:block;}
+/* DASHBOARD */
+.dash{max-width:1100px;margin:0 auto;padding:20px 16px 60px;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:700px){.dash-grid{grid-template-columns:1fr;}}
+.dash-full{grid-column:1/-1;}
+/* PANEL */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.phead{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+.phead-left{display:flex;align-items:center;gap:8px;}
+.ptitle{font-size:10px;font-weight:800;letter-spacing:0.14em;color:var(--text);text-transform:uppercase;}
+.parr{font-size:10px;color:var(--muted);transition:transform 0.2s;}
+.pbody{padding:12px 14px;}
+/* MATCH ROW */
+.mrow{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:9px;margin-bottom:7px;cursor:pointer;transition:background 0.15s;}
+.mrow:hover{background:rgba(224,182,73,0.05);}
+.mrow.owner{border-left-color:var(--green);}
+.mrow-info{flex:1;min-width:0;}
+.mrow-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mrow-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.mrow-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;border-radius:6px;font-size:10px;font-weight:700;padding:2px 7px;letter-spacing:0.04em;}
+.bg-gold{background:var(--accent-fade);color:var(--accent);border:1px solid var(--border-gold);}
+.bg-green{background:rgba(76,175,125,0.15);color:var(--green);border:1px solid rgba(76,175,125,0.3);}
+.bg-muted{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border);}
+.bg-red{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25);}
+.bg-blue{background:rgba(59,130,246,0.12);color:var(--blue);border:1px solid rgba(59,130,246,0.25);}
+/* INV */
+.invrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:rgba(224,182,73,0.04);border:1px solid var(--border-gold);border-radius:9px;margin-bottom:7px;}
+.invinfo{flex:1;min-width:0;}.invname{font-size:13px;font-weight:700;}.invsub{font-size:11px;color:var(--muted);}
+.invbtns{display:flex;gap:6px;flex-shrink:0;}
+.ibacc{background:var(--accent);color:#0a0c0f;border:none;border-radius:7px;padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;}
+.ibacc:hover{opacity:.85;}
+.ibdec{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;}
+.ibdec:hover{background:rgba(239,68,68,.12);color:var(--red);}
+/* DETAIL */
+.detail{max-width:900px;margin:0 auto;padding:16px 16px 80px;}
+.dback{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;margin-bottom:16px;padding:8px 0;}
+.dback:hover{color:var(--accent);}
+.dback svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.dname{font-size:22px;font-weight:900;letter-spacing:-0.01em;margin-bottom:6px;}
+.dmeta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.dmi{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.dmi svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+/* QUICK ACTIONS */
+.qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+@media(max-width:600px){.qgrid{grid-template-columns:1fr 1fr;}}
+.qbtn{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:9px;padding:11px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;}
+.qbtn:hover{background:rgba(224,182,73,.06);border-color:var(--border-gold);}
+.qbtn svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.qt{font-size:12px;font-weight:700;color:var(--text);}
+.qs{font-size:10px;color:var(--muted);margin-top:1px;}
+/* DETAIL TABS */
+.dtabs{display:flex;gap:4px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:14px;overflow-x:auto;}
+.dtab{flex-shrink:0;padding:8px 13px;background:transparent;border:none;border-radius:7px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.dtab.active{background:var(--accent-fade);color:var(--accent);border:1px solid var(--border-gold);}
+.dsec{display:none;}.dsec.active{display:block;}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;position:relative;}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:3px 0 0 3px;}
+.chead{padding:12px 16px 10px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ctitle{font-size:10px;font-weight:700;letter-spacing:.13em;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.ctitle svg{width:13px;height:13px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.cbody{padding:14px 16px;}
+/* FORMS */
+.fg{margin-bottom:12px;}
+.fl{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block;}
+.fi{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);color:var(--text);font-size:14px;padding:10px 13px;outline:none;transition:border-color .15s,background .15s;-webkit-appearance:none;}
+.fi:focus{border-color:rgba(224,182,73,.45);background:rgba(255,255,255,.06);}
+.fi::placeholder{color:rgba(255,255,255,.18);}
+select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+select.fi option{background:#141820;color:var(--text);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:480px){.frow{grid-template-columns:1fr;}}
+.trow{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;}
+.tl{font-size:13px;font-weight:600;}.ts{font-size:11px;color:var(--muted);margin-top:2px;}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;}
+.tslider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:22px;cursor:pointer;transition:background .2s;}
+.tslider::before{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;}
+.toggle input:checked+.tslider{background:var(--accent);}
+.toggle input:checked+.tslider::before{transform:translateX(18px);}
+/* BUTTONS */
+.btn-p{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0c0f;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:opacity .15s;}
+.btn-p:hover{opacity:.88;}.btn-p:disabled{opacity:.45;cursor:not-allowed;}
+.btn-s{width:100%;padding:10px;background:transparent;color:var(--accent);border:1px solid rgba(224,182,73,.28);border-radius:var(--radius-sm);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s;}
+.btn-s:hover{background:var(--accent-fade);}
+.btn-d{width:100%;padding:10px;background:transparent;color:var(--red);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius-sm);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s;}
+.btn-d:hover{background:rgba(239,68,68,.08);}
+.bsm{padding:5px 12px;font-size:10px;border-radius:7px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;transition:all .15s;}
+.bgold{background:var(--accent);color:#0a0c0f;}
+.bgh{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border);}
+.bgh:hover{background:rgba(255,255,255,.1);color:var(--text);}
+.bred{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.bred:hover{background:rgba(239,68,68,.2);}
+.msg{font-size:12px;min-height:16px;text-align:center;padding:5px 0;}
+.msg.err{color:var(--red);}.msg.ok{color:var(--green);}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.tbl td{font-size:13px;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,.02);}
+/* SCORE */
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.scell{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;}
+.slbl{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.sctr{display:flex;align-items:center;justify-content:center;gap:6px;}
+.sval{font-size:18px;font-weight:800;min-width:28px;text-align:center;}
+.sbtn{width:26px;height:26px;border-radius:6px;border:none;background:rgba(255,255,255,.08);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s;}
+.sbtn:hover{background:rgba(255,255,255,.14);}
+.acell{border-color:rgba(76,175,125,.3);}.acell .sval{color:var(--green);}
+.mcell{border-color:rgba(239,68,68,.3);}.mcell .sval{color:var(--red);}
+.hfbar{background:rgba(224,182,73,.08);border:1px solid var(--border-gold);border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.hflbl{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+.hfval{font-size:20px;font-weight:900;color:var(--accent);}
+/* EMPTY */
+.empty{text-align:center;padding:32px 20px;}
+.empty-ico{font-size:30px;opacity:.3;margin-bottom:8px;}
+.empty-t{font-size:13px;font-weight:700;color:var(--muted);}
+.empty-s{font-size:11px;color:rgba(255,255,255,.2);margin-top:3px;}
+/* MODAL */
+.moverlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);overflow-y:auto;padding:30px 16px;}
+.moverlay.show{display:block;}
+.mbox{max-width:480px;margin:0 auto;background:var(--card2);border:1px solid var(--border);border-top:2px solid var(--accent);border-radius:16px;padding:22px;}
+.mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.mtitle{font-size:14px;font-weight:800;}
+.mclose{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;}
+/* autofill */
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #141820 inset!important;-webkit-text-fill-color:#f0f2f5!important;caret-color:#f0f2f5!important;transition:background-color 9999s!important;}
 </style>
 </head>
 <body>
 
-<div id="global-spinner"><div class="spinner-ring"></div></div>
+<div id="gs"><div class="spin"></div></div>
 
-<!-- ── LOGIN SCREEN ── -->
-<div id="login-screen" class="show">
-  <div class="login-box">
-    <div class="login-logo-wrap">
-      <div class="login-logo-icon">🎯</div>
-      <div class="login-title-block">
-        <div class="t1"><span class="w">INSIGHT</span><span class="g"> DYNAMICS</span></div>
-        <div class="t2">Performance. Precision. Progress.</div>
-      </div>
+<!-- LOGIN -->
+<div id="ls" class="show">
+  <div class="lbox">
+    <div class="llogo">
+      <div class="licon">🎯</div>
+      <div><div class="lb1"><span class="w">INSIGHT</span><span class="g"> DYNAMICS</span></div><div class="lb2">Match Administration</div></div>
     </div>
-    <div class="status-strip">
-      <div class="status-dot"></div>
-      <span class="status-text">Matches · Sign in to continue</span>
-    </div>
-    <div class="login-card">
-      <div class="field-group">
-        <div class="field-lbl">
-          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          Email
-        </div>
-        <input id="login-email" class="field-input" type="email" placeholder="name@email.com" autocomplete="email"/>
-      </div>
-      <div class="field-group">
-        <div class="field-lbl">
-          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Password
-        </div>
-        <input id="login-password" class="field-input" type="password" placeholder="Password" autocomplete="current-password"/>
-      </div>
-      <div id="login-msg" class="msg error"></div>
-      <button class="btn-primary" id="login-btn">Sign In</button>
+    <div class="sstrip"><div class="sdot"></div><span class="stxt">Sign in to manage matches</span></div>
+    <div class="lcard">
+      <div class="fg"><label class="fl">Email</label><input id="l-email" class="fi" type="email" placeholder="name@email.com" autocomplete="email"/></div>
+      <div class="fg"><label class="fl">Password</label><input id="l-pw" class="fi" type="password" placeholder="Password" autocomplete="current-password"/></div>
+      <div id="l-msg" class="msg err"></div>
+      <button class="btn-p" id="l-btn">Sign In</button>
     </div>
   </div>
 </div>
 
-<!-- ── MAIN APP ── -->
+<!-- APP -->
 <div id="app" style="display:none;">
   <div class="topbar">
-    <div class="topbar-logo">🎯 Insight · Matches</div>
-    <div class="topbar-user">
-      <div class="nav-avatar" id="top-avatar">–</div>
-      <button class="btn-logout" id="logout-btn">Sign Out</button>
+    <div class="tlogo">🎯 Insight · Match Admin</div>
+    <div class="tright">
+      <div id="inv-badge" style="display:none;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:800;align-items:center;justify-content:center;cursor:pointer;"></div>
+      <div class="nav-av" id="top-av">–</div>
+      <button class="btn-logout" id="out-btn">Sign Out</button>
     </div>
   </div>
 
-  <div class="page">
-    <div class="page-header">
-      <div class="page-title" id="page-greeting">Matches</div>
-      <div class="page-sub">Create, search and manage your IPSC matches</div>
-    </div>
-
-    <!-- Pending invitations -->
-    <div id="invitations-section" style="display:none;">
-      <div class="field-lbl" style="margin-bottom:10px;">
-        <svg viewBox="0 0 24 24"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        Pending Invitations
-      </div>
-      <div id="invitations-list"></div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="tab-matches" onclick="switchTab('tab-matches')">
-        My Matches
-      </button>
-      <button class="tab-btn" data-tab="tab-create" onclick="switchTab('tab-create')">
-        + Create
-      </button>
-      <button class="tab-btn" data-tab="tab-search" onclick="switchTab('tab-search')">
-        🔍 Find
-      </button>
-    </div>
-
-    <!-- ──── TAB: MY MATCHES ──── -->
-    <div id="tab-matches" class="section active">
-      <div id="matches-list">
-        <div class="empty-state">
-          <div class="spinner-ring" style="margin:0 auto 16px;"></div>
-          <div class="empty-title">Loading matches…</div>
+  <!-- DASHBOARD -->
+  <div id="view-dashboard" class="view active">
+    <div class="dash">
+      <!-- Invitations -->
+      <div class="panel dash-full" style="margin-bottom:14px;">
+        <div class="phead" onclick="tp('inv-body','inv-arr')">
+          <div class="phead-left"><span style="font-size:15px;">🔔</span><span class="ptitle">Notifications &amp; Invitations</span></div>
+          <span class="parr" id="inv-arr">▾</span>
         </div>
+        <div class="pbody" id="inv-body"><div id="inv-list"><div class="empty"><div class="empty-t">No pending invitations</div></div></div></div>
       </div>
-    </div>
-
-    <!-- ──── TAB: CREATE MATCH ──── -->
-    <div id="tab-create" class="section">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New Match
+      <!-- My Matches -->
+      <div class="panel dash-full">
+        <div class="phead" onclick="tp('ml-body','ml-arr')">
+          <div class="phead-left"><span style="font-size:15px;">🏆</span><span class="ptitle">My Matches</span></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="bsm bgold" onclick="event.stopPropagation();om('modal-create')" style="width:auto;">+ New Match</button>
+            <button class="bsm bgh" onclick="event.stopPropagation();om('modal-find')" style="width:auto;">Find by ID</button>
+            <span class="parr" id="ml-arr">▾</span>
           </div>
         </div>
-        <div class="card-body">
-          <div class="field-group">
-            <div class="field-lbl">Match Name</div>
-            <input id="c-name" class="field-input" type="text" placeholder="e.g. Club Training May"/>
-          </div>
-          <div class="form-row">
-            <div class="field-group">
-              <div class="field-lbl">Location</div>
-              <input id="c-location" class="field-input" type="text" placeholder="e.g. Oslo Range"/>
+        <div class="pbody" id="ml-body"><div id="ml"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL -->
+  <div id="view-detail" class="view">
+    <div class="detail">
+      <div class="dback" onclick="sv('dashboard')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back to Dashboard
+      </div>
+      <div class="dname" id="d-name"></div>
+      <div class="dmeta" id="d-meta"></div>
+      <div id="d-badges" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
+      <div class="qgrid" id="d-quick" style="display:none;">
+        <div class="qbtn" onclick="odt('ds');openAddStage()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><div><div class="qt">Add Stage</div><div class="qs">Create stage</div></div></div>
+        <div class="qbtn" onclick="odt('dc')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><div><div class="qt">Competitors</div><div class="qs">Manage registrations</div></div></div>
+        <div class="qbtn" onclick="odt('dsc')"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div><div class="qt">Enter Score</div><div class="qs">Add stage result</div></div></div>
+        <div class="qbtn" onclick="odt('da')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg><div><div class="qt">Admin</div><div class="qs">Settings &amp; roles</div></div></div>
+      </div>
+      <div class="dtabs">
+        <button class="dtab active" id="tab-do" onclick="odt('do')">Overview</button>
+        <button class="dtab" id="tab-ds" onclick="odt('ds')">Stages</button>
+        <button class="dtab" id="tab-dc" onclick="odt('dc')">Competitors</button>
+        <button class="dtab" id="tab-dsc" onclick="odt('dsc')">Scoring</button>
+        <button class="dtab" id="tab-dr" onclick="odt('dr')">Roles</button>
+        <button class="dtab" id="tab-da" onclick="odt('da')">Admin</button>
+      </div>
+      <div id="do" class="dsec active"><div id="ov-c"></div></div>
+      <div id="ds" class="dsec">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+          <button class="bsm bgold" id="add-st-btn" onclick="openAddStage()" style="width:auto;">+ Add Stage</button>
+        </div>
+        <div id="sl"></div>
+      </div>
+      <div id="dc" class="dsec">
+        <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="bsm bgold" id="cf-all" onclick="setCF('all')" style="width:auto;">All</button>
+          <button class="bsm bgh" id="cf-approved" onclick="setCF('approved')" style="width:auto;">Approved</button>
+          <button class="bsm bgh" id="cf-pending" onclick="setCF('pending')" style="width:auto;">Pending</button>
+          <button class="bsm bgh" id="cf-waiting" onclick="setCF('waiting')" style="width:auto;">Waiting</button>
+        </div>
+        <div id="cl"></div>
+      </div>
+      <div id="dsc" class="dsec">
+        <div class="card">
+          <div class="chead"><div class="ctitle"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Enter Stage Result</div></div>
+          <div class="cbody">
+            <div class="frow">
+              <div class="fg"><label class="fl">Shooter</label><select id="sc-sh" class="fi" onchange="updHF()"><option value="">Select…</option></select></div>
+              <div class="fg"><label class="fl">Stage</label><select id="sc-st" class="fi"><option value="">Select…</option></select></div>
             </div>
-            <div class="field-group">
-              <div class="field-lbl">Date</div>
-              <input id="c-date" class="field-input" type="date"/>
+            <div class="fg"><label class="fl">Time (s)</label><input id="sc-t" class="fi" type="number" step="0.01" placeholder="e.g. 12.45" oninput="updHF()"/></div>
+            <div class="sgrid">
+              <div class="scell acell"><div class="slbl">A</div><div class="sctr"><button class="sbtn" onclick="adj('sc-a',-1)">−</button><span class="sval" id="sc-a">0</span><button class="sbtn" onclick="adj('sc-a',1)">+</button></div></div>
+              <div class="scell"><div class="slbl">C</div><div class="sctr"><button class="sbtn" onclick="adj('sc-c',-1)">−</button><span class="sval" id="sc-c">0</span><button class="sbtn" onclick="adj('sc-c',1)">+</button></div></div>
+              <div class="scell"><div class="slbl">D</div><div class="sctr"><button class="sbtn" onclick="adj('sc-d',-1)">−</button><span class="sval" id="sc-d">0</span><button class="sbtn" onclick="adj('sc-d',1)">+</button></div></div>
+              <div class="scell mcell"><div class="slbl">Miss</div><div class="sctr"><button class="sbtn" onclick="adj('sc-m',-1)">−</button><span class="sval" id="sc-m">0</span><button class="sbtn" onclick="adj('sc-m',1)">+</button></div></div>
+              <div class="scell"><div class="slbl">NS</div><div class="sctr"><button class="sbtn" onclick="adj('sc-n',-1)">−</button><span class="sval" id="sc-n">0</span><button class="sbtn" onclick="adj('sc-n',1)">+</button></div></div>
+              <div class="scell"><div class="slbl">Proc</div><div class="sctr"><button class="sbtn" onclick="adj('sc-p',-1)">−</button><span class="sval" id="sc-p">0</span><button class="sbtn" onclick="adj('sc-p',1)">+</button></div></div>
             </div>
-          </div>
-          <div class="form-row">
-            <div class="field-group">
-              <div class="field-lbl">Type</div>
-              <select id="c-type" class="field-input">
-                <option value="Training">Training</option>
-                <option value="Level 1">Level 1</option>
-                <option value="Level 2">Level 2</option>
-                <option value="Level 3">Level 3</option>
-                <option value="Level 4">Level 4</option>
-                <option value="Level 5">Level 5</option>
-              </select>
-            </div>
-            <div class="field-group">
-              <div class="field-lbl">Planned Stages</div>
-              <input id="c-stages" class="field-input" type="number" min="1" max="40" placeholder="e.g. 6"/>
-            </div>
-          </div>
-          <div class="field-group">
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label">Allow others to find this match</div>
-                <div class="toggle-sub">Users can search for this match by ID</div>
+            <div class="hfbar">
+              <div class="hflbl">Points / HF</div>
+              <div style="display:flex;gap:14px;align-items:center;">
+                <span style="font-size:14px;font-weight:600;color:var(--muted);" id="sc-pts">0 pts</span>
+                <span class="hfval" id="sc-hf">0.0000</span>
               </div>
-              <label class="toggle">
-                <input type="checkbox" id="c-searchable" checked/>
-                <span class="toggle-slider"></span>
-              </label>
             </div>
+            <div id="sc-msg" class="msg" style="margin-top:6px;"></div>
+            <button class="btn-p" style="margin-top:8px;" onclick="saveScore()">Save Result</button>
           </div>
-          <div id="create-msg" class="msg"></div>
-          <button class="btn-primary" id="create-btn">Create Match</button>
+        </div>
+        <div class="card" style="margin-top:6px;">
+          <div class="chead"><div class="ctitle"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Standings</div></div>
+          <div class="cbody" id="st-out"><div class="empty"><div class="empty-t">No results yet</div></div></div>
+        </div>
+      </div>
+      <div id="dr" class="dsec">
+        <div class="card">
+          <div class="chead"><div class="ctitle">Invite Staff</div></div>
+          <div class="cbody">
+            <div class="fg"><label class="fl">Search user</label><input id="r-srch" class="fi" type="text" placeholder="Name or email…" oninput="srchUsers(this.value)"/></div>
+            <div id="r-results" style="margin-bottom:10px;"></div>
+            <div class="fg"><label class="fl">Role</label>
+              <select id="r-role" class="fi"><option value="staff">Staff – enter scores &amp; manage competitors</option><option value="admin">Admin – full access</option></select>
+            </div>
+            <div id="r-msg" class="msg"></div>
+          </div>
+        </div>
+        <div class="card"><div class="chead"><div class="ctitle">Match Staff</div></div><div class="cbody" id="r-list"></div></div>
+      </div>
+      <div id="da" class="dsec">
+        <div class="card">
+          <div class="chead"><div class="ctitle">Match Settings</div></div>
+          <div class="cbody">
+            <div class="fg"><label class="fl">Match Name</label><input id="a-name" class="fi" type="text"/></div>
+            <div class="frow">
+              <div class="fg"><label class="fl">Location</label><input id="a-loc" class="fi" type="text"/></div>
+              <div class="fg"><label class="fl">Date</label><input id="a-date" class="fi" type="date"/></div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label class="fl">Type</label>
+                <select id="a-type" class="fi"><option value="Training">Training</option><option value="Level 1">Level 1</option><option value="Level 2">Level 2</option><option value="Level 3">Level 3</option><option value="Level 4">Level 4</option><option value="Level 5">Level 5</option></select>
+              </div>
+              <div class="fg"><label class="fl">Status</label>
+                <select id="a-status" class="fi"><option value="draft">Draft</option><option value="active">Active</option><option value="active_noedit">Active (no self-edit)</option><option value="preliminary">Preliminary</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label class="fl">Registration</label>
+                <select id="a-reg" class="fi"><option value="open_auto">Open – approved directly</option><option value="open_manual">Open – manual approval</option><option value="open_waiting">Open – waiting list</option><option value="closed">Closed</option></select>
+              </div>
+              <div class="fg"><label class="fl">Max Competitors</label><input id="a-max" class="fi" type="number" min="1" placeholder="Unlimited"/></div>
+            </div>
+            <div class="fg">
+              <div class="trow">
+                <div><div class="tl">Searchable / Public</div><div class="ts">Allow search by ID</div></div>
+                <label class="toggle"><input type="checkbox" id="a-srch"/><span class="tslider"></span></label>
+              </div>
+            </div>
+            <div id="a-msg" class="msg"></div>
+            <button class="btn-p" onclick="saveAdmin()">Save Changes</button>
+            <div style="margin-top:10px;"><button class="btn-d" onclick="delMatch()">Delete Match</button></div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- ──── TAB: FIND MATCH ──── -->
-    <div id="tab-search" class="section">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Find Match by ID
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="field-group">
-            <div class="field-lbl">Match ID</div>
-            <input id="s-id" class="field-input" type="text" placeholder="Enter match ID (e.g. 12345)"/>
-          </div>
-          <div id="search-msg" class="msg"></div>
-          <button class="btn-primary" id="search-btn">Search</button>
-
-          <!-- result card -->
-          <div id="search-result" class="search-result-box">
-            <div class="search-result-name" id="sr-name"></div>
-            <div class="search-result-meta" id="sr-meta"></div>
-            <div id="sr-status"></div>
-            <div id="join-msg" class="msg"></div>
-            <button class="btn-primary" id="join-btn" style="display:none;">Join Match</button>
-            <div id="joined-info" class="badge badge-green" style="display:none;margin-top:6px;">✓ You are already in this match</div>
-          </div>
-        </div>
+<!-- MODALS -->
+<!-- Create -->
+<div id="modal-create" class="moverlay" onclick="if(event.target===this)cm('modal-create')">
+  <div class="mbox">
+    <div class="mhdr"><div class="mtitle">New Match</div><button class="mclose" onclick="cm('modal-create')">✕</button></div>
+    <div class="fg"><label class="fl">Match Name</label><input id="c-name" class="fi" type="text" placeholder="Bergen Open 2026"/></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Location</label><input id="c-loc" class="fi" type="text" placeholder="Oslo Range"/></div>
+      <div class="fg"><label class="fl">Date</label><input id="c-date" class="fi" type="date"/></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Type</label>
+        <select id="c-type" class="fi"><option value="Training">Training</option><option value="Level 1">Level 1</option><option value="Level 2">Level 2</option><option value="Level 3">Level 3</option><option value="Level 4">Level 4</option><option value="Level 5">Level 5</option></select>
       </div>
-
-      <div class="separator"><span class="separator-text">or</span></div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <svg viewBox="0 0 24 24"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            Pending Invitations
-          </div>
-        </div>
-        <div class="card-body" id="search-tab-invitations">
-          <div class="empty-state" style="padding:24px 0;">
-            <div class="empty-title">No pending invitations</div>
-          </div>
-        </div>
+      <div class="fg"><label class="fl">Status</label>
+        <select id="c-status" class="fi"><option value="draft">Draft</option><option value="active" selected>Active</option></select>
       </div>
     </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Planned Stages</label><input id="c-stages" class="fi" type="number" min="1" max="40" placeholder="6"/></div>
+      <div class="fg"><label class="fl">Max Competitors</label><input id="c-maxc" class="fi" type="number" min="1" placeholder="Unlimited"/></div>
+    </div>
+    <div class="fg"><div class="trow"><div><div class="tl">Allow public search</div><div class="ts">Others can find by ID</div></div><label class="toggle"><input type="checkbox" id="c-pub" checked/><span class="tslider"></span></label></div></div>
+    <div id="cm-msg" class="msg"></div>
+    <button class="btn-p" id="cm-btn" onclick="createMatch()">Create Match</button>
+  </div>
+</div>
+<!-- Find -->
+<div id="modal-find" class="moverlay" onclick="if(event.target===this)cm('modal-find')">
+  <div class="mbox" style="max-width:420px;">
+    <div class="mhdr"><div class="mtitle">Find Match by ID</div><button class="mclose" onclick="cm('modal-find')">✕</button></div>
+    <div class="fg"><label class="fl">Match ID</label><input id="f-id" class="fi" type="text" placeholder="e.g. 12345"/></div>
+    <div id="fm-msg" class="msg"></div>
+    <button class="btn-p" onclick="findMatch()">Search</button>
+    <div id="fm-res" style="display:none;margin-top:12px;"></div>
+  </div>
+</div>
+<!-- Stage -->
+<div id="modal-stage" class="moverlay" onclick="if(event.target===this)cm('modal-stage')">
+  <div class="mbox" style="max-width:500px;">
+    <div class="mhdr"><div class="mtitle" id="st-modal-title">Add Stage</div><button class="mclose" onclick="cm('modal-stage')">✕</button></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Stage #</label><input id="st-num" class="fi" type="number" min="1" placeholder="1"/></div>
+      <div class="fg"><label class="fl">Name</label><input id="st-name" class="fi" type="text" placeholder="Stage 1"/></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Scoring</label><select id="st-sc" class="fi"><option value="comstock">Comstock</option><option value="virginia">Virginia Count</option><option value="fixedtime">Fixed Time</option></select></div>
+      <div class="fg"><label class="fl">Course</label><select id="st-co" class="fi"><option value="short">Short (≤60)</option><option value="medium">Medium (61–120)</option><option value="long">Long (&gt;120)</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Paper Targets</label><input id="st-pp" class="fi" type="number" min="0" value="4" oninput="updStCalc()"/></div>
+      <div class="fg"><label class="fl">Poppers</label><input id="st-po" class="fi" type="number" min="0" value="2" oninput="updStCalc()"/></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Plates</label><input id="st-pl" class="fi" type="number" min="0" value="0" oninput="updStCalc()"/></div>
+      <div class="fg"><label class="fl">No-Shoots</label><input id="st-ns" class="fi" type="number" min="0" value="0"/></div>
+    </div>
+    <div class="fg"><label class="fl">Procedure (optional)</label><input id="st-proc" class="fi" type="text" placeholder="Stage description…"/></div>
+    <div class="fg"><div class="trow"><div><div class="tl">Included in results</div><div class="ts">Stage counts toward match score</div></div><label class="toggle"><input type="checkbox" id="st-inc" checked/><span class="tslider"></span></label></div></div>
+    <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:12px;font-size:12px;color:var(--muted);">
+      Shots: <b id="st-shots" style="color:var(--text);">10</b> &nbsp;·&nbsp; Max pts: <b id="st-maxp" style="color:var(--accent);">50</b>
+    </div>
+    <div id="st-msg" class="msg"></div>
+    <button class="btn-p" id="st-btn" onclick="saveStage()">Save Stage</button>
+  </div>
+</div>
 
-  </div><!-- /page -->
-</div><!-- /app -->
-
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getFirestore, doc, getDoc, collection, query, where, getDocs,
-  setDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
-  arrayUnion, runTransaction
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ── Firebase config ──
-const firebaseConfig = {
-  apiKey: "AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5p7Q",
-  authDomain: "ipsc-insight-coach.firebaseapp.com",
-  projectId: "ipsc-insight-coach",
-  storageBucket: "ipsc-insight-coach.firebasestorage.app",
-  messagingSenderId: "864793320312",
-  appId: "1:864793320312:web:c586e384bbe365444bc68d"
-};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const FB={apiKey:"AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5p7Q",authDomain:"ipsc-insight-coach.firebaseapp.com",projectId:"ipsc-insight-coach",storageBucket:"ipsc-insight-coach.firebasestorage.app",messagingSenderId:"864793320312",appId:"1:864793320312:web:c586e384bbe365444bc68d"};
+const fbApp=initializeApp(FB);
+const auth=getAuth(fbApp);
+const db=getFirestore(fbApp);
 
-// ── State ──
-let currentUser = null;
-let userProfile = null;
-let matchesUnsub = null;
-let invitationsUnsub = null;
-let currentMatches = [];
-let pendingInvitations = [];
+let CU=null,UP=null,matches=[],invitations=[],AM=null,CF='all',editSN=null,rSel=null;
+let munsub=null,iunsub=null,rTimer=null;
 
-// ── Helpers ──
-const $  = id => document.getElementById(id);
-const spinner = show => $('global-spinner').classList.toggle('show', show);
-const fmtDate = d => { try { return new Date(d).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}); } catch { return d||''; } };
-function setMsg(id, txt, type='error') {
-  const el = $(id); if (!el) return;
-  el.textContent = txt; el.className = 'msg ' + type;
-}
+const $=id=>document.getElementById(id);
+const spin=s=>$('gs').classList.toggle('show',s);
+const fmtD=d=>{try{return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch{return d||'';}};
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const smsg=(id,t,tp='err')=>{const e=$(id);if(!e)return;e.textContent=t;e.className='msg '+(tp||'');};
 
-// ── Auth ──
-onAuthStateChanged(auth, async user => {
-  if (user) {
-    currentUser = user;
-    try {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      userProfile = snap.exists() ? { uid: user.uid, ...snap.data() } : {
-        uid: user.uid, email: user.email,
-        firstName: user.email.split('@')[0], lastName: '', division: '', powerFactor: 'minor'
-      };
-    } catch { userProfile = { uid: user.uid, email: user.email, firstName: user.email.split('@')[0], lastName: '' }; }
-    initApp();
-  } else {
-    currentUser = null; userProfile = null;
-    $('login-screen').classList.add('show');
-    $('app').style.display = 'none';
-    if (matchesUnsub) { matchesUnsub(); matchesUnsub = null; }
-    if (invitationsUnsub) { invitationsUnsub(); invitationsUnsub = null; }
+// expose globals
+Object.assign(window,{sv,om,cm,tp,odt,openAddStage,createMatch,findMatch,saveStage,saveScore,saveAdmin,delMatch,setCF,adj,updHF,updStCalc,srchUsers,inviteRole,removeRole,approveC,removeC,editStage,delStage,joinMatch,acceptInv,declineInv});
+
+// IPSC scoring
+const PFS={major:{A:5,C:4,D:2,miss:-10,ns:-10,proc:-10},minor:{A:5,C:3,D:1,miss:-10,ns:-10,proc:-10}};
+const calcShots=s=>Math.max(0,(s.paperTargets||0)*2+(s.poppers||0)+(s.plates||0));
+const calcMax=s=>Math.max(0,(s.paperTargets||0)*10+(s.poppers||0)*5+(s.plates||0)*5);
+const calcPts=(pf,a,c,d,m,n,p)=>{const sc=PFS[(pf||'minor').toLowerCase()]||PFS.minor;return a*sc.A+c*sc.C+d*sc.D+m*sc.miss+n*sc.ns+p*sc.proc;};
+
+// AUTH
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    CU=user;
+    try{const sn=await getDoc(doc(db,'users',user.uid));UP=sn.exists()?{uid:user.uid,...sn.data()}:{uid:user.uid,email:user.email,firstName:user.email.split('@')[0],lastName:'',division:'',powerFactor:'minor'};}
+    catch{UP={uid:user.uid,email:user.email,firstName:user.email.split('@')[0],lastName:'',powerFactor:'minor'};}
+    init();
+  }else{
+    CU=null;UP=null;
+    $('ls').classList.add('show');$('app').style.display='none';
+    munsub&&(munsub(),munsub=null);iunsub&&(iunsub(),iunsub=null);
   }
 });
-
-// ── Login ──
-$('login-btn').onclick = async () => {
-  setMsg('login-msg', '');
-  const email = $('login-email').value.trim();
-  const pw = $('login-password').value;
-  if (!email || !pw) { setMsg('login-msg', 'Please enter email and password.'); return; }
-  $('login-btn').disabled = true; $('login-btn').textContent = 'Signing in…';
-  try {
-    await signInWithEmailAndPassword(auth, email, pw);
-  } catch (e) {
-    let msg = 'Sign-in failed.';
-    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
-    else if (e.code === 'auth/invalid-email') msg = 'Invalid email address.';
-    setMsg('login-msg', msg);
-    $('login-btn').disabled = false; $('login-btn').textContent = 'Sign In';
-  }
+$('l-btn').onclick=async()=>{
+  smsg('l-msg','');
+  const email=$('l-email').value.trim(),pw=$('l-pw').value;
+  if(!email||!pw){smsg('l-msg','Enter email and password.');return;}
+  $('l-btn').disabled=true;$('l-btn').textContent='Signing in…';
+  try{await signInWithEmailAndPassword(auth,email,pw);}
+  catch(e){let m='Sign-in failed.';if(e.code==='auth/invalid-credential'||e.code==='auth/wrong-password')m='Invalid email or password.';smsg('l-msg',m);$('l-btn').disabled=false;$('l-btn').textContent='Sign In';}
 };
-$('login-email').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); });
-$('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); });
+['l-email','l-pw'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')$('l-btn').click();}));
+$('out-btn').onclick=()=>signOut(auth);
 
-// ── Logout ──
-$('logout-btn').onclick = async () => { await signOut(auth); };
-
-// ── Init App ──
-function initApp() {
-  $('login-screen').classList.remove('show');
-  $('app').style.display = 'block';
-
-  // Avatar & greeting
-  const fn = userProfile.firstName || '';
-  const ln = userProfile.lastName || '';
-  const initials = ((fn[0]||'') + (ln[0]||'')).toUpperCase() || (userProfile.email||'?')[0].toUpperCase();
-  if (userProfile.photoURL) {
-    $('top-avatar').innerHTML = `<img src="${userProfile.photoURL}" alt="avatar"/>`;
-  } else {
-    $('top-avatar').textContent = initials;
-  }
-  $('page-greeting').textContent = (fn ? `${fn}'s Matches` : 'My Matches');
-
-  // Set default date to today
-  $('c-date').value = new Date().toISOString().split('T')[0];
-
-  startMatchListener();
-  startInvitationListener();
+function init(){
+  $('ls').classList.remove('show');$('app').style.display='block';
+  const fn=UP.firstName||'',ln=UP.lastName||'';
+  const ini=((fn[0]||'')+(ln[0]||'')).toUpperCase()||(UP.email||'?')[0].toUpperCase();
+  if(UP.photoURL)$('top-av').innerHTML=`<img src="${UP.photoURL}" alt="av"/>`;else $('top-av').textContent=ini;
+  $('c-date').value=new Date().toISOString().split('T')[0];
+  startML();startIL();updStCalc();
 }
 
-// ── Real-time match listener ──
-function startMatchListener() {
-  if (matchesUnsub) matchesUnsub();
-  const q = query(collection(db, 'matches'), where('participants', 'array-contains', currentUser.uid));
-  matchesUnsub = onSnapshot(q, snap => {
-    currentMatches = [];
-    snap.forEach(d => currentMatches.push({ id: d.id, ...d.data() }));
-    currentMatches.sort((a, b) => {
-      const da = a.date ? new Date(a.date) : (a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0));
-      const db2 = b.date ? new Date(b.date) : (b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0));
-      return db2 - da;
-    });
-    renderMatches();
-  }, err => console.error('Match listener error:', err));
-}
-
-// ── Real-time invitation listener ──
-function startInvitationListener() {
-  if (invitationsUnsub) invitationsUnsub();
-  const q = query(collection(db, 'users', currentUser.uid, 'invitations'), where('status', '==', 'pending'));
-  invitationsUnsub = onSnapshot(q, snap => {
-    pendingInvitations = [];
-    snap.forEach(d => pendingInvitations.push({ id: d.id, ...d.data() }));
-    renderInvitations();
+function startML(){
+  munsub&&munsub();
+  const q=query(collection(db,'matches'),where('participants','array-contains',CU.uid));
+  munsub=onSnapshot(q,sn=>{
+    matches=[];sn.forEach(d=>matches.push({id:d.id,...d.data()}));
+    matches.sort((a,b)=>{const da=a.date?new Date(a.date):(a.createdAt?.toDate?.()??new Date(0));const db2=b.date?new Date(b.date):(b.createdAt?.toDate?.()??new Date(0));return db2-da;});
+    renderML();
+    if(AM){const u=matches.find(m=>m.id===AM.id);if(u){AM=u;renderD();}}
   });
 }
+function startIL(){
+  iunsub&&iunsub();
+  const q=query(collection(db,'users',CU.uid,'invitations'),where('status','==','pending'));
+  iunsub=onSnapshot(q,sn=>{invitations=[];sn.forEach(d=>invitations.push({id:d.id,...d.data()}));renderInv();});
+}
 
-// ── Render matches list ──
-function renderMatches() {
-  const container = $('matches-list');
-  if (!currentMatches.length) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🏆</div>
-        <div class="empty-title">No matches yet</div>
-        <div class="empty-sub">Create a match or join one via the Find tab</div>
-      </div>`;
-    return;
-  }
-  container.innerHTML = currentMatches.map(m => {
-    const isOwner = m.ownerId === currentUser.uid;
-    const shooterCount = (m.shooters || []).length;
-    const stageCount = (m.stages || []).filter(s => s && (s.number != null || s.name)).length;
-    const plannedStages = m.plannedStages || m.stages?.length || 0;
-    const dateStr = m.date ? fmtDate(m.date) : (m.createdAt?.toDate ? fmtDate(m.createdAt.toDate()) : '');
-    return `
-    <div class="match-item ${isOwner ? 'owner-match' : ''}" onclick="openMatchApp('${m.id}')">
-      <div class="match-item-top">
-        <div class="match-name">${escHtml(m.name || 'Unnamed Match')}</div>
-        <div class="match-badges">
-          ${m.type ? `<span class="badge badge-gold">${escHtml(m.type)}</span>` : ''}
-          ${isOwner ? `<span class="badge badge-green">Owner</span>` : ''}
-          ${m.searchable ? `<span class="badge badge-muted">🔍 Public</span>` : ''}
+// VIEWS
+function sv(name){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-'+name)?.classList.add('active');window.scrollTo(0,0);}
+function tp(bid,aid){const b=$(bid),a=$(aid);if(!b)return;const open=b.style.display!=='none';b.style.display=open?'none':'block';if(a)a.textContent=open?'▸':'▾';}
+function om(id){$(id)?.classList.add('show');}
+function cm(id){$(id)?.classList.remove('show');}
+function odt(id){
+  document.querySelectorAll('.dsec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+  $(id)?.classList.add('active');
+  $('tab-'+id)?.classList.add('active');
+}
+
+// RENDER MATCHES
+function renderML(){
+  const el=$('ml');
+  if(!matches.length){el.innerHTML='<div class="empty"><div class="empty-ico">🏆</div><div class="empty-t">No matches yet</div><div class="empty-s">Create or join a match</div></div>';return;}
+  const sc={'draft':'bg-muted','active':'bg-green','active_noedit':'bg-green','preliminary':'bg-gold','completed':'bg-blue','cancelled':'bg-red'};
+  el.innerHTML=matches.map(m=>{
+    const io=m.ownerId===CU.uid,sh=(m.shooters||[]).length,st=(m.stages||[]).filter(s=>s?.number!=null).length;
+    const status=m.status||'active';
+    return `<div class="mrow ${io?'owner':''}" onclick="openM('${m.id}')">
+      <div class="mrow-info">
+        <div class="mrow-name">${esc(m.name||'Unnamed')}</div>
+        <div class="mrow-meta">${m.date?fmtD(m.date)+' · ':''}${esc(m.location||'')}${m.location?' · ':''}${sh} shooters · ${st} stages · ID: ${m.id}</div>
+      </div>
+      <div class="mrow-right">
+        <span class="badge bg-gold">${esc(m.type||'')}</span>
+        <span class="badge ${sc[status]||'bg-muted'}" style="border:none;">${status.toUpperCase()}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.openM=id=>{AM=matches.find(m=>m.id===id||m.id?.toString()===id.toString());if(!AM)return;editSN=null;sv('detail');odt('do');renderD();};
+
+// RENDER INVITATIONS
+function renderInv(){
+  const el=$('inv-list'),badge=$('inv-badge');
+  if(!invitations.length){el.innerHTML='<div class="empty"><div class="empty-t">No pending invitations</div></div>';badge.style.display='none';return;}
+  badge.style.display='flex';badge.textContent=invitations.length;
+  el.innerHTML=invitations.map(inv=>`<div class="invrow" id="iv-${esc(inv.id)}">
+    <div class="invinfo"><div class="invname">${esc(inv.matchName||'Match Invitation')}</div><div class="invsub">Invited by ${esc(inv.invitedBy||'a user')}</div></div>
+    <div class="invbtns">
+      <button class="ibacc" onclick="acceptInv('${esc(inv.matchId||inv.id)}')">Accept</button>
+      <button class="ibdec" onclick="declineInv('${esc(inv.matchId||inv.id)}')">Decline</button>
+    </div>
+  </div>`).join('');
+}
+async function acceptInv(mid){
+  spin(true);
+  try{
+    const mRef=doc(db,'matches',mid.toString()),sn=await getDoc(mRef);if(!sn.exists()){spin(false);return;}
+    const md=sn.data(),exist=md.participants||[],alr=exist.includes(CU.uid);
+    if(!alr)await updateDoc(mRef,{participants:[...exist,CU.uid]});
+    const esh=md.shooters||[],alrS=esh.some(s=>s.uid===CU.uid||s.id===CU.uid);
+    const ns={id:CU.uid,isMe:false,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
+    await updateDoc(mRef,{shooters:alrS?esh:[...esh,ns],updatedAt:serverTimestamp()});
+    await updateDoc(doc(db,'users',CU.uid,'invitations',mid.toString()),{status:'accepted'});
+  }catch(e){console.error(e);}spin(false);
+}
+async function declineInv(mid){try{await updateDoc(doc(db,'users',CU.uid,'invitations',mid.toString()),{status:'declined'});}catch(e){console.error(e);}}
+
+// CREATE MATCH
+async function createMatch(){
+  smsg('cm-msg','');
+  const name=$('c-name').value.trim();if(!name){smsg('cm-msg','Match name required.');return;}
+  $('cm-btn').disabled=true;$('cm-btn').textContent='Creating…';spin(true);
+  try{
+    const mid=await nextMID();
+    const os={id:CU.uid,isMe:true,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
+    await setDoc(doc(db,'matches',mid.toString()),{id:mid,name,location:$('c-loc').value.trim(),date:$('c-date').value,type:$('c-type').value,status:$('c-status').value,plannedStages:parseInt($('c-stages').value)||0,maxCompetitors:parseInt($('c-maxc').value)||0,searchable:$('c-pub').checked,ownerId:CU.uid,participants:[CU.uid],shooters:[os],stages:[],registration:'open_auto',createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    smsg('cm-msg','✓ Match created! ID: '+mid,'ok');
+    ['c-name','c-loc','c-stages','c-maxc'].forEach(i=>{const e=$(i);if(e)e.value='';});
+    setTimeout(()=>cm('modal-create'),1600);
+  }catch(e){smsg('cm-msg','Error: '+e.message);}
+  $('cm-btn').disabled=false;$('cm-btn').textContent='Create Match';spin(false);
+}
+async function nextMID(){
+  const cr=doc(db,'counters','matchId');
+  return runTransaction(db,async t=>{const sn=await t.get(cr);const n=sn.exists()?sn.data().value+1:1;t.set(cr,{value:n});return n;});
+}
+
+// FIND MATCH
+async function findMatch(){
+  smsg('fm-msg','');$('fm-res').style.display='none';
+  const raw=$('f-id').value.trim();if(!raw){smsg('fm-msg','Enter a match ID.');return;}
+  spin(true);
+  try{
+    const local=matches.find(m=>m.id&&m.id.toString()===raw);
+    if(local){renderFR(local,true);spin(false);return;}
+    const sn=await getDoc(doc(db,'matches',raw));
+    if(!sn.exists()){smsg('fm-msg','Match not found.');spin(false);return;}
+    const md={id:sn.id,...sn.data()};
+    if(!md.searchable){smsg('fm-msg','This match is private.');spin(false);return;}
+    renderFR(md,false);
+  }catch(e){smsg('fm-msg','Error: '+e.message);}
+  spin(false);
+}
+function renderFR(m,alrIn){
+  const el=$('fm-res');el.style.display='block';
+  el.innerHTML=`<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:14px;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:5px;">${esc(m.name||'')}</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">${m.date?fmtD(m.date):''} ${m.location?'· '+esc(m.location):''} · ${(m.shooters||[]).length} shooters · ID: ${m.id}</div>
+    ${alrIn?'<span class="badge bg-green">✓ Already in this match</span>':`<div id="jmsg" class="msg"></div><button class="btn-p" onclick="joinMatch('${m.id}')">Join Match</button>`}
+  </div>`;
+}
+async function joinMatch(mid){
+  smsg('jmsg','');spin(true);
+  try{
+    const mRef=doc(db,'matches',mid.toString()),sn=await getDoc(mRef);if(!sn.exists()){smsg('jmsg','Not found.');spin(false);return;}
+    const md=sn.data(),ex=md.participants||[];
+    if(!ex.includes(CU.uid))await updateDoc(mRef,{participants:[...ex,CU.uid]});
+    const esh=md.shooters||[],alr=esh.some(s=>s.uid===CU.uid||s.id===CU.uid);
+    const ns={id:CU.uid,isMe:false,uid:CU.uid,firstName:UP.firstName||'',lastName:UP.lastName||'',division:UP.division||'Standard',pf:(UP.powerFactor||'minor').toLowerCase(),club:UP.club||'',stages:[]};
+    await updateDoc(mRef,{shooters:alr?esh:[...esh,ns],updatedAt:serverTimestamp()});
+    smsg('jmsg','✓ Joined!','ok');setTimeout(()=>cm('modal-find'),1400);
+  }catch(e){smsg('jmsg','Error: '+e.message);}
+  spin(false);
+}
+
+// RENDER DETAIL
+function renderD(){
+  if(!AM)return;const m=AM,io=m.ownerId===CU.uid;
+  $('d-name').textContent=m.name||'Unnamed';
+  const ds=m.date?fmtD(m.date):'';
+  $('d-meta').innerHTML=[
+    m.location?`<div class="dmi"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(m.location)}</div>`:'',
+    ds?`<div class="dmi"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${ds}</div>`:'',
+    `<div class="dmi" style="font-size:10px;opacity:.4;">ID: ${m.id}</div>`
+  ].join('');
+  const sc={'draft':'bg-muted','active':'bg-green','active_noedit':'bg-green','preliminary':'bg-gold','completed':'bg-blue','cancelled':'bg-red'};
+  const st=m.status||'active';
+  $('d-badges').innerHTML=[
+    `<span class="badge bg-gold">${esc(m.type||'')}</span>`,
+    `<span class="badge ${sc[st]||'bg-muted'}">${st.toUpperCase()}</span>`,
+    io?'<span class="badge bg-green">Owner</span>':'',
+    m.searchable?'<span class="badge bg-muted">🔍 Public</span>':''
+  ].join('');
+  $('d-quick').style.display=io?'grid':'none';
+  $('add-st-btn').style.display=io?'inline-block':'none';
+  renderOV();renderSL();renderCL();renderScSel();renderStOut();renderRoles();
+  if(io)fillAdmin();
+}
+
+// OVERVIEW
+function renderOV(){
+  const m=AM;
+  const stages=(m.stages||[]).filter(s=>s?.number!=null);
+  const shooters=m.shooters||[];
+  const res=shooters.reduce((a,sh)=>a+(sh.stages||[]).length,0);
+  $('ov-c').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
+      ${[['Stages',stages.length],['Shooters',shooters.length],['Results',res]].map(([l,v])=>`
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center;">
+          <div style="font-size:22px;font-weight:900;color:var(--accent);">${v}</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-top:3px;">${l}</div>
+        </div>`).join('')}
+    </div>
+    <div class="card"><div class="chead"><div class="ctitle">Live Standings</div></div><div class="cbody">${stTable(m)}</div></div>`;
+}
+
+function stTable(m){
+  const stages=(m.stages||[]).filter(s=>s?.number!=null);
+  if(!stages.length)return '<div class="empty"><div class="empty-t">No stages yet</div></div>';
+  const tot={};
+  (m.shooters||[]).forEach(sh=>{const nm=((sh.firstName||'')+(sh.lastName?' '+sh.lastName:'')).trim()||'Shooter';tot[sh.id]={nm,div:sh.division||'',sp:0,rp:0,n:0};});
+  stages.forEach(st=>{
+    const mets=stMets(m,st),topHF=mets.length?mets[0].hf:0,maxPts=calcMax(st);
+    mets.forEach(r=>{
+      if(!tot[r.id])tot[r.id]={nm:r.nm,div:'',sp:0,rp:0,n:0};
+      tot[r.id].sp+=topHF>0?r.hf/topHF*maxPts:0;tot[r.id].rp+=r.pts;tot[r.id].n++;
+    });
+  });
+  const srt=Object.values(tot).sort((a,b)=>b.sp-a.sp);
+  if(!srt.length)return '<div class="empty"><div class="empty-t">No results yet</div></div>';
+  const top=srt[0].sp||1;
+  return `<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Div</th><th>Stages</th><th>%</th></tr></thead><tbody>
+    ${srt.map((r,i)=>`<tr>
+      <td style="font-weight:800;color:${i===0?'#e0b649':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text)'}">${i+1}</td>
+      <td style="font-weight:600;">${esc(r.nm)}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.div)}</td>
+      <td>${r.n}</td>
+      <td style="color:var(--accent);font-weight:700;">${(r.sp/top*100).toFixed(2)}%</td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function stMets(m,stage){
+  const res=[];
+  (m.shooters||[]).forEach(sh=>{
+    const r=(sh.stages||[]).find(s=>String(s.num||s.number)===String(stage.number)&&s.time>0);
+    if(!r)return;
+    const pts=calcPts(sh.pf||'minor',r.a||0,r.c||0,r.d||0,r.miss||0,r.ns||0,r.proc||0);
+    res.push({id:sh.id,nm:((sh.firstName||'')+(sh.lastName?' '+sh.lastName:'')).trim()||'Shooter',pts,hf:r.time>0?pts/r.time:0,time:r.time});
+  });
+  return res.sort((a,b)=>b.hf-a.hf);
+}
+
+// STAGES
+function renderSL(){
+  const el=$('sl'),m=AM;
+  const stages=(m.stages||[]).filter(s=>s?.number!=null).sort((a,b)=>(a.number||0)-(b.number||0));
+  const io=m.ownerId===CU.uid;
+  if(!stages.length){el.innerHTML='<div class="empty"><div class="empty-ico">🎯</div><div class="empty-t">No stages yet</div></div>';return;}
+  el.innerHTML=stages.map(s=>{
+    const shots=calcShots(s),mp=calcMax(s),mets=stMets(m,s),topHF=mets.length?mets[0].hf:0;
+    return `<div class="card">
+      <div class="chead">
+        <div class="ctitle">Stage ${s.number}${s.name?' · '+esc(s.name):''}</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          ${!s.included?'<span class="badge bg-muted">Excluded</span>':''}
+          ${io?`<button class="bsm bgh" onclick="editStage(${s.number})" style="width:auto;">Edit</button><button class="bsm bred" onclick="delStage(${s.number})" style="width:auto;">Delete</button>`:''}
         </div>
       </div>
-      <div class="match-meta">
-        ${m.location ? `<div class="match-meta-item"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${escHtml(m.location)}</div>` : ''}
-        ${dateStr ? `<div class="match-meta-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${dateStr}</div>` : ''}
-        <div class="match-meta-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>${shooterCount} shooter${shooterCount !== 1 ? 's' : ''}</div>
-        <div class="match-meta-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>${stageCount}${plannedStages > stageCount ? ' / ' + plannedStages : ''} stage${plannedStages !== 1 ? 's' : ''}</div>
-        <div class="match-meta-item" style="color:rgba(255,255,255,0.2);font-size:10px;">ID: ${m.id}</div>
+      <div class="cbody">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+          ${[['Paper',s.paperTargets||0],['Poppers',s.poppers||0],['Plates',s.plates||0],['No-Shoots',s.noShoots||0]].map(([l,v])=>`<span style="font-size:11px;color:var(--muted);">${l}: <b style="color:var(--text);">${v}</b></span>`).join('')}
+          <span style="font-size:11px;color:var(--muted);">Shots: <b style="color:var(--accent);">${shots}</b></span>
+          <span style="font-size:11px;color:var(--muted);">Max: <b style="color:var(--accent);">${mp}</b></span>
+          <span style="font-size:11px;color:var(--muted);">Scoring: <b>${esc(s.scoring||'comstock')}</b></span>
+        </div>
+        ${mets.length?`<table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Time</th><th>Pts</th><th>HF</th><th>%</th></tr></thead><tbody>
+          ${mets.map((r,i)=>`<tr>
+            <td style="font-weight:800;color:${i===0?'#e0b649':'var(--text)'}">${i+1}</td>
+            <td style="font-weight:600;">${esc(r.nm)}</td>
+            <td>${r.time.toFixed(2)}s</td><td>${r.pts}</td>
+            <td style="color:var(--accent);font-weight:700;">${r.hf.toFixed(4)}</td>
+            <td style="color:var(--muted);">${topHF>0?(r.hf/topHF*100).toFixed(2):0}%</td>
+          </tr>`).join('')}
+        </tbody></table>`:'<div style="font-size:12px;color:var(--muted);">No results yet</div>'}
       </div>
     </div>`;
   }).join('');
 }
 
-// ── Render invitations ──
-function renderInvitations() {
-  const topSection = $('invitations-section');
-  const topList = $('invitations-list');
-  const searchTabInv = $('search-tab-invitations');
-
-  if (!pendingInvitations.length) {
-    topSection.style.display = 'none';
-    searchTabInv.innerHTML = `<div class="empty-state" style="padding:24px 0;"><div class="empty-title">No pending invitations</div></div>`;
-    return;
-  }
-
-  topSection.style.display = 'block';
-  const html = pendingInvitations.map(inv => `
-    <div class="inv-banner" id="inv-${inv.id}">
-      <div class="inv-info">
-        <div class="inv-title">${escHtml(inv.matchName || 'Match Invitation')}</div>
-        <div class="inv-sub">Invited by ${escHtml(inv.invitedBy || 'a user')}</div>
-      </div>
-      <div class="inv-actions">
-        <button class="inv-btn inv-btn-accept" onclick="acceptInvitation('${inv.matchId || inv.id}')">Accept</button>
-        <button class="inv-btn inv-btn-decline" onclick="declineInvitation('${inv.matchId || inv.id}')">Decline</button>
-      </div>
-    </div>`).join('');
-
-  topList.innerHTML = html;
-  searchTabInv.innerHTML = html.replace(/inv-btn-accept/g, 'inv-btn-accept').replace(/inv-btn-decline/g, 'inv-btn-decline');
+function openAddStage(){
+  editSN=null;$('st-modal-title').textContent='Add Stage';$('st-btn').textContent='Save Stage';
+  const m=AM,ex=(m.stages||[]).filter(s=>s?.number!=null).map(s=>s.number);
+  let n=1;while(ex.includes(n))n++;
+  $('st-num').value=n;$('st-name').value='';$('st-sc').value='comstock';$('st-co').value='short';
+  $('st-pp').value=4;$('st-po').value=2;$('st-pl').value=0;$('st-ns').value=0;$('st-proc').value='';$('st-inc').checked=true;
+  updStCalc();om('modal-stage');
 }
+function editStage(num){
+  const s=(AM.stages||[]).find(s=>s.number==num);if(!s)return;
+  editSN=num;$('st-modal-title').textContent='Edit Stage '+num;$('st-btn').textContent='Update Stage';
+  $('st-num').value=s.number;$('st-name').value=s.name||'';$('st-sc').value=s.scoring||'comstock';$('st-co').value=s.course||'short';
+  $('st-pp').value=s.paperTargets||0;$('st-po').value=s.poppers||0;$('st-pl').value=s.plates||0;$('st-ns').value=s.noShoots||0;
+  $('st-proc').value=s.procedure||'';$('st-inc').checked=s.included!==false;
+  updStCalc();om('modal-stage');
+}
+async function delStage(num){
+  if(!confirm('Delete Stage '+num+'?'))return;
+  const stages=(AM.stages||[]).filter(s=>s.number!==num);
+  spin(true);try{await updateDoc(doc(db,'matches',AM.id.toString()),{stages,updatedAt:serverTimestamp()});AM={...AM,stages};renderSL();renderOV();renderScSel();renderStOut();}catch(e){alert(e.message);}spin(false);
+}
+async function saveStage(){
+  smsg('st-msg','');
+  const num=parseInt($('st-num').value);if(!num||num<1){smsg('st-msg','Valid stage number required.');return;}
+  if(AM.ownerId!==CU.uid){smsg('st-msg','Only the owner can manage stages.');return;}
+  const sd={number:num,name:$('st-name').value.trim(),scoring:$('st-sc').value,course:$('st-co').value,paperTargets:parseInt($('st-pp').value)||0,poppers:parseInt($('st-po').value)||0,plates:parseInt($('st-pl').value)||0,noShoots:parseInt($('st-ns').value)||0,procedure:$('st-proc').value.trim(),included:$('st-inc').checked};
+  const stages=[...(AM.stages||[])];const idx=stages.findIndex(s=>s.number===num);
+  if(idx>=0)stages[idx]={...stages[idx],...sd};else stages.push(sd);
+  stages.sort((a,b)=>(a.number||0)-(b.number||0));
+  $('st-btn').disabled=true;$('st-btn').textContent='Saving…';spin(true);
+  try{await updateDoc(doc(db,'matches',AM.id.toString()),{stages,updatedAt:serverTimestamp()});AM={...AM,stages};smsg('st-msg','✓ Saved','ok');renderSL();renderOV();renderScSel();setTimeout(()=>cm('modal-stage'),1000);}
+  catch(e){smsg('st-msg','Error: '+e.message);}
+  $('st-btn').disabled=false;$('st-btn').textContent=editSN?'Update Stage':'Save Stage';spin(false);
+}
+function updStCalc(){const p=parseInt($('st-pp')?.value)||0,po=parseInt($('st-po')?.value)||0,pl=parseInt($('st-pl')?.value)||0;const sh=p*2+po+pl,mp=p*10+po*5+pl*5;if($('st-shots'))$('st-shots').textContent=sh;if($('st-maxp'))$('st-maxp').textContent=mp;}
 
-// ── Accept invitation ──
-window.acceptInvitation = async (matchId) => {
-  spinner(true);
-  try {
-    const matchRef = doc(db, 'matches', matchId.toString());
-    const matchSnap = await getDoc(matchRef);
-    if (!matchSnap.exists()) { spinner(false); alert('Match not found.'); return; }
-    const matchData = matchSnap.data();
-    const existingParticipants = matchData.participants || [];
-    const alreadyIn = existingParticipants.includes(currentUser.uid);
-    const newParticipants = alreadyIn ? existingParticipants : [...existingParticipants, currentUser.uid];
-    const existingShooters = matchData.shooters || [];
-    const alreadyShooter = existingShooters.some(s => s.uid === currentUser.uid || s.id === currentUser.uid);
-    const newShooter = { id: currentUser.uid, isMe: false, uid: currentUser.uid, firstName: userProfile.firstName||'', lastName: userProfile.lastName||'', division: userProfile.division||'Standard', pf: (userProfile.powerFactor||'minor').toLowerCase(), club: userProfile.club||'', stages: [] };
-    const newShooters = alreadyShooter ? existingShooters : [...existingShooters, newShooter];
-    const newInvUids = (matchData.invitedUids||[]).filter(u => u !== currentUser.uid);
-    const newInvUsers = (matchData.invitedUsers||[]).filter(u => u && u.uid !== currentUser.uid);
-    if (!alreadyIn) await updateDoc(matchRef, { participants: newParticipants });
-    await Promise.all([
-      updateDoc(matchRef, { shooters: newShooters, updatedAt: serverTimestamp() }),
-      updateDoc(matchRef, { invitedUids: newInvUids, invitedUsers: newInvUsers, updatedAt: serverTimestamp() }),
-      updateDoc(doc(db, 'users', currentUser.uid, 'invitations', matchId.toString()), { status: 'accepted' })
-    ]);
-  } catch (e) { console.error(e); alert('Failed to accept: ' + e.message); }
-  spinner(false);
-};
+// COMPETITORS
+function renderCL(){
+  const el=$('cl'),m=AM,io=m.ownerId===CU.uid;
+  let sh=(m.shooters||[]);
+  if(CF!=='all'){const sta=CF;sh=sh.filter(s=>(s.status||(s.uid===CU.uid?'approved':'approved'))===sta);}
+  if(!sh.length){el.innerHTML='<div class="empty"><div class="empty-t">No competitors</div></div>';return;}
+  const sc2={'approved':'bg-green','pending':'bg-gold','waiting':'bg-muted','declined':'bg-red'};
+  el.innerHTML=`<table class="tbl"><thead><tr><th>Name</th><th>Division</th><th>PF</th><th>Stages</th><th>Status</th>${io?'<th>Actions</th>':''}</tr></thead><tbody>
+    ${sh.map(s=>{
+      const nm=((s.firstName||'')+(s.lastName?' '+s.lastName:'')).trim()||'Shooter';
+      const st=s.status||(s.uid===CU.uid?'approved':'approved');
+      return `<tr>
+        <td style="font-weight:600;">${esc(nm)}${s.uid===CU.uid?' <span style="font-size:10px;color:var(--accent);">(you)</span>':''}</td>
+        <td style="color:var(--muted);font-size:12px;">${esc(s.division||'—')}</td>
+        <td style="font-size:11px;">${(s.pf||'minor').toUpperCase()}</td>
+        <td>${(s.stages||[]).length}</td>
+        <td><span class="badge ${sc2[st]||'bg-muted'}">${st.toUpperCase()}</span></td>
+        ${io?`<td style="display:flex;gap:5px;">
+          ${st==='pending'?`<button class="bsm bgold" onclick="approveC('${s.uid||s.id}')" style="width:auto;">✓</button>`:''}
+          ${(s.uid||s.id)!==CU.uid&&(s.uid||s.id)!==m.ownerId?`<button class="bsm bred" onclick="removeC('${s.uid||s.id}')" style="width:auto;">✕</button>`:''}
+        </td>`:''}
+      </tr>`;
+    }).join('')}
+  </tbody></table>`;
+}
+function setCF(f){CF=f;['all','approved','pending','waiting'].forEach(id=>{const b=$('cf-'+id);if(b)b.className='bsm '+(f===id?'bgold':'bgh');});renderCL();}
+async function approveC(uid){const sh=(AM.shooters||[]).map(s=>(s.uid===uid||s.id===uid)?{...s,status:'approved'}:s);try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,updatedAt:serverTimestamp()});AM={...AM,shooters:sh};renderCL();}catch(e){alert(e.message);}}
+async function removeC(uid){if(!confirm('Remove this competitor?'))return;const sh=(AM.shooters||[]).filter(s=>s.uid!==uid&&s.id!==uid);const pa=(AM.participants||[]).filter(p=>p!==uid);try{await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:sh,participants:pa,updatedAt:serverTimestamp()});AM={...AM,shooters:sh,participants:pa};renderCL();renderOV();}catch(e){alert(e.message);}}
 
-// ── Decline invitation ──
-window.declineInvitation = async (matchId) => {
-  try {
-    await updateDoc(doc(db, 'users', currentUser.uid, 'invitations', matchId.toString()), { status: 'declined' });
-  } catch (e) { console.error(e); }
-};
-
-// ── Get next match ID ──
-async function getNextMatchId() {
-  const counterRef = doc(db, 'counters', 'matchId');
-  return await runTransaction(db, async txn => {
-    const snap = await txn.get(counterRef);
-    const next = snap.exists() ? snap.data().value + 1 : 1;
-    txn.set(counterRef, { value: next });
-    return next;
+// SCORING
+function renderScSel(){
+  const sh=$('sc-sh'),st=$('sc-st');if(!sh||!st)return;
+  const psh=sh.value,pst=st.value;
+  sh.innerHTML='<option value="">Select shooter…</option>'+(AM.shooters||[]).map(s=>`<option value="${esc(s.uid||s.id)}">${esc(((s.firstName||'')+(s.lastName?' '+s.lastName:'')).trim()||'Shooter')}</option>`).join('');
+  const stgs=(AM.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));
+  st.innerHTML='<option value="">Select stage…</option>'+stgs.map(s=>`<option value="${s.number}">Stage ${s.number}${s.name?' – '+esc(s.name):''}</option>`).join('');
+  if(psh)sh.value=psh;if(pst)st.value=pst;
+}
+function renderStOut(){const el=$('st-out');if(!el||!AM)return;el.innerHTML=stTable(AM);}
+function adj(id,d){const e=$(id);if(!e)return;e.textContent=Math.max(0,(parseInt(e.textContent)||0)+d);updHF();}
+function updHF(){
+  const a=parseInt($('sc-a')?.textContent)||0,c=parseInt($('sc-c')?.textContent)||0,d=parseInt($('sc-d')?.textContent)||0,m=parseInt($('sc-m')?.textContent)||0,n=parseInt($('sc-n')?.textContent)||0,p2=parseInt($('sc-p')?.textContent)||0;
+  const t=parseFloat($('sc-t')?.value)||0;
+  let pf='minor';const shv=$('sc-sh')?.value;if(shv&&AM){const sh=(AM.shooters||[]).find(s=>(s.uid||s.id)===shv);if(sh)pf=sh.pf||'minor';}
+  const pts=calcPts(pf,a,c,d,m,n,p2);const hf=t>0?pts/t:0;
+  if($('sc-pts'))$('sc-pts').textContent=pts+' pts';if($('sc-hf'))$('sc-hf').textContent=hf.toFixed(4);
+}
+async function saveScore(){
+  smsg('sc-msg','');
+  const shId=$('sc-sh').value,stNum=parseInt($('sc-st').value),t=parseFloat($('sc-t').value);
+  if(!shId){smsg('sc-msg','Select a shooter.');return;}if(!stNum){smsg('sc-msg','Select a stage.');return;}if(!t||t<=0){smsg('sc-msg','Enter a valid time.');return;}
+  const sh=(AM.shooters||[]).find(s=>(s.uid||s.id)===shId);if(!sh){smsg('sc-msg','Shooter not found.');return;}
+  const a=parseInt($('sc-a').textContent)||0,c=parseInt($('sc-c').textContent)||0,d=parseInt($('sc-d').textContent)||0,ms=parseInt($('sc-m').textContent)||0,ns=parseInt($('sc-n').textContent)||0,pr=parseInt($('sc-p').textContent)||0;
+  const pts=calcPts(sh.pf||'minor',a,c,d,ms,ns,pr),hf=pts/t;
+  const sr={num:stNum,time:t,pts,hf,a,c,d,miss:ms,ns,proc:pr,savedAt:Date.now()};
+  const newSh=(AM.shooters||[]).map(s=>{
+    if((s.uid||s.id)!==shId)return s;
+    const stgs=[...(s.stages||[])];const idx=stgs.findIndex(x=>(x.num||x.number)===stNum);
+    if(idx>=0)stgs[idx]={...stgs[idx],...sr};else stgs.push(sr);
+    return {...s,stages:stgs};
   });
+  spin(true);
+  try{
+    await updateDoc(doc(db,'matches',AM.id.toString()),{shooters:newSh,updatedAt:serverTimestamp()});
+    AM={...AM,shooters:newSh};smsg('sc-msg','✓ Result saved!','ok');
+    ['sc-a','sc-c','sc-d','sc-m','sc-n','sc-p'].forEach(id=>{const e=$(id);if(e)e.textContent='0';});
+    $('sc-t').value='';updHF();renderStOut();renderSL();renderOV();
+  }catch(e){smsg('sc-msg','Error: '+e.message);}
+  spin(false);
 }
 
-// ── Create match ──
-$('create-btn').onclick = async () => {
-  setMsg('create-msg', '');
-  const name = $('c-name').value.trim();
-  const location = $('c-location').value.trim();
-  const date = $('c-date').value;
-  const type = $('c-type').value;
-  const stages = parseInt($('c-stages').value) || 0;
-  const searchable = $('c-searchable').checked;
-
-  if (!name) { setMsg('create-msg', 'Please enter a match name.'); return; }
-
-  $('create-btn').disabled = true; $('create-btn').textContent = 'Creating…';
-  spinner(true);
-  try {
-    const matchId = await getNextMatchId();
-    const ownerShooter = {
-      id: currentUser.uid, isMe: true, uid: currentUser.uid,
-      firstName: userProfile.firstName||'', lastName: userProfile.lastName||'',
-      division: userProfile.division||'Standard', pf: (userProfile.powerFactor||'minor').toLowerCase(),
-      club: userProfile.club||'', stages: []
-    };
-    const matchDoc = {
-      id: matchId, name, location, date, type, plannedStages: stages,
-      searchable, ownerId: currentUser.uid,
-      participants: [currentUser.uid], shooters: [ownerShooter],
-      stages: [], createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-    };
-    await setDoc(doc(db, 'matches', matchId.toString()), matchDoc);
-    setMsg('create-msg', `✓ Match created! ID: ${matchId}`, 'success');
-    $('c-name').value = ''; $('c-location').value = ''; $('c-stages').value = '';
-    $('c-date').value = new Date().toISOString().split('T')[0];
-    setTimeout(() => { setMsg('create-msg', ''); switchTab('tab-matches'); }, 1800);
-  } catch (e) {
-    console.error(e);
-    setMsg('create-msg', 'Failed to create match: ' + e.message);
-  }
-  $('create-btn').disabled = false; $('create-btn').textContent = 'Create Match';
-  spinner(false);
-};
-
-// ── Search match ──
-let searchedMatch = null;
-$('search-btn').onclick = searchMatch;
-$('s-id').addEventListener('keydown', e => { if (e.key === 'Enter') searchMatch(); });
-
-async function searchMatch() {
-  setMsg('search-msg', '');
-  $('search-result').classList.remove('visible');
-  searchedMatch = null;
-  const raw = $('s-id').value.trim();
-  if (!raw) { setMsg('search-msg', 'Enter a match ID.'); return; }
-
-  $('search-btn').disabled = true; $('search-btn').textContent = 'Searching…';
-  spinner(true);
-  try {
-    // First check if user is already a participant
-    const userMatch = currentMatches.find(m => m.id && m.id.toString() === raw);
-    let matchData = userMatch;
-
-    if (!matchData) {
-      // Try direct fetch for searchable matches
-      const snap = await getDoc(doc(db, 'matches', raw));
-      if (snap.exists()) {
-        const d = snap.data();
-        if (d.searchable) {
-          matchData = { id: snap.id, ...d };
-        } else {
-          setMsg('search-msg', 'This match is private. You must be invited to view it.');
-          spinner(false); $('search-btn').disabled = false; $('search-btn').textContent = 'Search'; return;
-        }
-      } else {
-        setMsg('search-msg', 'Match not found.');
-        spinner(false); $('search-btn').disabled = false; $('search-btn').textContent = 'Search'; return;
-      }
-    }
-
-    searchedMatch = matchData;
-    renderSearchResult(matchData);
-  } catch (e) {
-    console.error(e);
-    setMsg('search-msg', 'Search failed: ' + e.message);
-  }
-  $('search-btn').disabled = false; $('search-btn').textContent = 'Search';
-  spinner(false);
+// ROLES
+function renderRoles(){
+  const el=$('r-list');if(!el||!AM)return;
+  const roles=AM.matchRoles||[];
+  if(!roles.length){el.innerHTML='<div class="empty"><div class="empty-t">No staff assigned</div></div>';return;}
+  el.innerHTML=`<table class="tbl"><thead><tr><th>Name</th><th>Role</th><th></th></tr></thead><tbody>
+    ${roles.map(r=>`<tr><td>${esc(r.name||r.email||'Unknown')}</td><td><span class="badge bg-gold">${esc(r.role||'staff')}</span></td><td><button class="bsm bred" onclick="removeRole('${esc(r.uid)}')" style="width:auto;">Remove</button></td></tr>`).join('')}
+  </tbody></table>`;
 }
-
-function renderSearchResult(m) {
-  const isParticipant = (m.participants||[]).includes(currentUser.uid);
-  const isOwner = m.ownerId === currentUser.uid;
-  const shooterCount = (m.shooters||[]).length;
-  const dateStr = m.date ? fmtDate(m.date) : '';
-
-  $('sr-name').textContent = m.name || 'Unnamed Match';
-  $('sr-meta').innerHTML = `
-    ${m.type ? `<span class="badge badge-gold">${escHtml(m.type)}</span>` : ''}
-    ${isOwner ? `<span class="badge badge-green">You own this match</span>` : ''}
-    ${dateStr ? `<div class="match-meta-item"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${dateStr}</div>` : ''}
-    ${m.location ? `<div class="match-meta-item" style="font-size:11px;color:var(--muted);">📍 ${escHtml(m.location)}</div>` : ''}
-    <div class="match-meta-item" style="font-size:11px;color:var(--muted);">👥 ${shooterCount} shooter${shooterCount !== 1 ? 's' : ''}</div>
-    <div class="match-meta-item" style="font-size:10px;color:rgba(255,255,255,0.2);">ID: ${m.id}</div>
-  `;
-
-  setMsg('join-msg', '');
-  if (isParticipant) {
-    $('join-btn').style.display = 'none';
-    $('joined-info').style.display = 'inline-flex';
-  } else {
-    $('join-btn').style.display = 'block';
-    $('join-btn').textContent = 'Join Match';
-    $('join-btn').disabled = false;
-    $('joined-info').style.display = 'none';
-  }
-  $('search-result').classList.add('visible');
+async function srchUsers(val){
+  const el=$('r-results');if(!el)return;rSel=null;
+  if(!val||val.length<2){el.innerHTML='';return;}
+  clearTimeout(rTimer);
+  rTimer=setTimeout(async()=>{
+    try{
+      const t=val.toLowerCase().trim(),end=t.slice(0,-1)+String.fromCharCode(t.charCodeAt(t.length-1)+1);
+      const seen=new Set(),res=[];
+      const [es,fs]=await Promise.all([getDocs(query(collection(db,'users'),where('email','>=',t),where('email','<',end))),getDocs(query(collection(db,'users'),where('firstName','>=',t.charAt(0).toUpperCase()+t.slice(1)),where('firstName','<',end.charAt(0).toUpperCase()+end.slice(1))))]);
+      const add=sn=>sn.forEach(d=>{if(d.id===CU.uid||seen.has(d.id))return;seen.add(d.id);const r=d.data();res.push({uid:d.id,email:r.email,name:((r.firstName||'')+' '+(r.lastName||'')).trim()||r.email});});
+      add(es);add(fs);
+      if(!res.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:5px 0;">No users found</div>';return;}
+      el.innerHTML=res.slice(0,5).map(u=>`<div onclick="selRoleUser('${u.uid}','${esc(u.name)}')" style="padding:8px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;margin-bottom:4px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='rgba(224,182,73,.08)'" onmouseout="this.style.background='rgba(255,255,255,.03)'"><b>${esc(u.name)}</b><span style="color:var(--muted);font-size:11px;margin-left:8px;">${esc(u.email)}</span></div>`).join('');
+    }catch{el.innerHTML='';}
+  },350);
 }
+window.selRoleUser=(uid,nm)=>{rSel={uid,nm};$('r-srch').value=nm;$('r-results').innerHTML=`<div style="font-size:12px;color:var(--green);padding:4px 0;">✓ ${esc(nm)} — <button onclick="inviteRole()" class="bsm bgold" style="width:auto;">Invite</button></div>`;};
+async function inviteRole(){
+  if(!rSel){smsg('r-msg','Select a user first.');return;}
+  const m=AM,role=$('r-role').value,roles=[...(m.matchRoles||[])];
+  if(roles.find(r=>r.uid===rSel.uid)){smsg('r-msg','Already in match staff.');return;}
+  roles.push({uid:rSel.uid,name:rSel.nm,role,addedAt:Date.now()});
+  spin(true);
+  try{
+    await updateDoc(doc(db,'matches',m.id.toString()),{matchRoles:roles,updatedAt:serverTimestamp()});
+    await setDoc(doc(db,'users',rSel.uid,'invitations',m.id.toString()),{matchId:m.id,matchName:m.name||'Match',invitedBy:UP.firstName||UP.email||'',invitedByUid:CU.uid,timestamp:new Date().toISOString(),status:'pending'});
+    AM={...AM,matchRoles:roles};smsg('r-msg','✓ Invited!','ok');$('r-srch').value='';$('r-results').innerHTML='';rSel=null;renderRoles();
+  }catch(e){smsg('r-msg','Error: '+e.message);}
+  spin(false);
+}
+async function removeRole(uid){if(!confirm('Remove from match staff?'))return;const roles=(AM.matchRoles||[]).filter(r=>r.uid!==uid);try{await updateDoc(doc(db,'matches',AM.id.toString()),{matchRoles:roles,updatedAt:serverTimestamp()});AM={...AM,matchRoles:roles};renderRoles();}catch(e){alert(e.message);}}
 
-// ── Join match ──
-$('join-btn').onclick = async () => {
-  if (!searchedMatch) return;
-  $('join-btn').disabled = true; $('join-btn').textContent = 'Joining…';
-  spinner(true);
-  setMsg('join-msg', '');
-  try {
-    const matchId = searchedMatch.id.toString();
-    const matchRef = doc(db, 'matches', matchId);
-    const matchSnap = await getDoc(matchRef);
-    if (!matchSnap.exists()) { setMsg('join-msg', 'Match no longer exists.'); spinner(false); $('join-btn').disabled=false; $('join-btn').textContent='Join Match'; return; }
-    const md = matchSnap.data();
-    const existing = md.participants || [];
-    const alreadyIn = existing.includes(currentUser.uid);
-    if (!alreadyIn) await updateDoc(matchRef, { participants: [...existing, currentUser.uid] });
-    const existShooters = md.shooters || [];
-    const alreadyShooter = existShooters.some(s => s.uid === currentUser.uid || s.id === currentUser.uid);
-    const newShooter = { id: currentUser.uid, isMe: false, uid: currentUser.uid, firstName: userProfile.firstName||'', lastName: userProfile.lastName||'', division: userProfile.division||'Standard', pf: (userProfile.powerFactor||'minor').toLowerCase(), club: userProfile.club||'', stages: [] };
-    await updateDoc(matchRef, { shooters: alreadyShooter ? existShooters : [...existShooters, newShooter], updatedAt: serverTimestamp() });
-    setMsg('join-msg', '✓ You have joined the match!', 'success');
-    $('join-btn').style.display = 'none';
-    $('joined-info').style.display = 'inline-flex';
-  } catch (e) {
-    console.error(e);
-    setMsg('join-msg', 'Failed to join: ' + e.message);
-    $('join-btn').disabled = false; $('join-btn').textContent = 'Join Match';
-  }
-  spinner(false);
-};
-
-// ── Open match in main app (redirect) ──
-window.openMatchApp = (matchId) => {
-  // If the main app is on index.html, try navigating there with a hint
-  // For now just copy ID to clipboard and show notice
-  if (navigator.clipboard) navigator.clipboard.writeText(matchId);
-  // Could be: window.location.href = `index.html#match-${matchId}`;
-  alert(`Match ID: ${matchId}\n(Copied to clipboard)\n\nOpen in the main app to view full details.`);
-};
-
-// ── Tab switcher ──
-window.switchTab = (id) => {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-};
-
-// ── HTML escape ──
-function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ADMIN
+function fillAdmin(){const m=AM;$('a-name').value=m.name||'';$('a-loc').value=m.location||'';$('a-date').value=m.date||'';$('a-type').value=m.type||'Training';$('a-status').value=m.status||'active';$('a-reg').value=m.registration||'open_auto';$('a-max').value=m.maxCompetitors||'';$('a-srch').checked=m.searchable!==false;smsg('a-msg','');}
+async function saveAdmin(){
+  smsg('a-msg','');if(AM.ownerId!==CU.uid){smsg('a-msg','Only the owner can edit settings.');return;}
+  spin(true);
+  try{
+    const up={name:$('a-name').value.trim(),location:$('a-loc').value.trim(),date:$('a-date').value,type:$('a-type').value,status:$('a-status').value,registration:$('a-reg').value,maxCompetitors:parseInt($('a-max').value)||0,searchable:$('a-srch').checked,updatedAt:serverTimestamp()};
+    await updateDoc(doc(db,'matches',AM.id.toString()),up);AM={...AM,...up};smsg('a-msg','✓ Saved','ok');renderD();
+  }catch(e){smsg('a-msg','Error: '+e.message);}spin(false);
+}
+async function delMatch(){
+  if(AM.ownerId!==CU.uid){alert('Only the owner can delete this match.');return;}
+  if(!confirm(`Delete "${AM.name}"? This cannot be undone.`))return;
+  spin(true);try{await deleteDoc(doc(db,'matches',AM.id.toString()));sv('dashboard');AM=null;}catch(e){alert(e.message);}spin(false);
 }
 </script>
 </body>

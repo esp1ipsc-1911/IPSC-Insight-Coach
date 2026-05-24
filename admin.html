@@ -578,6 +578,8 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body>
   <div class="container">
@@ -708,6 +710,7 @@
           <button id="refreshShootersBtn" class="btn btn-secondary">↻ Oppdater</button>
         </div>
 
+        <div id="admin-match-map" style="width:100%;height:320px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px;background:var(--bg2);"></div>
         <div class="table-container">
           <table>
             <thead><tr><th>ID</th><th>Navn</th><th>Divisjon</th><th>PF</th><th>Draw</th><th>Reload</th><th>Short HF</th><th>Medium HF</th><th>Long HF</th><th>Status</th><th>Handlinger</th></tr></thead>
@@ -1232,7 +1235,51 @@
             <option value="finished">finished</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-label">Lokasjon</label><input id="cmLocation" class="form-input" type="text" placeholder="Kjevik skytebane" /></div>
+        <div class="form-group" style="position:relative;">
+          <label class="form-label">Lokasjon</label>
+          <input id="cmLocation" class="form-input" type="text" placeholder="Kjevik skytebane" autocomplete="off" oninput="adminGeoDebounce(this.value)"/>
+          <div id="cm-geo-results"></div>
+          <input type="hidden" id="cmLat" value=""/>
+          <input type="hidden" id="cmLng" value=""/>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nivå (Level)</label>
+          <select id="cmLevel" class="form-select">
+            <option value="Level I">Level I</option>
+            <option value="Level II">Level II</option>
+            <option value="Level III" selected>Level III</option>
+            <option value="Level IV">Level IV</option>
+            <option value="Level V">Level V</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select id="cmType" class="form-select">
+            <option value="Stevne">Stevne</option>
+            <option value="Trening">Trening</option>
+            <option value="IPSC">IPSC</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Region</label>
+          <select id="cmRegion" class="form-select">
+            <option value="Norway" selected>Norway</option>
+            <option value="Sweden">Sweden</option>
+            <option value="Denmark">Denmark</option>
+            <option value="Finland">Finland</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Maks deltakere</label>
+          <input id="cmMaxComp" class="form-input" type="number" min="1" placeholder="f.eks. 120"/>
+        </div>
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <input type="checkbox" id="cmSearchable" checked style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;"/>
+        <label for="cmSearchable" class="form-label" style="margin:0;cursor:pointer;">Søkbar (synlig i Find Matches)</label>
       </div>
       <div class="form-group">
         <label class="form-label">Director emails (komma-separert)</label>
@@ -1581,6 +1628,7 @@
       coachPanel.classList.toggle('active', tab === 'coach');
       shootersPanel.classList.toggle('active', tab === 'shooters');
       matchesPanel.classList.toggle('active', tab === 'matches');
+      if (tab === 'matches' && adminMap) { setTimeout(() => adminMap.invalidateSize(), 50); }
       rewardsPanel.classList.toggle('active', tab === 'rewards');
     }
 
@@ -2178,6 +2226,9 @@
         $('statMatchesFinished').textContent = matches.filter(m => (m.status || '') === 'finished').length;
         $('statParticipantsTotal').textContent = matches.reduce((sum, m) => sum + ((m.participants || []).length), 0);
 
+        initAdminMap();
+        updateAdminMapMarkers(matches);
+
         if (!matches.length) {
           matchesTable.innerHTML = '<tr><td data-label="Info" colspan="8" class="empty-state"><h3>Ingen matcher</h3><p>Matcher vises her når de er opprettet i appen</p></td></tr>';
           return;
@@ -2267,6 +2318,13 @@
         ownerId,
         participants: [ownerId],
         stages: [],
+        level: $('cmLevel').value,
+        type: $('cmType').value,
+        region: $('cmRegion').value,
+        searchable: $('cmSearchable').checked,
+        maxCompetitors: $('cmMaxComp').value ? parseInt($('cmMaxComp').value) : null,
+        lat: $('cmLat').value ? parseFloat($('cmLat').value) : null,
+        lng: $('cmLng').value ? parseFloat($('cmLng').value) : null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -3509,6 +3567,118 @@
       $('stageImportText').value = '';
       $('stageImportFeedback').style.display = 'none';
     };
-  </script>
+
+    // ══════════════════════════════════════════════════
+    // ADMIN MAP (Leaflet)
+    // ══════════════════════════════════════════════════
+    const ADMIN_REGION_COORDS = {
+      Norway:[60.472,8.4689], Sweden:[60.1282,18.6435],
+      Denmark:[56.2639,9.5018], Finland:[61.9241,25.7482], Other:[59.9139,10.7522]
+    };
+
+    function getAdminMatchCoords(m) {
+      const lat = parseFloat(m.lat ?? m.latitude ?? m.locationLat);
+      const lng = parseFloat(m.lng ?? m.longitude ?? m.locationLng);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng, true];
+      const fb = ADMIN_REGION_COORDS[m.region] || ADMIN_REGION_COORDS.Other;
+      return [fb[0], fb[1], false];
+    }
+
+    let adminMap = null, adminMarkers = null;
+
+    function initAdminMap() {
+      const el = document.getElementById('admin-match-map');
+      if (!el || typeof L === 'undefined') return;
+      if (!adminMap) {
+        adminMap = L.map('admin-match-map', {scrollWheelZoom: false}).setView([60.472, 8.4689], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18, attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(adminMap);
+        adminMarkers = L.layerGroup().addTo(adminMap);
+      }
+      setTimeout(() => adminMap.invalidateSize(), 100);
+    }
+
+    function updateAdminMapMarkers(matches) {
+      if (!adminMap || !adminMarkers) return;
+      adminMarkers.clearLayers();
+      if (!matches || !matches.length) return;
+      const bounds = [];
+      matches.forEach(m => {
+        const [lat, lng, exact] = getAdminMatchCoords(m);
+        bounds.push([lat, lng]);
+        const marker = L.marker([lat, lng]).addTo(adminMarkers);
+        const status = m.status || 'active';
+        const parts = m.participants ? m.participants.length : 0;
+        marker.bindPopup(
+          '<b>' + escapeHtml(m.name || 'Unnamed') + '</b><br>' +
+          escapeHtml(m.date || '—') + ' · ' + escapeHtml(m.location || m.region || '—') + '<br>' +
+          '<span style="color:#aaa;font-size:12px;">' + escapeHtml(status) + ' · ' + parts + ' deltakere' +
+          (exact ? '' : ' · regional pin') + '</span>'
+        );
+      });
+      if (bounds.length) adminMap.fitBounds(bounds, {padding: [32, 32], maxZoom: 10});
+    }
+
+    // ══════════════════════════════════════════════════
+    // NOMINATIM GEOCODING (admin create match)
+    // ══════════════════════════════════════════════════
+    let _adminGeoTimer = null;
+
+    function adminGeoDebounce(val) {
+      clearTimeout(_adminGeoTimer);
+      const res = document.getElementById('cm-geo-results');
+      if (res) res.innerHTML = '';
+      document.getElementById('cmLat').value = '';
+      document.getElementById('cmLng').value = '';
+      if (!val || val.length < 2) return;
+      _adminGeoTimer = setTimeout(function() { adminGeoFetch(val); }, 400);
+    }
+
+    function adminGeoFetch(val) {
+      const url = 'https://nominatim.openstreetmap.org/search?format=json&q=' +
+        encodeURIComponent(val) + '&limit=5&accept-language=no,en';
+      fetch(url)
+        .then(function(r) { return r.json(); })
+        .then(function(data) { adminGeoRender(data); })
+        .catch(function() {});
+    }
+
+    function adminGeoRender(data) {
+      const res = document.getElementById('cm-geo-results');
+      if (!res) return;
+      res.innerHTML = '';
+      if (!data || !data.length) return;
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:absolute;z-index:999;width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 4px 16px rgba(0,0,0,0.5);max-height:200px;overflow-y:auto;margin-top:2px;';
+      data.forEach(function(item) {
+        const name = item.display_name || '';
+        const short = (item.name && item.name.length > 0) ? item.name : (name.split(',')[0] || name);
+        const sub = name.split(',').slice(1, 3).join(',').trim();
+        const div = document.createElement('div');
+        div.style.cssText = 'padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);';
+        div.innerHTML = escapeHtml(short) + (sub ? '<span style="font-size:11px;color:var(--muted);margin-left:8px;">' + escapeHtml(sub) + '</span>' : '');
+        div.addEventListener('mouseover', function() { this.style.background = 'var(--bg3)'; });
+        div.addEventListener('mouseout', function() { this.style.background = ''; });
+        div.addEventListener('click', function() {
+          adminGeoSelect(short, parseFloat(item.lat), parseFloat(item.lon));
+        });
+        wrap.appendChild(div);
+      });
+      res.appendChild(wrap);
+    }
+
+    function adminGeoSelect(name, lat, lng) {
+      const inp = document.getElementById('cmLocation');
+      if (inp) inp.value = name;
+      const latEl = document.getElementById('cmLat');
+      const lngEl = document.getElementById('cmLng');
+      if (latEl) latEl.value = lat;
+      if (lngEl) lngEl.value = lng;
+      const res = document.getElementById('cm-geo-results');
+      if (res) res.innerHTML = '';
+    }
+
+    </script>
 </body>
 </html>

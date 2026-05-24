@@ -647,11 +647,10 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
         </div>
         <!-- PDF downloads -->
         <div class="pdf-row">
-          <span style="font-size:11px;color:var(--muted);align-self:center;">Download *.pdf:</span>
-          <button class="pdf-btn">Match Results</button>
-          <button class="pdf-btn">Combined Results</button>
-          <button class="pdf-btn">Division Stage Results</button>
-          <button class="pdf-btn">Category Stage Results</button>
+          <span style="font-size:11px;color:var(--muted);align-self:center;">Download PDF:</span>
+          <button class="pdf-btn" onclick="downloadPdf('match')">Match Results</button>
+          <button class="pdf-btn" onclick="downloadPdf('divisionStages')">Division Stage Results</button>
+          <button class="pdf-btn" onclick="downloadPdf('categoryStages')">Category Stage Results</button>
         </div>
       </div>
 
@@ -897,7 +896,7 @@ function configureNavPermissions(){
 }
 
 // expose globals
-Object.assign(window,{sv,toggleDD,closeAllDD,openAddStage,saveStage,updStC,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,findMatch,runCompare,clearCompare,closeCompare,showOrgTab,editStage,delStage,closeModal,openModal,toggleAdv,submitCreate,joinMatch,acceptInv,declineInv,showPublicTab,toggleCsec,renderFindMatches,centerFindMap});
+Object.assign(window,{sv,toggleDD,closeAllDD,openAddStage,saveStage,updStC,saveScore,adj,updHF,saveSettings,delMatch,setCF,srchUsers,inviteRole,removeRole,approveC,removeC,findMatch,runCompare,clearCompare,closeCompare,showOrgTab,editStage,delStage,closeModal,openModal,toggleAdv,submitCreate,joinMatch,acceptInv,declineInv,showPublicTab,toggleCsec,renderFindMatches,centerFindMap,downloadPdf});
 
 // AUTH
 onAuthStateChanged(auth,async user=>{
@@ -1240,15 +1239,62 @@ function calculateStandings(div='live'){
   const rows=shooters.map(sh=>{let matchPoints=0,rawPoints=0,completed=0,totalTime=0;stages.forEach(stage=>{const mets=stMets(m,stage).filter(r=>!onlyDivision||(r.div||'').toLowerCase()===div.toLowerCase());const topHF=mets.length?mets[0].hf:0;const r=mets.find(x=>String(x.id)===String(sh.uid||sh.id));if(!r)return;const stageMax=calcMax(stage);matchPoints+=topHF>0?(r.hf/topHF)*stageMax:0;rawPoints+=r.pts;totalTime+=r.time;completed++;});return{id:sh.uid||sh.id,name:(((sh.firstName||'')+' '+(sh.lastName||'')).trim()||'Shooter'),div:sh.division||'',cat:sh.category||'',club:sh.club||'',pf:sh.pf||'minor',matchPoints,rawPoints,totalTime,completed,totalStages:stages.length};}).filter(r=>r.completed>0).sort((a,b)=>b.matchPoints-a.matchPoints);
   const top=rows.length?(rows[0].matchPoints||1):1;return rows.map((r,i)=>({...r,rank:i+1,percent:top>0?(r.matchPoints/top*100):0}));
 }
-function renderResults(div){$('result-view').style.display='block';$('compare-view').style.display='none';if(div==='stages')return renderStageResultsOverview();return renderLiveStandings(div||'live');}
+function renderResults(div){
+  $('result-view').style.display='block';$('compare-view').style.display='none';
+  if(div==='stages')return renderStageResultsOverview();
+  return renderLiveStandings(div||'live');
+}
+function isDivisionFilter(div){return !!(AM&&(AM.divisions||[]).some(d=>String(d).toLowerCase()===String(div).toLowerCase()));}
+function divisionLabel(div){if(!isDivisionFilter(div))return 'All Divisions';return (AM.divisions||[]).find(d=>String(d).toLowerCase()===String(div).toLowerCase())||'Division';}
 function renderLiveStandings(div='live'){
-  const m=AM;const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false);const rows=calculateStandings(div);const label=div==='live'?'Overall':((m.divisions||[]).find(d=>d.toLowerCase()===String(div).toLowerCase())||'Division');
+  const m=AM;const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false);const rows=calculateStandings(div);const label=div==='live'?'Overall':divisionLabel(div);
   const scoredStages=new Set();(m.shooters||[]).forEach(sh=>(sh.stages||[]).forEach(r=>{if(r.time>0)scoredStages.add(String(r.num||r.number));}));const last=latestScoreTime(m);
-  $('results-content').innerHTML=`<div class="live-board"><div class="card"><div class="chead"><div class="ctitle"><span class="live-tag">● Live</span> ${esc(label)} Standings</div></div><div class="cbody">${rows.length?standingsTable(rows):'<div class="empty"><div class="empty-t">No live scores yet</div><div class="empty-s">Scores will appear here as soon as staff enter stage results.</div></div>'}</div></div><div class="card"><div class="chead"><div class="ctitle">Match Pulse</div></div><div class="cbody"><div class="live-summary"><div class="live-pill"><b>${rows.length}</b><span>Ranked shooters</span></div><div class="live-pill"><b>${scoredStages.size}/${stages.length}</b><span>Stages with scores</span></div><div class="live-pill"><b>${(m.shooters||[]).filter(s=>(s.status||'approved')==='approved').length}</b><span>Approved competitors</span></div><div class="live-pill"><b>${last}</b><span>Last update</span></div></div><div style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.5;">Live standings are recalculated from saved stage scores whenever the match document updates.</div></div></div></div>`;
+  $('results-content').innerHTML=`<div class="live-board"><div class="card"><div class="chead"><div class="ctitle"><span class="live-tag">● Live</span> ${esc(label)} Standings</div></div><div class="cbody">${rows.length?standingsTable(rows):'<div class="empty"><div class="empty-t">No live scores yet</div><div class="empty-s">Scores will appear here as soon as staff enter stage results.</div></div>'}</div></div><div class="card"><div class="chead"><div class="ctitle">Match Pulse</div></div><div class="cbody"><div class="live-summary"><div class="live-pill"><b>${rows.length}</b><span>Ranked shooters</span></div><div class="live-pill"><b>${scoredStages.size}/${stages.length}</b><span>Stages with scores</span></div><div class="live-pill"><b>${(m.shooters||[]).filter(s=>(s.status||'approved')==='approved').length}</b><span>Approved competitors</span></div><div class="live-pill"><b>${last}</b><span>Last update</span></div></div><div style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.5;">Live standings are recalculated from saved stage scores whenever the match document updates.</div></div></div></div><div style="margin-top:18px;">${stageResultsSection(m,div,{embedded:true})}</div>`;
 }
 function standingsTable(rows){return `<table class="rtbl"><thead><tr><th>#</th><th>Shooter</th><th>Division</th><th>Category</th><th>Match %</th><th>Match Points</th><th>Stages</th><th>Total Time</th></tr></thead><tbody>${rows.map(r=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}"><td class="${r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':''}" style="font-weight:900;">${r.rank}</td><td><b>${esc(r.name)}</b><div class="progress-shell" style="margin-top:6px;"><div class="progress-bar" style="width:${Math.max(0,Math.min(100,r.percent)).toFixed(2)}%"></div></div></td><td>${esc(r.div||'—')}</td><td>${esc(r.cat||'—')}</td><td style="font-weight:900;color:var(--accent);">${r.percent.toFixed(2)}%</td><td>${r.matchPoints.toFixed(4)}</td><td>${r.completed}/${r.totalStages}</td><td>${r.totalTime.toFixed(2)}s</td></tr>`).join('')}</tbody></table>`;}
 function latestScoreTime(m){let t=0;(m.shooters||[]).forEach(sh=>(sh.stages||[]).forEach(r=>{if(r.savedAt)t=Math.max(t,r.savedAt);}));if(!t)return '—';try{return new Date(t).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});}catch{return '—';}}
-function renderStageResultsOverview(){const m=AM;const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));const el=$('results-content');if(!stages.length){el.innerHTML='<div class="empty"><div class="empty-ico">🎯</div><div class="empty-t">No stages yet</div></div>';return;}el.innerHTML=`<div class="card"><div class="chead"><div class="ctitle">Stage Results</div></div><div class="cbody" style="padding-bottom:4px;color:var(--muted);font-size:12px;">Stage results remain available separately from live match standings.</div></div>`+stages.map(s=>{const mets=stMets(m,s);const topHF=mets.length?mets[0].hf:0;return `<div class="stage-sec card"><div class="chead"><div class="ctitle">Stage ${s.number}${s.name?' · '+esc(s.name):''}</div><span class="badge bg-blue">${calcMax(s)} pts</span></div><div class="cbody">${mets.length?`<table class="rtbl"><thead><tr><th>#</th><th>Stage %</th><th>Points</th><th>Shooter</th><th>Division</th><th>Category</th><th>Time</th><th>Hit Factor</th></tr></thead><tbody>${mets.map((r,i)=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}"><td class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${i+1}</td><td style="color:var(--accent);font-weight:700;">${topHF>0?(r.hf/topHF*100).toFixed(2):'0.00'}%</td><td>${r.pts}</td><td style="font-weight:600;">${esc((r.fn+' '+r.ln).trim()||'Shooter')}</td><td style="color:var(--muted);font-size:11px;">${esc(r.div||'—')}</td><td style="color:var(--muted);font-size:11px;">${esc(r.cat||'—')}</td><td style="color:var(--muted);">${r.time.toFixed(2)}s</td><td style="color:var(--accent);font-weight:700;">${r.hf.toFixed(4)}</td></tr>`).join('')}</tbody></table>`:'<div style="font-size:12px;color:var(--muted);padding:8px 0;">No results yet for this stage</div>'}</div></div>`;}).join('');}
+function renderStageResultsOverview(){const el=$('results-content');el.innerHTML=stageResultsSection(AM,'live',{standalone:true});}
+function stageResultsSection(m,div='live',opts={}){
+  const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));
+  const filterDiv=isDivisionFilter(div);const label=filterDiv?divisionLabel(div):'All Divisions';
+  if(!stages.length)return '<div class="empty"><div class="empty-ico">🎯</div><div class="empty-t">No stages yet</div></div>';
+  const intro=opts.standalone||opts.embedded?`<div class="card"><div class="chead"><div class="ctitle">Stage Results · ${esc(label)}</div></div><div class="cbody" style="padding-bottom:4px;color:var(--muted);font-size:12px;">Stage-by-stage scoring is shown below the live standings so competitors can verify points, time, hit factor, and stage percentage.</div></div>`:'';
+  return intro+stages.map(s=>{let mets=stMets(m,s);if(filterDiv)mets=mets.filter(r=>String(r.div).toLowerCase()===String(div).toLowerCase());const topHF=mets.length?mets[0].hf:0;return `<div class="stage-sec card"><div class="chead"><div class="ctitle">Stage ${s.number}${s.name?' · '+esc(s.name):''}</div><span class="badge bg-blue">${calcMax(s)} pts</span></div><div class="cbody">${mets.length?`<table class="rtbl"><thead><tr><th>#</th><th>Shooter</th><th>Division</th><th>Category</th><th>Points</th><th>Time</th><th>Hit Factor</th><th>Stage %</th></tr></thead><tbody>${mets.map((r,i)=>`<tr class="${compareSelected.has(r.id)?'sel-row':''}"><td class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">${i+1}</td><td style="font-weight:600;">${esc((r.fn+' '+r.ln).trim()||'Shooter')}</td><td style="color:var(--muted);font-size:11px;">${esc(r.div||'—')}</td><td style="color:var(--muted);font-size:11px;">${esc(r.cat||'—')}</td><td>${r.pts}</td><td style="color:var(--muted);">${r.time.toFixed(2)}s</td><td style="color:var(--accent);font-weight:700;">${r.hf.toFixed(4)}</td><td style="color:var(--accent);font-weight:700;">${topHF>0?(r.hf/topHF*100).toFixed(2):'0.00'}%</td></tr>`).join('')}</tbody></table>`:'<div style="font-size:12px;color:var(--muted);padding:8px 0;">No results yet for this stage.</div>'}</div></div>`;}).join('');
+}
+function categoryStageResultsSection(m,div='live'){
+  const stages=(m.stages||[]).filter(s=>s?.number!=null&&s.included!==false).sort((a,b)=>(a.number||0)-(b.number||0));
+  const filterDiv=isDivisionFilter(div);const label=filterDiv?divisionLabel(div):'All Divisions';
+  if(!stages.length)return '<div class="empty"><div class="empty-t">No stages yet</div></div>';
+  return `<div class="card"><div class="chead"><div class="ctitle">Category Stage Results · ${esc(label)}</div></div><div class="cbody" style="color:var(--muted);font-size:12px;">Results grouped by category for each stage.</div></div>`+stages.map(st=>{
+    let mets=stMets(m,st);if(filterDiv)mets=mets.filter(r=>String(r.div).toLowerCase()===String(div).toLowerCase());
+    const cats=[...new Set(mets.map(r=>r.cat||'Uncategorized'))].sort();
+    return `<div class="stage-sec card"><div class="chead"><div class="ctitle">Stage ${st.number}${st.name?' · '+esc(st.name):''}</div><span class="badge bg-blue">${calcMax(st)} pts</span></div><div class="cbody">${cats.length?cats.map(cat=>{const rows=mets.filter(r=>(r.cat||'Uncategorized')===cat);const topHF=rows.length?rows[0].hf:0;return `<div style="font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:12px 0 6px;">${esc(cat)}</div><table class="rtbl"><thead><tr><th>#</th><th>Shooter</th><th>Division</th><th>Points</th><th>Time</th><th>Hit Factor</th><th>Stage %</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td><b>${esc((r.fn+' '+r.ln).trim()||'Shooter')}</b></td><td>${esc(r.div||'—')}</td><td>${r.pts}</td><td>${r.time.toFixed(2)}s</td><td>${r.hf.toFixed(4)}</td><td>${topHF>0?(r.hf/topHF*100).toFixed(2):'0.00'}%</td></tr>`).join('')}</tbody></table>`;}).join(''):'<div style="font-size:12px;color:var(--muted);padding:8px 0;">No category results yet for this stage.</div>'}</div></div>`;
+  }).join('');
+}
+function reportTitle(type){if(type==='match')return 'Match Results';if(type==='divisionStages')return 'Division Stage Results';if(type==='categoryStages')return 'Category Stage Results';return 'Match Report';}
+function buildPdfHtml(type){
+  const m=AM;const selectedDiv=isDivisionFilter(activeDiv)?activeDiv:'live';const title=reportTitle(type);const rows=calculateStandings(type==='match'?'live':selectedDiv);
+  let body='';
+  if(type==='match')body=`<h2>Overall Match Results</h2>${rows.length?standingsTable(rows):'<p>No scored results yet.</p>'}`;
+  else if(type==='divisionStages')body=`<h2>${esc(divisionLabel(selectedDiv))} Stage Results</h2>${stageResultsSection(m,selectedDiv,{})}`;
+  else if(type==='categoryStages')body=`<h2>${esc(divisionLabel(selectedDiv))} Category Stage Results</h2>${categoryStageResultsSection(m,selectedDiv)}`;
+  const generated=new Date().toLocaleString('en-US');
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(title)} - ${esc(m.name||'Match')}</title><style>body{font-family:Arial,sans-serif;color:#111;margin:28px;}h1{margin:0 0 4px;font-size:26px;}h2{margin:24px 0 10px;font-size:18px;}.meta{color:#555;margin-bottom:22px;font-size:12px}.card{border:1px solid #ddd;border-radius:10px;margin:12px 0;page-break-inside:avoid;overflow:hidden}.chead{background:#f4f6f8;padding:9px 12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:12px}.cbody{padding:10px 12px}.badge{display:inline-block;border:1px solid #999;border-radius:12px;padding:2px 8px;font-size:11px}.rtbl{width:100%;border-collapse:collapse;font-size:11px}.rtbl th{background:#f4f6f8;text-align:left;border-bottom:1px solid #bbb;padding:6px;text-transform:uppercase;letter-spacing:.05em;color:#333}.rtbl td{border-bottom:1px solid #e5e5e5;padding:6px}.progress-shell{display:none}.live-board{display:block}.stage-sec{margin-top:12px}.empty{padding:16px;color:#666}.rank-1,.rank-2,.rank-3{font-weight:800}.live-tag{color:#111}@media print{button{display:none}.card{break-inside:avoid}body{margin:18mm}}</style></head><body><h1>${esc(m.name||'Match')}</h1><div class="meta">${esc(title)} · ${m.date?esc(fmtD(m.date)):''} · ${esc(m.location||'')} · Generated ${esc(generated)}</div>${body}<script>window.onload=()=>setTimeout(()=>window.print(),250);window.onafterprint=()=>setTimeout(()=>window.close(),250);<\/script></body></html>`;
+}
+function downloadPdf(type){
+  if(!AM){alert('Open a match before downloading a PDF.');return;}
+  spin(true);
+  let w=null;
+  try{
+    w=window.open('','_blank');
+    if(!w)throw new Error('Popup blocked');
+    w.document.open();w.document.write(buildPdfHtml(type));w.document.close();
+    setTimeout(()=>spin(false),1800);
+  }catch(e){
+    spin(false);
+    alert('The PDF print window could not be opened. Please allow pop-ups for this site and try again.');
+  }
+}
 
 function stMets(m,stage){
   const res=[];

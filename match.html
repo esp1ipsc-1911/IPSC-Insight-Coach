@@ -913,7 +913,7 @@ function renderML(){
 // ── PUBLIC MATCH PAGE ──
 async function openPubMatch(mid){
   spin(true);
-  orgFromView=document.querySelector('.view.active')?.id?.replace('view-',')||'my-comps';
+  orgFromView=(document.querySelector('.view.active')?.id?.replace('view-',''))||'my-comps';
   try{
     let m=matches.find(x=>x.id===mid||x.id?.toString()===mid.toString());
     if(!m){const sn=await getDoc(doc(db,'matches',mid.toString()));if(sn.exists())m={id:sn.id,...sn.data()};}

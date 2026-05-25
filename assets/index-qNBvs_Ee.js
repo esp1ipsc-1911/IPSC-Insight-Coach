@@ -581,7 +581,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 }\\\n/* HERO */\
 #home-content{display:block!important;overflow-y:auto!important;padding:20px!important;height:calc(100vh - 56px)!important;box-sizing:border-box!important;}\
 #screen-home>.scroll-content{display:block!important;padding:0 0 0 72px!important;overflow-y:auto!important;overflow-x:hidden!important;height:calc(100vh - 56px)!important;}\
-@media(orientation:portrait){#home-content{padding:16px!important;}#screen-home>.scroll-content{padding:0!important;}}\
+@media(orientation:portrait){#home-content{padding:16px 16px 80px 16px!important;}#screen-home>.scroll-content{padding:0!important;}}\
 .home-hero{background:linear-gradient(135deg,rgba(15,22,35,0.98),rgba(13,15,18,0.98));border:1px solid rgba(59,130,246,0.15);border-radius:16px;padding:22px 24px;margin-bottom:16px;position:relative;overflow:hidden;max-width:680px;}\
 .hero-divider{height:1px;background:rgba(255,255,255,0.07);margin:16px 0;}\
 .hero-goal-wrap{}\

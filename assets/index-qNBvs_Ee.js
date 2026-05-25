@@ -901,7 +901,7 @@ document.head.appendChild(_st);
  <button class="btn-primary" onclick="openCreateTeam()" style="width:100%;">${dt==="no"?"+ Create New Team":"+ Create New Team"}</button>
  </div>
  <div style="max-width:640px;margin:16px auto 0;width:100%;" id="teams-list-container"></div>
-  </div>
+ </div>
  </div>
  <div class="tab-bar">
  <div class="tab-item" onclicss="tab-item" onclick="switchTab('screen-home')"><div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></div><span class="lang-home">${d("home")}</span></div>

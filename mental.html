@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>IPSC Mental Trainer</title>
+  <meta name="description" content="Mental treningsapp for IPSC med Firebase-login, korttrekking og refleksjon.">
+  <style>
+:root{
+  --bg:#090c12;
+  --panel:#111722;
+  --panel-2:#0d1420;
+  --panel-3:#151b27;
+  --stroke:#1b2d4f;
+  --stroke-soft:#242b36;
+  --text:#f4f7ff;
+  --muted:#7c838f;
+  --blue:#3380ff;
+  --blue-soft:#1b4fb7;
+  --gold:#d9b44a;
+  --green:#43c789;
+  --danger:#ff6b6b;
+  --shadow:0 22px 60px rgba(0,0,0,.42);
+  --radius:26px;
+}
+
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  margin:0;
+  color:var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(45,115,255,.16), transparent 28rem),
+    radial-gradient(circle at 20% 30%, rgba(25,63,125,.18), transparent 22rem),
+    var(--bg);
+  min-height:100vh;
+}
+
+.app-shell{
+  width:min(100%, 980px);
+  margin:0 auto;
+  padding:calc(env(safe-area-inset-top) + 32px) 18px 130px;
+}
+
+.topbar{
+  display:grid;
+  grid-template-columns:auto auto 1fr auto;
+  gap:14px;
+  align-items:center;
+  margin:10px 2px 28px;
+}
+
+.brand{
+  font-weight:900;
+  font-size:40px;
+  letter-spacing:-4px;
+  line-height:1;
+}
+.brand-i{color:#fff}
+.brand-d{color:var(--blue)}
+.ghost-button,.mini-icon{
+  border:0;
+  color:var(--muted);
+  background:transparent;
+  font-size:28px;
+  cursor:pointer;
+}
+.match-pill{
+  justify-self:center;
+  width:min(100%, 560px);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border:1px solid var(--stroke-soft);
+  border-radius:999px;
+  padding:12px 22px;
+  background:#121823;
+  color:#f1f4fb;
+  font-size:clamp(15px, 3vw, 22px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+}
+.live-dot{
+  display:inline-block;
+  width:13px;height:13px;
+  border-radius:999px;
+  background:var(--green);
+  box-shadow:0 0 14px rgba(67,199,137,.6);
+}
+.chev{color:var(--muted)}
+.avatar{
+  width:64px;height:64px;border-radius:999px;
+  display:grid;place-items:center;
+  font-weight:900;
+  background:linear-gradient(145deg,#2d7cff,#7aa7ff);
+  border:4px solid #16264a;
+  box-shadow:0 0 24px rgba(51,128,255,.35);
+}
+
+.card{
+  border:1px solid var(--stroke);
+  background:linear-gradient(145deg, rgba(17,23,34,.96), rgba(11,15,23,.96));
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:clamp(22px, 5vw, 42px);
+  margin-bottom:28px;
+}
+
+.hero h1{
+  font-size:clamp(36px, 8vw, 72px);
+  line-height:1.02;
+  margin:24px 0 18px;
+  letter-spacing:-.055em;
+}
+.muted{
+  color:var(--muted);
+  font-size:clamp(18px, 3vw, 28px);
+  line-height:1.45;
+  max-width:820px;
+}
+.divider{
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent);
+  margin:34px 0;
+}
+.eyebrow{
+  margin:0;
+  font-weight:900;
+  letter-spacing:.38em;
+  font-size:clamp(13px, 2.5vw, 20px);
+}
+.blue{color:#3b82ff}
+.gold{color:var(--gold)}
+.goal-line,.deck-top,.card-meta,.actions{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+.goal{
+  margin:26px 0 4px;
+  font-size:clamp(23px, 4vw, 36px);
+  line-height:1.35;
+}
+
+.deck-panel{
+  position:relative;
+  border-color:#283140;
+}
+.deck-panel:before{
+  content:"";
+  position:absolute;inset:12px auto 12px 0;
+  width:6px;border-radius:999px;
+  background:var(--blue);
+  box-shadow:0 0 18px rgba(51,128,255,.7);
+}
+.count{color:var(--muted);font-weight:800}
+.challenge-card{
+  margin-top:22px;
+  border-radius:22px;
+  border:1px solid #202a3b;
+  background:rgba(7,11,18,.55);
+  padding:24px;
+}
+.tag{
+  color:#dce8ff;
+  background:rgba(51,128,255,.14);
+  border:1px solid rgba(51,128,255,.38);
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:800;
+}
+#sourceTags{
+  color:var(--muted);
+  font-size:13px;
+  text-align:right;
+}
+.challenge-card h2{
+  font-size:clamp(28px, 6vw, 52px);
+  line-height:1.04;
+  letter-spacing:-.045em;
+  margin:22px 0 14px;
+}
+.situation{
+  color:#d5dae4;
+  font-size:clamp(17px, 2.7vw, 24px);
+  line-height:1.48;
+}
+.prompt-block{
+  margin:24px 0;
+  padding:22px;
+  border-radius:18px;
+  background:#111823;
+  border:1px solid #242d3b;
+}
+.prompt-block h3,.history h3{
+  margin:0 0 10px;
+  font-size:20px;
+}
+.prompt-block p{
+  color:#b9c1d0;
+  line-height:1.5;
+}
+textarea{
+  width:100%;
+  min-height:96px;
+  resize:vertical;
+  border-radius:16px;
+  border:1px solid #2b3444;
+  background:#090d14;
+  color:var(--text);
+  padding:16px;
+  font:inherit;
+  outline:none;
+}
+textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(51,128,255,.15);
+}
+.thinking-box,.reflection-box{
+  margin:22px 0;
+  padding:22px;
+  border-radius:18px;
+  background:linear-gradient(145deg, rgba(26,34,48,.85), rgba(11,16,24,.85));
+  border:1px solid #283247;
+}
+.thinking-box p:last-child{
+  font-size:clamp(21px, 3vw, 30px);
+  line-height:1.35;
+  margin:14px 0 0;
+}
+.reflection-box p{
+  color:#c5cedd;
+  line-height:1.55;
+}
+.citation-line{
+  color:var(--gold)!important;
+  font-size:14px;
+}
+button{
+  -webkit-tap-highlight-color:transparent;
+}
+.secondary{
+  border:1px solid #2b5fbb;
+  background:rgba(51,128,255,.12);
+  color:#d8e7ff;
+  border-radius:16px;
+  padding:14px 18px;
+  font-weight:900;
+  cursor:pointer;
+}
+.secondary:hover{background:rgba(51,128,255,.22)}
+.wide{width:100%}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:22px;
+}
+.stats div{
+  background:#0b1018;
+  border:1px solid #222a37;
+  border-radius:18px;
+  padding:18px;
+  text-align:center;
+}
+.stats strong{
+  display:block;
+  font-size:30px;
+}
+.stats span{
+  color:var(--muted);
+  font-size:13px;
+  font-weight:800;
+}
+.hidden{display:none}
+.history{
+  margin-top:24px;
+  border-top:1px solid #252d3a;
+  padding-top:18px;
+}
+.history-item{
+  padding:16px;
+  border:1px solid #222c3d;
+  border-radius:16px;
+  margin-bottom:12px;
+  background:#0a0f16;
+}
+.history-item small{color:var(--muted)}
+.references ol{
+  margin:18px 0 0;
+  padding-left:22px;
+}
+.references li{
+  color:#bfc7d6;
+  line-height:1.55;
+  margin:0 0 12px;
+  overflow-wrap:anywhere;
+}
+.bottom-nav{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:0;
+  width:min(100%, 980px);
+  padding:14px 16px calc(env(safe-area-inset-bottom) + 12px);
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  background:#11151c;
+  border-top:1px solid #242a34;
+  z-index:5;
+}
+.bottom-nav a{
+  color:#717783;
+  text-decoration:none;
+  display:grid;
+  gap:4px;
+  place-items:center;
+  font-size:28px;
+  font-weight:700;
+}
+.bottom-nav a span{
+  font-size:11px;
+  letter-spacing:.18em;
+}
+.bottom-nav a.active{color:var(--blue)}
+.bottom-nav a.active:before{
+  content:"";
+  position:absolute;
+  top:0;
+  width:58px;height:4px;
+  border-radius:0 0 999px 999px;
+  background:var(--blue);
+}
+
+.fab{
+  position:fixed;
+  right:max(24px, calc((100vw - 980px)/2 + 28px));
+  bottom:calc(env(safe-area-inset-bottom) + 92px);
+  width:92px;height:92px;
+  border:0;
+  border-radius:999px;
+  color:#fff;
+  background:linear-gradient(145deg,#3b86ff,#2466ef);
+  font-size:46px;
+  box-shadow:0 18px 40px rgba(51,128,255,.35);
+  cursor:pointer;
+  z-index:6;
+}
+.fab:active{transform:scale(.97)}
+
+@media (max-width:640px){
+  .app-shell{padding-left:14px;padding-right:14px}
+  .topbar{grid-template-columns:auto auto 1fr auto;gap:8px}
+  .brand{font-size:34px}
+  .avatar{width:54px;height:54px}
+  .match-pill{padding:10px 14px}
+  .card{border-radius:22px}
+  .challenge-card{padding:18px}
+  .actions{flex-direction:column}
+  .secondary{width:100%}
+  .stats{grid-template-columns:1fr}
+  .bottom-nav a span{font-size:10px}
+  .bottom-nav a{font-size:24px}
+  .fab{width:80px;height:80px;font-size:42px}
+}
+
+/* Login – inspired by the admin login layout, adapted for IPSC Mental Deck */
+.login-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:calc(env(safe-area-inset-top) + 52px) 16px 32px;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(45,115,255,.18), transparent 28rem),
+    radial-gradient(circle at 20% 30%, rgba(25,63,125,.20), transparent 22rem),
+    var(--bg);
+}
+.login-card{
+  width:100%;
+  max-width:390px;
+  background:linear-gradient(145deg, rgba(17,23,34,.98), rgba(11,15,23,.98));
+  border:1px solid var(--stroke);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:28px;
+}
+.login-brand{
+  font-weight:900;
+  font-size:42px;
+  letter-spacing:-4px;
+  line-height:1;
+  text-align:center;
+  margin-bottom:14px;
+}
+.login-kicker{
+  text-align:center;
+  font-size:12px;
+  letter-spacing:.30em;
+  margin-bottom:14px;
+}
+.login-card h1{
+  margin:0 0 12px;
+  text-align:center;
+  font-size:30px;
+  line-height:1.08;
+  letter-spacing:-.04em;
+}
+.login-note,
+.login-hint{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.45;
+  text-align:center;
+  margin:0 0 20px;
+}
+.login-hint{
+  margin:14px 0 0;
+  font-size:11px;
+}
+.login-field{margin-bottom:16px;}
+.login-field label{
+  display:block;
+  margin-bottom:8px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+.login-field input{
+  width:100%;
+  min-height:48px;
+  padding:13px 14px;
+  color:var(--text);
+  background:#111823;
+  border:1px solid #242d3b;
+  border-radius:14px;
+  font:inherit;
+  outline:none;
+}
+.login-field input:focus{
+  border-color:rgba(51,128,255,.75);
+  box-shadow:0 0 0 3px rgba(51,128,255,.16);
+}
+.login-btn{
+  width:100%;
+  min-height:48px;
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(145deg,#3b86ff,#2466ef);
+  color:#fff;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 12px 26px rgba(51,128,255,.28);
+}
+.login-btn:active{transform:translateY(1px);}
+.login-error{
+  background:rgba(255,107,107,.12);
+  border:1px solid rgba(255,107,107,.28);
+  color:var(--danger);
+  padding:12px 14px;
+  border-radius:14px;
+  font-size:13px;
+  margin-bottom:16px;
+}
+.logout-link{
+  grid-column:1 / -1;
+  justify-self:end;
+  margin-top:8px;
+  border:1px solid var(--stroke-soft);
+  background:#121823;
+  color:var(--muted);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+@media (min-width:641px){
+  .logout-link{grid-column:auto;margin-top:0;}
+  .topbar{grid-template-columns:auto auto 1fr auto auto;}
+}
+
+    .login-btn:disabled { opacity: .7; cursor: wait; }
+  </style>
+</head>
+<body>
+  <section id="loginSection" class="login-wrap" aria-label="Innlogging">
+    <div class="login-card">
+      <div class="login-brand"><span class="brand-i">I</span><span class="brand-d">M</span></div>
+      <p class="eyebrow blue login-kicker">IPSC MENTAL TRAINER</p>
+      <h1>IPSC Mental Trainer Login</h1>
+      <p class="login-note">Logg inn for å trekke mentale IPSC-kort, lagre refleksjoner og trene robuste tanker under stage-press.</p>
+      <div id="loginError" class="login-error" style="display:none;"></div>
+      <div class="login-field">
+        <label for="loginEmail">E-post</label>
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="navn@klubb.no" />
+      </div>
+      <div class="login-field">
+        <label for="loginPassword">Passord</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Passord" />
+      </div>
+      <button id="loginBtn" class="login-btn" type="button">Logg inn</button>
+      <p class="login-hint">Logg inn med Firebase-brukeren din. Tilgang krever rollen user eller admin.</p>
+    </div>
+  </section>
+
+  <div class="app-shell" id="appShell" style="display:none;">
+    <header class="topbar">
+      <div class="brand"><span class="brand-i">I</span><span class="brand-d">M</span></div>
+      <button class="ghost-button" id="shuffleBtn" aria-label="Bland kort">↻</button>
+      <div class="match-pill"><span class="live-dot"></span><span>IPSC Mental Deck</span><span class="chev">▾</span></div>
+      <div class="avatar" id="avatar" aria-label="Profil">ES</div>
+      <button class="logout-link" id="logoutBtn" type="button">Logg ut</button>
+    </header>
+
+    <main>
+      <section class="hero card">
+        <p class="eyebrow blue">PERFORMANCE INTELLIGENCE DASHBOARD</p>
+        <h1 id="welcomeTitle">Welcome back, Espen</h1>
+        <p class="muted">Trekk et mentalt IPSC-kort. Bruk situasjonen til å trene fokus, reset, stage-plan og robuste tanker under press.</p>
+        <div class="divider"></div>
+        <div class="goal-line">
+          <p class="eyebrow gold">MY SEASON GOAL</p>
+          <button id="editGoal" class="mini-icon" aria-label="Rediger mål">✎</button>
+        </div>
+        <p id="seasonGoal" class="goal">Norgesmester individuelt og lag. Topp 25 på EM, og laget på pallen</p>
+      </section>
+
+      <section class="deck-panel card">
+        <div class="deck-top">
+          <p class="eyebrow blue">☆ MENTAL CARD</p>
+          <span id="cardCount" class="count"></span>
+        </div>
+
+        <article class="challenge-card" id="challengeCard">
+          <div class="card-meta">
+            <span id="levelTag" class="tag">Stage-plan</span>
+            <span id="sourceTags"></span>
+          </div>
+          <h2 id="challengeTitle">Trekk et kort</h2>
+          <p id="situation" class="situation">Trykk på pluss-knappen for å trekke en relevant mental utfordring fra en IPSC-stage.</p>
+
+          <div class="prompt-block">
+            <h3>Hva har du tenkt før?</h3>
+            <p id="askBefore">Kortet vil spørre hva du tidligere har tenkt før tilsvarende situasjon.</p>
+            <textarea id="answerBefore" placeholder="Skriv refleksjonen din her ..."></textarea>
+          </div>
+
+          <div class="prompt-block">
+            <h3>Hva har du tenkt under?</h3>
+            <p id="askDuring">Kortet vil spørre hva du tenkte mens situasjonen faktisk skjedde.</p>
+            <textarea id="answerDuring" placeholder="Hva skjedde mentalt i øyeblikket?"></textarea>
+          </div>
+
+          <div class="thinking-box">
+            <p class="eyebrow gold">HVA BØR DU TENKE?</p>
+            <p id="shouldThink">Trekk et kort for å få en kort, praktisk tanke du kan bruke på line.</p>
+          </div>
+
+          <div class="reflection-box">
+            <p class="eyebrow blue">REFLEKSJON MED KILDER</p>
+            <p id="reflection">Refleksjonen kobler IPSC-situasjonen til forskning på selvprat, oppmerksomhet, rutiner, stress og prestasjon under press.</p>
+            <p id="citations" class="citation-line"></p>
+          </div>
+
+          <div class="actions">
+            <button id="saveReflection" class="secondary">Lagre refleksjon</button>
+            <button id="copyCard" class="secondary">Kopier kort</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="progress card">
+        <div class="deck-top">
+          <p class="eyebrow blue">REWARDS</p>
+          <button class="mini-icon" id="toggleHistory">⌄</button>
+        </div>
+        <div class="stats">
+          <div><strong id="drawnStat">0</strong><span>kort trukket</span></div>
+          <div><strong id="savedStat">0</strong><span>refleksjoner</span></div>
+          <div><strong id="streakStat">0</strong><span>dager streak</span></div>
+        </div>
+        <div id="historyPanel" class="history hidden">
+          <h3>Lagrede refleksjoner</h3>
+          <div id="historyList"></div>
+          <button id="exportHistory" class="secondary wide">Eksporter refleksjoner som JSON</button>
+        </div>
+      </section>
+
+      <section class="references card">
+        <p class="eyebrow gold">APA 7 REFERENCES</p>
+        <ol id="referenceList"></ol>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navigasjon">
+      <a class="active">⌂<span>HOME</span></a>
+      <a>☆<span>MATCHES</span></a>
+      <a>↗<span>PROGNOSIS</span></a>
+      <a>⊙<span>LIVE</span></a>
+      <a>♙<span>TEAMS</span></a>
+      <a>♙<span>PROFILE</span></a>
+    </nav>
+
+    <button id="drawBtn" class="fab" aria-label="Trekk kort">+</button>
+  </div>
+<script id="deck-data" type="application/json">[{"id": "grip", "level": "Teknikk under press", "title": "Dårlig grep fra start", "situation": "Du merker etter første skudd at grepet ikke sitter. Pistolen løfter mer enn forventet, og du kjenner at støttehånden ikke låser våpenet.", "askBefore": "Hva tenkte du rett før startsignalet sist du opplevde dette? Var fokuset på resultat, fart, andre skyttere eller egen gjennomføring?", "askDuring": "Hva tenkte du mens grepet glapp? Forsøkte du å tvinge tempoet videre, eller gjorde du en enkel justering?", "shouldThink": "Neste siktebilde. Trykk våpenet inn i grepet. Se det du trenger å se. Løs ett problem av gangen.", "reflection": "Når presset øker, er det lett å gå inn i mekanisk overkontroll eller resultatfokus. En enkel, oppgaveorientert tanke gir mindre kognitiv støy og hjelper deg tilbake til utførelse. Ekstern fokus – på siktebilde, treff og våpenets respons – er ofte mer robust enn å analysere håndledd, fingre og detaljer midt i stagen.", "sources": ["wulf2013", "beilock2001", "moreira2021"]}, {"id": "reload", "level": "Våpenhåndtering", "title": "Dårlig magasinbytte", "situation": "Magasinet går ikke rett inn. Du mister et halvt sekund, og kroppen vil begynne å stresse videre.", "askBefore": "Hva var planen for magasinbyttet? Var det koblet til et bestemt steg, en posisjon eller et visuelt signal?", "askDuring": "Hva var den første tanken da byttet ble dårlig: irritasjon, hastverk, eller en nøktern korrigering?", "shouldThink": "Fullfør byttet. Øyne til neste oppgave. Ikke betal feilen to ganger.", "reflection": "Et dårlig magasinbytte blir dyrt først når det skaper en ny feil. En pre-performance-rutine og en planlagt reset gjør at feilen blir isolert i stedet for å spre seg til neste posisjon, neste skive eller neste avtrekk.", "sources": ["rupprecht2024", "hatzigeorgiadis2011", "ipsc2024"]}, {"id": "miss", "level": "Treffkontroll", "title": "Du tror du bommet", "situation": "Et skudd føles feil. Du er usikker på om det var miss, delta eller godt nok.", "askBefore": "Hva var kriteriet ditt før start for når du skulle ta et ekstra skudd?", "askDuring": "Hva skjedde mentalt: ble du irritert, usikker, eller fulgte du en forhåndsbestemt beslutningsregel?", "shouldThink": "Se. Bekreft. Skyt ekstra bare når informasjonen krever det.", "reflection": "IPSC belønner balansen mellom presisjon og fart. Beslutninger underveis bør derfor baseres på synsinformasjon, ikke følelser. En enkel regel før start reduserer panikkvalg under press.", "sources": ["ipscWhat", "ipsc2024", "yu2015"]}, {"id": "position", "level": "Bevegelse", "title": "Feil posisjonering", "situation": "Du kommer inn i en posisjon litt for dypt eller for grunt. Vinkelen til siste skive blir dårligere enn planlagt.", "askBefore": "Hvordan visualiserte du stoppunktet før start? Hadde du et konkret visuelt anker på gulv, vegg eller target-array?", "askDuring": "Da du kjente at posisjonen var feil, prøvde du å redde planen eller skape en ny enkel løsning?", "shouldThink": "Stabilt nok. Se skivene. Skyt fra der du er hvis det er trygt og effektivt.", "reflection": "Feil posisjonering er en typisk test av fleksibel oppmerksomhet. En god mental plan er ikke bare en film av perfekt gjennomføring; den inneholder også en rolig respons når planen ikke stemmer.", "sources": ["ipscWhat", "wulf2013", "park2023"]}, {"id": "forgot-target", "level": "Stage-plan", "title": "Du glemmer en skive", "situation": "Du forlater en posisjon og får en plutselig følelse av at noe mangler.", "askBefore": "Hvordan kodet du target-rekkefølgen før start: tall, bilder, rytme, posisjoner eller nøkkelord?", "askDuring": "Hva gjorde du da usikkerheten kom: fortsatte blindt, stoppet opp, eller brukte du en definert sjekk?", "shouldThink": "Sjekk planen raskt. Hvis informasjonen er tydelig, korriger. Hvis ikke, hold sikkerhet og flyt.", "reflection": "Arbeidsminnet svekkes lett under press. Derfor bør stage-planen bygges med få, sterke holdepunkter: posisjon, første skive, siste skive og exit-signal. Det reduserer sjansen for at én glemt detalj velter hele stagen.", "sources": ["yu2015", "rupprecht2024", "ipscWhat"]}, {"id": "no-shoot", "level": "Risiko", "title": "Nær no-shoot", "situation": "Du skal skyte en delvis dekket skive. No-shooten tar mye av synsbildet, og du kjenner at du blir forsiktig eller aggressiv på feil måte.", "askBefore": "Hva var planen din for akseptabelt siktebilde på denne skiven?", "askDuring": "Tenkte du «ikke treff no-shoot», eller tenkte du på den konkrete treffsonen du faktisk skulle levere?", "shouldThink": "Se A-sonen. Aksepter riktig siktebilde. Rent avtrekk.", "reflection": "Negativ selvprat binder oppmerksomheten til det du vil unngå. Målrettet selvprat og positivt formulerte instruksjoner gjør det lettere å rette oppmerksomheten mot handlingen du faktisk skal utføre.", "sources": ["hatzigeorgiadis2011", "wulf2013", "ipscWhat"]}, {"id": "activation", "level": "Aktivering", "title": "For høy puls før start", "situation": "Du står på line og kjenner høy puls, varme i kroppen og kortere pust. Du vil starte før du egentlig er klar.", "askBefore": "Hva pleier du å tolke høy aktivering som: fare, dårlig tegn, eller kroppens konkurransemodus?", "askDuring": "Hvordan påvirket aktiveringen beslutningene dine i starten av stagen?", "shouldThink": "Pust ut. Mykt blikk. Første oppgave. Kroppen er klar, jeg styrer retningen.", "reflection": "Mental trening handler ikke om å fjerne aktivering, men å regulere og tolke den. Skyttere rapporterer at stress, angst og mental forberedelse påvirker prestasjon, og at trenerstyrt press i trening kan være nyttig når det gjøres kontrollert.", "sources": ["moreira2021", "park2023", "rupprecht2024"]}, {"id": "speeding", "level": "Tempo", "title": "Du løper fra siktene", "situation": "Du presser tempoet fordi du vil ta igjen tid. Skuddene kommer før du egentlig har sett nok.", "askBefore": "Hva var tempo-målet før start: raskest mulig, eller riktig mengde informasjon per skive?", "askDuring": "Hva var varselsignalet på at du skjøt fortere enn du så?", "shouldThink": "Se mer. Treff først. Fart kommer fra beslutning, ikke panikk.", "reflection": "IPSC handler om balanse mellom accuracy, power og speed. Når fart blir en emosjonell reaksjon, faller ofte presisjonen. En kort instruksjon som «se mer» kan fungere som reset mot oppgavefokus.", "sources": ["ipscWhat", "hatzigeorgiadis2011", "wulf2013"]}, {"id": "makeup", "level": "Beslutning", "title": "Unødvendige make-up skudd", "situation": "Du tar ekstra skudd på flere skiver uten klar informasjon. Tiden øker, og du mister rytme.", "askBefore": "Hadde du definert hvilke skiver som skulle få ekstra skudd ved usikkerhet?", "askDuring": "Var make-up-skuddet basert på syn, lyd, følelse eller frykt?", "shouldThink": "Bare informasjon utløser ekstra skudd. Ikke skyt samvittigheten ren.", "reflection": "Under press kan hjernen søke trygghet gjennom ekstra handlinger. I practical shooting må trygghet erstattes av tydelige beslutningsregler: når jeg ser X, gjør jeg Y.", "sources": ["yu2015", "rupprecht2024", "ipsc2024"]}, {"id": "mover", "level": "Moving target", "title": "Mover aktiveres tidligere enn forventet", "situation": "En moving target, swinger eller aktivator endrer rytmen. Du kjenner at planen din sprekker.", "askBefore": "Hadde du en sekundærplan for timing dersom aktiveringen ble tidligere eller senere?", "askDuring": "Ble oppmerksomheten fanget av feilen, eller flyttet du den til neste løsningspunkt?", "shouldThink": "Finn vinduet. Aksepter riktig bilde. Neste oppgave.", "reflection": "Dynamiske baner inneholder bevegelige og reagerende mål. Mental robusthet betyr å kunne skifte oppmerksomhet raskt uten å starte indre kritikk.", "sources": ["ipscWhat", "park2023", "wulf2013"]}, {"id": "footwork", "level": "Bevegelse", "title": "Dårlig exit", "situation": "Du skyter ferdig en posisjon, men beina starter sent. Du mister rytmen ut av posisjonen.", "askBefore": "Hvilket signal skulle starte exit: siste skudd, siste siktebilde eller blikk til neste posisjon?", "askDuring": "Hva tenkte du idet du ble stående for lenge?", "shouldThink": "Skudd ferdig – øyne videre – kropp følger.", "reflection": "Et effektivt exit-signal er en pre-performance-rutine i mikroformat. Når signalet er trent, trenger du mindre bevisst kontroll og kan bevare flyt.", "sources": ["rupprecht2024", "beilock2001", "ipsc2024"]}, {"id": "first-shot", "level": "Start", "title": "Treig første skudd", "situation": "Startsignelet kommer, men du bruker for lang tid på å komme i gang. Du jakter deretter resten av stagen.", "askBefore": "Var du virkelig klar på første oppgave, eller ventet du bare på lyd?", "askDuring": "Etter treg start: klarte du å la resten av stagen være en ny oppgave?", "shouldThink": "Første oppgave er nok. Se første akseptable bilde. Utfør.", "reflection": "En tydelig startrutine beskytter mot både nøling og overreaksjon. Den bør være kort, repeterbar og knyttet til første handling, ikke til resultatet på stagen.", "sources": ["rupprecht2024", "hatzigeorgiadis2011"]}, {"id": "penalty-thought", "level": "Resiliens", "title": "Du tenker på straff midt i stagen", "situation": "Du tror du kan ha fått en prosedyre eller miss. Tankene går til resultatlisten mens du fortsatt skyter.", "askBefore": "Hvilke feil er du mest redd for i konkurranse, og hvordan viser den frykten seg i tankene?", "askDuring": "Hvor mange skudd eller beslutninger mistet kvalitet fordi du vurderte resultatet for tidlig?", "shouldThink": "Stagen er ikke ferdig. Neste skive fortjener full oppmerksomhet.", "reflection": "Resultatvurdering midt i prestasjonen er sjelden nyttig. Oppmerksomheten bør tilbake til kontrollerbare arbeidsoppgaver: siktebilde, avtrekk, posisjon og sikker våpenhåndtering.", "sources": ["park2023", "yu2015", "ipscWhat"]}, {"id": "weak-hand", "level": "Spesialkrav", "title": "Strong hand / weak hand krav", "situation": "Du møter en stage-del med enhåndsskyting og kjenner lavere tillit til teknikken.", "askBefore": "Hvordan beskrev du denne delen for deg selv før start: problem, risiko eller konkret oppgave?", "askDuring": "Var fokuset på hånden, eller på treffbildet og avtrekket?", "shouldThink": "Rolig trykk. Se løftet. Ett skudd om gangen.", "reflection": "Ved krevende teknikk kan intern detaljfokus øke. For en erfaren utøver er det ofte bedre å bruke en kort ekstern cue og la innlært teknikk jobbe.", "sources": ["wulf2013", "beilock2001", "hatzigeorgiadis2011"]}, {"id": "memory", "level": "Plan", "title": "For kompleks stage-plan", "situation": "Du har laget en plan med for mange detaljer. Under press husker du ikke rekkefølgen rent.", "askBefore": "Hvor mange mentale holdepunkter hadde planen? Var de enkle nok til å overleve startsignalet?", "askDuring": "Når planen ble uklar, hadde du en måte å rekonstruere den på?", "shouldThink": "Punkt én. Punkt to. Exit. Enkelt slår perfekt.", "reflection": "En plan som bare fungerer i ro, er ikke robust nok. Bruk få chunker, tydelige visuelle anker og nøkkelord som tåler puls, lyd og observatører.", "sources": ["yu2015", "rupprecht2024", "park2023"]}, {"id": "dq-fear", "level": "Sikkerhet", "title": "Frykt for sikkerhetsfeil", "situation": "Du blir så redd for å gjøre en sikkerhetsfeil at all bevegelse blir stiv og hakkete.", "askBefore": "Hva er forskjellen på sunn sikkerhetsbevissthet og hemmende frykt for deg?", "askDuring": "Hvilken konkret sikkerhetsregel skulle ha oppmerksomhet akkurat da?", "shouldThink": "Munning. Finger. Retning. Rolig løsning.", "reflection": "Sikkerhet skal være tydelig og konkret, ikke en diffus katastrofetanke. Konkrete cue-ord kan redusere støy og støtte trygg utførelse under tidspress.", "sources": ["ipscWhat", "ipsc2024", "hatzigeorgiadis2011"]}, {"id": "steel", "level": "Stål", "title": "Stål som ikke faller", "situation": "Du skyter stål, men platen faller ikke. Du er usikker på treff, kanttreff eller dårlig call.", "askBefore": "Hadde du en forhåndsregel for hvor raskt du skulle skyte om igjen på stål?", "askDuring": "Reagerte du med frustrasjon eller rolig bekreftelse?", "shouldThink": "Se stål. Bekreft. Skyt til oppgaven er løst.", "reflection": "Stål gir rask feedback, men kan også trigge emosjonell respons. Målet er å gjøre feedback om til handling uten indre debatt.", "sources": ["ipscWhat", "yu2015"]}, {"id": "trigger-freeze", "level": "Avtrekk", "title": "Avtrekksfrys på liten skive", "situation": "På en liten eller hardt dekket skive stopper avtrekket. Du sikter lenge, men skuddet går ikke.", "askBefore": "Hva sa du til deg selv om denne skiven før start?", "askDuring": "Var du i ferd med å sikre deg mot feil, eller utføre riktig handling?", "shouldThink": "Akseptert bilde. Jevnt trykk. Stol på prosessen.", "reflection": "Når konsekvensen oppleves stor, kan overkontroll skape stopp. En rutine med akseptabelt siktebilde og avtrekkscue gjør oppgaven mer gjennomførbar.", "sources": ["beilock2001", "rupprecht2024", "hatzigeorgiadis2011"]}, {"id": "after-stage", "level": "Læring", "title": "Dårlig post-stage refleksjon", "situation": "Etter stagen husker du bare at den var dårlig. Du får lite konkret læring ut av opplevelsen.", "askBefore": "Hva skulle du egentlig evaluere etter stagen?", "askDuring": "Hvilke tre observerbare ting skjedde, uten forklaring og uten dom?", "shouldThink": "Fakta først. Én læring. Én justering. Ferdig.", "reflection": "Mental trening styrkes av presis refleksjon. Skille mellom observasjon, vurdering og tiltak gjør at du trener bedre neste gang i stedet for å bare bekrefte frustrasjon.", "sources": ["park2023", "moreira2021"]}, {"id": "squad-pressure", "level": "Sosialt press", "title": "Du skyter foran sterke skyttere", "situation": "Du står i squad med skyttere du respekterer, og begynner å endre egen plan for å se raskere ut.", "askBefore": "Hvem var planen laget for: deg, eller publikum?", "askDuring": "Når du merket sosialt press, hva ble første konkrete cue tilbake til egen løsning?", "shouldThink": "Min plan. Min informasjon. Min gjennomføring.", "reflection": "Press øker når evaluering oppleves viktig. Prestasjonen blir mer stabil når oppmerksomheten flyttes fra inntrykk til oppgave.", "sources": ["yu2015", "park2023", "rupprecht2024"]}, {"id": "classification", "level": "Resultatpress", "title": "Classifier-stress", "situation": "Du vet at stagen påvirker klassifisering eller uttak. Du begynner å tenke på prosent før du skyter.", "askBefore": "Hva er den konkrete arbeidsoppgaven som gir best prosent – ikke tallet i seg selv?", "askDuring": "Hvor tidlig kom resultat-tankene, og hva kostet de?", "shouldThink": "Prosenten kommer etterpå. Nå: se, trykk, flytt.", "reflection": "Når insentivet blir stort, kan både distraksjon og overkontroll øke. En kort prosesscue beskytter mot at hjernen regner resultat mens kroppen skal prestere.", "sources": ["yu2015", "beilock2001", "hatzigeorgiadis2011"]}, {"id": "visual-patience", "level": "Siktebilde", "title": "Manglende visuell tålmodighet", "situation": "På lengre hold skyter du før siktene har kommet tilbake til et bilde du faktisk aksepterer.", "askBefore": "Hva var ditt akseptkriterium for langt hold?", "askDuring": "Var det tidspress eller synsinformasjon som bestemte skuddet?", "shouldThink": "Vent på nok. Ikke mer enn nok.", "reflection": "Visuell tålmodighet betyr ikke å skyte sakte; det betyr å la kravene styre informasjonsmengden. Det er en kjerneferdighet i balansen mellom presisjon og fart.", "sources": ["ipscWhat", "wulf2013", "moreira2021"]}, {"id": "bad-plan-copy", "level": "Planlegging", "title": "Du kopierer en annen skytters plan", "situation": "Rett før start ser du en bedre skytter løse stagen annerledes. Du endrer plan uten å ha trent den mentalt.", "askBefore": "Hva gjorde den nye planen bedre – og var den realistisk for deg?", "askDuring": "Når planen ble ukjent, hvilke beslutninger ble tregere?", "shouldThink": "Velg før start. Eier jeg ikke planen, bruker jeg den ikke.", "reflection": "Freestyle-prinsippet gir frihet til å løse stagen, men frihet krever eierskap. En plan som passer en annen kropp, divisjon eller kapasitet kan gi unødvendig mental last.", "sources": ["ipsc2024", "ipscWhat", "rupprecht2024"]}, {"id": "equipment", "level": "Uventet hendelse", "title": "Utstyr kjennes feil", "situation": "Hylster, magasin eller beltet føles annerledes enn vanlig rett før start.", "askBefore": "Har du en sjekkrutine før du går til line?", "askDuring": "Hvis noe føles feil, skaper du en trygg pause eller starter du med uro?", "shouldThink": "Sjekk det som kan sjekkes. Så første oppgave.", "reflection": "Forberedende rutiner reduserer tilfeldige bekymringer. Når utstyr er kontrollert, bør oppmerksomheten slippes videre til første prestasjonsoppgave.", "sources": ["rupprecht2024", "park2023"]}, {"id": "bad-hit-start", "level": "Resiliens", "title": "Dårlig treff på første target", "situation": "Første target føles svakt. Du kjenner irritasjonen komme allerede etter to skudd.", "askBefore": "Hva var planen for mental reset etter en dårlig åpning?", "askDuring": "Lot du første target definere resten av stagen?", "shouldThink": "Neste target er uavhengig. Lever neste bilde.", "reflection": "En tidlig feil får ofte uforholdsmessig stor mental vekt. Treningen bør lære hjernen at hver ny skive er en ny oppgave, ikke en dom over stagen.", "sources": ["hatzigeorgiadis2011", "park2023", "yu2015"]}, {"id": "risk-speed", "level": "Risikostyring", "title": "Du velger for høy risiko på close targets", "situation": "Nære skiver får deg til å skyte aggressivt, men du overfører samme tempo til vanskeligere skiver etterpå.", "askBefore": "Hadde planen tydelige tempobytter?", "askDuring": "Hva var signalet for å gå fra attack til kontroll?", "shouldThink": "Tempo følger krav. Nær er raskt, vanskelig er sett.", "reflection": "Stage-kontroll handler om å kunne skifte gir. Mental cueing bør derfor skille mellom ulike krav, ikke bruke samme tempo overalt.", "sources": ["ipscWhat", "wulf2013", "rupprecht2024"]}, {"id": "target-transition", "level": "Overganger", "title": "Du over-svinger mellom targets", "situation": "Overgangene blir for harde. Du passerer siktebildet og må korrigere tilbake.", "askBefore": "Hva var fokus for blikket før våpenet flyttet?", "askDuring": "Fulgte våpenet øynene, eller jaget øynene våpenet?", "shouldThink": "Øyne først. Stopp på informasjon. Rent skudd.", "reflection": "Ekstern fokus på hvor skuddet skal leveres kan støtte mer effektiv motorikk enn å styre armene bevisst. Overganger bør trenes med blikket som leder.", "sources": ["wulf2013", "beilock2001"]}, {"id": "mental-fatigue", "level": "Matchdag", "title": "Mental slitenhet sent i matchen", "situation": "På siste stager blir stage-walkthrough slappere. Du gjør en planfeil som du vanligvis ikke gjør.", "askBefore": "Hva er minimumsrutinen din når du er sliten?", "askDuring": "Merket du at kvaliteten i planleggingen falt før det ble en feil?", "shouldThink": "Kort rutine. Første skive, siste skive, reload, exit.", "reflection": "Mental ferdighet må fungere også når energi er lav. En minimumsprotokoll gjør at du ikke er avhengig av motivasjon eller overskudd for å planlegge godt.", "sources": ["park2023", "rupprecht2024"]}, {"id": "anger", "level": "Emosjonskontroll", "title": "Irritasjon etter RO-kommentar eller venting", "situation": "Du blir irritert av venting, restart, kommentar eller teknisk kluss. Du tar følelsen med inn i stagen.", "askBefore": "Hva pleier å trigge irritasjon hos deg på match?", "askDuring": "Hvordan visste du at følelsen hadde tatt styring over tempo og beslutninger?", "shouldThink": "Følelsen kan være der. Oppgaven er fortsatt enkel.", "reflection": "Psykologisk ferdighetstrening inkluderer regulering av stress, følelser, motivasjon og coping. Målet er ikke følelsesløshet, men at følelsen ikke får velge handlingen.", "sources": ["park2023", "hatzigeorgiadis2011"]}, {"id": "good-stage-next", "level": "Etter suksess", "title": "Du har nettopp skutt en veldig god stage", "situation": "Etter en topp stage blir du mer opptatt av å beskytte resultatet enn å skyte neste stage.", "askBefore": "Hvordan nullstiller du etter suksess, ikke bare etter feil?", "askDuring": "Begynte du å skyte for å ikke ødelegge, eller for å utføre neste oppgave?", "shouldThink": "Forrige stage er ferdig. Samme rutine. Samme arbeid.", "reflection": "Suksess kan skape like mye resultatfokus som feil. En stabil rutine bør brukes etter gode og dårlige prestasjoner, slik at neste stage behandles likt.", "sources": ["rupprecht2024", "yu2015"]}, {"id": "partial-memory", "level": "Målhukommelse", "title": "Blander partials og åpne skiver", "situation": "Du skyter en åpen skive som om den var hardt dekket, eller angriper en partial for raskt.", "askBefore": "Hvordan markerte du ulike vanskelighetsgrader i planen?", "askDuring": "Hva gjorde blikket ditt før hvert skudd: sjekket krav eller fulgte rytmen automatisk?", "shouldThink": "Les skiven. Kravet bestemmer skuddet.", "reflection": "Når rytmen tar over, kan hjernen forenkle for mye. En kort visuell sjekk før vanskelige skiver gjør planen mer presis under press.", "sources": ["ipscWhat", "wulf2013"]}, {"id": "stage-reset", "level": "Uventet pause", "title": "Restart etter teknisk stopp", "situation": "Du får stopp i gjennomføringen og må starte på nytt. Kroppen er aktivert, men planen føles brukt opp.", "askBefore": "Har du en rutine for å bygge planen på nytt etter restart?", "askDuring": "Tok du med irritasjonen fra første forsøk inn i andre forsøk?", "shouldThink": "Ny stage. Ny start. Samme første oppgave.", "reflection": "Restart krever mental disiplin: ikke forbedre alt, ikke kompensere, bare reetablere rutinen og første oppgave. Dette er en trenbar konkurranseferdighet.", "sources": ["rupprecht2024", "park2023"]}, {"id": "malfunction", "level": "Problemløsning", "title": "Funksjoneringsfeil", "situation": "Våpenet stopper. Du taper tid og må løse problemet trygt mens adrenalinet øker.", "askBefore": "Hvordan har du mentalt trent på stopp uten å katastrofetolke det?", "askDuring": "Gikk tanken til resultatet, eller til korrekt feilretting?", "shouldThink": "Sikker retning. Løs stopp. Fortsett kun med kontroll.", "reflection": "Ved uventede hendelser er enkel beslutningsstruktur viktigere enn følelser. Sikkerhet og korrekt prosedyre må komme først; prestasjon kommer etterpå.", "sources": ["ipsc2024", "ipscWhat", "hatzigeorgiadis2011"]}, {"id": "too-careful", "level": "Selvtillit", "title": "Du blir for forsiktig", "situation": "Du har respekt for stagen og skyter betydelig saktere enn ferdighetene tilsier.", "askBefore": "Hva var du redd for skulle skje?", "askDuring": "Hvilken informasjon viste at du kunne stole på et høyere tempo?", "shouldThink": "Respekt, ikke frykt. Skyt det bildet du eier.", "reflection": "Selvtillit i sport er ikke bare en følelse; den støttes av forberedelse, konkrete cue-ord og erfaring med kontrollert press på trening.", "sources": ["park2023", "moreira2021", "hatzigeorgiadis2011"]}, {"id": "too-aggressive", "level": "Selvkontroll", "title": "Du blir for aggressiv", "situation": "Du vil dominere stagen og begynner å ignorere presisjonskrav, fotarbeid eller siktebilde.", "askBefore": "Hva var grensen mellom aggressiv plan og uforsvarlig gjennomføring?", "askDuring": "Hvilket signal kunne fortalt deg at du måtte roe én prosent ned?", "shouldThink": "Aggressiv plan, presis utførelse.", "reflection": "Høy intensitet er nyttig når den er styrt. Når den blir emosjonell, reduserer den informasjonskvalitet og beslutningskvalitet.", "sources": ["yu2015", "ipscWhat"]}, {"id": "calling-shots", "level": "Shot calling", "title": "Du stoler ikke på egne calls", "situation": "Du ser egentlig hvor skuddet gikk, men tør ikke stole på informasjonen. Du tar ekstra skudd eller blir usikker.", "askBefore": "Hvor tydelig må synsinformasjonen være for at du skal stole på den?", "askDuring": "Var usikkerheten teknisk, mental eller resultatdrevet?", "shouldThink": "Jeg stoler på det jeg ser. Bekreft og gå videre.", "reflection": "I høy fart må skytteren stole på relevant informasjon. Trening bør derfor koble syn, beslutning og handling, ikke bare treffresultat etterpå.", "sources": ["wulf2013", "moreira2021", "ipscWhat"]}, {"id": "walkthrough-noise", "level": "Forstyrrelser", "title": "Støy under walkthrough", "situation": "Andre prater, skyttere diskuterer løsninger, og du mister egen plan i støyen.", "askBefore": "Hvordan beskytter du de siste 30 sekundene av egen mental forberedelse?", "askDuring": "Hva trengte du å repetere for at planen skulle sitte?", "shouldThink": "Min rytme. Mine anker. Første oppgave.", "reflection": "Konsentrasjon er lettere når rutinen skjer likt hver gang. Siste del av walkthrough bør være enkel og personlig, ikke en åpen diskusjon.", "sources": ["rupprecht2024", "park2023"]}, {"id": "memory-of-error", "level": "Selvbilde", "title": "Du tar med gamle feil til ny match", "situation": "En tidligere miss, no-shoot eller DQ-følelse dukker opp før en lignende stage.", "askBefore": "Hva forteller du deg selv når en gammel feil dukker opp?", "askDuring": "Klarte du å skille minne fra nåværende oppgave?", "shouldThink": "Dette er en ny repetisjon. Jeg bruker læringen, ikke frykten.", "reflection": "Erfaring blir verdifull når den omformes til en konkret strategi. Hvis den bare repeteres som frykt, øker den mental belastning.", "sources": ["hatzigeorgiadis2011", "park2023"]}, {"id": "coach-feedback", "level": "Trenerrolle", "title": "For mye teknisk feedback rett før start", "situation": "Noen gir deg et godt tips rett før du skal skyte, men det gjør deg mer analytisk og mindre fri.", "askBefore": "Når er du mottakelig for teknisk feedback, og når må du beskytte gjennomføringsmodus?", "askDuring": "Ble du opptatt av kroppsdelene dine i stedet for skivene?", "shouldThink": "Feedback etterpå. Nå er planen låst.", "reflection": "Teknisk læring og prestasjon krever ofte ulik oppmerksomhet. Rett før start bør cue-ord være få og oppgaveorienterte, ikke en ny teknisk leksjon.", "sources": ["beilock2001", "wulf2013", "moreira2021"]}, {"id": "double-tap-myth", "level": "Rytme", "title": "Rytmen bestemmer mer enn siktene", "situation": "Du skyter i fast rytme fordi det føles raskt, selv om målene krever ulik kontroll.", "askBefore": "Hvilke targets krevde annen rytme enn resten?", "askDuring": "Var rytmen et hjelpemiddel eller en tvang?", "shouldThink": "Skiven bestemmer rytmen. Jeg skyter når bildet er nok.", "reflection": "Automatisering er nyttig, men ikke når den overstyrer informasjon. Practical shooting krever at rytme justeres etter avstand, partials, bevegelse og risiko.", "sources": ["ipscWhat", "wulf2013", "yu2015"]}, {"id": "final-target", "level": "Avslutning", "title": "Du mister fokus på siste skive", "situation": "Du kjenner deg ferdig før siste target faktisk er skutt. Siste skudd blir svakt.", "askBefore": "Hva er ditt mentale sluttsignal: siste skudd, unloaded and show clear, eller først etter RO-kommando?", "askDuring": "Når begynte du å evaluere stagen?", "shouldThink": "Stage ferdig først etter siste sikre handling. Full verdi til siste skive.", "reflection": "Hjernen vil gjerne avslutte når hovedoppgaven føles løst. En bevisst sluttregel holder oppmerksomheten i prestasjonen helt til handlingen faktisk er ferdig.", "sources": ["rupprecht2024", "ipsc2024", "park2023"]}]</script>
+  <script id="ref-data" type="application/json">{"ipscWhat": {"intext": "International Practical Shooting Confederation, n.d.", "apa": "International Practical Shooting Confederation. (n.d.). What is IPSC? https://www.ipsc.org/what-is-ipsc/"}, "ipsc2024": {"intext": "International Practical Shooting Confederation, 2024", "apa": "International Practical Shooting Confederation. (2024). IPSC handgun competition rules: January 2024 edition. https://www.ipsc.org/wp-content/uploads/2023/12/IPSC-Handgun-Competition-Rules-Jan-2024-Edition-Final-27-Dec-2023.pdf"}, "hatzigeorgiadis2011": {"intext": "Hatzigeorgiadis et al., 2011", "apa": "Hatzigeorgiadis, A., Zourbanos, N., Galanis, E., & Theodorakis, Y. (2011). Self-talk and sports performance: A meta-analysis. Perspectives on Psychological Science, 6(4), 348–356. https://doi.org/10.1177/1745691611413136"}, "wulf2013": {"intext": "Wulf, 2013", "apa": "Wulf, G. (2013). Attentional focus and motor learning: A review of 15 years. International Review of Sport and Exercise Psychology, 6(1), 77–104. https://doi.org/10.1080/1750984X.2012.723728"}, "rupprecht2024": {"intext": "Rupprecht et al., 2024", "apa": "Rupprecht, A. G. O., Tran, U. S., & Gröpel, P. (2024). The effectiveness of pre-performance routines in sports: A meta-analysis. International Review of Sport and Exercise Psychology, 17(1), 39–64. https://doi.org/10.1080/1750984X.2021.1944271"}, "beilock2001": {"intext": "Beilock & Carr, 2001", "apa": "Beilock, S. L., & Carr, T. H. (2001). On the fragility of skilled performance: What governs choking under pressure? Journal of Experimental Psychology: General, 130(4), 701–725. https://doi.org/10.1037/0096-3445.130.4.701"}, "yu2015": {"intext": "Yu, 2015", "apa": "Yu, R. (2015). Choking under pressure: The neuropsychological mechanisms of incentive-induced performance decrements. Frontiers in Behavioral Neuroscience, 9, Article 19. https://doi.org/10.3389/fnbeh.2015.00019"}, "park2023": {"intext": "Park et al., 2023", "apa": "Park, I., Jeon, J., & Lee, E. (2023). Psychological skills training for athletes in sports: Web of Science bibliometric analysis. Healthcare, 11(2), 259. https://doi.org/10.3390/healthcare11020259"}, "moreira2021": {"intext": "Moreira da Silva et al., 2021", "apa": "Moreira da Silva, F., Fernandes, J., Maia, J., & Ribeiro, J. (2021). Which are the most determinant psychological factors in Olympic shooting performance? A self-perspective from elite shooters. International Journal of Environmental Research and Public Health, 18(9), 4637. https://doi.org/10.3390/ijerph18094637"}}</script>
+  <script type="module">
+
+    import { auth, db } from './src/firebase.js';
+    import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    const deck = JSON.parse(document.getElementById('deck-data').textContent);
+    const refs = JSON.parse(document.getElementById('ref-data').textContent);
+    const $ = (id) => document.getElementById(id);
+
+    let current = null;
+    let currentUser = null;
+    let currentProfile = null;
+    let storagePrefix = 'ipscMental:guest';
+    let drawn = 0;
+    let saved = [];
+    let streak = { count: 0, last: '' };
+
+    const allowedRoles = ['user', 'admin'];
+
+    function setLoginError(message){
+      const error = $('loginError');
+      if(!error) return;
+      error.textContent = message || '';
+      error.style.display = message ? 'block' : 'none';
+    }
+
+    function loadLocalState(uid){
+      storagePrefix = `ipscMental:${uid}`;
+      drawn = Number(localStorage.getItem(`${storagePrefix}:drawn`) || 0);
+      saved = JSON.parse(localStorage.getItem(`${storagePrefix}:reflections`) || '[]');
+      streak = JSON.parse(localStorage.getItem(`${storagePrefix}:streak`) || '{"count":0,"last":""}');
+      const savedGoal = localStorage.getItem(`${storagePrefix}:seasonGoal`) || localStorage.getItem('seasonGoal');
+      if(savedGoal && $('seasonGoal')) $('seasonGoal').textContent = savedGoal;
+    }
+
+    function initialsFromName(name, email){
+      const raw = String(name || email || 'IPSC Shooter').split('@')[0].replace(/[._-]+/g, ' ').trim();
+      const parts = raw.split(/\s+/).filter(Boolean);
+      if(parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return (parts[0] || 'IM').slice(0,2).toUpperCase();
+    }
+
+    function nameFromProfile(profile, user){
+      const firstLast = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim();
+      if(firstLast) return firstLast;
+      if(profile?.displayName) return profile.displayName;
+      if(user?.displayName) return user.displayName;
+      const raw = String(user?.email || 'skytter').split('@')[0].replace(/[._-]+/g, ' ').trim();
+      return raw ? raw.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'skytter';
+    }
+
+    async function resolveAccess(user){
+      let roles = [];
+      let profile = {};
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if(userDoc.exists()){
+          profile = userDoc.data() || {};
+          roles = Array.isArray(profile.roles) ? profile.roles : (profile.role ? [profile.role] : []);
+        }
+      } catch (error) {
+        console.warn('Kunne ikke lese users-rolle:', error);
+      }
+
+      if(!roles.length && user.email){
+        try {
+          const adminDoc = await getDoc(doc(db, 'adminUsers', user.email));
+          if(adminDoc.exists()){
+            const d = adminDoc.data() || {};
+            profile = { ...profile, ...d };
+            roles = Array.isArray(d.roles) ? d.roles : (d.role ? [d.role] : []);
+          }
+        } catch (error) {
+          console.warn('Kunne ikke lese adminUsers-rolle:', error);
+        }
+      }
+
+      const normalizedRoles = roles.map(r => String(r).toLowerCase());
+      const hasAccess = normalizedRoles.some(r => allowedRoles.includes(r));
+      return { hasAccess, roles: normalizedRoles, profile };
+    }
+
+    function showLogin(){
+      const login = $('loginSection');
+      const app = $('appShell');
+      if(login) login.style.display = 'flex';
+      if(app) app.style.display = 'none';
+    }
+
+    function showApp(user, profile, roles){
+      currentUser = user;
+      currentProfile = profile || {};
+      loadLocalState(user.uid);
+      const login = $('loginSection');
+      const app = $('appShell');
+      if(login) login.style.display = 'none';
+      if(app) app.style.display = 'block';
+      const name = nameFromProfile(currentProfile, user);
+      if($('welcomeTitle')) $('welcomeTitle').textContent = `Welcome back, ${name}`;
+      if($('avatar')) $('avatar').textContent = initialsFromName(name, user.email);
+      renderReferences();
+      renderStats();
+      renderHistory();
+    }
+
+    async function login(){
+      const email = ($('loginEmail')?.value || '').trim();
+      const password = ($('loginPassword')?.value || '');
+      const btn = $('loginBtn');
+      setLoginError('');
+      if(!email || !email.includes('@')){
+        setLoginError('Skriv inn en gyldig e-postadresse.');
+        return;
+      }
+      if(!password){
+        setLoginError('Skriv inn passord.');
+        return;
+      }
+      try {
+        if(btn){ btn.disabled = true; btn.textContent = 'Logger inn…'; }
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        setLoginError('Innlogging feilet: ' + friendlyAuthError(error));
+      } finally {
+        if(btn){ btn.disabled = false; btn.textContent = 'Logg inn'; }
+      }
+    }
+
+    async function logout(){
+      await signOut(auth);
+    }
+
+    function friendlyAuthError(error){
+      const code = error?.code || '';
+      if(code.includes('invalid-credential') || code.includes('wrong-password') || code.includes('user-not-found')) return 'Feil e-post eller passord.';
+      if(code.includes('too-many-requests')) return 'For mange forsøk. Vent litt og prøv igjen.';
+      return error?.message || 'Ukjent feil.';
+    }
+
+    function todayKey(){ return new Date().toISOString().slice(0,10); }
+
+    function updateStreak(){
+      const today = todayKey();
+      if(streak.last !== today){
+        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+        streak.count = streak.last === yesterday ? streak.count + 1 : 1;
+        streak.last = today;
+        localStorage.setItem(`${storagePrefix}:streak`, JSON.stringify(streak));
+      }
+    }
+
+    function drawCard(){
+      const previousId = current?.id;
+      let next = deck[Math.floor(Math.random() * deck.length)];
+      if(deck.length > 1){
+        while(next.id === previousId) next = deck[Math.floor(Math.random() * deck.length)];
+      }
+      current = next;
+      drawn += 1;
+      localStorage.setItem(`${storagePrefix}:drawn`, String(drawn));
+      updateStreak();
+      renderCard();
+      renderStats();
+      $('challengeCard')?.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    function renderCard(){
+      if(!current) return;
+      $('levelTag').textContent = current.level;
+      $('challengeTitle').textContent = current.title;
+      $('situation').textContent = current.situation;
+      $('askBefore').textContent = current.askBefore;
+      $('askDuring').textContent = current.askDuring;
+      $('shouldThink').textContent = current.shouldThink;
+      $('reflection').textContent = current.reflection;
+      $('answerBefore').value = '';
+      $('answerDuring').value = '';
+      const intexts = current.sources.map(k => refs[k]?.intext).filter(Boolean);
+      $('citations').textContent = `Kilder: ${intexts.join('; ')}.`;
+      $('sourceTags').textContent = current.sources.map(k => refs[k]?.intext.split(',')[0]).filter(Boolean).join(' · ');
+      $('cardCount').textContent = `${drawn} trukket`;
+    }
+
+    function renderReferences(){
+      const list = $('referenceList');
+      if(!list) return;
+      list.innerHTML = Object.values(refs)
+        .sort((a,b)=>a.apa.localeCompare(b.apa))
+        .map(r => `<li>${escapeHtml(r.apa)}</li>`)
+        .join('');
+    }
+
+    function renderStats(){
+      if($('drawnStat')) $('drawnStat').textContent = drawn;
+      if($('savedStat')) $('savedStat').textContent = saved.length;
+      if($('streakStat')) $('streakStat').textContent = streak.count || 0;
+      if($('cardCount')) $('cardCount').textContent = `${drawn} trukket`;
+    }
+
+    function renderHistory(){
+      const list = $('historyList');
+      if(!list) return;
+      if(saved.length === 0){
+        list.innerHTML = `<p class="muted">Ingen lagrede refleksjoner ennå.</p>`;
+        return;
+      }
+      list.innerHTML = saved.slice().reverse().map(item => `
+        <div class="history-item">
+          <strong>${escapeHtml(item.title)}</strong><br>
+          <small>${escapeHtml(item.date)}</small>
+          <p><b>Før:</b> ${escapeHtml(item.before || 'Ikke fylt ut')}</p>
+          <p><b>Under:</b> ${escapeHtml(item.during || 'Ikke fylt ut')}</p>
+          <p><b>Bør tenke:</b> ${escapeHtml(item.shouldThink)}</p>
+        </div>
+      `).join('');
+    }
+
+    function saveReflection(){
+      if(!current){ drawCard(); return; }
+      const item = {
+        uid: currentUser?.uid || null,
+        id: current.id,
+        title: current.title,
+        date: new Date().toLocaleString('no-NO'),
+        before: $('answerBefore').value.trim(),
+        during: $('answerDuring').value.trim(),
+        shouldThink: current.shouldThink,
+        reflection: current.reflection,
+        sources: current.sources.map(k => refs[k]?.apa).filter(Boolean)
+      };
+      saved.push(item);
+      localStorage.setItem(`${storagePrefix}:reflections`, JSON.stringify(saved));
+      renderStats();
+      renderHistory();
+      $('saveReflection').textContent = 'Lagret ✓';
+      setTimeout(()=>$('saveReflection').textContent = 'Lagre refleksjon', 1400);
+    }
+
+    async function copyCard(){
+      if(!current){ drawCard(); return; }
+      const text = [
+        `IPSC Mental Trainer – ${current.title}`,
+        '',
+        `Situasjon: ${current.situation}`,
+        `Hva har du tenkt før? ${current.askBefore}`,
+        `Hva har du tenkt under? ${current.askDuring}`,
+        `Hva bør du tenke? ${current.shouldThink}`,
+        `Refleksjon: ${current.reflection}`,
+        `Kilder: ${current.sources.map(k => refs[k]?.apa).join(' | ')}`
+      ].join('\n');
+      await navigator.clipboard.writeText(text);
+      $('copyCard').textContent = 'Kopiert ✓';
+      setTimeout(()=>$('copyCard').textContent = 'Kopier kort', 1400);
+    }
+
+    function exportHistory(){
+      const blob = new Blob([JSON.stringify(saved, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ipsc-mental-refleksjoner.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function editGoal(){
+      const old = localStorage.getItem(`${storagePrefix}:seasonGoal`) || $('seasonGoal').textContent;
+      const next = prompt('Skriv sesongmålet ditt:', old);
+      if(next && next.trim()){
+        localStorage.setItem(`${storagePrefix}:seasonGoal`, next.trim());
+        $('seasonGoal').textContent = next.trim();
+      }
+    }
+
+    function shuffleDeck(){
+      for(let i=deck.length-1; i>0; i--){
+        const j = Math.floor(Math.random() * (i+1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      drawCard();
+    }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+      }[m]));
+    }
+
+    $('loginBtn')?.addEventListener('click', login);
+    $('loginPassword')?.addEventListener('keydown', (event) => { if(event.key === 'Enter') login(); });
+    $('logoutBtn')?.addEventListener('click', logout);
+    $('drawBtn')?.addEventListener('click', drawCard);
+    $('shuffleBtn')?.addEventListener('click', shuffleDeck);
+    $('saveReflection')?.addEventListener('click', saveReflection);
+    $('copyCard')?.addEventListener('click', copyCard);
+    $('toggleHistory')?.addEventListener('click', () => { $('historyPanel').classList.toggle('hidden'); renderHistory(); });
+    $('exportHistory')?.addEventListener('click', exportHistory);
+    $('editGoal')?.addEventListener('click', editGoal);
+
+    onAuthStateChanged(auth, async (user) => {
+      if(!user){
+        currentUser = null;
+        currentProfile = null;
+        showLogin();
+        return;
+      }
+      try {
+        await user.getIdToken(true);
+        const access = await resolveAccess(user);
+        if(access.hasAccess){
+          setLoginError('');
+          showApp(user, access.profile, access.roles);
+        } else {
+          await signOut(auth);
+          showLogin();
+          setLoginError('Du har ikke tilgang til Mental Trainer. Kontoen må ha rollen user eller admin.');
+        }
+      } catch (error) {
+        await signOut(auth);
+        showLogin();
+        setLoginError('Feil ved tilgangssjekk: ' + (error?.message || error));
+      }
+    });
+
+  </script>
+</body>
+</html>

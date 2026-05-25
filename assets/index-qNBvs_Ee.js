@@ -854,8 +854,6 @@ document.head.appendChild(_st);
 
   <div id="profile-match-tips"></div>
 
-  <div id="profile-rewards-section"></div>
-
   <div class="card" style="margin-bottom:12px;">
    <div class="card-header" style="display:flex;align-items:center;gap:8px;">
     <div class="card-title" id="prof-lang-title">${dt==="no"?"Language":"Language"}</div>
@@ -1654,7 +1652,7 @@ function icEvaluateRewards(profile, matches) {
 }
 
 function icRenderRewards() {
-  const el = document.getElementById('profile-rewards-section');
+  const el = document.getElementById('home-rewards-section');
   if (!el) return;
 
   const xp = icCalcXP(g, $);
@@ -2133,7 +2131,9 @@ t+='<button onclick="teGoalSave()" style="background:var(--accent);color:#fff;bo
 t+='<button onclick="teGoalCancel()" style="background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.12);border-radius:7px;padding:8px 14px;font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;">Cancel</button>';
 t+="</div></div>";
 t+="</div></div>";
+t+='<div id="home-rewards-section" style="margin-top:12px;"></div>';
 e.innerHTML=t;
+icRenderRewards();
 }
 window.teGoalEdit=function(){
   var d=document.getElementById('hero-goal-display');

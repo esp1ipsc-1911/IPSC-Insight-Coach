@@ -578,9 +578,10 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 #screen-matches>.scroll-content{padding-left:72px!important;}\
 #match-list-container{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))!important;gap:16px!important;padding:20px!important;}\
 .standings-table,table{width:100%!important;}\
-/* HERO */\
-#home-content{display:block!important;overflow-y:auto!important;padding:20px 24px!important;height:calc(100vh - 56px)!important;box-sizing:border-box!important;}\
-#screen-home>.scroll-content{display:block!important;padding:0!important;overflow:visible!important;height:auto!important;}\
+}\\\n/* HERO */\
+#home-content{display:block!important;overflow-y:auto!important;padding:20px!important;height:calc(100vh - 56px)!important;box-sizing:border-box!important;}\
+#screen-home>.scroll-content{display:block!important;padding:0 0 0 72px!important;overflow-y:auto!important;overflow-x:hidden!important;height:calc(100vh - 56px)!important;}\
+@media(orientation:portrait){#home-content{padding:16px!important;}#screen-home>.scroll-content{padding:0!important;}}\
 .home-hero{background:linear-gradient(135deg,rgba(15,22,35,0.98),rgba(13,15,18,0.98));border:1px solid rgba(59,130,246,0.15);border-radius:16px;padding:22px 24px;margin-bottom:16px;position:relative;overflow:hidden;max-width:680px;}\
 .hero-divider{height:1px;background:rgba(255,255,255,0.07);margin:16px 0;}\
 .hero-goal-wrap{}\
@@ -622,7 +623,6 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 /* ATTENTION */\
 .att-it{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(224,182,73,0.05);border:1px solid rgba(224,182,73,0.18);border-radius:9px;margin-bottom:7px;}\
 .att-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}\
-}\
 ";
 document.head.appendChild(_st);
 })();const t=Pe();const[i,_matches]=await Promise.all([Promise.resolve(Pe()),Vt()]);i?g=i:g={firstName:t.name||((s=t.email)==null?void 0:s.split("@")[0])||"",lastName:"",division:"",category:"",powerFactor:"",region:"",club:"",draw:null,reloadTime:null};$=_matches;loadReferenceShooters().then(refs=>{refShooters=refs;}).catch(()=>{});if($&&$.length>0){const a=new Date,n=$.filter(r=>r.status!=="finished"&&r.date);if(n.length>0){let r=n[0],u=Math.abs(new Date(n[0].date)-a);for(const m of n){const b=new Date(m.date),f=Math.abs(b-a);f<u&&(u=f,r=m)}R=r.id}}ke&&ke(),ke=qt(a=>{$=a,fe(),te()}),ze_unsub&&ze_unsub(),ze_unsub=Zt(a=>{ee=a,Ye()});if(R){try{pt(R);}catch(e){}};e.innerHTML=`

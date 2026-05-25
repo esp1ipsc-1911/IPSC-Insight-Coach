@@ -2133,7 +2133,6 @@ t+="</div></div>";
 t+="</div></div>";
 t+='<div id="home-rewards-section" style="margin-top:12px;"></div>';
 e.innerHTML=t;
-icRenderRewards();
 }
 window.teGoalEdit=function(){
   var d=document.getElementById('hero-goal-display');

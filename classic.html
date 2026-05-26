@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Classic Team Norway · EM Mental Stage Deck</title>
+  <meta name="description" content="Positiv mental stage-kortstokk for Classic Team Norway under EHC 2026.">
+  <style>
+    :root{
+      --bg:#090c12; --panel:#111722; --panel2:#151b27; --panel3:#0d1420;
+      --stroke:rgba(255,255,255,.10); --stroke2:rgba(51,128,255,.28);
+      --text:#f4f7ff; --muted:#9aa3b2; --blue:#3380ff; --gold:#d9b44a;
+      --green:#43c789; --shadow:0 24px 70px rgba(0,0,0,.44);
+      --radius:24px; --radius-sm:16px;
+    }
+    *{box-sizing:border-box}
+    html{background:var(--bg);scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:radial-gradient(circle at 80% 0%,rgba(51,128,255,.18),transparent 34rem),radial-gradient(circle at 15% 25%,rgba(217,180,74,.13),transparent 22rem),var(--bg)}
+    button{font:inherit}
+    .app-shell{min-height:100vh;padding:16px 16px 36px;max-width:1040px;margin:0 auto}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .top-left{display:flex;align-items:center;gap:12px;min-width:0}
+    .mini-brand{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),#122348);border:1px solid rgba(217,180,74,.35);font-weight:950;letter-spacing:-.08em;font-size:18px;box-shadow:0 12px 34px rgba(0,0,0,.28)}
+    .mini-brand span:first-child{color:#fff}.mini-brand span:last-child{color:var(--gold)}
+    .titleblock h1{font-size:22px;line-height:1;margin:0;letter-spacing:-.04em}.titleblock p{margin:5px 0 0;color:var(--muted);font-size:12px}
+    .pill{border:1px solid var(--stroke);border-radius:999px;padding:10px 13px;font-size:12px;font-weight:900;color:var(--muted);background:rgba(255,255,255,.03);white-space:nowrap}
+    .intro{background:linear-gradient(180deg,rgba(21,27,39,.88),rgba(13,20,32,.88));border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:18px;text-align:center;overflow:hidden;position:relative}
+    .intro:before{content:"";position:absolute;inset:auto -80px -120px auto;width:260px;height:260px;border-radius:50%;background:rgba(217,180,74,.13);filter:blur(10px)}
+    .eyebrow{margin:0 0 8px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:950;color:var(--blue)}
+    .intro h2{position:relative;margin:0 0 9px;font-size:30px;letter-spacing:-.055em}.intro p{position:relative;margin:0;color:var(--muted);line-height:1.5}
+    .deck-stage{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}.deck-area{position:relative;background:linear-gradient(180deg,#101620,#0c121c);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;overflow:hidden}.deck-area:before{content:"";position:absolute;inset:-80px auto auto -80px;width:220px;height:220px;border-radius:50%;background:rgba(51,128,255,.16);filter:blur(18px)}
+    .deck-header{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.count{font-size:12px;color:var(--muted);font-weight:850;border:1px solid var(--stroke);padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.03)}
+    .table{position:relative;min-height:480px;display:grid;place-items:center;padding:10px}.stack{position:absolute;width:275px;height:375px;border-radius:26px;background:linear-gradient(135deg,#10234f,#07111f);border:1px solid rgba(217,180,74,.28);box-shadow:0 26px 60px rgba(0,0,0,.45);transform:translate(-18px,12px) rotate(-8deg)}.stack:before,.stack:after{content:"";position:absolute;inset:0;border-radius:26px;border:1px solid rgba(255,255,255,.08);background:repeating-linear-gradient(45deg,rgba(255,255,255,.055) 0 8px,transparent 8px 16px)}.stack:after{transform:translate(18px,-12px) rotate(5deg);background:linear-gradient(135deg,#182446,#0b1423)}
+    .stage-card{position:relative;width:min(360px,88vw);min-height:440px;border-radius:28px;padding:22px;background:linear-gradient(180deg,#f8fbff,#dbe8ff);color:#09101c;box-shadow:0 30px 70px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.8);transition:transform .55s cubic-bezier(.2,.9,.1,1),opacity .25s ease;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}.stage-card.dealing{animation:dealCard .72s cubic-bezier(.15,.9,.2,1)}@keyframes dealCard{0%{transform:translate(-80px,40px) rotate(-16deg) scale(.72);opacity:.25}55%{transform:translate(18px,-8px) rotate(4deg) scale(1.03);opacity:1}100%{transform:translate(0,0) rotate(0) scale(1)}}
+    .card-face{position:relative;z-index:2;display:flex;min-height:395px;flex-direction:column;justify-content:space-between;gap:16px}.card-kicker{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#34527c;font-size:11px;font-weight:950;letter-spacing:.12em;text-transform:uppercase}.card-symbol{width:42px;height:42px;border-radius:14px;background:#0c1626;color:var(--gold);display:grid;place-items:center;font-size:21px}.stage-title{font-size:40px;line-height:.95;letter-spacing:-.07em;margin:0 0 8px}.stage-meta{font-size:14px;color:#34527c;font-weight:900;margin:0}.team-cue{font-size:17px;line-height:1.44;color:#17243a;margin:0;border-top:1px solid rgba(9,16,28,.13);border-bottom:1px solid rgba(9,16,28,.13);padding:15px 0}.team-cue strong{color:#09101c}.card-footer{color:#52627a;font-size:12px;font-weight:850;display:flex;justify-content:space-between;gap:10px;align-items:center}.progressbar{height:8px;background:rgba(9,16,28,.11);border-radius:999px;overflow:hidden;margin-top:12px}.progressbar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:999px;transition:width .25s ease}
+    .draw-row{position:relative;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}.primary,.secondary{border:0;border-radius:16px;min-height:46px;padding:12px 18px;font-weight:950;cursor:pointer;transition:transform .15s ease,filter .15s ease}.primary:active,.secondary:active{transform:translateY(1px)}.primary{background:linear-gradient(135deg,var(--gold),#f2d783);color:#0a0c10;min-width:170px}.secondary{background:#151b27;color:var(--text);border:1px solid var(--stroke);min-width:124px}.secondary:disabled{opacity:.35;cursor:default}.primary:hover,.secondary:hover{filter:brightness(1.05)}
+    .work-panel{display:grid;gap:14px}.step{background:linear-gradient(180deg,#151b27,#101620);border:1px solid var(--stroke);border-radius:var(--radius-sm);padding:18px;box-shadow:0 14px 38px rgba(0,0,0,.22)}.step h3{margin:0 0 8px;font-size:18px;letter-spacing:-.02em}.step p{margin:0;color:var(--muted);line-height:1.45}.team-grid{display:grid;gap:12px;margin-top:12px}.person{border:1px solid var(--stroke);background:linear-gradient(180deg,rgba(13,20,32,.95),rgba(9,14,22,.92));border-radius:18px;padding:14px}.person-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.person h4{margin:0;font-size:16px}.tag{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);font-weight:950}.person p{font-size:14px;color:#d7deeb;margin:0}.today{display:grid;gap:8px}.stage-line{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--stroke);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.03);font-size:13px;color:var(--muted)}.stage-line.active{border-color:rgba(217,180,74,.45);background:rgba(217,180,74,.08);color:var(--text)}.stage-line strong{color:var(--text)}.quote{border-left:3px solid var(--gold);padding-left:12px;color:#d7deeb!important;font-weight:800}.copy-ok{display:none;color:var(--green);font-size:12px;font-weight:900;margin-top:10px}.copy-ok.show{display:block}.day-off{color:#d7deeb;font-size:14px;line-height:1.5;margin-top:12px;background:rgba(67,199,137,.08);border:1px solid rgba(67,199,137,.22);border-radius:16px;padding:14px}
+    @media(min-width:900px){.deck-stage{grid-template-columns:minmax(420px,1fr) minmax(390px,.95fr)}.table{min-height:560px}.stage-card{width:370px;min-height:470px}.card-face{min-height:425px}.team-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:560px){.app-shell{padding:12px 12px 28px}.intro h2{font-size:25px}.titleblock h1{font-size:18px}.pill{display:none}.stage-card{min-height:420px}.stack{width:238px;height:330px}.stage-title{font-size:35px}.primary,.secondary{flex:1 1 135px}.team-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="top-left">
+        <div class="mini-brand"><span>C</span><span>N</span></div>
+        <div class="titleblock"><h1>Classic Team Norway</h1><p>EM 2026 · positiv mental stage-kortstokk</p></div>
+      </div>
+      <div class="pill">Squad 05 · Classic</div>
+    </header>
+
+    <section class="intro">
+      <p class="eyebrow">MENTAL MATCHPLAN</p>
+      <h2>Én stage. Fire positive fokus. Samme lag.</h2>
+      <p>Klikk deg gjennom EM-planen i riktig skyterekkefølge. Hver stage har et felles lagfokus og en personlig mental cue for Espen, Stig, Henrik og Jan Stian.</p>
+    </section>
+
+    <main class="deck-stage">
+      <section class="deck-area" aria-label="Stage-kortstokk">
+        <div class="deck-header"><p class="eyebrow">STAGE-KORT</p><span id="cardCount" class="count">1 av 24</span></div>
+        <div class="table">
+          <div class="stack" aria-hidden="true"></div>
+          <article id="stageCard" class="stage-card">
+            <div class="card-face">
+              <div class="card-kicker"><span id="dayLabel">Mandag 8. juni</span><span class="card-symbol">♠</span></div>
+              <div>
+                <h2 id="stageTitle" class="stage-title">Stage 05</h2>
+                <p id="stageMeta" class="stage-meta">07:20 · Morgenøkt</p>
+              </div>
+              <p id="teamCue" class="team-cue"><strong>Lagfokus:</strong> Start samlet, tydelig og offensivt.</p>
+              <div>
+                <div class="card-footer"><span id="orderText">Første stage</span><span>Classic · CLA</span></div>
+                <div class="progressbar" aria-hidden="true"><span id="progressFill"></span></div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="draw-row">
+          <button id="prevBtn" class="secondary" type="button">Forrige</button>
+          <button id="nextBtn" class="primary" type="button">Neste stage</button>
+          <button id="copyBtn" class="secondary" type="button">Kopier</button>
+        </div>
+      </section>
+
+      <section class="work-panel" aria-label="Personlige mentale cues">
+        <div class="step">
+          <p class="eyebrow">PERSONLIGE CUES</p>
+          <h3 id="cueHeading">Mental inngang til Stage 05</h3>
+          <p class="quote" id="stageAffirmation">Vi møter første stage med ro, presisjon og positiv energi.</p>
+          <div class="team-grid" id="peopleGrid"></div>
+          <p id="copyOk" class="copy-ok">Kopiert ✓</p>
+        </div>
+        <div class="step">
+          <p class="eyebrow">DAGENS REKKEFØLGE</p>
+          <h3 id="dayHeading">Mandag 8. juni</h3>
+          <div class="today" id="dayList"></div>
+        </div>
+        <div class="step">
+          <p class="eyebrow">DAY OFF</p>
+          <h3>Fredag 12. juni</h3>
+          <div class="day-off">Restitusjon, lagfølelse og energi inn mot resten av mesterskapet. Bruk dagen til å bygge overskudd, støtte hverandre og holde den positive tonen levende.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const stages = [
+      {day:'Mandag 8. juni', session:'Morgenøkt', time:'07:20', stage:'05', team:'Lagfokus: Start mesterskapet med ro, tydelighet og positiv energi.', affirmation:'Vi åpner EM med selvtillit, lagfølelse og full tilstedeværelse.', cues:{Espen:'Rolig autoritet. Bruk erfaringen din, se første tydelige bilde og la planen bære tempoet.', Stig:'Trygg rytme. Gå inn med positiv energi, sterk tilstedeværelse og full tillit til egen løsning.', Henrik:'Friskt fokus. La blikket lede deg inn i flyt, og bygg momentum fra første oppgave.', 'Jan Stian':'Stødig inngang. Pust dypt, finn balansen og lever med kontroll fra første skudd.'}},
+      {day:'Mandag 8. juni', session:'Morgenøkt', time:'07:45', stage:'06', team:'Lagfokus: Bygg videre på starten og la hver skytter eie sin rytme.', affirmation:'Vi forsterker det som fungerer og løfter hverandre videre.', cues:{Espen:'Klar retning. Velg løsningen tidlig, stol på vurderingen og gjennomfør med lederskap.', Stig:'Sterk flyt. La kroppen arbeide naturlig og bruk energien som drivkraft.', Henrik:'Skarpt blikk. Hold oppmerksomheten fremover og skap tempo gjennom gode beslutninger.', 'Jan Stian':'Rolig presisjon. La hvert siktebilde få akkurat den tiden det fortjener.'}},
+      {day:'Mandag 8. juni', session:'Morgenøkt', time:'08:10', stage:'04', team:'Lagfokus: Samme gode prosess, nytt kort, ny mulighet.', affirmation:'Hver stage er en ny sjanse til å skyte med glede og kvalitet.', cues:{Espen:'Erfaren ro. Gå inn med enkel plan og tydelige visuelle holdepunkter.', Stig:'Positiv kraft. Skyt offensivt med kontrollert rytme og god kroppsfølelse.', Henrik:'Aktivt fokus. Se neste løsning tidlig og la beslutningene komme lett.', 'Jan Stian':'Stabil flyt. Hold pusten lav, blikket tydelig og gjennomføringen ren.'}},
+      {day:'Mandag 8. juni', session:'Morgenøkt', time:'08:35', stage:'02', team:'Lagfokus: Vi holder stemningen høy og arbeidsoppgavene enkle.', affirmation:'Enkelhet, tillit og positiv energi gir god gjennomføring.', cues:{Espen:'Tydelig plan. Led deg selv med korte cue-ord og trygg gjennomføring.', Stig:'Egen rytme. Kjenn balansen, skyt med overskudd og hold flyten levende.', Henrik:'Offensiv klarhet. Bruk farten din gjennom blikk, retning og beslutning.', 'Jan Stian':'Sikker kvalitet. Gjør det enkelt, stødig og presist gjennom hele stagen.'}},
+      {day:'Mandag 8. juni', session:'Morgenøkt', time:'09:00', stage:'03', team:'Lagfokus: Vi avslutter økten med samme positive trøkk.', affirmation:'Morgenøkten gir oss erfaring, selvtillit og energi.', cues:{Espen:'Samlet fokus. Bruk oversikten din og la hvert valg være tydelig.', Stig:'God energi. Fortsett å skyte med trygg rytme og positiv kroppsholdning.', Henrik:'Skap momentum. Vær nysgjerrig, offensiv og til stede i hvert bilde.', 'Jan Stian':'Kontrollert tempo. Hold deg i sonen og la presisjonen bygge resultatet.'}},
+      {day:'Mandag 8. juni', session:'Morgenøkt', time:'09:25', stage:'01', team:'Lagfokus: Første dag fullføres med lagfølelse og kvalitet.', affirmation:'Vi tar med oss dagens positive gjennomføringer videre.', cues:{Espen:'Avslutt sterkt. Bruk roen din og sett en tydelig standard for laget.', Stig:'Løft energien. Skyt med trygghet, glede og solid gjennomføring helt inn.', Henrik:'Hold gnisten. La siste stage i økten få samme skarpe fokus som første.', 'Jan Stian':'Stødig avslutning. Pust, se og lever med trygg rytme til siste handling.'}},
+
+      {day:'Tirsdag 9. juni', session:'Formiddag', time:'09:50', stage:'11', team:'Lagfokus: Ny dag, frisk energi og klar tro på egen plan.', affirmation:'Vi starter tirsdagen med overskudd, ro og offensiv lagånd.', cues:{Espen:'Ny dag, klar lederrolle. Sett retning med rolig blikk og trygg beslutning.', Stig:'Frisk energi. Bruk formiddagen positivt og finn rytmen tidlig.', Henrik:'Klar start. La første oppgave samle fokus og åpne for god flyt.', 'Jan Stian':'God balanse. Bygg gjennomføringen med presisjon, pust og tålmodig blikk.'}},
+      {day:'Tirsdag 9. juni', session:'Formiddag', time:'10:15', stage:'12', team:'Lagfokus: Vi holder trykket positivt og støtter hverandre videre.', affirmation:'Laget skyter best når hver skytter kjenner støtte og frihet.', cues:{Espen:'Trygg oversikt. Les stagen tidlig og stol på valget du har gjort.', Stig:'Sterk tilstedeværelse. La energien være lett, positiv og målrettet.', Henrik:'Rask klarhet. Se løsningen, start bestemt og bygg rytme gjennom blikket.', 'Jan Stian':'Ren gjennomføring. Hold det enkelt og la kvaliteten komme naturlig.'}},
+      {day:'Tirsdag 9. juni', session:'Formiddag', time:'10:40', stage:'07', team:'Lagfokus: Midt i økten holder vi kvaliteten høy og hodet lett.', affirmation:'Vi skyter med overskudd, tydelige cues og godt humør.', cues:{Espen:'Lett hode. Bruk rutinen til å forenkle og holde flyten ren.', Stig:'God puls. Ta med deg energien inn i presise og bestemte handlinger.', Henrik:'Visuell skarphet. La øynene finne veien før kroppen følger.', 'Jan Stian':'Stødig rytme. Kjenn tempoet, se kvaliteten og lever med ro.'}},
+      {day:'Tirsdag 9. juni', session:'Formiddag', time:'11:05', stage:'08', team:'Lagfokus: Vi bygger videre med optimisme og tydelig kommunikasjon.', affirmation:'Hver gjennomføring gir oss noe positivt å ta med videre.', cues:{Espen:'Klar kommunikasjon med deg selv. Enkle ord, tydelig retning, god flyt.', Stig:'Positivt driv. La selvtilliten være synlig i måten du beveger deg på.', Henrik:'Offensiv ro. Kombiner energi med tålmodig synsinformasjon.', 'Jan Stian':'Fokusert stabilitet. La pusten holde rytmen og blikket styre tempoet.'}},
+      {day:'Tirsdag 9. juni', session:'Formiddag', time:'11:30', stage:'09', team:'Lagfokus: Vi gir hver stage full verdi og holder laget samlet.', affirmation:'Full tilstedeværelse gir glede, læring og sterke prestasjoner.', cues:{Espen:'Full verdi. Bruk din konkurranseerfaring til å være til stede i hvert valg.', Stig:'Eierskap. Skyt din plan med selvtillit og god energi.', Henrik:'Fremoverblikk. Vær tidlig med øynene og la kroppen løse resten.', 'Jan Stian':'Trygg presisjon. Lever hvert bilde med rolig kontroll og positivt fokus.'}},
+      {day:'Tirsdag 9. juni', session:'Formiddag', time:'11:55', stage:'10', team:'Lagfokus: Dagen rundes av med ro, stolthet og positiv evaluering.', affirmation:'Vi avslutter tirsdagen med sterk lagfølelse og gode arbeidsoppgaver.', cues:{Espen:'Stødig avslutning. Samle laget gjennom egen ro og tydelig gjennomføring.', Stig:'Bevar flyten. Ta med deg overskuddet helt gjennom siste handling.', Henrik:'Skarp finish. Hold blikket aktivt og energien positiv til slutt.', 'Jan Stian':'Rolig sluttføring. La presisjonen og rytmen få følge deg helt inn.'}},
+
+      {day:'Onsdag 10. juni', session:'Ettermiddag', time:'13:20', stage:'17', team:'Lagfokus: Ettermiddagen åpnes med tålmodighet, overskudd og tro.', affirmation:'Vi møter tredje skyteøkt med modenhet, humør og klar retning.', cues:{Espen:'Moden kontroll. Bruk erfaringen til å skape en enkel og effektiv inngang.', Stig:'God energi etter pause. Finn rytmen raskt og skyt med positiv kraft.', Henrik:'Friskt blikk. La første visuelle anker gi deg trygg start.', 'Jan Stian':'Tålmodig presisjon. Gi deg selv god tid til å se det du skal se.'}},
+      {day:'Onsdag 10. juni', session:'Ettermiddag', time:'13:45', stage:'18', team:'Lagfokus: Vi holder fokus varmt, enkelt og løsningsorientert.', affirmation:'En positiv tanke før start gjør gjennomføringen lettere.', cues:{Espen:'Løsningsmodus. Velg det som er tydelig, og la gjennomføringen følge beslutningen.', Stig:'Lett og kraftfull. Bruk entusiasmen som drivstoff for gode valg.', Henrik:'Raskt overblikk. Se strukturen og bygg fart gjennom klare steg.', 'Jan Stian':'Jevn kvalitet. Pust rolig og la hvert skudd være en trygg levering.'}},
+      {day:'Onsdag 10. juni', session:'Ettermiddag', time:'14:10', stage:'13', team:'Lagfokus: Vi bruker laget som positiv støtte mellom stagene.', affirmation:'Støtte, smil og tydelige rutiner holder energien god.', cues:{Espen:'Lagbygger. La roen din smitte over i egen gjennomføring.', Stig:'Positiv tilstedeværelse. Bruk smilet, rytmen og tryggheten din aktivt.', Henrik:'Klar energi. Gå inn med lyst til å løse oppgaven godt.', 'Jan Stian':'Stabil base. Hold deg samlet og la roen være din styrke.'}},
+      {day:'Onsdag 10. juni', session:'Ettermiddag', time:'14:35', stage:'14', team:'Lagfokus: Vi skyter med kontrollert intensitet og godt humør.', affirmation:'Kontrollert intensitet gir god fart og høy kvalitet.', cues:{Espen:'Kontrollert intensitet. La planen være styrende og energien være positiv.', Stig:'Kraft med retning. Bruk tempoet ditt gjennom klare siktebilder.', Henrik:'Offensiv struktur. La hvert steg ha hensikt og hvert skudd ha kvalitet.', 'Jan Stian':'Rolig tempo. La presisjonen være tydelig og bevegelsen naturlig.'}},
+      {day:'Onsdag 10. juni', session:'Ettermiddag', time:'15:00', stage:'15', team:'Lagfokus: Vi holder standarden vår og bygger videre.', affirmation:'Standard, rutine og positiv energi følger oss gjennom dagen.', cues:{Espen:'Høy standard. Stol på rutinen og lever med tydelig autoritet.', Stig:'God standard. Vær sterk, trygg og positiv i hver overgang.', Henrik:'Hold trykket. La blikket være tidlig og avgjørelsene lette.', 'Jan Stian':'Stødig standard. Gjenta det enkle godt, og la kvaliteten samle seg.'}},
+      {day:'Onsdag 10. juni', session:'Ettermiddag', time:'15:25', stage:'16', team:'Lagfokus: Økten avsluttes med stolthet, ro og konstruktiv energi.', affirmation:'Vi tar med oss mestring, læring og lagstyrke videre.', cues:{Espen:'Stolt avslutning. Bruk roen og erfaringen til å lande dagen sterkt.', Stig:'Positiv finish. La energien være lett, trygg og målrettet helt inn.', Henrik:'Skarp avslutning. Hold oppmerksomheten fremover og lever med glede.', 'Jan Stian':'Trygg slutt. Pust godt, se tydelig og avslutt med stabil kvalitet.'}},
+
+      {day:'Torsdag 11. juni', session:'Sen ettermiddag', time:'15:50', stage:'23', team:'Lagfokus: Siste skyteøkt starter med lagets beste energi.', affirmation:'Vi går inn i siste økt med tro, støtte og overskudd.', cues:{Espen:'Siste økt, tydelig ro. Bruk erfaringen din og sett en sterk positiv tone.', Stig:'Sterk energi. La torsdagen få din beste rytme og tryggeste gjennomføring.', Henrik:'Klar gnist. Skyt med offensivt blikk og god flyt fra start.', 'Jan Stian':'Solid inngang. Hold balansen, pusten og presisjonen i sentrum.'}},
+      {day:'Torsdag 11. juni', session:'Sen ettermiddag', time:'16:15', stage:'24', team:'Lagfokus: Vi holder oss i nåtid og lar hvert kort være nytt.', affirmation:'Nåtid, positivitet og tydelig plan gir fri gjennomføring.', cues:{Espen:'Nåtid. Vær i denne stagen, med denne planen og dette fokuset.', Stig:'Fri gjennomføring. La kroppen bevege seg med selvtillit og positiv rytme.', Henrik:'Se tidlig. Skap fart gjennom blikket og stol på treningen.', 'Jan Stian':'Jevnt fokus. Gjør hver del ren, stødig og positiv.'}},
+      {day:'Torsdag 11. juni', session:'Sen ettermiddag', time:'16:40', stage:'19', team:'Lagfokus: Laget står samlet og gir energi inn mot de siste stagene.', affirmation:'Vi løfter hverandre og skyter med trygghet helt inn.', cues:{Espen:'Samlet ledelse. Vær tydelig, rolig og offensiv i egen gjennomføring.', Stig:'Lagsenergi. Ta imot støtten og gjør den om til trygg flyt.', Henrik:'Positiv attack. Bruk energien klokt og la fokus styre tempoet.', 'Jan Stian':'Stødig støttepunkt. La din ro og presisjon være en styrke for laget.'}},
+      {day:'Torsdag 11. juni', session:'Sen ettermiddag', time:'17:05', stage:'20', team:'Lagfokus: Vi gir de siste stagene samme respekt og glede som de første.', affirmation:'Glede i gjennomføringen holder kvaliteten høy.', cues:{Espen:'Glede og kontroll. La erfaringen gi frihet i utførelsen.', Stig:'Spill på styrkene dine. Rytme, energi og trygghet i ett uttrykk.', Henrik:'Friskt mot. Hold fokuset levende og la løsningen være enkel.', 'Jan Stian':'Kvalitet hele veien. Pust, se og lever med samme gode standard.'}},
+      {day:'Torsdag 11. juni', session:'Sen ettermiddag', time:'17:30', stage:'21', team:'Lagfokus: Nest siste stage skytes med full positiv tilstedeværelse.', affirmation:'Vi er her, vi er klare, og vi gir denne stagen full verdi.', cues:{Espen:'Full tilstedeværelse. Led deg selv med ro, blikk og tydelige valg.', Stig:'Sterk tilstedeværelse. La positiv kraft være synlig fra første bevegelse.', Henrik:'Full verdi. Skyt hver oppgave med skarphet og lyst.', 'Jan Stian':'Trygg tilstedeværelse. La roen forankre tempoet og kvaliteten.'}},
+      {day:'Torsdag 11. juni', session:'Sen ettermiddag', time:'17:55', stage:'22', team:'Lagfokus: Matchen fullføres med stolthet, samhold og positiv avslutning.', affirmation:'Vi avslutter EM-planen med lagstyrke, glede og kvalitet.', cues:{Espen:'Stolt sluttføring. Bruk roen, erfaringen og lederskapet helt til siste handling.', Stig:'Positiv avslutning. La energien din løfte både deg selv og laget.', Henrik:'Siste kort, klart blikk. Skyt med frihet, fokus og offensiv glede.', 'Jan Stian':'Solid finish. Hold pusten lav, blikket tydelig og kvaliteten trygg helt inn.'}}
+    ];
+
+    const names = ['Espen','Stig','Henrik','Jan Stian'];
+    let index = Number(localStorage.getItem('classicTeamNorway:stageIndex') || 0);
+    if(index < 0 || index >= stages.length) index = 0;
+    const $ = (id) => document.getElementById(id);
+
+    function render(){
+      const s = stages[index];
+      const card = $('stageCard');
+      card.classList.remove('dealing'); void card.offsetWidth; card.classList.add('dealing');
+      $('cardCount').textContent = `${index + 1} av ${stages.length}`;
+      $('dayLabel').textContent = s.day;
+      $('stageTitle').textContent = `Stage ${s.stage}`;
+      $('stageMeta').textContent = `${s.time} · ${s.session}`;
+      $('teamCue').innerHTML = `<strong>${s.team.split(':')[0]}:</strong>${s.team.includes(':') ? ' ' + s.team.split(':').slice(1).join(':').trim() : ' ' + s.team}`;
+      $('orderText').textContent = index === 0 ? 'Første stage' : index === stages.length - 1 ? 'Siste stage' : `Stagekort ${index + 1}`;
+      $('progressFill').style.width = `${((index + 1) / stages.length) * 100}%`;
+      $('cueHeading').textContent = `Mental inngang til Stage ${s.stage}`;
+      $('stageAffirmation').textContent = s.affirmation;
+      $('peopleGrid').innerHTML = names.map(name => `
+        <article class="person">
+          <div class="person-head"><h4>${name}</h4><span class="tag">positiv cue</span></div>
+          <p>${s.cues[name]}</p>
+        </article>`).join('');
+      $('dayHeading').textContent = s.day;
+      const sameDay = stages.filter(x => x.day === s.day);
+      $('dayList').innerHTML = sameDay.map(x => {
+        const active = x.stage === s.stage && x.time === s.time ? ' active' : '';
+        return `<div class="stage-line${active}"><span><strong>Stage ${x.stage}</strong> · ${x.time}</span><span>${x.session}</span></div>`;
+      }).join('');
+      $('prevBtn').disabled = index === 0;
+      $('nextBtn').textContent = index === stages.length - 1 ? 'Start på nytt' : 'Neste stage';
+      localStorage.setItem('classicTeamNorway:stageIndex', String(index));
+    }
+
+    function next(){ index = index === stages.length - 1 ? 0 : index + 1; render(); }
+    function prev(){ if(index > 0){ index--; render(); } }
+    async function copyCurrent(){
+      const s = stages[index];
+      const text = [`Classic Team Norway · Stage ${s.stage}`, `${s.day} · ${s.time} · ${s.session}`, '', s.team, s.affirmation, '', ...names.map(name => `${name}: ${s.cues[name]}`)].join('\n');
+      try{ await navigator.clipboard.writeText(text); $('copyOk').classList.add('show'); setTimeout(()=>$('copyOk').classList.remove('show'), 1400); }
+      catch(e){ $('copyOk').textContent = 'Kopiering krever nettlesertilgang.'; $('copyOk').classList.add('show'); setTimeout(()=>{$('copyOk').classList.remove('show'); $('copyOk').textContent='Kopiert ✓';}, 1800); }
+    }
+
+    $('nextBtn').addEventListener('click', next);
+    $('prevBtn').addEventListener('click', prev);
+    $('copyBtn').addEventListener('click', copyCurrent);
+    window.addEventListener('keydown', (e) => { if(e.key === 'ArrowRight') next(); if(e.key === 'ArrowLeft') prev(); });
+    render();
+  </script>
+</body>
+</html>

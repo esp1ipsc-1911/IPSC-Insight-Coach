@@ -185,7 +185,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5p7Q",
@@ -219,11 +219,24 @@
 
     function setLoginError(message){ const el=$('loginError'); if(!el)return; el.textContent=message||''; el.style.display=message?'block':'none'; }
     function escapeHtml(str){ return String(str ?? '').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-    function loadLocalState(uid){ storagePrefix=`ipscMental:${uid}`; drawn=Number(localStorage.getItem(`${storagePrefix}:drawn`)||0); saved=JSON.parse(localStorage.getItem(`${storagePrefix}:reflections`)||'[]'); }
+    async function loadUserState(uid){
+      storagePrefix=`ipscMental:${uid}`;
+      drawn=Number(localStorage.getItem(`${storagePrefix}:drawn`)||0);
+      // Last refleksjoner fra Firestore
+      try {
+        const q = query(collection(db,'users',uid,'mentalReflections'), orderBy('savedAt','desc'));
+        const snap = await getDocs(q);
+        saved = snap.docs.map(d=>d.data());
+      } catch(e) {
+        // Fallback til localStorage
+        saved = JSON.parse(localStorage.getItem(`${storagePrefix}:reflections`)||'[]');
+        console.warn('Kunne ikke laste refleksjoner fra Firestore:', e);
+      }
+    }
     function nameFromProfile(profile,user){ const firstLast=[profile?.firstName,profile?.lastName].filter(Boolean).join(' ').trim(); return firstLast || profile?.displayName || user?.displayName || String(user?.email||'skytter').split('@')[0]; }
 
     function showLogin(){ $('loginSection').style.display='flex'; $('appShell').style.display='none'; }
-    function showApp(user,profile){ currentUser=user; currentProfile=profile||{}; loadLocalState(user.uid); $('loginSection').style.display='none'; $('appShell').style.display='block'; renderReferences(); updateCount(); }
+    async function showApp(user,profile){ currentUser=user; currentProfile=profile||{}; await loadUserState(user.uid); $('loginSection').style.display='none'; $('appShell').style.display='block'; renderReferences(); updateCount(); }
     async function logout(){ await signOut(auth); }
 
     function enableSteps(){ ['stepBefore','stepDuring','stepReveal'].forEach(id=>$(id).classList.remove('disabled')); $('answerBefore').disabled=false; $('answerDuring').disabled=false; $('revealBtn').disabled=false; }
@@ -246,10 +259,32 @@
       $('revealPanel').classList.add('show'); $('revealPanel').scrollIntoView({behavior:'smooth',block:'start'});
     }
     function renderReferences(){ const list=$('referenceList'); if(!list)return; list.innerHTML=Object.values(refs).sort((a,b)=>a.apa.localeCompare(b.apa)).map(r=>`<li>${escapeHtml(r.apa)}</li>`).join(''); }
-    function saveReflection(){
-      if(!current) return;
-      const item={ uid:currentUser?.uid||null, id:current.id, title:current.title, date:new Date().toLocaleString('no-NO'), before:$('answerBefore').value.trim(), during:$('answerDuring').value.trim(), shouldThink:current.shouldThink, reflection:current.reflection, sources:current.sources.map(k=>refs[k]?.apa).filter(Boolean) };
-      saved.push(item); localStorage.setItem(`${storagePrefix}:reflections`,JSON.stringify(saved)); $('saveReflection').textContent='Lagret ✓'; setTimeout(()=>$('saveReflection').textContent='Lagre refleksjon',1400);
+    async function saveReflection(){
+      if(!current || !currentUser) return;
+      const btn = $('saveReflection');
+      const uid = currentUser.uid;
+      const docId = `${current.id}_${Date.now()}`;
+      const item = {
+        uid, cardId:current.id, title:current.title,
+        date: new Date().toLocaleString('no-NO'),
+        savedAt: new Date().toISOString(),
+        before: $('answerBefore').value.trim(),
+        during: $('answerDuring').value.trim(),
+        shouldThink: current.shouldThink,
+        reflection: current.reflection,
+        sources: current.sources.map(k=>refs[k]?.apa).filter(Boolean)
+      };
+      try {
+        await setDoc(doc(db,'users',uid,'mentalReflections',docId), item);
+        saved.unshift(item);
+        // Behold localStorage som backup
+        localStorage.setItem(`${storagePrefix}:reflections`, JSON.stringify(saved));
+        btn.textContent='Lagret ✓';
+      } catch(e) {
+        console.error('Lagring feilet:', e);
+        btn.textContent='Feil ved lagring';
+      }
+      setTimeout(()=>btn.textContent='Lagre refleksjon', 1400);
     }
     async function copyCard(){
       if(!current)return; const text=[`IPSC Mental Deck – ${current.title}`,'',`Situasjon: ${current.situation}`,`Hva har du tenkt før? ${current.askBefore}`,`Hva har du tenkt under? ${current.askDuring}`,`Hva bør du tenke? ${current.shouldThink}`,`Refleksjon: ${current.reflection}`,`Kilder: ${current.sources.map(k=>refs[k]?.apa).filter(Boolean).join(' | ')}`].join('\n');

@@ -199,24 +199,8 @@
     function loadLocalState(uid){ storagePrefix=`ipscMental:${uid}`; drawn=Number(localStorage.getItem(`${storagePrefix}:drawn`)||0); saved=JSON.parse(localStorage.getItem(`${storagePrefix}:reflections`)||'[]'); }
     function nameFromProfile(profile,user){ const firstLast=[profile?.firstName,profile?.lastName].filter(Boolean).join(' ').trim(); return firstLast || profile?.displayName || user?.displayName || String(user?.email||'skytter').split('@')[0]; }
 
-    async function resolveAccess(user){
-      let roles=[], profile={};
-      try{ const snap=await getDoc(doc(db,'users',user.uid)); if(snap.exists()){ profile=snap.data()||{}; roles=Array.isArray(profile.roles)?profile.roles:(profile.role?[profile.role]:[]); } }catch(e){ console.warn('Kunne ikke lese users-rolle:',e); }
-      if(!roles.length && user.email){ try{ const snap=await getDoc(doc(db,'adminUsers',user.email)); if(snap.exists()){ const d=snap.data()||{}; profile={...profile,...d}; roles=Array.isArray(d.roles)?d.roles:(d.role?[d.role]:[]); } }catch(e){ console.warn('Kunne ikke lese adminUsers-rolle:',e); } }
-      const normalized=roles.map(r=>String(r).toLowerCase());
-      return { hasAccess: normalized.some(r=>allowedRoles.includes(r)), roles: normalized, profile };
-    }
     function showLogin(){ $('loginSection').style.display='flex'; $('appShell').style.display='none'; }
     function showApp(user,profile){ currentUser=user; currentProfile=profile||{}; loadLocalState(user.uid); $('loginSection').style.display='none'; $('appShell').style.display='block'; renderReferences(); updateCount(); }
-    async function login(){
-      const email=($('loginEmail')?.value||'').trim(), password=$('loginPassword')?.value||'', btn=$('loginBtn'); setLoginError('');
-      if(!email || !email.includes('@')) return setLoginError('Skriv inn en gyldig e-postadresse.');
-      if(!password) return setLoginError('Skriv inn passord.');
-      try{ btn.disabled=true; btn.textContent='Logger inn…'; await signInWithEmailAndPassword(auth,email,password); }
-      catch(e){ setLoginError('Innlogging feilet: '+friendlyAuthError(e)); }
-      finally{ btn.disabled=false; btn.textContent='Logg inn'; }
-    }
-    function friendlyAuthError(error){ const code=error?.code||''; if(code.includes('invalid-credential')||code.includes('wrong-password')||code.includes('user-not-found'))return 'Feil e-post eller passord.'; if(code.includes('too-many-requests'))return 'For mange forsøk. Vent litt og prøv igjen.'; return error?.message||'Ukjent feil.'; }
     async function logout(){ await signOut(auth); }
 
     function enableSteps(){ ['stepBefore','stepDuring','stepReveal'].forEach(id=>$(id).classList.remove('disabled')); $('answerBefore').disabled=false; $('answerDuring').disabled=false; $('revealBtn').disabled=false; }
@@ -245,19 +229,68 @@
       saved.push(item); localStorage.setItem(`${storagePrefix}:reflections`,JSON.stringify(saved)); $('saveReflection').textContent='Lagret ✓'; setTimeout(()=>$('saveReflection').textContent='Lagre refleksjon',1400);
     }
     async function copyCard(){
-      if(!current)return; const text=[`IPSC Mental Deck – ${current.title}`,'',`Situasjon: ${current.situation}`,`Hva har du tenkt før? ${current.askBefore}`,`Hva har du tenkt under? ${current.askDuring}`,`Hva bør du tenke? ${current.shouldThink}`,`Refleksjon: ${current.reflection}`,`Kilder: ${current.sources.map(k=>refs[k]?.apa).filter(Boolean).join(' | ')}`].join('
-');
+      if(!current)return; const text=[`IPSC Mental Deck – ${current.title}`,'',`Situasjon: ${current.situation}`,`Hva har du tenkt før? ${current.askBefore}`,`Hva har du tenkt under? ${current.askDuring}`,`Hva bør du tenke? ${current.shouldThink}`,`Refleksjon: ${current.reflection}`,`Kilder: ${current.sources.map(k=>refs[k]?.apa).filter(Boolean).join(' | ')}`].join('\n');
       await navigator.clipboard.writeText(text); $('copyCard').textContent='Kopiert ✓'; setTimeout(()=>$('copyCard').textContent='Kopier kort',1400);
     }
     function shuffleDeck(){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } drawCard(); }
 
-    $('loginBtn')?.addEventListener('click',login); $('loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')login();}); $('logoutBtn')?.addEventListener('click',logout);
+    $('loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter') $('loginBtn')?.click(); }); $('logoutBtn')?.addEventListener('click',logout);
     $('drawBtn')?.addEventListener('click',drawCard); $('shuffleBtn')?.addEventListener('click',shuffleDeck); $('revealBtn')?.addEventListener('click',revealAnswer); $('saveReflection')?.addEventListener('click',saveReflection); $('copyCard')?.addEventListener('click',copyCard);
 
-    onAuthStateChanged(auth, async (user)=>{
+    $('loginBtn')?.addEventListener('click', async () => {
+      const email = ($('loginEmail')?.value||'').trim();
+      const password = $('loginPassword')?.value||'';
+      if(!email || !password){ setLoginError('Fyll ut alle feltene.'); return; }
+      setLoginError('');
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch(e) {
+        setLoginError('Innlogging feilet: ' + (e?.message||e));
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
       if(!user){ currentUser=null; currentProfile=null; showLogin(); return; }
-      try{ await user.getIdToken(true); const access=await resolveAccess(user); if(access.hasAccess){ setLoginError(''); showApp(user,access.profile); } else { await signOut(auth); showLogin(); setLoginError('Du har ikke tilgang til Mental Deck. Kontoen må ha rollen user eller admin.'); } }
-      catch(e){ await signOut(auth); showLogin(); setLoginError('Feil ved tilgangssjekk: '+(e?.message||e)); }
+      try {
+        await user.getIdToken(true);
+        let hasAccess = false, profile = {};
+
+        // Sjekk users/{uid}
+        try {
+          const snap = await getDoc(doc(db,'users',user.uid));
+          if(snap.exists()){
+            profile = snap.data()||{};
+            const roles = Array.isArray(profile.roles)?profile.roles:(profile.role?[profile.role]:[]);
+            hasAccess = roles.some(r=>allowedRoles.includes(String(r).toLowerCase()));
+          }
+        } catch(e){ console.warn('users lookup feil:',e); }
+
+        // Fallback: sjekk adminUsers/{email}
+        if(!hasAccess && user.email){
+          try {
+            const snap = await getDoc(doc(db,'adminUsers',user.email));
+            if(snap.exists()){
+              const d = snap.data()||{};
+              profile = {...profile,...d};
+              const roles = Array.isArray(d.roles)?d.roles:(d.role?[d.role]:[]);
+              hasAccess = roles.some(r=>allowedRoles.includes(String(r).toLowerCase()));
+            }
+          } catch(e){ console.warn('adminUsers lookup feil:',e); }
+        }
+
+        if(hasAccess){
+          setLoginError('');
+          showApp(user, profile);
+        } else {
+          await signOut(auth);
+          showLogin();
+          setLoginError('Du har ikke tilgang til Mental Deck. Kontoen må ha rollen user eller admin.');
+        }
+      } catch(e){
+        await signOut(auth);
+        showLogin();
+        setLoginError('Feil ved tilgangssjekk: '+(e?.message||e));
+      }
     });
   </script>
 </body>

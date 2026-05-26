@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EHC 2026 IPSC Rule Lookup v3 RO Prep</title>
+<style>
+:root{
+  --bg:#070a0f; --panel:#101722; --panel2:#151b26; --line:#263244; --line2:#173b78;
+  --text:#eef3ff; --muted:#8b92a0; --blue:#3478ff; --blue2:#4aa3ff; --yellow:#f1c84a; --green:#42c979; --red:#ff5d6c;
+  --shadow: 0 24px 60px rgba(0,0,0,.42);
+}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 90% 0%,rgba(52,120,255,.16),transparent 35%),linear-gradient(180deg,#080b10,#06080c);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);}
+.app{max-width:1160px;margin:0 auto;padding:28px 18px 110px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}.brand{display:flex;align-items:center;gap:14px}.logo{font-weight:900;letter-spacing:-.08em;font-size:36px}.logo span{color:var(--blue)}.matchpill{display:flex;align-items:center;gap:10px;background:#121823;border:1px solid var(--line);border-radius:999px;padding:12px 18px;color:#dbe4f6;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}.dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green)}.avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#264c9b,#101722);border:2px solid #224d9b;display:grid;place-items:center;font-weight:800}.hero{border:1px solid #173262;background:linear-gradient(145deg,rgba(19,28,42,.96),rgba(10,14,22,.98));border-radius:30px;padding:34px;margin-bottom:28px;box-shadow:var(--shadow)}.eyebrow{letter-spacing:.35em;text-transform:uppercase;color:var(--blue2);font-weight:800;font-size:13px}.hero h1{font-size:44px;line-height:1;margin:26px 0 18px}.hero p{color:var(--muted);font-size:19px;line-height:1.65;max-width:820px}.rule{height:1px;background:var(--line);margin:28px 0}.goal{display:grid;grid-template-columns:1fr auto;gap:22px}.goal .label{color:var(--yellow);letter-spacing:.32em;text-transform:uppercase;font-weight:900}.goal .value{font-size:23px;margin-top:18px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 28px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px}.stat b{font-size:28px;color:var(--blue2)}.stat span{display:block;color:var(--muted);margin-top:6px}.toolbar{position:sticky;top:0;z-index:20;background:rgba(7,10,15,.86);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:24px;padding:12px;margin:0 0 22px;display:grid;grid-template-columns:1fr auto;gap:12px}.tabs{display:flex;gap:8px;overflow:auto}.tab{border:1px solid var(--line);background:#111720;color:var(--muted);padding:12px 18px;border-radius:999px;text-transform:uppercase;letter-spacing:.16em;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}.tab.active{color:#dce9ff;background:linear-gradient(135deg,#1d67ff,#2f80ff);border-color:#448dff}.search{background:#111720;border:1px solid var(--line);border-radius:999px;color:var(--text);padding:12px 16px;width:280px}.section{display:none}.section.active{display:block}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:linear-gradient(180deg,var(--panel2),#101620);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 14px 36px rgba(0,0,0,.2)}.card:hover{border-color:#2c61b7}.card h3{margin:0 0 10px;font-size:22px}.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.tag{border:1px solid #2b3850;background:#111824;border-radius:999px;padding:7px 10px;color:#cbd6e8;font-size:12px;font-weight:750}.tag.blue{border-color:#285fb9;color:#7db0ff;background:#10224a}.tag.yellow{border-color:#756223;color:#f4ce5b;background:#2c2510}.tag.green{border-color:#2f724d;color:#62dd94;background:#10291b}.tag.red{border-color:#7d2e3a;color:#ff8390;background:#321119}.muted{color:var(--muted);line-height:1.55}.row{display:grid;grid-template-columns:160px 1fr;gap:10px;margin:8px 0}.row .k{color:#7f8795}.list{margin:12px 0 0;padding-left:20px;color:#c8d2e3;line-height:1.55}.accordion{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}.acc-title{display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:#79adff;font-weight:850}.acc-body{display:none;margin-top:12px}.acc-body.open{display:block}.stageNo{display:flex;align-items:center;gap:14px}.datebox{width:58px;height:64px;border:2px solid #204b90;background:#14264a;border-radius:16px;display:grid;place-items:center;color:#3f87ff;font-weight:950}.datebox small{display:block;color:#5391ff;font-size:11px;letter-spacing:.12em}.impact{border-left:4px solid var(--blue);padding-left:14px;margin-top:12px;color:#d6dfef}.bottomnav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;z-index:40;width:min(1160px,100%);background:rgba(12,16,22,.96);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:12px 10px 16px}.navitem{text-align:center;color:#6e7582;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;cursor:pointer}.navitem.active{color:var(--blue2)}.notice{background:#101722;border:1px solid var(--line2);border-radius:22px;padding:18px;margin-bottom:18px;color:#cbd6e8}.miniTable{width:100%;border-collapse:collapse;margin-top:14px}.miniTable th,.miniTable td{border-bottom:1px solid var(--line);padding:10px;text-align:left;font-size:14px}.miniTable th{color:#7dabff;text-transform:uppercase;letter-spacing:.12em;font-size:11px}.source{font-size:12px;color:#6f7785;margin-top:18px}.hidden{display:none!important}@media(max-width:820px){.hero h1{font-size:36px}.grid{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.search{width:100%}.row{grid-template-columns:1fr}.app{padding-left:12px;padding-right:12px}.topbar{gap:10px}.matchpill{font-size:13px;padding:10px 12px}.avatar{width:42px;height:42px}.hero{padding:26px 20px}.bottomnav{grid-template-columns:repeat(5,1fr)}}
+</style>
+</head>
+<body>
+<!-- v3-ro-prep: added stage-by-stage RO discussion preparation; bottom nav is Home | Stages | Rules | RO Prep | Checklist -->
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">I<span>D</span></div><div class="matchpill"><span class="dot"></span>EHC 2026 Rule Intelligence</div></div>
+    <div class="avatar">EF</div>
+  </header>
+
+  <section class="grid">
+    <div class="stat"><b>24</b><span>Stages reviewed</span></div>
+    <div class="stat"><b>441</b><span>Minimum rounds</span></div>
+    <div class="stat"><b>4</b><span>Single-hand stages</span></div>
+    <div class="stat"><b>15</b><span>Activated / moving target stages</span></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="tabs">
+      <button class="tab active" data-section="home">Home</button>
+      <button class="tab" data-section="stages">Stages</button>
+      <button class="tab" data-section="rules">Rules</button>
+      <button class="tab" data-section="roprep">RO Prep</button>
+      <button class="tab" data-section="checklist">Checklist</button>
+    </div>
+    <input id="search" class="search" placeholder="Search stages, rules, elements..." />
+  </div>
+
+  <main>
+    <section id="home" class="section active">
+      <div class="notice"><b>Purpose:</b> This dashboard maps EHC 2026 stage elements to the IPSC Handgun Rules, January 2026 Edition. It is a preparation tool, not an official ruling. The written stage briefing, Range Officer, Range Master and current rulebook control at the match.</div>
+      <div class="cards">
+        <div class="card"><h3>High-priority RO discussion areas</h3><div class="meta"><span class="tag blue">Single-hand shooting</span><span class="tag blue">Moving targets</span><span class="tag blue">Metal distance</span><span class="tag blue">Hard cover</span><span class="tag blue">Fault lines</span><span class="tag blue">No-shoots</span></div><p class="muted">These elements are most likely to create RO calls, scoring questions, reshoots, or rule discussions if misunderstood. Use RO Prep for stage-by-stage talking points.</p></div>
+        <div class="card"><h3>Single-hand stages</h3><p class="muted">Stage 1 and Stage 24 specify weak hand only. Stage 8 and Stage 16 specify strong hand only. Rule 10.2.8 is the key procedural rule.</p><div class="impact">Holding a magazine in the opposite hand is not, by itself, described as the prohibited act. The critical risk is touching or scooping the handgun with the other hand, except for the listed exceptions such as reloading or clearing a malfunction.</div></div>
+        <div class="card"><h3>Hard cover target review</h3><p class="muted">Use this lookup whenever a paper target is partially hidden, cut, painted, taped, or obscured by a prop or hard cover surface. Check whether every scoring zone remains partly visible and whether the A-zone is completely hidden.</p></div>
+        <div class="card"><h3>Moving target review</h3><p class="muted">Stages with activated targets should be checked for activator identity, visible-at-rest status, disappearing target status, reset consistency, and range equipment failure handling.</p></div>
+      </div>
+    </section>
+
+    <section id="stages" class="section"><div id="stageCards" class="cards"></div></section>
+    <section id="rules" class="section"><div id="ruleCards" class="cards"></div></section>
+    <section id="roprep" class="section">
+      <div class="notice"><b>RO discussion preparation:</b> Use this section before each stage to identify what Range Officers may judge, which rule areas may be discussed, and what to ask or say calmly if there is a rule question. This is not an official ruling; the posted Written Stage Briefing and the Range Master control at the match.</div>
+      <div id="roPrepCards" class="cards"></div>
+    </section>
+
+    <section id="checklist" class="section">
+      <div class="cards">
+        <div class="card"><h3>Before walkthrough</h3><ul class="list"><li>Confirm the written stage briefing controls over published diagrams.</li><li>Identify all scoring targets, no-shoots, poppers, plates and activators.</li><li>Note whether any target remains visible at rest or disappears after activation.</li><li>Confirm firearm ready condition where the published stage text is blank.</li></ul></div>
+        <div class="card"><h3>During walkthrough</h3><ul class="list"><li>Check fault lines, shortcuts, ports and barriers from each planned view.</li><li>Check minimum distance to metal targets and metal hard cover.</li><li>For single-hand stages, plan how to pick up the gun, reload, clear malfunctions and avoid touching the handgun with the other hand outside the exceptions.</li><li>For hard cover targets, inspect scoring-zone visibility and no-shoot overlap.</li></ul></div>
+        <div class="card"><h3>Ask the RO / CRO if unclear</h3><ul class="list"><li>Does this target remain visible at rest or count as disappearing?</li><li>Where exactly does strong/weak hand only begin?</li><li>Is this object hard cover, soft cover, a barrier, or a stage prop?</li><li>Is this start position demonstrated with heels, hands, body, or object contact?</li></ul></div>
+        <div class="card"><h3>Source package</h3><p class="muted">Stage package: STAGES-2026-EHC-2.pdf. Rule source: IPSC Handgun Competition Rules, January 2026 Edition. The dashboard uses paraphrased practical explanations with rule-number references.</p><p class="source">Static HTML · English content only</p></div>
+      </div>
+    </section>
+  </main>
+</div>
+<nav class="bottomnav"><div class="navitem active" data-section="home">Home</div><div class="navitem" data-section="stages">Stages</div><div class="navitem" data-section="rules">Rules</div><div class="navitem" data-section="roprep">RO Prep</div><div class="navitem" data-section="checklist">Checklist</div></nav>
+<script>
+const stages = [
+{n:1,r:9,t:'5 IPSC targets, 1 IPSC no-shoot target, 4 IPSC mini poppers',ready:'Firearm loaded, lying flat in the tray; all magazines on belt',start:'Sitting on the barrel, hands on marks',proc:'P2 activates moving target T1. P3 activates moving targets T2. Targets remain visible at rest. Weak hand only, minimum 1 shot per paper target.',flags:['weak hand only','moving targets','mini poppers','no-shoot','firearm on tray','seated start']},
+{n:2,r:21,t:'8 IPSC targets, 1 IPSC no-shoot target, 4 IPSC mini poppers, 1 IPSC metal plate',ready:'Loaded, chamber empty, magazine inserted',start:'Standing at the mark, heels touching the mark',proc:'P1 activates T2, P2 activates T1, P3 activates T3, P4 activates T4. Moving targets remain visible at rest.',flags:['moving targets','mini poppers','metal plate','no-shoot','empty chamber start','fault lines']},
+{n:3,r:12,t:'4 IPSC targets, 2 IPSC mini poppers, 2 IPSC metal plates',ready:'Firearm loaded and lying flat on the barrel; all magazines to be used on the barrel',start:'Standing at the mark, both heels touching the mark',proc:'Engage all targets.',flags:['firearm on barrel','magazines on barrel','mini poppers','metal plates','stage props']},
+{n:4,r:23,t:'10 IPSC targets, 1 IPSC no-shoot target, 2 IPSC mini poppers, 1 IPSC metal plate',ready:'Not specified in the published text; confirm WSB',start:'Standing, anywhere',proc:'P2 activates moving target T1, which remains visible at rest.',flags:['moving target','mini poppers','metal plate','no-shoot','barriers','hard cover review']},
+{n:5,r:32,t:'12 IPSC targets, 2 IPSC no-shoot targets, 3 IPSC mini poppers, 5 IPSC metal plates',ready:'Not specified in the published text; confirm WSB',start:'Standing, anywhere',proc:'Engage all targets.',flags:['long course','mini poppers','metal plates','no-shoots','barriers','hard cover review']},
+{n:6,r:11,t:'3 IPSC targets, 2 IPSC poppers, 3 IPSC metal plates',ready:'Loaded and holstered, chamber empty, magazine inserted',start:'Sitting on the chair, both hands on knees',proc:'P1 activates moving targets PL2-PL3, which remain visible at rest.',flags:['seated start','empty chamber start','moving targets','poppers','metal plates']},
+{n:7,r:12,t:'4 IPSC targets, 1 IPSC popper, 3 IPSC metal plates, 2 IPSC metal no-shoot plates',ready:'Not specified in the published text; confirm WSB',start:'Standing, anywhere',proc:'P1 activates moving target T1, which remains visible at rest.',flags:['moving target','popper','metal plates','metal no-shoots','hard cover review']},
+{n:8,r:16,t:'7 IPSC targets, 2 IPSC no-shoot targets, 2 IPSC metal plates',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'Opening the door activates moving target PL1, which remains visible at rest. Strong hand only.',flags:['strong hand only','door activation','moving target','metal plates','no-shoots','stage props']},
+{n:9,r:32,t:'16 IPSC targets, 4 IPSC no-shoot targets',ready:'Not specified in the published text; confirm WSB',start:'Standing in front of the wall, touching the mark with both hands',proc:'Engage all targets.',flags:['long course','no-shoots','hands on mark','barriers','hard cover review']},
+{n:10,r:12,t:'5 IPSC targets, 2 IPSC poppers, 1 IPSC no-shoot popper',ready:'Not specified in the published text; confirm WSB',start:'Standing, both heels touching the mark',proc:'P2 activates moving target T1, which remains visible at rest.',flags:['moving target','poppers','metal no-shoot','barriers']},
+{n:11,r:23,t:'10 IPSC targets, 1 IPSC no-shoot, 1 IPSC popper, 2 IPSC no-shoot poppers, 2 IPSC metal plates, 1 IPSC no-shoot metal plate',ready:'Not specified in the published text; confirm WSB',start:'Standing, anywhere',proc:'P1 activates moving targets T1 and T2, which remain visible at rest.',flags:['moving targets','poppers','metal plates','metal no-shoots','no-shoot','hard cover review']},
+{n:12,r:12,t:'5 IPSC targets, 2 IPSC poppers',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'P1 activates flip-up targets T1-T2. P2 activates flip-up targets T3-T4.',flags:['flip-up targets','poppers','moving targets','barriers']},
+{n:13,r:12,t:'5 IPSC targets, 1 IPSC no-shoot target, 1 IPSC mini popper, 1 IPSC metal plate',ready:'Not specified in the published text; confirm WSB',start:'Standing, anywhere',proc:'P1 activates moving target T1, which remains visible at rest.',flags:['moving target','mini popper','metal plate','no-shoot']},
+{n:14,r:24,t:'11 IPSC targets, 1 IPSC no-shoot target, 2 IPSC mini poppers, 1 IPSC no-shoot mini popper',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'P1 activates moving target T1, visible at rest. P2 activates moving targets T2-T3, which disappear after activation. Cooper Tunnel on stage.',flags:['moving targets','disappearing targets','cooper tunnel','mini poppers','no-shoot popper','no-shoot']},
+{n:15,r:32,t:'16 IPSC targets, 4 IPSC no-shoot targets',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'Engage all targets.',flags:['long course','no-shoots','barriers','hard cover review']},
+{n:16,r:12,t:'12 IPSC targets, 4 IPSC no-shoot targets',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'Strong hand only with minimum 1 hit per paper target.',flags:['strong hand only','no-shoots','minimum hit requirement','hard cover review']},
+{n:17,r:24,t:'12 IPSC targets, 3 IPSC no-shoot targets',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'Engage all targets.',flags:['no-shoots','medium course','barriers','hard cover review']},
+{n:18,r:12,t:'5 IPSC targets, 1 IPSC no-shoot target, 1 IPSC popper, 1 IPSC metal plate',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'P1 activates moving target T1, which remains visible at rest.',flags:['moving target','popper','metal plate','no-shoot']},
+{n:19,r:12,t:'5 IPSC targets, 1 IPSC no-shoot paper target, 2 IPSC poppers',ready:'Not specified in the published text; confirm WSB',start:'Standing, both heels touching the mark',proc:'P2 activates moving target T1, which remains visible at rest.',flags:['moving target','poppers','no-shoot']},
+{n:20,r:23,t:'10 IPSC targets, 3 IPSC no-shoot paper targets, 3 IPSC poppers',ready:'Not specified in the published text; confirm WSB',start:'Standing, anywhere',proc:'Engage all targets.',flags:['poppers','no-shoots','medium course','hard cover review']},
+{n:21,r:24,t:'11 IPSC targets, 2 no-shoot targets, 2 IPSC poppers',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'Engage all targets.',flags:['poppers','no-shoots','medium course']},
+{n:22,r:30,t:'15 IPSC targets, 2 IPSC no-shoot targets',ready:'Not specified in the published text; confirm WSB',start:'Holding the bull’s horns with both hands',proc:'Engage all targets.',flags:['long course','no-shoots','object start','stage props','hard cover review']},
+{n:23,r:12,t:'4 IPSC targets, 2 IPSC poppers, 2 IPSC metal plates, 2 IPSC metal no-shoot plates',ready:'Not specified in the published text; confirm WSB',start:'Standing at the mark, both heels touching the mark',proc:'P1 activates moving target T1, which will disappear.',flags:['disappearing target','moving target','poppers','metal plates','metal no-shoots']},
+{n:24,r:9,t:'5 IPSC targets, 2 IPSC poppers',ready:'Firearm loaded, lying flat in the box; all magazines on belt',start:'Sitting in the boat. Strong hand keeping the engine joystick.',proc:'P1 activates moving target T1. P2 activates moving target T2. Moving targets remain visible at rest. Weak hand only.',flags:['weak hand only','firearm in box','seated boat start','object retained','moving targets','poppers']}
+];
+const roPrep = [
+{
+"n": 1,
+"focus": "Weak hand only from the stage procedure; firearm starts loaded in a tray; minimum one shot per paper target; two activated movers remain visible at rest.",
+"ro": [
+"Support hand touching or scooping the handgun during weak-hand-only shooting.",
+"Whether every paper target received at least one shot.",
+"Whether P2/P3 activated the correct movers and whether a failed or unreset mover is range equipment failure.",
+"Muzzle angle while seated, picking up the gun and transitioning from the barrel/tray area."
+],
+"say": [
+"Rule 10.2.8 is about touching or scooping the handgun with the other hand; simply holding a magazine in the other hand is not the prohibited act unless it touches/supports the gun.",
+"The stage says movers remain visible at rest, so clarify whether they are scored as normal visible targets after activation.",
+"If an activator or mover fails, stop discussing with the timer running; call the RO and ask whether this is range equipment failure under Rule 4.7."
+],
+"check": [
+"Ask exactly when weak hand only begins: entire attempt, from start signal, or from first shot.",
+"Confirm how the gun must lie in the tray and what “all magazines on belt” means at Make Ready.",
+"Watch the seated draw/pickup path for 90-degree muzzle angle risk."
+],
+"rules": "1.1.5.3, 1.1.5.4, 3.2, 4.7, 10.2.8, 10.2.2, 10.5.2"
+},
+{
+"n": 2,
+"focus": "Empty chamber start with magazine inserted; four mini poppers activate four movers; metal plate and no-shoot are present.",
+"ro": [
+"Incorrect ready condition if the chamber is not empty.",
+"Popper activation sequence or activator failure.",
+"Metal target minimum-distance issue if fault lines are close.",
+"No-shoot and partial-target scoring disputes."
+],
+"say": [
+"The published ready condition says loaded with chamber empty and magazine inserted; the posted WSB should confirm the exact condition.",
+"If a mover fails to activate or was not reset, Rule 4.7 may require a reshoot.",
+"For metal, Rule 2.1.3 requires distance precautions; ask where the legal shooting area ends."
+],
+"check": [
+"Confirm chamber-empty condition and whether hammer/striker state is demonstrated by the RO.",
+"Identify each popper-to-mover link before shooting.",
+"Check the shortest possible angle to each metal target."
+],
+"rules": "2.1.3, 3.2, 4.3, 4.7, 8.1, 10.4.7"
+},
+{
+"n": 3,
+"focus": "Gun and all magazines to be used start on the barrel; mini poppers and metal plates are present.",
+"ro": [
+"Scooping or unsafe pickup from the barrel.",
+"Using a magazine that was not staged on the barrel if the WSB requires all magazines to be used on the barrel.",
+"Shooting metal too close or from an unintended position.",
+"Prop movement or rearrangement."
+],
+"say": [
+"The WSB wording controls where magazines must start and whether belt magazines may be used; clarify before Make Ready.",
+"If the barrel or staged equipment position changes between competitors, ask the RO to restore consistency under Rule 4.6/4.7."
+],
+"check": [
+"Ask whether every magazine you may use must start on the barrel.",
+"Plan the pickup so the muzzle remains within the 90-degree limits.",
+"Check plate visibility and reset before stepping in."
+],
+"rules": "2.1.3, 3.2, 4.3, 4.6, 4.7, 8.1, 10.5.2"
+},
+{
+"n": 4,
+"focus": "Medium course with barriers, hard-cover review, one mover activated by P2, metal plate and no-shoot.",
+"ro": [
+"Fault line or barrier advantage calls.",
+"Whether target areas hidden by props are hard cover or merely visual obstruction.",
+"P2/mover activation failure or target not reset.",
+"Scoring on partial/no-shoot target arrays."
+],
+"say": [
+"Ask the RO to clarify hard cover versus soft cover if a prop or painted/taped area obscures a target.",
+"Rule 4.2.4 prevents hard cover or overlapping no-shoots from completely hiding the A-zone on a partial paper target.",
+"If the mover does not present the same way for all shooters, raise Rule 4.7 range equipment failure immediately."
+],
+"check": [
+"Look at all partial targets from your planned views.",
+"Confirm whether the blank firearm ready condition in the published PDF is completed on the posted WSB.",
+"Check where fault lines extend to infinity."
+],
+"rules": "2.2.1, 2.2.3, 3.2, 4.1.4, 4.2.3, 4.2.4, 4.7, 9.1.6"
+},
+{
+"n": 5,
+"focus": "Long course with many paper targets, two no-shoots, mini poppers, plates, barriers and likely hard-cover/partial-target questions.",
+"ro": [
+"Faulting while shooting around barriers.",
+"Hard-cover scoring disputes on partial targets.",
+"Metal target reset/fall disputes.",
+"Stage-plan shortcut or shooting from a prohibited view."
+],
+"say": [
+"If a hit is called as hard cover, ask the RO to identify the hard-cover boundary and scoring perforation being used.",
+"A plate must fall or overturn to score; if it falls due to support/wind, Rule 4.3.1.2/4.7 may be relevant."
+],
+"check": [
+"Walk the long course for every legal view and any 9-hit-from-one-view design issue.",
+"Identify no-shoot exposure before committing to high-speed entries.",
+"Check reset of all plates and poppers."
+],
+"rules": "1.2.1.3, 2.2.1, 4.2.3, 4.3.1, 4.3.3, 4.7, 9.1.6"
+},
+{
+"n": 6,
+"focus": "Seated start with hands on knees; chamber empty holstered firearm; P1 activates moving targets PL2-PL3; poppers and plates.",
+"ro": [
+"Start-position compliance: hands on knees and seated posture.",
+"Chamber-empty ready condition.",
+"Movement from seated position with muzzle-angle risk.",
+"Activator failure or unreset PL targets."
+],
+"say": [
+"Ask the RO to demonstrate the acceptable seated start position as required by Rule 3.2.2.",
+"If the activated targets were not reset or do not move, Rule 4.7 range equipment failure is relevant."
+],
+"check": [
+"Confirm whether hands must remain on knees until the start signal.",
+"Confirm chamber-empty condition and how the gun is holstered.",
+"Check first movement and draw path from the chair."
+],
+"rules": "3.2.2, 4.7, 8.1, 8.2, 10.5.2"
+},
+{
+"n": 7,
+"focus": "Metal no-shoot plates, one popper activator for a visible-at-rest mover, barriers and hard-cover review.",
+"ro": [
+"Metal no-shoot repaint/reset issues.",
+"Whether a metal no-shoot hit belongs to your run or a previous shooter.",
+"P1 activation or mover reset failure.",
+"Fault line and barrier calls."
+],
+"say": [
+"Rule 4.3.4 requires metal no-shoots to be repainted when hit; visible older hits should not be used against a later competitor.",
+"If the mover is visible at rest, clarify whether failure to engage while moving changes anything in scoring."
+],
+"check": [
+"Inspect metal no-shoot paint before Make Ready.",
+"Identify P1 and the final rest position of T1.",
+"Check legal views around barriers."
+],
+"rules": "2.2.1, 4.3.4, 4.7, 9.4, 9.5"
+},
+{
+"n": 8,
+"focus": "Strong hand only; opening a door activates a moving metal/paper target PL1; no-shoots and plates are present.",
+"ro": [
+"Support hand touching or helping the handgun during strong-hand-only shooting.",
+"Whether opening the door is part of the procedure and how it must be done.",
+"Door or mover activation failure.",
+"Holding a magazine in the weak hand while shooting."
+],
+"say": [
+"Rule 10.2.8 penalizes touching or scooping the handgun with the other hand; holding a magazine in the other hand is not itself the listed prohibited action unless it touches/supports the gun.",
+"A door or activation mechanism that fails may be range equipment failure under Rule 4.7."
+],
+"check": [
+"Ask exactly when strong hand only starts and whether it applies to the entire attempt.",
+"Ask if the door may be opened with either hand before/while strong-hand-only applies.",
+"Plan reloads so the support hand is only used within the reloading exception."
+],
+"rules": "1.1.5.3, 1.1.5.4, 2.2.6, 4.7, 10.2.8"
+},
+{
+"n": 9,
+"focus": "Long paper/no-shoot course; start in front of wall touching mark with both hands; barrier and hard-cover review.",
+"ro": [
+"Start-position faults: not touching the mark correctly.",
+"Fault line/barrier shooting calls.",
+"Hard-cover or partial target scoring.",
+"No-shoot hits in tight arrays."
+],
+"say": [
+"Rule 3.2.2 requires the RO to demonstrate the acceptable start position; ask before shooting if hand placement is unclear.",
+"For a hard-cover scoring call, ask whether the target is physically hidden, cut, painted/taped as hard cover, or only visually obscured."
+],
+"check": [
+"Confirm exact hand placement on the mark.",
+"Check all partial/no-shoot arrays from the views you will use.",
+"Identify whether any wall/barrier is deemed to extend skywards."
+],
+"rules": "2.2.3, 3.2.2, 4.1.4, 4.2.3, 4.2.4, 9.1.6"
+},
+{
+"n": 10,
+"focus": "Short course with P2-activated mover, two poppers and a no-shoot popper.",
+"ro": [
+"No-shoot popper hit and repaint/reset.",
+"Popper calibration or fall issue.",
+"Mover activation failure.",
+"Fault line or barrier use."
+],
+"say": [
+"Metal no-shoots must be repainted if hit; visible old marks should be raised before shooting.",
+"Poppers recognize power and calibration may matter; plates do not."
+],
+"check": [
+"Identify which popper is P2 before the run.",
+"Check no-shoot popper paint.",
+"Confirm mover remains visible at rest."
+],
+"rules": "4.3.2, 4.3.4, 4.7, 9.4"
+},
+{
+"n": 11,
+"focus": "Medium course with multiple metal no-shoots, two movers activated by P1, plates, barriers and hard-cover review.",
+"ro": [
+"Metal no-shoot scoring/repaint issues.",
+"P1 activation of T1/T2 and reset consistency.",
+"Fault line or barrier advantage.",
+"Partial/no-shoot target scoring."
+],
+"say": [
+"Ask for clarification if an RO calls a no-shoot on metal that was not repainted.",
+"If one of the two movers activates differently, Rule 4.7 may be relevant."
+],
+"check": [
+"Inspect paint on all metal no-shoots.",
+"Watch both movers during the briefing demonstration.",
+"Check if hard cover and no-shoot overlap leave A-zones legal."
+],
+"rules": "2.2.1, 4.2.4, 4.3.4, 4.7, 9.1.6"
+},
+{
+"n": 12,
+"focus": "Two poppers activate flip-up targets T1-T4; barriers and possible partial views.",
+"ro": [
+"Whether a flip-up target is disappearing or remains available.",
+"Activator failure or target not reset.",
+"Timing/scoring if a target fails to present.",
+"Fault line/barrier calls."
+],
+"say": [
+"Ask during briefing whether flip-up targets are disappearing targets or remain visible/scorable.",
+"If a flip-up fails to present or was not reset, Rule 4.7 range equipment failure should be discussed before accepting the score."
+],
+"check": [
+"Watch the exact target presentation during demonstration.",
+"Confirm which popper activates which pair.",
+"Plan whether to shoot activators early or late."
+],
+"rules": "4.1.6, 4.7, 9.9"
+},
+{
+"n": 13,
+"focus": "Short course with mini popper activation, one mover visible at rest, one no-shoot and one plate.",
+"ro": [
+"Mover/activator failure.",
+"Metal distance and plate fall/reset.",
+"No-shoot scoring on partial arrays.",
+"Faulting from compact views."
+],
+"say": [
+"Because T1 remains visible at rest, clarify whether it is treated as a normal target after activation.",
+"If a plate does not fall when hit, remember plates are not calibration targets; the scoring question is whether it fell/overturned."
+],
+"check": [
+"Identify P1/T1 relationship.",
+"Check metal distance.",
+"Confirm no-shoot and hard-cover boundaries if present."
+],
+"rules": "2.1.3, 4.3.3, 4.7, 9.5"
+},
+{
+"n": 14,
+"focus": "Cooper Tunnel; P1 activates T1 visible at rest; P2 activates disappearing T2-T3; mini poppers and no-shoot mini popper.",
+"ro": [
+"Cooper Tunnel material dislodged.",
+"Unsafe gun handling or muzzle angle in/around the tunnel.",
+"Disappearing target scoring for T2-T3.",
+"Activator failure or late/non-presentation."
+],
+"say": [
+"Rule 2.2.5 covers Cooper Tunnels and Rule 10.2.5 may apply if overhead material is dislodged.",
+"The WSB says T2-T3 disappear after activation; Rule 9.9 disappearing-target scoring should be the discussion point.",
+"If an activator fails, separate that from a miss on a correctly presented disappearing target."
+],
+"check": [
+"Physically inspect tunnel entry/exit and overhead material.",
+"Ask whether T2-T3 are officially disappearing targets.",
+"Watch P1 and P2 activations during demonstration."
+],
+"rules": "2.2.5, 4.7, 9.9, 10.2.5, 10.5.4"
+},
+{
+"n": 15,
+"focus": "Long paper/no-shoot course with barriers and hard-cover/partial-target review.",
+"ro": [
+"Fault lines and barrier use.",
+"Hard-cover scoring disputes.",
+"No-shoot calls in dense arrays.",
+"Course-design view limitations in a long course."
+],
+"say": [
+"If a target is partial, ask whether the obscuring area is hard cover, no-shoot overlap or simply a prop edge.",
+"Long courses must not require more than 32 rounds; this stage is at the limit."
+],
+"check": [
+"Walk every target array from planned shooting positions.",
+"Check no-shoots before scoring.",
+"Look for possible shoot-through concerns."
+],
+"rules": "1.2.1.3, 2.1.8, 2.2.1, 4.1.4, 4.2.4"
+},
+{
+"n": 16,
+"focus": "Strong hand only with minimum one hit per paper target; many paper targets and no-shoots.",
+"ro": [
+"Support hand touching/supporting the gun.",
+"Whether each paper target has at least one hit, not just one shot fired.",
+"No-shoot scoring and misses.",
+"Magazine in the opposite hand during single-hand shooting."
+],
+"say": [
+"The stage says minimum one hit per paper target; distinguish this from Stage 1, which says minimum one shot per paper target.",
+"Holding a magazine in the other hand is not the prohibited act under Rule 10.2.8; touching/supporting/scooping the handgun is the issue, except during reload/malfunction exceptions."
+],
+"check": [
+"Ask when strong hand only begins and whether it applies to the whole stage.",
+"Plan make-up shots carefully because the requirement is one hit on each paper target.",
+"Confirm how reloads are expected to be performed under the single-hand condition."
+],
+"rules": "1.1.5.3, 1.1.5.4, 10.2.8, 10.2.7, 9.5"
+},
+{
+"n": 17,
+"focus": "Medium paper/no-shoot course with barriers and likely partial-target/hard-cover review.",
+"ro": [
+"Fault line or shortcut calls.",
+"No-shoot scoring.",
+"Hard-cover/partial scoring disputes.",
+"Start position at mark."
+],
+"say": [
+"Ask RO to demonstrate heels-on-mark start if unclear.",
+"For partial target disputes, Rule 4.2.4 and Rule 9.1.6 are relevant."
+],
+"check": [
+"Confirm ready condition because published field is blank.",
+"Inspect all partial/no-shoot arrays.",
+"Check legal views and wall extensions."
+],
+"rules": "2.2.1, 2.2.3, 3.2.2, 4.2.4, 9.1.6"
+},
+{
+"n": 18,
+"focus": "Short course with P1-activated mover visible at rest, one no-shoot, popper and plate.",
+"ro": [
+"Activator failure.",
+"Plate/poppers reset and metal distance.",
+"No-shoot scoring.",
+"Faulting from the marked start/shooting area."
+],
+"say": [
+"If T1 remains visible at rest, scoring should be discussed differently than a disappearing target under Rule 9.9.",
+"For metal distance, ask where the fault line/barrier limit is intended to keep shooters outside the minimum distance."
+],
+"check": [
+"Confirm P1 activates T1.",
+"Inspect plate and popper reset.",
+"Check ready condition on posted WSB."
+],
+"rules": "2.1.3, 4.3, 4.7, 9.9"
+},
+{
+"n": 19,
+"focus": "Short course with P2-activated visible-at-rest mover, no-shoot and poppers.",
+"ro": [
+"P2 activator or mover reset failure.",
+"No-shoot scoring.",
+"Popper calibration/fall questions.",
+"Start heels on mark."
+],
+"say": [
+"If a popper hit does not cause the expected activation, ask whether the activator failed or whether the popper was not successfully neutralized.",
+"Clarify that visible-at-rest movers are not the same issue as disappearing targets unless the WSB says so."
+],
+"check": [
+"Identify P2 before shooting.",
+"Watch the mover demonstration.",
+"Confirm exact start mark."
+],
+"rules": "3.2.2, 4.3.2, 4.7, 9.9"
+},
+{
+"n": 20,
+"focus": "Medium course with ten paper targets, three no-shoots and three poppers; hard-cover/barrier review.",
+"ro": [
+"Poppers not falling or reset incorrectly.",
+"No-shoot/partial target scoring.",
+"Fault line or barrier advantage.",
+"Metal distance."
+],
+"say": [
+"If a popper or target is not reset, raise it before Make Ready or immediately if discovered during the run.",
+"For hard cover, ask for the exact boundary and whether scoring zones remain visible."
+],
+"check": [
+"Inspect popper reset and calibration relevance.",
+"Walk fault lines from both sides.",
+"Check every no-shoot array from the intended view."
+],
+"rules": "2.1.3, 2.2.1, 4.2.3, 4.3.2, 4.7"
+},
+{
+"n": 21,
+"focus": "Medium course with paper targets, no-shoots and two poppers.",
+"ro": [
+"Popper fall/calibration questions.",
+"No-shoot scoring.",
+"Start position at mark.",
+"Faulting around barriers if used."
+],
+"say": [
+"Poppers are calibration targets; if a scoring popper does not fall after a hit, the IPSC calibration procedure may be relevant.",
+"No-shoot and scoring target colors/markings should be consistent under Rule 4.1.3."
+],
+"check": [
+"Confirm which targets are no-shoots.",
+"Check popper reset.",
+"Confirm ready condition on posted WSB."
+],
+"rules": "3.2, 4.1.3, 4.3.2, Appendix C1"
+},
+{
+"n": 22,
+"focus": "Long course; start holding the bull’s horns with both hands; paper/no-shoot arrays and stage prop start.",
+"ro": [
+"Start-position compliance and early release/movement.",
+"Whether holding/retaining an object affects procedure.",
+"No-shoot/partial target scoring.",
+"Prop movement or failure."
+],
+"say": [
+"If an object must be held, Rule 1.1.5.4 points to Rule 10.2.2 rather than the single-hand rule, unless the WSB also specifies strong/weak hand only.",
+"Ask the RO to demonstrate exactly how both hands must hold the horns."
+],
+"check": [
+"Confirm whether horns must be held until the start signal only or longer.",
+"Check no-shoot arrays and possible hard-cover boundaries.",
+"Plan safe draw/movement immediately after release."
+],
+"rules": "1.1.5.4, 2.2.6, 3.2.2, 4.6, 10.2.2"
+},
+{
+"n": 23,
+"focus": "Short course with disappearing target T1 activated by P1; poppers, plates and metal no-shoot plates.",
+"ro": [
+"Disappearing-target scoring on T1.",
+"Metal no-shoot repaint/reset.",
+"Activator failure versus shooter timing.",
+"Plate fall/reset and metal distance."
+],
+"say": [
+"The WSB says T1 will disappear; Rule 9.9 is relevant for scoring discussion if it is not engaged.",
+"If T1 does not activate or was not reset, that is different from missing a correctly presented disappearing target and may be Rule 4.7.",
+"Metal no-shoots should be repainted after hits."
+],
+"check": [
+"Watch T1 activation and disappearance during demonstration.",
+"Inspect metal no-shoot paint.",
+"Identify P1 and all steel before shooting."
+],
+"rules": "2.1.3, 4.3.4, 4.7, 9.9"
+},
+{
+"n": 24,
+"focus": "Weak hand only; seated in boat; strong hand keeps the engine joystick; firearm loaded in box; two poppers activate two movers visible at rest.",
+"ro": [
+"Support hand/strong hand interaction with the gun under weak-hand-only.",
+"Whether the strong hand must keep the joystick and for how long.",
+"Picking up the firearm from the box without scooping with the other hand.",
+"Activator/mover failure and seated muzzle-angle risk."
+],
+"say": [
+"Weak hand only and object retention interact: ask whether the strong hand must remain on the joystick for the entire attempt or only at start.",
+"Rule 10.2.8 is about the non-shooting hand touching/scooping/supporting the handgun; reloading and malfunction correction are exceptions.",
+"If a mover fails or remains unreset, Rule 4.7 is the correct discussion."
+],
+"check": [
+"Ask for a physical demonstration of the boat/joystick start.",
+"Confirm how the loaded gun must lie in the box and how it may be picked up.",
+"Plan reloads without the strong hand assisting the gun except during the reloading exception."
+],
+"rules": "1.1.5.3, 1.1.5.4, 2.2.6, 3.2.2, 4.7, 10.2.8"
+}
+];
+const ruleCards = [
+{title:'Written Stage Briefing',rules:'3.2.1, 3.2.2, 3.2.3',applies:'All stages',why:'The written stage briefing must provide minimum information such as scoring targets, minimum rounds, ready condition, start position, start signal and procedure. It controls over published stage information.',risk:'If the published PDF is incomplete, the posted WSB and RO demonstration are decisive.'},
+{title:'Safety Angles',rules:'2.1.2, 2.1.2.1, 10.5.2',applies:'All stages',why:'Every EHC stage states 2 × 90 degrees and top of the back stop and side berms. Muzzle-angle management is relevant throughout the course of fire.',risk:'Breach of the applicable muzzle angle may be a disqualification issue.'},
+{title:'Metal Target / Metal Hard Cover Distance',rules:'2.1.3, 10.4.7',applies:'Stages 1-8, 10-14, 18-21, 23-24',why:'Any stage with poppers, mini poppers, plates, metal no-shoots or metal hard cover requires distance awareness. The stage designer should use barriers or fault lines to maintain the required safety distance.',risk:'Shooting metal from too close can create DQ risk; fault lines should normally provide extra margin.'},
+{title:'Fault Lines and Shortcuts',rules:'2.2.1, 10.2.1, 10.2.1.1',applies:'All stages with red shooting areas or passageways; visually relevant on most stages',why:'Fault lines define where shots may be taken and may simulate barriers or define shooting areas.',risk:'Shots fired while faulting can receive procedural penalties, especially if a significant advantage is gained.'},
+{title:'Barriers, Walls and Ports',rules:'2.2.3, 2.2.7, 10.2.11',applies:'Visually relevant on Stages 2-12, 14-17, 20-23; verify at walkthrough',why:'Walls and ports may force shooting positions or views while preserving freestyle within the constructed problem.',risk:'Shooting through, over or around a barrier contrary to the stage construction or WSB can create procedural exposure.'},
+{title:'Stage Props',rules:'2.2.6, 4.6, 4.7',applies:'Stages 1, 3, 6, 8, 14, 22, 24 and any stage using doors, trays, barrels, boxes, chairs, horns, boats or target activators',why:'Props must be safe and strong enough, and competitors must not rearrange them. Prop failures may be range equipment failure.',risk:'Do not move props to create a better solution. If a door, tray, activator or target mechanism fails, call for the RO rather than self-correcting.'},
+{title:'Cooper Tunnel',rules:'2.2.5, 10.2.5, 10.5.4',applies:'Stage 14',why:'The stage briefing states that there is a Cooper Tunnel. Loose overhead material may fall if disturbed.',risk:'Dislodged overhead material can create procedural penalties. Unsafe gun handling in a tunnel can create DQ risk.'},
+{title:'IPSC Paper Targets',rules:'4.1.1, 4.1.2, 4.2.1, 4.2.2, Appendix B',applies:'All stages',why:'All stages use IPSC paper targets. Approved target type, color, borders and scoring-line requirements matter for match consistency.',risk:'Check target visibility, replacement marks and whether no-shoots are clearly distinguishable.'},
+{title:'No-Shoots',rules:'4.1.3, 4.2.2.1, 9.4, 9.5',applies:'Stages 1, 2, 4, 5, 7-11, 13-23',why:'Paper and metal no-shoots must be clearly identified and consistent by material type. They affect scoring and risk management on partial arrays.',risk:'No-shoot hits are penalty hits; overlapping no-shoots can also interact with hard cover and A-zone visibility.'},
+{title:'Hard Cover / Partially Hidden Targets',rules:'4.1.4, 4.2.3, 4.2.4, 9.1.5, 9.1.6',applies:'Use on any stage with painted, taped, cut, physically hidden or prop-obscured targets. Visual review is especially relevant on Stages 4, 5, 7-12, 14-17, 20-23.',why:'Hard cover hides part of a target and must be represented correctly. Partially hidden paper targets must retain visibility of at least part of every scoring zone, and hard cover or overlapping no-shoots must not completely hide the A-zone.',risk:'Hits on hard cover do not score in the protected area. Misreading hard cover vs soft cover can change the plan and the scoring outcome.'},
+{title:'Metal Targets — General',rules:'4.3.1, 4.3.4, Appendix C',applies:'Stages 1-8, 10-14, 18-21, 23-24',why:'Metal targets must be safe, visible, properly reset and treated consistently.',risk:'Metal targets that fall by support hits, wind or other accidental causes may be range equipment failure rather than a scored hit.'},
+{title:'Poppers and Mini Poppers',rules:'4.3.2, Appendix C1, Appendix C2',applies:'Stages 1-7, 10-14, 18-21, 23-24',why:'Poppers recognize power and may activate moving targets. Mini poppers simulate greater distance.',risk:'Calibration and activation issues can affect scoring or require official review. Know which popper activates which target.'},
+{title:'Metal Plates',rules:'4.3.3, Appendix C3',applies:'Stages 2-8, 11, 13, 18, 23',why:'Metal plates are scoring metal targets, but unlike poppers they do not recognize power and are not subject to calibration challenges.',risk:'A plate must fall or overturn to score. At least one authorized paper target or scoring popper must also be included in the course.'},
+{title:'Metal No-Shoots',rules:'4.3.4',applies:'Stages 7, 10, 11, 23',why:'Metal no-shoot poppers or plates may fall or remain upright, but must be repainted when hit during scoring.',risk:'Visible hits from previous competitors should not create penalties for later competitors; raise reset/repaint concerns immediately.'},
+{title:'Moving and Activated Targets',rules:'4.1.6, 4.7, 9.9',applies:'Stages 1, 2, 4, 6-8, 10-14, 18, 19, 23, 24',why:'Only IPSC targets and mechanical/electrical devices may activate moving targets. Moving targets must be reset consistently.',risk:'A moving target or activator failure may be range equipment failure. Confirm whether the target remains visible at rest or disappears.'},
+{title:'Disappearing Targets',rules:'9.9',applies:'Stage 14 targets T2-T3; Stage 23 target T1',why:'The stage text says some activated targets disappear after activation. Disappearing-target scoring rules can affect misses and penalties.',risk:'Plan the activation sequence and confirm during briefing whether a target is disappearing or remains visible at rest.'},
+{title:'Strong Hand / Weak Hand Only',rules:'1.1.5.3, 1.1.5.4, 10.2.8',applies:'Stage 1 weak hand only; Stage 8 strong hand only; Stage 16 strong hand only; Stage 24 weak hand only',why:'If a stage or part of a stage specifies strong or weak hand only, the specified hand must be used from the stipulated point.',risk:'Rule 10.2.8 penalizes touching the handgun or scooping it from a table with the other hand after the start signal or from the stipulated point. Exceptions include releasing an external safety without scooping, reloading, and correcting a malfunction.'},
+{title:'Magazine in the Opposite Hand During Strong/Weak Hand Only',rules:'10.2.8',applies:'Stages 1, 8, 16, 24',why:'The rule focuses on touching the handgun with the other hand. It does not, by itself, describe merely holding a magazine in the other hand as the prohibited act.',risk:'Holding a magazine in the opposite hand is high-risk if that hand touches, supports, steadies or scoops the handgun. Reloading is an exception, but shooting while the other hand assists the gun is not.'},
+{title:'Firearm Ready Condition',rules:'8.1, 3.2.1',applies:'Stages 1, 2, 3, 6 and 24 have explicit published ready conditions; all blank entries must be confirmed in the posted WSB',why:'Ready condition controls whether the firearm is loaded, chamber empty, holstered, placed on a table/barrel/tray/box, and where magazines must be located.',risk:'Incorrect ready condition can trigger procedural or restart issues depending on when it is detected.'},
+{title:'Competitor Ready Condition and Start Position',rules:'8.2, 3.2.2, 10.2.6',applies:'All stages; special attention to Stages 1, 6, 8, 9, 22, 24',why:'The RO must demonstrate the acceptable start position. Some stages require sitting, hands on marks, hands on knees, holding horns, or holding a joystick.',risk:'Creeping or moving toward a more advantageous position after Standby can be penalized.'},
+{title:'Minimum One Shot / Hit per Paper Target',rules:'10.2.2, 10.2.7, 9.5',applies:'Stage 1: minimum 1 shot per paper target. Stage 16: minimum 1 hit per paper target.',why:'These are stage-procedure requirements beyond simply engaging all targets.',risk:'Failure to comply may create procedural penalties and normal misses/no-shoot penalties may still apply.'},
+{title:'Range Equipment Failure',rules:'4.7.1, 4.7.2, 2.3',applies:'All stages with moving targets, poppers, plates, doors, activators, ports or props; especially Stages 1, 2, 4, 6-8, 10-14, 18, 19, 23, 24',why:'Failure includes displaced targets, premature activation, unreset moving or metal targets, and malfunctioning mechanical/electrical equipment.',risk:'If the course cannot be completed due to range equipment failure, the normal remedy is a required reshoot after correction.'},
+{title:'Course Type and Round Count',rules:'1.2.1.1, 1.2.1.2, 1.2.1.3, Appendix A4',applies:'Short: 1,3,6,7,10,12,13,16,18,19,23,24. Medium: 2,4,11,14,17,20,21. Long: 5,9,15,22.',why:'Short, medium and long courses have different round-count limits and view restrictions.',risk:'This is mainly a stage-design and sanctioning check, but it helps understand the intended challenge balance.'}
+];
+function badge(f){let c='tag'; if(/weak|strong|moving|hard|fault|metal|no-shoot|cooper|disappear|empty/.test(f)) c+=' blue'; if(/risk|DQ|no-shoot/.test(f)) c+=' red'; return `<span class="${c}">${f}</span>`}
+function renderStages(q=''){
+ const el=document.getElementById('stageCards'); el.innerHTML='';
+ stages.filter(s=>(JSON.stringify(s).toLowerCase().includes(q))).forEach(s=>{
+  const div=document.createElement('div'); div.className='card searchable'; div.innerHTML=`<div class="stageNo"><div class="datebox"><div>${s.n}<small>STAGE</small></div></div><div><h3>Stage ${s.n}</h3><div class="meta"><span class="tag green">${s.r} min rounds</span>${s.flags.slice(0,4).map(badge).join('')}</div></div></div><div class="row"><div class="k">Targets</div><div>${s.t}</div></div><div class="row"><div class="k">Ready condition</div><div>${s.ready}</div></div><div class="row"><div class="k">Start position</div><div>${s.start}</div></div><div class="row"><div class="k">Procedure</div><div>${s.proc}</div></div><div class="accordion"><div class="acc-title">Relevant rule checks <span>⌄</span></div><div class="acc-body"><ul class="list">${getStageRules(s).map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`; el.appendChild(div);
+ }); attachAcc();
+}
+function getStageRules(s){const a=['WSB controls: Rules 3.2.1-3.2.2','Safety angles: Rule 2.1.2 / 10.5.2','Fault lines if used: Rules 2.2.1 and 10.2.1']; const f=s.flags.join(' '); if(/weak|strong/.test(f)) a.push('Single-hand shooting: Rules 1.1.5.3, 1.1.5.4 and 10.2.8, including support-hand magazine handling risk'); if(/moving|flip|disappear/.test(f)) a.push('Activated or moving targets: Rules 4.1.6, 4.7 and 9.9'); if(/disappear/.test(f)) a.push('Disappearing target scoring: Rule 9.9'); if(/metal|popper|plate/.test(f)) a.push('Metal targets and distance: Rules 2.1.3, 4.3 and Appendix C'); if(/no-shoot/.test(f)) a.push('No-shoot identification and penalties: Rules 4.1.3, 4.3.4 and Chapter 9'); if(/hard|barrier/.test(f)) a.push('Hard cover / barriers review: Rules 4.1.4, 4.2.3, 4.2.4 and 2.2.3'); if(/cooper/.test(f)) a.push('Cooper Tunnel: Rules 2.2.5 and 10.2.5'); if(/prop|door|tray|barrel|box|boat|horn/.test(f)) a.push('Stage props and equipment failure: Rules 2.2.6, 4.6 and 4.7'); if(/minimum/.test(f)||s.n===1) a.push('Minimum shot/hit procedure: Rules 10.2.2 and 10.2.7'); return a;}
+
+function renderRoPrep(q=''){
+ const el=document.getElementById('roPrepCards'); if(!el) return; el.innerHTML='';
+ roPrep.filter(p=>(JSON.stringify(p).toLowerCase().includes(q))).forEach(p=>{
+  const div=document.createElement('div'); div.className='card searchable';
+  div.innerHTML=`<div class="stageNo"><div class="datebox"><div>${p.n}<small>STAGE</small></div></div><div><h3>Stage ${p.n} — RO Prep</h3><div class="meta"><span class="tag blue">Rules ${p.rules}</span></div></div></div><div class="row"><div class="k">Shooter focus</div><div>${p.focus}</div></div><div class="accordion"><div class="acc-title">What the RO may judge <span>⌄</span></div><div class="acc-body open"><ul class="list">${p.ro.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div class="accordion"><div class="acc-title">Calm rule discussion points <span>⌄</span></div><div class="acc-body"><ul class="list">${p.say.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div class="accordion"><div class="acc-title">Walkthrough questions <span>⌄</span></div><div class="acc-body"><ul class="list">${p.check.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`;
+  el.appendChild(div);
+ }); attachAcc();
+}
+
+function renderRules(q=''){
+ const el=document.getElementById('ruleCards'); el.innerHTML='';
+ ruleCards.filter(r=>(JSON.stringify(r).toLowerCase().includes(q))).forEach(r=>{const div=document.createElement('div'); div.className='card searchable'; div.innerHTML=`<h3>${r.title}</h3><div class="meta"><span class="tag blue">Rules ${r.rules}</span></div><div class="row"><div class="k">Applies to</div><div>${r.applies}</div></div><div class="row"><div class="k">Why it matters</div><div>${r.why}</div></div><div class="impact"><b>Risk / action:</b> ${r.risk}</div>`; el.appendChild(div);});
+}
+function attachAcc(){document.querySelectorAll('.acc-title').forEach(x=>x.onclick=()=>x.nextElementSibling.classList.toggle('open'))}
+function setSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.tab,.navitem').forEach(t=>t.classList.toggle('active',t.dataset.section===id));document.getElementById('search').value='';renderStages();renderRules();renderRoPrep();window.scrollTo({top:0,behavior:'smooth'});}
+document.querySelectorAll('[data-section]').forEach(b=>b.addEventListener('click',()=>setSection(b.dataset.section)));
+document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase();renderStages(q);renderRules(q);renderRoPrep(q);document.querySelectorAll('#home .card,#checklist .card').forEach(c=>c.classList.toggle('hidden',!c.innerText.toLowerCase().includes(q)&&q));});
+renderStages();renderRules();renderRoPrep();
+</script>
+</body>
+</html>

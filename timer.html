@@ -1,0 +1,1268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <title>IPSC Insight Timer</title>
+  <style>
+    :root {
+      --gold: rgb(212,168,79);
+      --card: rgb(26,31,38);
+      --black: #000;
+      --white: #fff;
+      --gray: #8b8f97;
+      --red: #ff3b30;
+      --led-bg: rgb(173,217,230);
+      --led-text: rgb(38,64,115);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: var(--black);
+      color: var(--white);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+    }
+
+    button, select, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: 100vw;
+      height: 100dvh;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+      scrollbar-width: none;
+    }
+
+    .content::-webkit-scrollbar { display: none; }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding-top: calc(12px + var(--safe-top));
+      padding-bottom: 20px;
+    }
+
+    .top-bar {
+      display: grid;
+      grid-template-columns: 28px 1fr 28px;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .title {
+      text-align: center;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: .2px;
+    }
+
+    .icon-button {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      background: transparent;
+      font-size: 22px;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .mode-bar {
+      margin: 0 20px;
+      padding: 8px;
+      height: 62px;
+      display: flex;
+      gap: 8px;
+      background: var(--card);
+      border-radius: 22px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      height: 46px;
+      border-radius: 18px;
+      color: var(--gold);
+      background: transparent;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .mode-btn.active {
+      background: #000;
+      color: #fff;
+    }
+
+    .card {
+      margin: 0 20px;
+      background: var(--card);
+      border-radius: 20px;
+    }
+
+    .audio-card {
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .audio-copy { flex: 1; min-width: 0; }
+
+    .caption {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .15px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .audio-route {
+      color: #fff;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .debug-line {
+      margin-top: 4px;
+      color: #8f8f93;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ready-card {
+      min-height: 180px;
+      padding: 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .ready-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.12;
+    }
+
+    .ready-subtitle {
+      color: #8f8f93;
+      font-size: 20px;
+      line-height: 1.22;
+      white-space: pre-line;
+    }
+
+    .start-mode {
+      padding-top: 6px;
+      color: var(--gold);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .timer-card {
+      min-height: 320px;
+      border-radius: 24px;
+      padding: 24px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .big-time {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: clamp(56px, 19vw, 78px);
+      font-weight: 800;
+      letter-spacing: -4px;
+      line-height: .98;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown-time {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: clamp(70px, 23vw, 88px);
+      font-weight: 800;
+      letter-spacing: -5px;
+      line-height: .98;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .shots-label, .small-gray {
+      color: #8f8f93;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .countdown-label {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .listening {
+      font-size: clamp(40px, 12vw, 48px);
+      font-weight: 800;
+      line-height: 1.05;
+    }
+
+    .summary-lines {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 8px;
+    }
+
+    .summary-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .summary-line .label { color: #8f8f93; }
+    .summary-line .value {
+      color: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .commands-card {
+      border-radius: 24px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .bottom-bar {
+      flex: 0 0 auto;
+      background: #000;
+      padding: 10px 20px calc(14px + var(--safe-bottom));
+    }
+
+    .main-button {
+      height: 64px;
+      width: 100%;
+      border-radius: 22px;
+      background: var(--gold);
+      color: #000;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: .1px;
+    }
+
+    .main-button.red {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .led-wrap {
+      width: 100%;
+      padding-top: 16px;
+    }
+
+    .led-card {
+      margin: 0 20px;
+      background: var(--led-bg);
+      border-radius: 24px;
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--led-text);
+    }
+
+    .led-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: rgba(38,64,115,.88);
+      margin-bottom: 6px;
+    }
+
+    .led-last {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: clamp(62px, 21vw, 80px);
+      font-weight: 800;
+      color: rgb(38,64,115);
+      line-height: .98;
+      letter-spacing: -5px;
+      text-shadow: 0 2px 4px rgba(38,64,115,.3);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .led-divider {
+      height: 2px;
+      background: rgba(38,64,115,.3);
+      margin: 16px 40px;
+    }
+
+    .led-grid {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .led-small-box { flex: 1; min-width: 0; }
+    .led-small-label {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: rgba(38,64,115,.88);
+    }
+
+    .led-small-time {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: clamp(36px, 12vw, 48px);
+      font-weight: 800;
+      color: rgb(38,64,115);
+      line-height: .98;
+      letter-spacing: -3px;
+      text-shadow: 0 2px 3px rgba(38,64,115,.3);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .led-shot-count {
+      padding-top: 20px;
+      font-size: 16px;
+      font-weight: 700;
+      color: rgba(38,64,115,.88);
+    }
+
+    .shot-list {
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(0,0,0,.3);
+      border-radius: 12px;
+      margin: 12px 20px 0;
+      padding: 12px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .shot-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 20px;
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .shot-row .time {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.58);
+      display: none;
+      align-items: flex-end;
+      z-index: 20;
+    }
+
+    .sheet-backdrop.show { display: flex; }
+
+    .sheet {
+      width: 100%;
+      max-height: 88dvh;
+      background: #000;
+      border-radius: 26px 26px 0 0;
+      border: 1px solid rgba(255,255,255,.08);
+      padding: 12px 20px calc(20px + var(--safe-bottom));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 -16px 60px rgba(0,0,0,.6);
+    }
+
+    .grabber {
+      width: 42px;
+      height: 5px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.28);
+      margin: 0 auto 16px;
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .sheet-title {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .done-btn {
+      background: transparent;
+      color: var(--gold);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .settings-section {
+      background: var(--card);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .setting-row {
+      min-height: 54px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      color: #fff;
+    }
+
+    .setting-row:last-child { border-bottom: 0; }
+
+    .setting-title { font-size: 16px; font-weight: 600; }
+    .setting-subtitle { color: #8f8f93; font-size: 12px; margin-top: 2px; }
+
+    .segmented-small {
+      display: flex;
+      background: #000;
+      border-radius: 13px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .segmented-small button {
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .segmented-small button.active {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .switch {
+      position: relative;
+      width: 52px;
+      height: 32px;
+      flex: 0 0 auto;
+    }
+
+    .switch input { display: none; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #3a3a3c;
+      border-radius: 99px;
+      transition: .18s;
+    }
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      left: 2px;
+      top: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .18s;
+    }
+    .switch input:checked + .slider { background: var(--gold); }
+    .switch input:checked + .slider:before { transform: translateX(20px); }
+
+    .preset-select {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: #000;
+      color: var(--gold);
+      border-radius: 12px;
+      padding: 8px 28px 8px 10px;
+      font-size: 14px;
+      font-weight: 700;
+      max-width: 170px;
+    }
+
+    .manual-shot {
+      background: transparent;
+      color: var(--gold);
+      padding: 10px 0 0;
+      font-size: 13px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .manual-shot.show { display: block; }
+
+    @media (orientation: landscape) {
+      body::before {
+        content: "Rotate iPhone to portrait";
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        background: #000;
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        font-weight: 700;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-label="IPSC Insight Timer">
+    <section class="content">
+      <div class="stack">
+        <header class="top-bar">
+          <span></span>
+          <div class="title">IPSC INSIGHT TIMER</div>
+          <button class="icon-button" id="settingsButton" aria-label="Settings">⚙︎</button>
+        </header>
+
+        <nav class="mode-bar" aria-label="Timer mode">
+          <button class="mode-btn active" data-mode="ro">RO</button>
+          <button class="mode-btn" data-mode="spy">Spy</button>
+          <button class="mode-btn" data-mode="training">Training</button>
+        </nav>
+
+        <section class="card audio-card">
+          <div class="audio-copy">
+            <div class="caption">AUDIO OUTPUT</div>
+            <div class="audio-route" id="audioRouteName">Unknown</div>
+            <div class="debug-line" id="audioDebug">Live -160.0 dB • Last -160.0 dB</div>
+          </div>
+          <button class="icon-button" id="refreshAudioButton" aria-label="Refresh audio route">↻</button>
+        </section>
+
+        <section id="readyCard" class="ready-card">
+          <div class="ready-title" id="readyTitle">READY</div>
+          <div class="ready-subtitle" id="readySubtitle">Load And Make Ready
+Are You Ready?</div>
+          <div class="start-mode" id="startModeText">START MODE: RANDOM</div>
+        </section>
+
+        <section id="timerCard" class="card timer-card" hidden>
+          <div id="timerMain"></div>
+        </section>
+
+        <section id="ledDisplay" class="led-wrap" hidden>
+          <div class="led-card">
+            <div class="led-label">Last shot</div>
+            <div class="led-last" id="ledLastShot">0.00</div>
+            <div class="led-divider"></div>
+            <div class="led-grid">
+              <div class="led-small-box">
+                <div class="led-small-label">First shot</div>
+                <div class="led-small-time" id="ledFirstShot">0.00</div>
+              </div>
+              <div class="led-small-box">
+                <div class="led-small-label">Split</div>
+                <div class="led-small-time" id="ledSplit">0.00</div>
+              </div>
+            </div>
+            <div class="led-shot-count" id="ledShots">Shots: 0</div>
+          </div>
+          <div class="shot-list" id="shotList" hidden></div>
+        </section>
+
+        <section id="commandsCard" class="card commands-card" hidden>
+          <div class="caption">POST-RUN COMMANDS</div>
+          <div>If You Are Finished, Unload And Show Clear</div>
+          <div>If Clear, Hammer Down, Holster</div>
+          <div>Range Is Clear</div>
+        </section>
+      </div>
+    </section>
+
+    <footer class="bottom-bar">
+      <button class="main-button" id="mainButton">START</button>
+      <button class="manual-shot" id="manualShotButton">REGISTER SHOT</button>
+    </footer>
+  </main>
+
+  <div class="sheet-backdrop" id="settingsSheet" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Settings">
+      <div class="grabber"></div>
+      <div class="sheet-header">
+        <div class="sheet-title">Settings</div>
+        <button class="done-btn" id="doneSettings">Done</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="setting-row">
+          <div>
+            <div class="setting-title">Start Mode</div>
+            <div class="setting-subtitle">Same delay modes as the Swift app</div>
+          </div>
+          <div class="segmented-small" id="delayPicker">
+            <button data-delay="random" class="active">Random</button>
+            <button data-delay="instant">Instant</button>
+            <button data-delay="fixed3">3 Sec</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-title">Weapon Preset</div>
+            <div class="setting-subtitle">Audio detection thresholds</div>
+          </div>
+          <select class="preset-select" id="presetSelect">
+            <option value="nineMM">9mm Pistol</option>
+            <option value="fortyfive">.45 ACP</option>
+            <option value="rifle">Rifle</option>
+            <option value="suppressedPistol">Suppressed</option>
+            <option value="dryFire">Dry Fire</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <label class="setting-row">
+          <div>
+            <div class="setting-title">Debug Audio</div>
+            <div class="setting-subtitle">Show live and last registered dB</div>
+          </div>
+          <span class="switch">
+            <input type="checkbox" id="debugToggle" checked />
+            <span class="slider"></span>
+          </span>
+        </label>
+        <label class="setting-row">
+          <div>
+            <div class="setting-title">Prefer Bluetooth Output</div>
+            <div class="setting-subtitle">Browser support is limited on iPhone</div>
+          </div>
+          <span class="switch">
+            <input type="checkbox" id="bluetoothToggle" />
+            <span class="slider"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const presets = {
+      nineMM: { shotThreshold: -10.0, transientRiseThreshold: 8.0, echoFilter: 0.14, spyThreshold: -8.0, blankingPeriod: 0.40 },
+      fortyfive: { shotThreshold: -8.0, transientRiseThreshold: 10.0, echoFilter: 0.16, spyThreshold: -8.0, blankingPeriod: 0.40 },
+      rifle: { shotThreshold: -6.0, transientRiseThreshold: 12.0, echoFilter: 0.12, spyThreshold: -8.0, blankingPeriod: 0.40 },
+      suppressedPistol: { shotThreshold: -15.0, transientRiseThreshold: 6.0, echoFilter: 0.18, spyThreshold: -8.0, blankingPeriod: 0.40 },
+      dryFire: { shotThreshold: -25.0, transientRiseThreshold: 4.0, echoFilter: 0.10, spyThreshold: -8.0, blankingPeriod: 0.40 },
+      custom: { shotThreshold: -10.0, transientRiseThreshold: 8.0, echoFilter: 0.14, spyThreshold: -8.0, blankingPeriod: 0.40 }
+    };
+
+    const state = {
+      mode: "ro",
+      timerState: "ready",
+      startDelayMode: "random",
+      displayTime: 0,
+      countdownValue: 0,
+      shots: [],
+      summary: { finalTime: 0, shotCount: 0, firstShot: 0, lastShot: 0, lastSplit: 0 },
+      showAfterRunCommands: false,
+      audioReady: false,
+      audioRouteName: "Unknown",
+      preferBluetoothOutput: false,
+      debugAudioEnabled: true,
+      selectedPreset: "nineMM",
+      currentLiveDB: -160,
+      lastRegisteredDB: -160,
+      previousPeak: -160,
+      lastShotAt: 0,
+      runStart: 0,
+      countdownStart: 0,
+      countdownDuration: 0,
+      countdownRaf: null,
+      runRaf: null,
+      delayTimeout: null,
+      audioContext: null,
+      mediaStream: null,
+      analyser: null,
+      sourceNode: null,
+      monitorRaf: null,
+      monitoring: false,
+      spyMode: false,
+      signalContext: null
+    };
+
+    const el = {
+      readyCard: document.getElementById("readyCard"),
+      readyTitle: document.getElementById("readyTitle"),
+      readySubtitle: document.getElementById("readySubtitle"),
+      startModeText: document.getElementById("startModeText"),
+      timerCard: document.getElementById("timerCard"),
+      timerMain: document.getElementById("timerMain"),
+      commandsCard: document.getElementById("commandsCard"),
+      mainButton: document.getElementById("mainButton"),
+      modeButtons: [...document.querySelectorAll(".mode-btn")],
+      audioRouteName: document.getElementById("audioRouteName"),
+      audioDebug: document.getElementById("audioDebug"),
+      refreshAudioButton: document.getElementById("refreshAudioButton"),
+      settingsButton: document.getElementById("settingsButton"),
+      settingsSheet: document.getElementById("settingsSheet"),
+      doneSettings: document.getElementById("doneSettings"),
+      delayPicker: document.getElementById("delayPicker"),
+      presetSelect: document.getElementById("presetSelect"),
+      debugToggle: document.getElementById("debugToggle"),
+      bluetoothToggle: document.getElementById("bluetoothToggle"),
+      manualShotButton: document.getElementById("manualShotButton"),
+      ledDisplay: document.getElementById("ledDisplay"),
+      ledLastShot: document.getElementById("ledLastShot"),
+      ledFirstShot: document.getElementById("ledFirstShot"),
+      ledSplit: document.getElementById("ledSplit"),
+      ledShots: document.getElementById("ledShots"),
+      shotList: document.getElementById("shotList")
+    };
+
+    const fmt = n => (Number.isFinite(n) ? n : 0).toFixed(2);
+    const now = () => performance.now() / 1000;
+
+    function getDelaySeconds() {
+      if (state.startDelayMode === "random") return 1 + Math.random() * 3;
+      if (state.startDelayMode === "fixed3") return 3;
+      return 0;
+    }
+
+    function getStartModeDisplayText() {
+      if (state.startDelayMode === "random") return "RANDOM";
+      if (state.startDelayMode === "instant") return "INSTANT";
+      return "FIXED 3 SEC";
+    }
+
+    function getReadyTitle() {
+      if (state.mode === "spy") return "SPY READY";
+      return "READY";
+    }
+
+    function getReadySubtitle() {
+      if (state.mode === "spy") return "Are You Ready?\nWaiting for external Start Signal";
+      return "Load And Make Ready\nAre You Ready?";
+    }
+
+    function getCountdownLabel() {
+      if (state.startDelayMode === "random") return "Random delay";
+      if (state.startDelayMode === "instant") return "Instant";
+      return "Fixed delay";
+    }
+
+    function lastShotTime() { return state.shots[state.shots.length - 1] || 0; }
+    function firstShotTime() { return state.shots[0] || 0; }
+    function lastSplit() {
+      if (state.shots.length < 2) return 0;
+      return state.shots[state.shots.length - 1] - state.shots[state.shots.length - 2];
+    }
+
+    function vibrate(ms = 12) {
+      if (navigator.vibrate) navigator.vibrate(ms);
+    }
+
+    async function setupAudio() {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          state.audioReady = false;
+          state.audioRouteName = "Microphone unavailable";
+          render();
+          return;
+        }
+
+        if (!state.mediaStream) {
+          state.mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+          });
+        }
+
+        if (!state.audioContext) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          state.audioContext = new AudioContext();
+          state.analyser = state.audioContext.createAnalyser();
+          state.analyser.fftSize = 512;
+          state.analyser.smoothingTimeConstant = 0;
+          state.sourceNode = state.audioContext.createMediaStreamSource(state.mediaStream);
+          state.sourceNode.connect(state.analyser);
+        }
+
+        if (state.audioContext.state === "suspended") await state.audioContext.resume();
+        state.audioReady = true;
+        state.audioRouteName = "Speaker";
+      } catch (error) {
+        state.audioReady = false;
+        state.audioRouteName = "Microphone permission denied";
+      }
+      render();
+    }
+
+    function refreshAudioRoute() {
+      state.audioRouteName = state.audioReady ? "Speaker" : "Unknown";
+      render();
+    }
+
+    function playStartSignal() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = state.signalContext || new AudioContext();
+        state.signalContext = ctx;
+        if (ctx.state === "suspended") ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = 3000;
+        osc.type = "sine";
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.9, ctx.currentTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.17);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.18);
+      } catch (_) {}
+    }
+
+    function startTimer() {
+      if (state.timerState !== "ready") return;
+      resetRunState();
+      if (state.mode === "spy") startSpyListening();
+      else startWithConfiguredDelay();
+    }
+
+    function startWithConfiguredDelay() {
+      const delay = getDelaySeconds();
+      if (delay > 0) startCountdown(delay);
+      scheduleSignalAndTimer(delay);
+    }
+
+    function startCountdown(duration) {
+      stopCountdownTimer();
+      state.countdownDuration = duration;
+      state.countdownValue = duration;
+      state.countdownStart = now();
+      state.timerState = "countdown";
+      render();
+
+      const tick = () => {
+        if (state.timerState !== "countdown") return;
+        const elapsed = now() - state.countdownStart;
+        state.countdownValue = Math.max(0, state.countdownDuration - elapsed);
+        renderTimerOnly();
+        if (state.countdownValue <= 0) {
+          stopCountdownTimer();
+          return;
+        }
+        state.countdownRaf = requestAnimationFrame(tick);
+      };
+      state.countdownRaf = requestAnimationFrame(tick);
+    }
+
+    function scheduleSignalAndTimer(delay) {
+      clearTimeout(state.delayTimeout);
+      state.delayTimeout = setTimeout(() => {
+        playStartSignal();
+        startTimerClock(now());
+        state.delayTimeout = null;
+      }, delay * 1000);
+    }
+
+    function startTimerClock(startUptime) {
+      state.timerState = "running";
+      state.runStart = startUptime;
+      state.displayTime = 0;
+      stopRunTimer();
+      render();
+
+      const tick = () => {
+        if (state.timerState !== "running") return;
+        state.displayTime = Math.max(0, now() - state.runStart);
+        renderTimerOnly();
+        state.runRaf = requestAnimationFrame(tick);
+      };
+      state.runRaf = requestAnimationFrame(tick);
+
+      if (state.mode !== "training") startMonitoring(false);
+    }
+
+    async function startSpyListening() {
+      await setupAudio();
+      if (!state.audioReady) return;
+      state.timerState = "waitingForSpyBeep";
+      render();
+      startMonitoring(true);
+    }
+
+    function startTimerFromSpyBeep() {
+      stopMonitoring();
+      startTimerClock(now());
+    }
+
+    function cancelTimer() {
+      if (state.timerState === "countdown") cancelCountdown();
+      else if (state.timerState === "waitingForSpyBeep") cancelSpyListening();
+    }
+
+    function cancelCountdown() {
+      clearTimeout(state.delayTimeout);
+      state.delayTimeout = null;
+      stopCountdownTimer();
+      state.countdownStart = 0;
+      state.countdownDuration = 0;
+      state.countdownValue = 0;
+      state.timerState = "ready";
+      render();
+    }
+
+    function cancelSpyListening() {
+      stopMonitoring();
+      state.timerState = "ready";
+      render();
+    }
+
+    function stopAndScore() {
+      if (state.timerState !== "running") return;
+      stopRunTimer();
+      stopMonitoring();
+      state.summary = {
+        finalTime: state.displayTime,
+        shotCount: state.shots.length,
+        firstShot: firstShotTime(),
+        lastShot: lastShotTime(),
+        lastSplit: lastSplit()
+      };
+      state.showAfterRunCommands = true;
+      state.timerState = "results";
+      render();
+    }
+
+    function resetForNewRun() {
+      cleanup();
+      resetRunState();
+      state.timerState = "ready";
+      render();
+    }
+
+    function resetRunState() {
+      state.shots = [];
+      state.displayTime = 0;
+      state.summary = { finalTime: 0, shotCount: 0, firstShot: 0, lastShot: 0, lastSplit: 0 };
+      state.showAfterRunCommands = false;
+      state.currentLiveDB = -160;
+      state.lastRegisteredDB = -160;
+      state.previousPeak = -160;
+      state.lastShotAt = 0;
+    }
+
+    function cleanup() {
+      clearTimeout(state.delayTimeout);
+      state.delayTimeout = null;
+      stopRunTimer();
+      stopCountdownTimer();
+      stopMonitoring();
+    }
+
+    function stopRunTimer() {
+      if (state.runRaf) cancelAnimationFrame(state.runRaf);
+      state.runRaf = null;
+    }
+
+    function stopCountdownTimer() {
+      if (state.countdownRaf) cancelAnimationFrame(state.countdownRaf);
+      state.countdownRaf = null;
+    }
+
+    async function startMonitoring(spyMode) {
+      await setupAudio();
+      if (!state.audioReady || !state.analyser) return;
+      state.monitoring = true;
+      state.spyMode = spyMode;
+      state.previousPeak = -160;
+      state.lastShotAt = now();
+      monitorAudio();
+    }
+
+    function stopMonitoring() {
+      state.monitoring = false;
+      if (state.monitorRaf) cancelAnimationFrame(state.monitorRaf);
+      state.monitorRaf = null;
+    }
+
+    function monitorAudio() {
+      if (!state.monitoring || !state.analyser) return;
+
+      const buffer = new Float32Array(state.analyser.fftSize);
+      state.analyser.getFloatTimeDomainData(buffer);
+
+      let peak = 0;
+      for (let i = 0; i < buffer.length; i++) {
+        const sample = Math.abs(buffer[i]);
+        if (sample > peak) peak = sample;
+      }
+
+      const peakDB = peak > 0 ? 20 * Math.log10(peak) : -160;
+      const rise = peakDB - state.previousPeak;
+      state.currentLiveDB = peakDB;
+
+      if (state.spyMode) {
+        if (peakDB > presets[state.selectedPreset].spyThreshold) {
+          startTimerFromSpyBeep();
+          return;
+        }
+      } else {
+        detectShot(peakDB, rise);
+      }
+
+      state.previousPeak = peakDB;
+      renderDebugOnly();
+      state.monitorRaf = requestAnimationFrame(monitorAudio);
+    }
+
+    function detectShot(peakDB, rise) {
+      const config = presets[state.selectedPreset];
+      const elapsedSeconds = state.timerState === "running" ? Math.max(0, now() - state.runStart) : 0;
+      const timeSinceLastShot = now() - state.lastShotAt;
+      const passesThreshold = peakDB > config.shotThreshold;
+      const passesRise = rise > config.transientRiseThreshold;
+      const enoughTime = timeSinceLastShot > config.echoFilter;
+      const passesBlankingPeriod = elapsedSeconds > config.blankingPeriod;
+
+      if (passesThreshold && passesRise && enoughTime && passesBlankingPeriod) {
+        registerShot(elapsedSeconds, peakDB);
+      }
+    }
+
+    function registerShot(shotTime = Math.max(0, now() - state.runStart), peakDB = state.currentLiveDB) {
+      if (state.timerState !== "running") return;
+      state.lastShotAt = now();
+      state.shots.push(shotTime);
+      state.lastRegisteredDB = peakDB;
+      vibrate(20);
+      render();
+    }
+
+    function switchMode(mode) {
+      if (state.mode === mode) return;
+      resetForNewRun();
+      state.mode = mode;
+      render();
+    }
+
+    function openSettings() {
+      el.settingsSheet.classList.add("show");
+      el.settingsSheet.setAttribute("aria-hidden", "false");
+    }
+
+    function closeSettings() {
+      el.settingsSheet.classList.remove("show");
+      el.settingsSheet.setAttribute("aria-hidden", "true");
+    }
+
+    function mainButtonText() {
+      if (state.timerState === "ready") return "START";
+      if (state.timerState === "countdown") return "CANCEL";
+      if (state.timerState === "waitingForSpyBeep") return "CANCEL";
+      if (state.timerState === "running") return "SCORING";
+      return "NEW RUN";
+    }
+
+    function renderTimerOnly() {
+      if (state.timerState === "running" || state.timerState === "results" || state.timerState === "countdown" || state.timerState === "waitingForSpyBeep") {
+        renderTimerCard();
+        if (state.mode === "training" && (state.timerState === "running" || state.timerState === "results")) renderLedDisplay();
+      }
+    }
+
+    function renderDebugOnly() {
+      el.audioDebug.textContent = `Live ${state.currentLiveDB.toFixed(1)} dB • Last ${state.lastRegisteredDB.toFixed(1)} dB`;
+    }
+
+    function renderTimerCard() {
+      const isResult = state.timerState === "results";
+      if (state.timerState === "running" || isResult) {
+        const time = isResult ? state.summary.finalTime : state.displayTime;
+        const shotCount = isResult ? state.summary.shotCount : state.shots.length;
+        const first = isResult ? state.summary.firstShot : firstShotTime();
+        const split = isResult ? state.summary.lastSplit : lastSplit();
+        const last = isResult ? state.summary.lastShot : lastShotTime();
+        el.timerMain.innerHTML = `
+          <div class="big-time">${fmt(time)}</div>
+          <div class="shots-label">Shots: ${shotCount}</div>
+          <div class="summary-lines">
+            <div class="summary-line"><span class="label">First shot:</span><span class="value">${first > 0 ? fmt(first) : "--"}</span></div>
+            <div class="summary-line"><span class="label">Last split:</span><span class="value">${split > 0 ? fmt(split) : "--"}</span></div>
+            <div class="summary-line"><span class="label">Last shot:</span><span class="value">${last > 0 ? fmt(last) : "--"}</span></div>
+          </div>
+          ${state.debugAudioEnabled && state.timerState === "running" ? `<div class="debug-line">Live ${state.currentLiveDB.toFixed(1)} dB</div>` : ""}
+        `;
+      } else if (state.timerState === "countdown") {
+        el.timerMain.innerHTML = `
+          <div class="countdown-time">${fmt(state.countdownValue)}</div>
+          <div class="countdown-label">${getCountdownLabel()}</div>
+        `;
+      } else if (state.timerState === "waitingForSpyBeep") {
+        el.timerMain.innerHTML = `
+          <div class="listening">LISTENING</div>
+          <div class="small-gray">Waiting for external Start Signal</div>
+        `;
+      }
+    }
+
+    function renderLedDisplay() {
+      el.ledLastShot.textContent = fmt(lastShotTime());
+      el.ledFirstShot.textContent = fmt(firstShotTime());
+      el.ledSplit.textContent = fmt(lastSplit());
+      el.ledShots.textContent = `Shots: ${state.shots.length}`;
+      if (state.shots.length > 0) {
+        el.shotList.hidden = false;
+        el.shotList.innerHTML = state.shots.map((shotTime, index) => {
+          const split = index > 0 ? shotTime - state.shots[index - 1] : shotTime;
+          return `<div class="shot-row"><span>Shot ${index + 1} (split ${fmt(split)})</span><span class="time">${fmt(shotTime)}</span></div>`;
+        }).join("");
+      } else {
+        el.shotList.hidden = true;
+        el.shotList.innerHTML = "";
+      }
+    }
+
+    function render() {
+      const activeTimer = state.timerState !== "ready";
+      const showLed = state.mode === "training" && (state.timerState === "running" || state.timerState === "results");
+
+      el.readyCard.hidden = activeTimer;
+      el.timerCard.hidden = !activeTimer;
+      el.ledDisplay.hidden = !showLed;
+      el.commandsCard.hidden = !(state.showAfterRunCommands && state.timerState === "results");
+
+      el.readyTitle.textContent = getReadyTitle();
+      el.readySubtitle.textContent = getReadySubtitle();
+      el.startModeText.textContent = `START MODE: ${getStartModeDisplayText()}`;
+
+      el.modeButtons.forEach(button => button.classList.toggle("active", button.dataset.mode === state.mode));
+
+      el.audioRouteName.textContent = state.audioRouteName;
+      el.audioDebug.hidden = !state.debugAudioEnabled;
+      renderDebugOnly();
+
+      el.mainButton.textContent = mainButtonText();
+      el.mainButton.classList.toggle("red", state.timerState === "countdown" || state.timerState === "waitingForSpyBeep" || state.timerState === "running");
+      el.manualShotButton.classList.toggle("show", state.timerState === "running" && state.mode === "training");
+
+      renderTimerCard();
+      if (showLed) renderLedDisplay();
+
+      [...el.delayPicker.querySelectorAll("button")].forEach(button => button.classList.toggle("active", button.dataset.delay === state.startDelayMode));
+      el.presetSelect.value = state.selectedPreset;
+      el.debugToggle.checked = state.debugAudioEnabled;
+      el.bluetoothToggle.checked = state.preferBluetoothOutput;
+    }
+
+    el.modeButtons.forEach(button => button.addEventListener("click", () => switchMode(button.dataset.mode)));
+
+    el.mainButton.addEventListener("click", async () => {
+      await setupAudio();
+      if (state.timerState === "ready") startTimer();
+      else if (state.timerState === "countdown" || state.timerState === "waitingForSpyBeep") cancelTimer();
+      else if (state.timerState === "running") stopAndScore();
+      else if (state.timerState === "results") resetForNewRun();
+    });
+
+    el.manualShotButton.addEventListener("click", () => registerShot());
+    el.refreshAudioButton.addEventListener("click", refreshAudioRoute);
+    el.settingsButton.addEventListener("click", openSettings);
+    el.doneSettings.addEventListener("click", closeSettings);
+    el.settingsSheet.addEventListener("click", e => { if (e.target === el.settingsSheet) closeSettings(); });
+
+    el.delayPicker.addEventListener("click", e => {
+      const button = e.target.closest("button[data-delay]");
+      if (!button) return;
+      state.startDelayMode = button.dataset.delay;
+      render();
+    });
+
+    el.presetSelect.addEventListener("change", e => {
+      state.selectedPreset = e.target.value;
+      render();
+    });
+
+    el.debugToggle.addEventListener("change", e => {
+      state.debugAudioEnabled = e.target.checked;
+      render();
+    });
+
+    el.bluetoothToggle.addEventListener("change", e => {
+      state.preferBluetoothOutput = e.target.checked;
+      render();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && (state.timerState === "running" || state.timerState === "countdown")) {
+        stopAndScore();
+      }
+    });
+
+    window.addEventListener("beforeunload", cleanup);
+    render();
+  </script>
+</body>
+</html>

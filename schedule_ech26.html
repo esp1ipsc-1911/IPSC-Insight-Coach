@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Team Classic Norway · EHC 2026 – Dagsplan</title>
+  <meta name="description" content="Mobiltilpasset dagsplan for Team Classic Norway, Squad 05, EHC 2026." />
+  <style>
+    :root {
+      --bg-main: #070a10;
+      --bg-hero: #08162b;
+      --bg-panel: #101823;
+      --bg-card: #141d29;
+      --bg-card-2: #182334;
+      --bg-chip: #1b2b42;
+      --border-soft: #283448;
+      --border-blue: #3478f6;
+      --text-main: #f2f5f9;
+      --text-muted: #a4adba;
+      --text-dim: #737f8f;
+      --accent-blue: #3478f6;
+      --accent-blue-light: #52a8ff;
+      --accent-yellow: #f2c94c;
+      --accent-green: #48c78e;
+      --accent-red: #ff6b6b;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --max-width: 1080px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(52,120,246,.23), transparent 34rem),
+        radial-gradient(circle at top right, rgba(242,201,76,.12), transparent 28rem),
+        linear-gradient(180deg, #07101f 0%, var(--bg-main) 42%, #05070b 100%);
+      color: var(--text-main);
+      line-height: 1.45;
+    }
+
+    a { color: inherit; }
+
+    .app {
+      width: min(100%, var(--max-width));
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    header.hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(82,168,255,.24);
+      background:
+        linear-gradient(135deg, rgba(9,26,52,.96), rgba(11,17,28,.96)),
+        radial-gradient(circle at 15% 10%, rgba(82,168,255,.35), transparent 24rem);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -120px auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: rgba(52,120,246,.17);
+      filter: blur(8px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 10px;
+      border: 1px solid rgba(242,201,76,.35);
+      background: rgba(242,201,76,.10);
+      color: var(--accent-yellow);
+      border-radius: 999px;
+      font-size: .8rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 18px 0 4px;
+      font-size: clamp(2rem, 9vw, 4.8rem);
+      line-height: .95;
+      letter-spacing: -.06em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: clamp(1rem, 3.5vw, 1.35rem);
+      font-weight: 650;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .meta-card {
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.055);
+      border-radius: var(--radius-md);
+      padding: 13px;
+      min-height: 76px;
+    }
+
+    .meta-card span {
+      display: block;
+      color: var(--text-dim);
+      font-size: .78rem;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .meta-card strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 1rem;
+    }
+
+    nav.day-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin: 14px -16px 22px;
+      padding: 10px 16px;
+      background: rgba(7,10,16,.86);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      overflow-x: auto;
+      scrollbar-width: none;
+      white-space: nowrap;
+    }
+
+    nav.day-nav::-webkit-scrollbar { display: none; }
+
+    .day-nav-inner {
+      display: flex;
+      gap: 8px;
+      width: max-content;
+      min-width: 100%;
+    }
+
+    .day-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 9px 13px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-panel);
+      border-radius: 999px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 850;
+      font-size: .88rem;
+    }
+
+    .day-link:hover,
+    .day-link:focus-visible {
+      color: var(--text-main);
+      border-color: var(--accent-blue-light);
+      outline: none;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+    }
+
+    section.day {
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(20,29,41,.94), rgba(12,18,27,.96));
+      border-radius: var(--radius-lg);
+      box-shadow: 0 14px 36px rgba(0,0,0,.28);
+      overflow: hidden;
+    }
+
+    .day-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+      padding: 18px;
+      background: linear-gradient(90deg, rgba(52,120,246,.18), rgba(242,201,76,.06));
+      border-bottom: 1px solid rgba(255,255,255,.075);
+    }
+
+    .day-date {
+      margin: 0 0 4px;
+      color: var(--accent-yellow);
+      font-size: .86rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .day-title {
+      margin: 0;
+      font-size: clamp(1.25rem, 5vw, 2rem);
+      letter-spacing: -.03em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(52,120,246,.15);
+      border: 1px solid rgba(82,168,255,.35);
+      color: var(--accent-blue-light);
+      font-weight: 900;
+      font-size: .82rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .badge.green {
+      background: rgba(72,199,142,.14);
+      border-color: rgba(72,199,142,.38);
+      color: var(--accent-green);
+    }
+
+    .badge.yellow {
+      background: rgba(242,201,76,.12);
+      border-color: rgba(242,201,76,.34);
+      color: var(--accent-yellow);
+    }
+
+    .day-body { padding: 8px 16px 18px; }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px;
+      align-items: stretch;
+      position: relative;
+      border: 1px solid rgba(255,255,255,.055);
+      background: rgba(255,255,255,.035);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .item::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: rgba(52,120,246,.65);
+    }
+
+    .time {
+      padding: 12px 8px 12px 14px;
+      color: var(--accent-blue-light);
+      font-weight: 950;
+      font-size: .88rem;
+      letter-spacing: -.02em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .activity {
+      padding: 12px 12px 12px 0;
+      color: var(--text-main);
+      font-weight: 650;
+    }
+
+    .muted { color: var(--text-muted); font-weight: 600; }
+
+    .stage::before { background: var(--accent-yellow); }
+    .stage .time { color: var(--accent-yellow); }
+    .stage .activity { font-weight: 900; }
+
+    .success::before { background: var(--accent-green); }
+    .success .time { color: var(--accent-green); }
+    .success .activity { color: #dbfff0; font-weight: 900; }
+
+    .rest::before { background: rgba(164,173,186,.7); }
+    .rest .time { color: var(--text-muted); }
+
+    .note {
+      margin-top: 12px;
+      border: 1px solid rgba(242,201,76,.28);
+      background: linear-gradient(135deg, rgba(242,201,76,.11), rgba(242,201,76,.045));
+      border-radius: var(--radius-md);
+      padding: 14px;
+      color: #ffe8a4;
+      font-weight: 720;
+    }
+
+    .note strong {
+      color: var(--accent-yellow);
+      display: block;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: .78rem;
+    }
+
+    .footer {
+      margin: 24px 0 8px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.035);
+      color: var(--text-muted);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .top-button {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 30;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      border: 1px solid rgba(82,168,255,.4);
+      background: rgba(16,24,35,.9);
+      color: var(--text-main);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      font-weight: 950;
+    }
+
+    @media (max-width: 720px) {
+      .app { padding: 12px; }
+      header.hero { padding: 18px; }
+      .meta-grid { grid-template-columns: 1fr; }
+      nav.day-nav { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; }
+      .day-head { grid-template-columns: 1fr; padding: 16px; }
+      .badge { width: fit-content; }
+      .day-body { padding: 7px 12px 15px; }
+      .item { grid-template-columns: 78px 1fr; gap: 8px; }
+      .time { padding-left: 12px; font-size: .82rem; }
+      .activity { font-size: .95rem; }
+    }
+
+    @media print {
+      body { background: #fff; color: #000; }
+      .app { max-width: none; }
+      nav.day-nav, .top-button { display: none; }
+      header.hero, section.day, .footer { box-shadow: none; background: #fff; color: #000; border-color: #ccc; }
+      .subtitle, .meta-card span, .muted, .footer { color: #333; }
+      .day { break-inside: avoid; }
+      .item, .note, .meta-card { background: #fff; border-color: #ddd; }
+      .time, .stage .time, .success .time, .day-date { color: #000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="top">
+    <header class="hero" aria-label="Toppinformasjon">
+      <div class="eyebrow">EHC 2026 · Dagsplan</div>
+      <h1>Team Classic Norway</h1>
+      <p class="subtitle">Classic Norge · Squad 05 · LZ Range, Buzsak, Ungarn</p>
+      <div class="meta-grid" aria-label="Nøkkelinformasjon">
+        <div class="meta-card"><span>Periode</span><strong>6.–12. juni 2026</strong></div>
+        <div class="meta-card"><span>Lag</span><strong>Classic Norge</strong></div>
+        <div class="meta-card"><span>Sted</span><strong>LZ Range, Buzsak</strong></div>
+      </div>
+    </header>
+
+    <nav class="day-nav" aria-label="Hurtignavigasjon mellom dager">
+      <div class="day-nav-inner">
+        <a class="day-link" href="#lordag">Lør 6</a>
+        <a class="day-link" href="#sondag">Søn 7</a>
+        <a class="day-link" href="#mandag">Man 8</a>
+        <a class="day-link" href="#tirsdag">Tir 9</a>
+        <a class="day-link" href="#onsdag">Ons 10</a>
+        <a class="day-link" href="#torsdag">Tor 11</a>
+        <a class="day-link" href="#fredag">Fre 12</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="day" id="lordag">
+        <div class="day-head">
+          <div><p class="day-date">Lørdag 6. juni</p><h2 class="day-title">Ankomst</h2></div>
+          <span class="badge yellow">Reise og etablering</span>
+        </div>
+        <div class="day-body">
+          <div class="timeline">
+            <div class="item"><div class="time">Dagtid</div><div class="activity">Fly til Ungarn – ankomst Budapest</div></div>
+            <div class="item"><div class="time">Ettermiddag</div><div class="activity">Hente leiebil</div></div>
+            <div class="item"><div class="time">Ettermiddag</div><div class="activity">Innsjekk hus – pakke ut og gjøre seg hjemme</div></div>
+            <div class="item"><div class="time">Sen etterm.</div><div class="activity">Evt. rekognosering av banen <span class="muted">(LZ Range, Buzsak)</span></div></div>
+            <div class="item"><div class="time">Kveld</div><div class="activity">Middag – enkel og rolig</div></div>
+            <div class="item rest"><div class="time">21:00–22:00</div><div class="activity">Legg deg tidlig – lang dag i morgen</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="day" id="sondag">
+        <div class="day-head">
+          <div><p class="day-date">Søndag 7. juni</p><h2 class="day-title">Guncheck og åpningsseremoni</h2></div>
+          <span class="badge yellow">Forberedelse</span>
+        </div>
+        <div class="day-body">
+          <div class="timeline">
+            <div class="item"><div class="time">Morgen</div><div class="activity">Rolig frokost hjemme</div></div>
+            <div class="item"><div class="time">Formiddag</div><div class="activity">Avreise til bane</div></div>
+            <div class="item"><div class="time">Formiddag</div><div class="activity">Guncheck – pistol, magasiner, utstyr godkjent</div></div>
+            <div class="item"><div class="time">Ettermiddag</div><div class="activity">Åpningsseremoni</div></div>
+            <div class="item stage"><div class="time">Ettermiddag</div><div class="activity">Gjennomgang av mandagens stager <span class="muted">(Stage 5, 6, 4, 2, 3, 1)</span></div></div>
+            <div class="item"><div class="time">Kveld</div><div class="activity">Middag ute + evt. dagligvare</div></div>
+            <div class="item"><div class="time">Kveld</div><div class="activity">Hjem – våpenpuss og klargjøring</div></div>
+            <div class="item rest"><div class="time">21:30</div><div class="activity">Legg deg – 07:20-start i morgen!</div></div>
+          </div>
+          <div class="note"><strong>NB</strong>Tidligste skytestart hele uka. Sett vekkerklokka tidlig.</div>
+        </div>
+      </section>
+
+      <section class="day" id="mandag">
+        <div class="day-head">
+          <div><p class="day-date">Mandag 8. juni</p><h2 class="day-title">Skyting 07:20–09:50</h2></div>
+          <span class="badge">Stage 05–01</span>
+        </div>
+        <div class="day-body">
+          <div class="timeline">
+            <div class="item"><div class="time">05:30</div><div class="activity">Opp – frokost</div></div>
+            <div class="item"><div class="time">06:15</div><div class="activity">Avreise til bane <span class="muted">(30 min kjøring)</span></div></div>
+            <div class="item"><div class="time">06:45</div><div class="activity">Oppmøte bane – klargjøring, stage brief</div></div>
+            <div class="item stage"><div class="time">07:20</div><div class="activity">Stage 05</div></div>
+            <div class="item stage"><div class="time">07:45</div><div class="activity">Stage 06</div></div>
+            <div class="item stage"><div class="time">08:10</div><div class="activity">Stage 04</div></div>
+            <div class="item stage"><div class="time">08:35</div><div class="activity">Stage 02</div></div>
+            <div class="item stage"><div class="time">09:00</div><div class="activity">Stage 03</div></div>
+            <div class="item stage"><div class="time">09:25</div><div class="activity">Stage 01</div></div>
+            <div class="item success"><div class="time">09:50</div><div class="activity">Ferdig for dagen</div></div>
+            <div class="item stage"><div class="time">10:30</div><div class="activity">Gjennomgang tirsdagens stager <span class="muted">(Stage 11, 12, 7, 8, 9, 10)</span></div></div>
+            <div class="item"><div class="time">11:30</div><div class="activity">Middag ute + evt. dagligvare</div></div>
+            <div class="item"><div class="time">13:30</div><div class="activity">Hjem – våpenpuss og klargjøring for neste dag</div></div>
+            <div class="item"><div class="time">14:30</div><div class="activity">Debriefing – evaluering av dagen, poeng og ranking</div></div>
+            <div class="item rest"><div class="time">15:30–22:00</div><div class="activity">Fritid – hvile, sosialt, eller hva man vil</div></div>
+            <div class="item rest"><div class="time">22:00</div><div class="activity">Legg deg</div></div>
+          </div>
+          <div class="note"><strong>Væskeinntak</strong>Minst 4L i dag. Start med 0,5L til frokost, drikk jevnt gjennom dagen – ikke vent til du blir tørst.</div>
+        </div>
+      </section>
+
+      <section class="day" id="tirsdag">
+        <div class="day-head">
+          <div><p class="day-date">Tirsdag 9. juni</p><h2 class="day-title">Skyting 09:50–12:20</h2></div>
+          <span class="badge">Stage 11–10</span>
+        </div>
+        <div class="day-body">
+          <div class="timeline">
+            <div class="item"><div class="time">07:00</div><div class="activity">Opp – rolig morgen</div></div>
+            <div class="item"><div class="time">07:30</div><div class="activity">Frokost</div></div>
+            <div class="item"><div class="time">08:15</div><div class="activity">Lett gåtur</div></div>
+            <div class="item"><div class="time">08:35</div><div class="activity">Avreise til bane</div></div>
+            <div class="item"><div class="time">09:05</div><div class="activity">Oppmøte bane – evt. litt ekstra tid til forberedelse</div></div>
+            <div class="item stage"><div class="time">09:50</div><div class="activity">Stage 11</div></div>
+            <div class="item stage"><div class="time">10:15</div><div class="activity">Stage 12</div></div>
+            <div class="item stage"><div class="time">10:40</div><div class="activity">Stage 07</div></div>
+            <div class="item stage"><div class="time">11:05</div><div class="activity">Stage 08</div></div>
+            <div class="item stage"><div class="time">11:30</div><div class="activity">Stage 09</div></div>
+            <div class="item stage"><div class="time">11:55</div><div class="activity">Stage 10</div></div>
+            <div class="item success"><div class="time">12:20</div><div class="activity">Ferdig for dagen</div></div>
+            <div class="item stage"><div class="time">13:00</div><div class="activity">Gjennomgang onsdagens stager <span class="muted">(Stage 17, 18, 13, 14, 15, 16)</span></div></div>
+            <div class="item"><div class="time">14:00</div><div class="activity">Middag ute + evt. dagligvare</div></div>
+            <div class="item"><div class="time">16:00</div><div class="activity">Hjem – våpenpuss og klargjøring</div></div>
+            <div class="item"><div class="time">17:00</div><div class="activity">Debriefing – evaluering, poeng og ranking</div></div>
+            <div class="item rest"><div class="time">18:00–22:00</div><div class="activity">Fritid – hvile, sosialt, eller hva man vil</div></div>
+            <div class="item rest"><div class="time">22:00</div><div class="activity">Legg deg</div></div>
+          </div>
+          <div class="note"><strong>Væskeinntak</strong>Minst 4L i dag. Drikk jevnt gjennom dagen.</div>
+        </div>
+      </section>
+
+      <section class="day" id="onsdag">
+        <div class="day-head">
+          <div><p class="day-date">Onsdag 10. juni</p><h2 class="day-title">Skyting 13:20–15:50</h2></div>
+          <span class="badge">Stage 17–16</span>
+        </div>
+        <div class="day-body">
+          <div class="timeline">
+            <div class="item"><div class="time">08:00</div><div class="activity">Opp – rolig morgen</div></div>
+            <div class="item"><div class="time">08:30</div><div class="activity">Frokost</div></div>
+            <div class="item"><div class="time">09:00</div><div class="activity">Lett gåtur</div></div>
+            <div class="item rest"><div class="time">10:00–12:30</div><div class="activity">Hvile / ro – evt. tidlig oppmøte på bane</div></div>
+            <div class="item"><div class="time">12:20</div><div class="activity">Avreise til bane</div></div>
+            <div class="item"><div class="time">12:50</div><div class="activity">Oppmøte bane</div></div>
+            <div class="item stage"><div class="time">13:20</div><div class="activity">Stage 17</div></div>
+            <div class="item stage"><div class="time">13:45</div><div class="activity">Stage 18</div></div>
+            <div class="item stage"><div class="time">14:10</div><div class="activity">Stage 13</div></div>
+            <div class="item stage"><div class="time">14:35</div><div class="activity">Stage 14</div></div>
+            <div class="item stage"><div class="time">15:00</div><div class="activity">Stage 15</div></div>
+            <div class="item stage"><div class="time">15:25</div><div class="activity">Stage 16</div></div>
+            <div class="item success"><div class="time">15:50</div><div class="activity">Ferdig for dagen</div></div>
+            <div class="item stage"><div class="time">16:30</div><div class="activity">Gjennomgang torsdagens stager <span class="muted">(Stage 23, 24, 19, 20, 21, 22)</span></div></div>
+            <div class="item"><div class="time">17:30</div><div class="activity">Middag ute + evt. dagligvare</div></div>
+            <div class="item"><div class="time">19:30</div><div class="activity">Hjem – våpenpuss og klargjøring</div></div>
+            <div class="item"><div class="time">20:30</div><div class="activity">Debriefing – evaluering, poeng og ranking</div></div>
+            <div class="item rest"><div class="time">21:00–22:00</div><div class="activity">Fritid</div></div>
+            <div class="item rest"><div class="time">22:00</div><div class="activity">Legg deg</div></div>
+          </div>
+          <div class="note"><strong>Væskeinntak</strong>Minst 4L i dag. Drikk jevnt gjennom dagen.</div>
+        </div>
+      </section>
+
+      <section class="day" id="torsdag">
+        <div class="day-head">
+          <div><p class="day-date">Torsdag 11. juni</p><h2 class="day-title">Skyting 15:50–18:20</h2></div>
+          <span class="badge green">Matchavslutning</span>
+        </div>
+        <div class="day-body">
+          <div class="timeline">
+            <div class="item"><div class="time">08:30</div><div class="activity">Opp – rolig morgen</div></div>
+            <div class="item"><div class="time">09:00</div><div class="activity">Frokost</div></div>
+            <div class="item"><div class="time">09:30</div><div class="activity">Lett gåtur</div></div>
+            <div class="item rest"><div class="time">10:00–14:00</div><div class="activity">Hvile / ro – evt. tidlig oppmøte på bane</div></div>
+            <div class="item"><div class="time">14:50</div><div class="activity">Avreise til bane</div></div>
+            <div class="item"><div class="time">15:20</div><div class="activity">Oppmøte bane</div></div>
+            <div class="item stage"><div class="time">15:50</div><div class="activity">Stage 23</div></div>
+            <div class="item stage"><div class="time">16:15</div><div class="activity">Stage 24</div></div>
+            <div class="item stage"><div class="time">16:40</div><div class="activity">Stage 19</div></div>
+            <div class="item stage"><div class="time">17:05</div><div class="activity">Stage 20</div></div>
+            <div class="item stage"><div class="time">17:30</div><div class="activity">Stage 21</div></div>
+            <div class="item stage"><div class="time">17:55</div><div class="activity">Stage 22</div></div>
+            <div class="item success"><div class="time">18:20</div><div class="activity">FERDIG MED MATCHEN!</div></div>
+            <div class="item success"><div class="time">19:30</div><div class="activity">Feiring – middag ute med laget</div></div>
+          </div>
+          <div class="note"><strong>Væskeinntak</strong>Minst 4L i dag. Drikk jevnt – varmt og lang dag!</div>
+        </div>
+      </section>
+
+      <section class="day" id="fredag">
+        <div class="day-head">
+          <div><p class="day-date">Fredag 12. juni</p><h2 class="day-title">Fridag</h2></div>
+          <span class="badge green">Ingen plan</span>
+        </div>
+        <div class="day-body">
+          <div class="timeline">
+            <div class="item rest"><div class="time">Hele dagen</div><div class="activity">Fri – ingen plan</div></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="footer">Team Classic Norway · Classic Norge · Squad 05 · EHC 2026 · LZ Range, Buzsak, Ungarn</div>
+  </div>
+  <a class="top-button" href="#top" aria-label="Til toppen">↑</a>
+</body>
+</html>

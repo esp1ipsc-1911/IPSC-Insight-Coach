@@ -78,6 +78,52 @@ h1,h2,h3,h4{font-family:var(--font-main);text-transform:uppercase;letter-spacing
 .source{font-family:var(--font-main);font-size:10px;color:var(--muted);margin-top:18px;letter-spacing:.06em}
 .hidden{display:none!important}
 
+
+/* ── RO PREP STAGE BUTTONS ───────────────────────────────────── */
+.stage-jump{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:0 0 18px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-left:3px solid rgba(245,200,0,.38);
+  border-radius:var(--radius);
+  background:rgba(13,14,16,.76);
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+}
+
+.stage-jump button{
+  min-height:38px;
+  border:1px solid var(--line);
+  border-radius:var(--radius-sm);
+  background:var(--panel);
+  color:var(--muted);
+  padding:8px 12px;
+  font-family:var(--font-main);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background .15s ease,border-color .15s ease,color .15s ease,transform .15s ease;
+}
+
+.stage-jump button:hover,
+.stage-jump button:focus-visible{
+  color:var(--yellow);
+  border-color:rgba(245,200,0,.46);
+  background:rgba(245,200,0,.07);
+  outline:none;
+}
+
+.stage-jump button.active{
+  color:var(--bg);
+  background:var(--yellow);
+  border-color:var(--yellow);
+}
+
+
 /* ── LIGHT STAGE MENU PANELS ───────────────────────────────────
    Used for opened accordion menus inside stage / rule cards.
    Keeps the dashboard dark, but breaks up long RO Prep sections
@@ -193,6 +239,7 @@ h1,h2,h3,h4{font-family:var(--font-main);text-transform:uppercase;letter-spacing
     <section id="rules" class="section"><div id="ruleCards" class="cards"></div></section>
     <section id="roprep" class="section">
       <div class="notice"><b>RO discussion preparation:</b> Use this section before each stage to identify what Range Officers may judge, which rule areas may be discussed, and what to ask or say calmly if there is a rule question. This is not an official ruling; the posted Written Stage Briefing and the Range Master control at the match.</div>
+      <div id="stageJump" class="stage-jump" aria-label="Jump to stage"></div>
       <div id="roPrepCards" class="cards"></div>
     </section>
 
@@ -751,16 +798,33 @@ function badge(f){let c='tag'; if(/weak|strong|moving|hard|fault|metal|no-shoot|
 function renderStages(q=''){
  const el=document.getElementById('stageCards'); el.innerHTML='';
  stages.filter(s=>(JSON.stringify(s).toLowerCase().includes(q))).forEach(s=>{
-  const div=document.createElement('div'); div.className='card searchable'; div.innerHTML=`<div class="stageNo"><div class="datebox"><div>${s.n}<small>STAGE</small></div></div><div><h3>Stage ${s.n}</h3><div class="meta"><span class="tag green">${s.r} min rounds</span>${s.flags.slice(0,4).map(badge).join('')}</div></div></div><div class="row"><div class="k">Targets</div><div>${s.t}</div></div><div class="row"><div class="k">Ready condition</div><div>${s.ready}</div></div><div class="row"><div class="k">Start position</div><div>${s.start}</div></div><div class="row"><div class="k">Procedure</div><div>${s.proc}</div></div><div class="accordion"><div class="acc-title">Relevant rule checks <span>⌄</span></div><div class="acc-body"><ul class="list">${getStageRules(s).map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`; el.appendChild(div);
+  const div=document.createElement('div'); div.className='card searchable'; div.id=`ro-stage-${p.n}`; div.innerHTML=`<div class="stageNo"><div class="datebox"><div>${s.n}<small>STAGE</small></div></div><div><h3>Stage ${s.n}</h3><div class="meta"><span class="tag green">${s.r} min rounds</span>${s.flags.slice(0,4).map(badge).join('')}</div></div></div><div class="row"><div class="k">Targets</div><div>${s.t}</div></div><div class="row"><div class="k">Ready condition</div><div>${s.ready}</div></div><div class="row"><div class="k">Start position</div><div>${s.start}</div></div><div class="row"><div class="k">Procedure</div><div>${s.proc}</div></div><div class="accordion"><div class="acc-title">Relevant rule checks <span>⌄</span></div><div class="acc-body"><ul class="list">${getStageRules(s).map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`; el.appendChild(div);
  }); attachAcc();
 }
 function getStageRules(s){const a=['WSB controls: Rules 3.2.1-3.2.2','Safety angles: Rule 2.1.2 / 10.5.2','Fault lines if used: Rules 2.2.1 and 10.2.1']; const f=s.flags.join(' '); if(/weak|strong/.test(f)) a.push('Single-hand shooting: Rules 1.1.5.3, 1.1.5.4 and 10.2.8, including support-hand magazine handling risk'); if(/moving|flip|disappear/.test(f)) a.push('Activated or moving targets: Rules 4.1.6, 4.7 and 9.9'); if(/disappear/.test(f)) a.push('Disappearing target scoring: Rule 9.9'); if(/metal|popper|plate/.test(f)) a.push('Metal targets and distance: Rules 2.1.3, 4.3 and Appendix C'); if(/no-shoot/.test(f)) a.push('No-shoot identification and penalties: Rules 4.1.3, 4.3.4 and Chapter 9'); if(/hard|barrier/.test(f)) a.push('Hard cover / barriers review: Rules 4.1.4, 4.2.3, 4.2.4 and 2.2.3'); if(/cooper/.test(f)) a.push('Cooper Tunnel: Rules 2.2.5 and 10.2.5'); if(/prop|door|tray|barrel|box|boat|horn/.test(f)) a.push('Stage props and equipment failure: Rules 2.2.6, 4.6 and 4.7'); if(/minimum/.test(f)||s.n===1) a.push('Minimum shot/hit procedure: Rules 10.2.2 and 10.2.7'); return a;}
+
+
+function renderStageJump(){
+ const el=document.getElementById('stageJump'); if(!el) return; el.innerHTML='';
+ roPrep.forEach(p=>{
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.textContent=`Stage ${p.n}`;
+  btn.dataset.stage=String(p.n);
+  btn.addEventListener('click',()=>{
+   document.querySelectorAll('.stage-jump button').forEach(b=>b.classList.toggle('active',b===btn));
+   const card=document.getElementById(`ro-stage-${p.n}`);
+   if(card){ card.scrollIntoView({behavior:'smooth',block:'start'}); }
+  });
+  el.appendChild(btn);
+ });
+}
 
 function renderRoPrep(q=''){
  const el=document.getElementById('roPrepCards'); if(!el) return; el.innerHTML='';
  roPrep.filter(p=>(JSON.stringify(p).toLowerCase().includes(q))).forEach(p=>{
   const div=document.createElement('div'); div.className='card searchable';
-  div.innerHTML=`<div class="stageNo"><div class="datebox"><div>${p.n}<small>STAGE</small></div></div><div><h3>Stage ${p.n} — RO Prep</h3><div class="meta"><span class="tag blue">Rules ${p.rules}</span></div></div></div><div class="row"><div class="k">Shooter focus</div><div>${p.focus}</div></div><div class="accordion"><div class="acc-title">What the RO may judge <span>⌄</span></div><div class="acc-body open"><ul class="list">${p.ro.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div class="accordion"><div class="acc-title">Calm rule discussion points <span>⌄</span></div><div class="acc-body"><ul class="list">${p.say.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div class="accordion"><div class="acc-title">Walkthrough questions <span>⌄</span></div><div class="acc-body"><ul class="list">${p.check.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`;
+  div.innerHTML=`<div class="stageNo"><div class="datebox"><div>${p.n}<small>STAGE</small></div></div><div><h3>Stage ${p.n} — RO Prep</h3><div class="meta"><span class="tag blue">Rules ${p.rules}</span></div></div></div><div class="row"><div class="k">Shooter focus</div><div>${p.focus}</div></div><div class="accordion"><div class="acc-title">What the RO may judge <span>⌄</span></div><div class="acc-body"><ul class="list">${p.ro.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div class="accordion"><div class="acc-title">Calm rule discussion points <span>⌄</span></div><div class="acc-body"><ul class="list">${p.say.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div class="accordion"><div class="acc-title">Walkthrough questions <span>⌄</span></div><div class="acc-body"><ul class="list">${p.check.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`;
   el.appendChild(div);
  }); attachAcc();
 }
@@ -770,10 +834,10 @@ function renderRules(q=''){
  ruleCards.filter(r=>(JSON.stringify(r).toLowerCase().includes(q))).forEach(r=>{const div=document.createElement('div'); div.className='card searchable'; div.innerHTML=`<h3>${r.title}</h3><div class="meta"><span class="tag blue">Rules ${r.rules}</span></div><div class="row"><div class="k">Applies to</div><div>${r.applies}</div></div><div class="row"><div class="k">Why it matters</div><div>${r.why}</div></div><div class="impact"><b>Risk / action:</b> ${r.risk}</div>`; el.appendChild(div);});
 }
 function attachAcc(){document.querySelectorAll('.acc-title').forEach(x=>x.onclick=()=>x.nextElementSibling.classList.toggle('open'))}
-function setSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.tab,.navitem').forEach(t=>t.classList.toggle('active',t.dataset.section===id));document.getElementById('search').value='';renderStages();renderRules();renderRoPrep();window.scrollTo({top:0,behavior:'smooth'});}
+function setSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.tab,.navitem').forEach(t=>t.classList.toggle('active',t.dataset.section===id));document.getElementById('search').value='';renderStages();renderRules();renderRoPrep();renderStageJump();renderStageJump();window.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-section]').forEach(b=>b.addEventListener('click',()=>setSection(b.dataset.section)));
 document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase();renderStages(q);renderRules(q);renderRoPrep(q);document.querySelectorAll('#home .card,#checklist .card').forEach(c=>c.classList.toggle('hidden',!c.innerText.toLowerCase().includes(q)&&q));});
-renderStages();renderRules();renderRoPrep();
+renderStages();renderRules();renderRoPrep();renderStageJump();
 </script>
 </body>
 </html>

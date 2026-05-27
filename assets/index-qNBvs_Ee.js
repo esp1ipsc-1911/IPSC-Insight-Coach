@@ -2048,6 +2048,11 @@ match.teams=match.teams||[];if(currentEditTeamIdx!==null){match.teams[currentEdi
   Me=Number(stageNum);
   // Open modal first (icInitManualResult runs inside ie())
   ie("modal-add");
+  // Override name and title with the correct shooter (icInitManualResult sets logged-in user)
+  const _editNameEl=document.getElementById("modal-add-shooter-name");
+  if(_editNameEl){_editNameEl.textContent=((shooter.firstName||"")+" "+(shooter.lastName||"")).trim();_editNameEl.style.color="#e0b649";}
+  const _editTitleEl=document.getElementById("modal-add-title");
+  if(_editTitleEl){_editTitleEl.textContent="Edit Result · Stage "+stageNum;}
   // Set hit values AFTER modal opens (overrides icInitManualResult)
   const stageEl=document.getElementById("new-result-stage");
   if(stageEl){stageEl.value=stageNum;}

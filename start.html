@@ -8,7 +8,7 @@
   <meta name="description" content="Insight Dynamics Shooting hybrid operator start portal for dynamic shooting tools, team resources and support." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* ── DESIGN TOKENS ─────────────────────────────────────────── */
     :root {
@@ -32,8 +32,6 @@
       --radius:    6px;
       --radius-lg: 10px;
       --max:       1120px;
-      --font-ui:   'Outfit', sans-serif;
-      --font-tech: 'Share Tech Mono', monospace;
 
       /* Stripe pattern reused throughout */
       --stripe: repeating-linear-gradient(
@@ -55,7 +53,7 @@
       margin: 0;
       min-height: 100vh;
       color: var(--text);
-      font-family: var(--font-ui);
+      font-family: 'Outfit', sans-serif;
       font-size: 15px;
       line-height: 1.5;
       overflow-x: hidden;
@@ -95,29 +93,6 @@
     }
 
     a { color: inherit; text-decoration: none; }
-
-
-    /* Consistent type system */
-    .kicker,
-    .sysline,
-    .meta-chip,
-    .section-count,
-    .status,
-    .tag {
-      font-family: var(--font-tech);
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      text-transform: uppercase;
-      line-height: 1;
-      text-rendering: geometricPrecision;
-    }
-
-    .hero h1,
-    .section-title h2,
-    .module h3 {
-      font-family: var(--font-ui);
-      text-rendering: geometricPrecision;
-    }
 
     .shell {
       position: relative;
@@ -182,7 +157,7 @@
       border: 1px solid rgba(245,200,0,.35);
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
       padding: 8px 20px 8px 14px;
-      font-family: var(--font-tech);
+      font-family: 'Outfit', sans-serif;
       font-size: 10px;
       letter-spacing: .20em;
       text-transform: uppercase;
@@ -208,7 +183,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-family: var(--font-tech);
+      font-family: 'Outfit', sans-serif;
       font-size: 10px;
       letter-spacing: .18em;
       text-transform: uppercase;
@@ -234,7 +209,7 @@
 
     .hero h1 {
       margin: 0 0 12px;
-      font-family: var(--font-ui);
+      font-family: 'Outfit', sans-serif;
       font-size: clamp(42px, 7vw, 72px);
       font-weight: 800;
       line-height: .94;
@@ -276,7 +251,7 @@
       background: rgba(0,0,0,.22);
       clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
       padding: 7px 14px;
-      font-family: var(--font-tech);
+      font-family: 'Outfit', sans-serif;
       font-size: 9px;
       letter-spacing: .14em;
       text-transform: uppercase;
@@ -324,7 +299,7 @@
 
     .section-title h2 {
       margin: 0;
-      font-family: var(--font-ui);
+      font-family: 'Outfit', sans-serif;
       font-size: clamp(20px, 3vw, 28px);
       font-weight: 700;
       letter-spacing: .01em;
@@ -345,7 +320,7 @@
       display: flex;
       align-items: center;
       gap: 7px;
-      font-family: var(--font-tech);
+      font-family: 'Outfit', sans-serif;
       font-size: 10px;
       letter-spacing: .18em;
       text-transform: uppercase;
@@ -449,7 +424,7 @@
     .module h3 {
       margin: 0;
       min-width: 0;
-      font-family: var(--font-ui);
+      font-family: 'Outfit', sans-serif;
       font-size: clamp(16px, 1.8vw, 20px);
       font-weight: 700;
       letter-spacing: .01em;
@@ -512,7 +487,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-family: var(--font-tech);
+      font-family: 'Outfit', sans-serif;
       font-size: 9px;
       font-weight: 700;
       letter-spacing: .16em;
@@ -529,7 +504,7 @@
     }
 
     .tag {
-      font-family: var(--font-tech);
+      font-family: 'Outfit', sans-serif;
       font-size: 9px;
       letter-spacing: .13em;
       text-transform: uppercase;
@@ -554,12 +529,12 @@
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
-      font-family: var(--font-tech);
+      font-family: 'Outfit', sans-serif;
       font-size: 10px;
       letter-spacing: .08em;
     }
 
-    .footer strong { color: var(--text); font-weight: 700; letter-spacing: .12em; }
+    .footer strong { color: var(--text); font-weight: 700; }
 
     /* ── STAGGERED LOAD ANIMATION ──────────────────────────────── */
     .hero           { animation: fadeUp .4s ease both; }
@@ -707,11 +682,11 @@
       <div class="section-head">
         <div class="section-title">
           <h2 id="support-title">Support</h2>
-          <p>Support resources and contact access.</p>
+          <p>Administrative system access and control.</p>
         </div>
-        <div class="section-count">Support</div>
+        <div class="section-count">00 Modules</div>
       </div>
-      <!-- Admin module removed. Support section intentionally retained. -->
+      <div class="grid support" aria-label="Support modules"></div>
     </section>
 
     <footer class="footer">

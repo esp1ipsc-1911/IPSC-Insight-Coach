@@ -4,48 +4,54 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IPSC Insight – Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     :root{
-      --bg:#0a0c10;--bg2:#111318;--bg3:#181c24;--card:#1a1e28;
-      --border:rgba(255,255,255,0.08);--accent:#e8b84b;--accent2:#f0d080;
-      --red:#e05252;--green:#4caf7d;--blue:#4a9eff;--orange:#f07030;
-      --text:#f0f2f5;--muted:#8a93a1;--sub:#9ca3af;
-      --radius:14px;--radius-sm:10px;--shadow:0 14px 40px rgba(0,0,0,.3);
+      --bg:#0d0e10;--bg2:#111314;--bg3:#161819;--card:#181a1c;
+      --border:rgba(255,255,255,0.08);--accent:#f5c800;--accent2:#ffe566;
+      --red:#e05252;--green:#6aad3e;--blue:#3380ff;--orange:#f07030;
+      --text:#eef0ec;--muted:#7a8070;--sub:#9ca3af;
+      --radius:8px;--radius-sm:6px;--shadow:0 14px 40px rgba(0,0,0,.35);
+      --stripe:repeating-linear-gradient(-55deg,#f5c800 0px,#f5c800 7px,transparent 7px,transparent 14px);
     }
-    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh;}
+    body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;background:radial-gradient(ellipse 900px 400px at 80% -10%,rgba(245,200,0,.06),transparent),radial-gradient(ellipse 600px 500px at -5% 40%,rgba(74,92,42,.08),transparent),linear-gradient(180deg,#0f1210 0%,#0d0e10 40%,#080909 100%);}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 4px)}
+    h1,h2,h3,h4{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em}
 
     /* ── TOPBAR ── */
     .topbar{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;gap:12px;}
-    .topbar-brand{font-size:16px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+    .topbar-brand{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
     .topbar-brand span{color:var(--accent);}
     .topbar-match{flex:1;min-width:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .topbar-match strong{color:var(--text);}
     .topbar-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
     .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.8s ease infinite;}
     @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-    .btn{border:none;border-radius:var(--radius-sm);min-height:32px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:filter .12s,transform .12s;}
+    .btn{border:none;border-radius:var(--radius-sm);min-height:32px;padding:6px 12px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:filter .12s,transform .12s;}
     .btn:hover{filter:brightness(1.07);}
     .btn:active{transform:translateY(1px);}
-    .btn-primary{background:var(--accent);color:var(--bg);}
+    .btn-primary{background:var(--accent);color:#0a0c0e;font-family:'Oswald',sans-serif;}
     .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
     .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
     .btn-danger{background:var(--red);color:#fff;}
     .btn-sm{min-height:28px;padding:4px 10px;font-size:11px;}
-    .tog-btn{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
-    .tog-btn.on{border-color:rgba(74,158,255,.4);background:rgba(74,158,255,.12);color:var(--blue);}
+    .tog-btn{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.10em;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap;}
+    .tog-btn.on{border-color:rgba(245,200,0,.35);background:rgba(245,200,0,.10);color:var(--accent);}
     .tog-btn .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
 
     /* ── LOGIN ── */
     #loginSection{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-    .login-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;}
-    .login-logo{text-align:center;font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+    .login-card{width:100%;max-width:400px;background:linear-gradient(160deg,#1c1e20,#181a1c);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);box-shadow:var(--shadow),0 0 80px rgba(245,200,0,.04);padding:32px 28px 28px;position:relative;overflow:hidden;}.login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--stripe);opacity:.85}.login-card::after{content:"";position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 32px 32px 0;border-color:transparent var(--bg) transparent transparent;z-index:2}
+    .login-logo{display:block;width:180px;margin:0 auto 20px;opacity:.95;}
     .login-logo span{color:var(--accent);}
-    .login-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:24px;}
+    .login-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);text-align:center;margin:0 0 6px;}.login-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(245,200,0,.35),transparent);margin:0 0 18px}.login-sysline{display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}.login-sysline::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(106,173,62,.8);animation:blink 3s ease-in-out infinite;flex-shrink:0}@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
     .form-group{margin-bottom:16px;}
-    .form-label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:700;}
+    .form-label{display:block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;}
     .form-input,.form-select{width:100%;min-height:42px;padding:10px 13px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;}
-    .form-input:focus,.form-select:focus{outline:none;border-color:rgba(232,184,75,.55);box-shadow:0 0 0 3px rgba(232,184,75,.08);}
+    .form-input:focus,.form-select:focus{outline:none;border-color:rgba(245,200,0,.55);box-shadow:0 0 0 3px rgba(245,200,0,.08);}
     .error-box{background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.25);color:var(--red);padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;}
     .success-box{background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.25);color:var(--green);padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;}
 
@@ -240,18 +246,20 @@
 <!-- ══ LOGIN ══ -->
 <div id="loginSection">
   <div class="login-card">
-    <div class="login-logo">IPSC <span>INSIGHT</span></div>
-    <div class="login-sub">Coach Dashboard — Logg inn</div>
+    <img src="./Logo_IPSC-insight.png" alt="IPSC Insight" class="login-logo">
+    <div class="login-divider"></div>
+    <div class="login-sub">Coach Dashboard · Secure Access</div>
+    <div class="login-sysline">All systems operational</div>
     <div id="loginError" class="error-box" style="display:none;"></div>
     <div class="form-group">
-      <label class="form-label">E-post</label>
-      <input id="loginEmail" class="form-input" type="email" placeholder="coach@ipsc.no" />
+      <label class="form-label">Email</label>
+      <input id="loginEmail" class="form-input" type="email" placeholder="coach@ipsc.no" autocomplete="username" name="username" />
     </div>
     <div class="form-group">
-      <label class="form-label">Passord</label>
-      <input id="loginPassword" class="form-input" type="password" placeholder="Passord" />
+      <label class="form-label">Password</label>
+      <input id="loginPassword" class="form-input" type="password" placeholder="Password" autocomplete="current-password" name="password" />
     </div>
-    <button id="loginBtn" class="btn btn-primary" style="width:100%;min-height:42px;font-size:14px;">Logg inn</button>
+    <button id="loginBtn" class="btn btn-primary" style="width:100%;min-height:44px;font-size:15px;letter-spacing:.08em;">Sign In</button>
   </div>
 </div>
 

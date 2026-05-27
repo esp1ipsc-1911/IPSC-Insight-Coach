@@ -6,7 +6,7 @@
   <title>IPSC Insight – Coach</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     :root{
@@ -17,23 +17,23 @@
       --radius:8px;--radius-sm:6px;--shadow:0 14px 40px rgba(0,0,0,.35);
       --stripe:repeating-linear-gradient(-55deg,#f5c800 0px,#f5c800 7px,transparent 7px,transparent 14px);
     }
-    body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;background:radial-gradient(ellipse 900px 400px at 80% -10%,rgba(245,200,0,.06),transparent),radial-gradient(ellipse 600px 500px at -5% 40%,rgba(74,92,42,.08),transparent),linear-gradient(180deg,#0f1210 0%,#0d0e10 40%,#080909 100%);}
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;background:radial-gradient(ellipse 900px 400px at 80% -10%,rgba(245,200,0,.06),transparent),radial-gradient(ellipse 600px 500px at -5% 40%,rgba(74,92,42,.08),transparent),linear-gradient(180deg,#0f1210 0%,#0d0e10 40%,#080909 100%);}
     body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 4px)}
-    h1,h2,h3,h4{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em}
+    h1,h2,h3,h4{font-family:'Outfit',sans-serif;text-transform:uppercase;letter-spacing:.03em}
 
     /* ── TOPBAR ── */
     .topbar{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;gap:16px;}
-    .topbar-brand{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+    .topbar-brand{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
     .topbar-brand span{color:var(--accent);}
     .topbar-match{flex:1;min-width:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .topbar-match strong{color:var(--text);}
     .topbar-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
     .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.8s ease infinite;}
     @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-    .btn{border:none;border-radius:var(--radius-sm);min-height:32px;padding:6px 12px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:filter .12s,transform .12s;}
+    .btn{border:none;border-radius:var(--radius-sm);min-height:32px;padding:6px 12px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:filter .12s,transform .12s;}
     .btn:hover{filter:brightness(1.07);}
     .btn:active{transform:translateY(1px);}
-    .btn-primary{background:var(--accent);color:#0a0c0e;font-family:'Oswald',sans-serif;}
+    .btn-primary{background:var(--accent);color:#0a0c0e;font-family:'Outfit',sans-serif;}
     .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
     .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
     .btn-danger{background:var(--red);color:#fff;}

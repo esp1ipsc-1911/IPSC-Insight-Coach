@@ -26,8 +26,8 @@
     .app-shell{min-height:100vh;padding:16px 16px 36px;max-width:1040px;margin:0 auto;position:relative;z-index:1}
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
     .top-left{display:flex;align-items:center;gap:12px;min-width:0}
-    .mini-brand{width:46px;height:46px;display:grid;place-items:center;background:rgba(245,200,0,.10);border:1px solid rgba(245,200,0,.35);clip-path:polygon(15% 0%,85% 0%,100% 50%,85% 100%,15% 100%,0% 50%);font-family:'Oswald',sans-serif;font-weight:700;font-size:17px;letter-spacing:.05em;box-shadow:0 8px 24px rgba(0,0,0,.28)}
-    .mini-brand span:first-child{color:#fff}.mini-brand span:last-child{color:var(--gold)}
+    .topbar-logo{height:32px;width:auto;display:block;opacity:.92}
+    .mini-brand{display:none}
     .titleblock h1{font-size:20px;line-height:1;margin:0;letter-spacing:.04em;font-family:'Oswald',sans-serif;text-transform:uppercase}.titleblock p{margin:4px 0 0;color:var(--muted);font-size:12px;font-family:'Share Tech Mono',monospace;letter-spacing:.06em}
     .pill{border:1px solid var(--stroke);clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);padding:8px 14px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:rgba(0,0,0,.2);white-space:nowrap}
     .intro{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--stroke);border-left:3px solid var(--gold);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:18px;text-align:center;overflow:hidden;position:relative}
@@ -50,7 +50,7 @@
   <div class="app-shell">
     <header class="topbar">
       <div class="top-left">
-        <div class="mini-brand"><span>C</span><span>N</span></div>
+        <img src="./Logo_IPSC-insight.png" alt="IPSC Insight" class="topbar-logo">
         <div class="titleblock"><h1>Classic Team Norway</h1><p>EM 2026 · positiv mental stage-kortstokk</p></div>
       </div>
       <div class="pill">Squad 05 · Classic</div>

@@ -3,169 +3,591 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#05070a" />
+  <meta name="theme-color" content="#0d0e10" />
   <title>Insight Dynamics Shooting · Start</title>
-  <!-- Version: Hybrid Operator Army Green / No Blue · esp1 design 2026 -->
   <meta name="description" content="Insight Dynamics Shooting hybrid operator start portal for dynamic shooting tools, team resources and support." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#050805;
-      --bg2:#080b07;
-      --panel:#0f1510;
-      --panel2:#151d15;
-      --card:#152015;
-      --card2:#1d2b1d;
-      --card3:#263925;
-      --army-dark:#10180f;
-      --army-panel:#182318;
-      --army-card:#22301f;
-      --army-soft:#2f4429;
-      --army-mid:#4f6f3a;
-      --army-light:#7e9f58;
-      --army-neon:#a3c76d;
-      --line:rgba(255,255,255,.105);
-      --line2:rgba(126,159,88,.30);
-      --yellow:#f2c400;
-      --yellow2:#f6d44e;
-      --olive:#b6d47a;
-      --olive2:#7e9f58;
-      --green:#a3c76d;
-      --red:#ff645e;
-      --text:#f4f7fb;
-      --muted:#a6afbd;
-      --dim:#737d8c;
-      --shadow:0 20px 55px rgba(0,0,0,.42);
-      --radius:18px;
-      --max:1120px;
-    }
-    *{box-sizing:border-box}
-    html{background:var(--bg);scroll-behavior:smooth}
-    body{
-      margin:0;
-      min-height:100vh;
-      color:var(--text);
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-      background:
-        radial-gradient(circle at 12% -8%,rgba(126,159,88,.14),transparent 26rem),
-        radial-gradient(circle at 88% 6%,rgba(126,159,88,.20),transparent 26rem),
-        radial-gradient(circle at 96% 4%,rgba(242,196,0,.10),transparent 24rem),
-        linear-gradient(180deg,#07110e 0%,#050805 54%,#030403 100%);
-      overflow-x:hidden;
-    }
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:.22;
-      background:
-        repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 5px),
-        linear-gradient(rgba(126,159,88,.04) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(126,159,88,.030) 1px,transparent 1px);
-      background-size:auto,54px 54px,54px 54px;
-      mask-image:linear-gradient(180deg,black 0%,rgba(0,0,0,.72) 42%,transparent 100%);
-    }
-    a{color:inherit;text-decoration:none}
-    .shell{position:relative;z-index:1;width:min(100%,var(--max));margin:0 auto;padding:14px 14px 40px}
+    /* ── DESIGN TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:        #0d0e10;
+      --bg2:       #111314;
+      --panel:     #161819;
+      --panel2:    #1c1e20;
+      --card:      #181a1c;
+      --card2:     #1e2124;
+      --border:    rgba(255,255,255,.08);
+      --border2:   rgba(245,200,0,.28);
+      --yellow:    #f5c800;
+      --yellow2:   #ffe566;
+      --green:     #6aad3e;
+      --green2:    #4a7a2a;
+      --red:       #e05252;
+      --text:      #eef0ec;
+      --muted:     #7a8070;
+      --dim:       #4a4e48;
+      --shadow:    0 20px 60px rgba(0,0,0,.55);
+      --radius:    6px;
+      --radius-lg: 10px;
+      --max:       1120px;
 
-    .hero{
-      position:relative;
-      overflow:hidden;
-      margin:6px 0 18px;
-      border-radius:28px;
-      border:1px solid rgba(126,159,88,.42);
-      background:
-        radial-gradient(circle at 90% 8%,rgba(242,196,0,.12),transparent 18rem),
-        radial-gradient(circle at 78% 82%,rgba(126,159,88,.28),transparent 24rem),
-        radial-gradient(circle at 96% 86%,rgba(126,159,88,.14),transparent 22rem),
-        linear-gradient(135deg,rgba(24,35,24,.96),rgba(7,12,10,.99) 62%,rgba(31,48,35,.93));
-      box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.06);
-      padding:30px 34px 32px;
+      /* Stripe pattern reused throughout */
+      --stripe: repeating-linear-gradient(
+        -55deg,
+        var(--yellow) 0px, var(--yellow) 7px,
+        transparent 7px, transparent 14px
+      );
     }
-    .hero::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        linear-gradient(110deg,rgba(255,255,255,.06),transparent 24%,transparent 72%,rgba(255,255,255,.035)),
-        repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 46px);
-    }
-    .hero::after{
-      content:"";
-      position:absolute;
-      left:0;right:0;top:0;height:5px;
-      background:linear-gradient(90deg,var(--yellow) 0 16%,transparent 16% 19%,rgba(163,199,109,.78) 19% 27%,transparent 27% 100%);
-      opacity:.95;
-    }
-    .hero-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:26px}
-    .kicker{
-      display:inline-flex;align-items:center;gap:10px;
-      border:1px solid rgba(242,196,0,.50);
-      border-radius:999px;
-      min-height:38px;
-      padding:9px 18px;
-      color:#ffe36c;
-      background:rgba(255,255,255,.035);
-      font-size:12px;
-      font-weight:950;
-      letter-spacing:.22em;
-      text-transform:uppercase;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
-    }
-    .kicker::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--yellow);box-shadow:0 0 18px rgba(242,196,0,.65)}
-    .sysline{display:flex;align-items:center;gap:9px;color:#d8deea;font-size:11px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
-    .sysline::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 14px rgba(132,185,76,.7)}
-    .hero-content{position:relative;z-index:1;max-width:780px}
-    .hero h1{margin:0 0 14px;font-size:clamp(42px,7vw,74px);line-height:.94;letter-spacing:-.07em;text-wrap:balance}
-    .hero h1 span{color:var(--yellow2);text-shadow:0 0 18px rgba(242,196,0,.18)}
-    .hero p{margin:0;max-width:720px;color:#bcc5d2;font-size:clamp(18px,3vw,27px);line-height:1.28;letter-spacing:-.02em}
-    .hero-meta{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;padding-top:14px;border-top:1px solid rgba(255,255,255,.09)}
-    .meta-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.16);border-radius:999px;padding:8px 10px;color:#c1cbd9;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
-    .meta-chip b{color:var(--yellow2);font-weight:950}.meta-chip i{width:5px;height:5px;border-radius:50%;background:var(--yellow);display:inline-block}
 
-    .section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:22px 0 10px;padding-bottom:9px;border-bottom:1px solid rgba(255,255,255,.09)}
-    .section-title{display:flex;flex-direction:column;gap:4px;min-width:0}.section-title h2{margin:0;font-size:clamp(22px,3.2vw,34px);letter-spacing:-.045em;line-height:1}.section-title p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}.section-count{display:flex;align-items:center;gap:8px;color:#d7ec9a;font-size:10px;font-weight:950;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}.section-count::before{content:"";width:7px;height:7px;background:var(--yellow);border-radius:50%}
+    /* ── RESET & BASE ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
 
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.grid.team{grid-template-columns:repeat(4,minmax(0,1fr))}.grid.support{grid-template-columns:minmax(0,360px)}
-    .module{
-      position:relative;overflow:hidden;isolation:isolate;
-      min-height:126px;
-      border-radius:var(--radius);
-      border:1px solid var(--line2);
-      background:
-        linear-gradient(135deg,rgba(36,54,35,.97),rgba(18,28,20,.99) 60%,rgba(9,14,11,.99)),
-        var(--card);
-      box-shadow:0 14px 36px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.045);
-      padding:13px 13px 12px;
-      display:flex;flex-direction:column;gap:9px;
-      transition:transform .15s ease,border-color .15s ease,filter .15s ease,background .15s ease;
+    html {
+      background: var(--bg);
+      scroll-behavior: smooth;
     }
-    .module::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--yellow) 0 16%,transparent 16% 20%,var(--army-neon) 20% 32%,transparent 32% 100%);opacity:.9}
-    .module::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.16;background:repeating-linear-gradient(135deg,rgba(255,255,255,.055) 0 1px,transparent 1px 9px);mask-image:linear-gradient(90deg,transparent,black 18%,transparent 92%)}
-    .module:hover{transform:translateY(-2px);border-color:rgba(126,159,88,.62);filter:brightness(1.06);background:linear-gradient(135deg,rgba(48,68,42,.98),rgba(22,36,25,.99) 62%,rgba(12,18,14,.99))}
-    .module:focus-visible{outline:3px solid rgba(242,196,0,.78);outline-offset:4px}
-    .module-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0}
-    .icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#a7b09f;background:rgba(126,159,88,.055);border:1px solid rgba(255,255,255,.10)}
-    .icon svg{width:20px;height:20px;display:block;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-    .module h3{margin:0;min-width:0;font-size:clamp(18px,2vw,22px);line-height:1.05;letter-spacing:-.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .open-mark{width:30px;height:30px;border-radius:999px;display:grid;place-items:center;color:#d7ec9a;background:rgba(126,159,88,.075);border:1px solid rgba(126,159,88,.22)}
-    .open-mark svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
-    .module p{margin:0;color:#c1cada;font-size:12.5px;line-height:1.34;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .module-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)}
-    .status{display:inline-flex;align-items:center;gap:7px;color:#c7f0aa;font-size:9px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}.status::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 12px rgba(132,185,76,.8)}
-    .tag{font-size:9px;font-weight:950;letter-spacing:.13em;text-transform:uppercase;color:#ffe16b;background:rgba(242,196,0,.10);border:1px solid rgba(242,196,0,.22);border-radius:999px;padding:5px 7px;white-space:nowrap}
 
-    .footer{margin:24px 0 0;padding:13px 15px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:rgba(255,255,255,.032);color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px}.footer strong{color:var(--text)}
-    @media (max-width:980px){.grid,.grid.team{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.support{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media (max-width:640px){
-      .shell{padding:8px 10px 28px}.hero{border-radius:20px;padding:20px 18px 22px;margin:4px 0 14px}.hero-top{margin-bottom:18px}.kicker{min-height:31px;padding:7px 12px;font-size:9px;letter-spacing:.15em}.kicker::before{width:8px;height:8px}.sysline{display:none}.hero h1{font-size:38px;line-height:.96;margin-bottom:10px}.hero p{font-size:17px;line-height:1.32}.hero-meta{margin-top:16px;padding-top:10px;gap:6px}.meta-chip{font-size:8.5px;padding:6px 8px;letter-spacing:.12em}
-      .section-head{margin:17px 0 8px;padding-bottom:7px}.section-title h2{font-size:22px}.section-title p{font-size:12px}.section-count{font-size:9px;letter-spacing:.12em}.grid,.grid.team,.grid.support{grid-template-columns:1fr;gap:8px}.module{min-height:0;border-radius:14px;padding:10px 10px 9px;gap:6px}.module-head{gap:9px}.icon{width:32px;height:32px}.icon svg{width:18px;height:18px}.open-mark{width:27px;height:27px}.module h3{font-size:18px}.module p{font-size:12px;line-height:1.25;-webkit-line-clamp:1;color:#aeb7c6}.module-foot{display:none}.footer{flex-direction:column;align-items:flex-start;border-radius:14px;padding:11px;font-size:11px}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      background:
+        radial-gradient(ellipse 900px 400px at 80% -10%, rgba(245,200,0,.06), transparent),
+        radial-gradient(ellipse 600px 500px at -5% 40%,  rgba(74,92,42,.10), transparent),
+        linear-gradient(180deg, #0f1210 0%, var(--bg) 40%, #080909 100%);
+    }
+
+    /* Scanline overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,.06) 3px, rgba(0,0,0,.06) 4px
+      );
+    }
+
+    /* Grid texture fading down */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .18;
+      background:
+        linear-gradient(rgba(245,200,0,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,200,0,.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, black 0%, transparent 55%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(100%, var(--max));
+      margin: 0 auto;
+      padding: 16px 16px 48px;
+    }
+
+    /* ── HERO ──────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      margin: 6px 0 22px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(245,200,0,.22);
+      border-left: 3px solid var(--yellow);
+      background:
+        radial-gradient(ellipse 60% 80% at 95% 10%, rgba(245,200,0,.07), transparent),
+        linear-gradient(135deg, rgba(22,26,20,.98), rgba(12,14,12,.99) 60%, rgba(18,22,16,.97));
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.04);
+      padding: 32px 36px 30px;
+    }
+
+    /* Top warning stripe */
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 4px;
+      background: var(--stripe);
+      opacity: .85;
+    }
+
+    /* Corner cut — top right */
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 48px 48px 0;
+      border-color: transparent var(--bg) transparent transparent;
+      z-index: 2;
+    }
+
+    .hero-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(245,200,0,.08);
+      border: 1px solid rgba(245,200,0,.35);
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
+      padding: 8px 20px 8px 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .20em;
+      text-transform: uppercase;
+      color: var(--yellow);
+    }
+
+    .kicker::before {
+      content: "";
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--yellow);
+      box-shadow: 0 0 10px rgba(245,200,0,.8);
+      animation: blink 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .25; }
+    }
+
+    .sysline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .sysline::before {
+      content: "";
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(106,173,62,.7);
+      animation: blink 3s ease-in-out infinite .4s;
+      flex-shrink: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(44px, 7vw, 76px);
+      font-weight: 700;
+      line-height: .92;
+      letter-spacing: -.01em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .hero h1 span {
+      color: var(--yellow);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 600px;
+      color: var(--muted);
+      font-size: clamp(16px, 2.4vw, 20px);
+      font-weight: 500;
+      letter-spacing: .01em;
+      line-height: 1.4;
+    }
+
+    .hero-meta {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.22);
+      clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+      padding: 7px 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .meta-chip i {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--yellow);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .meta-chip b {
+      color: var(--yellow2);
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    /* ── SECTION HEADERS ───────────────────────────────────────── */
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 28px 0 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    /* Yellow left accent on section border */
+    .section-head::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 48px;
+      height: 2px;
+      background: var(--yellow);
+    }
+
+    .section-title { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+    .section-title h2 {
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(20px, 3vw, 30px);
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .01em;
+    }
+
+    .section-count {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .section-count::before {
+      content: "";
+      width: 6px; height: 6px;
+      background: var(--yellow);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* diamond */
+    }
+
+    /* ── MODULE GRID ───────────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+    }
+    .grid.team    { grid-template-columns: repeat(4, minmax(0,1fr)); }
+    .grid.support { grid-template-columns: minmax(0, 360px); }
+
+    /* ── MODULE CARD ───────────────────────────────────────────── */
+    .module {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      min-height: 128px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(245,200,0,.14);
+      border-left: 2px solid rgba(245,200,0,.45);
+      background: linear-gradient(135deg, var(--card2), var(--card) 55%, rgba(10,11,12,.99));
+      box-shadow: 0 8px 28px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.03);
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      transition: transform .15s ease, border-color .15s ease, filter .15s ease, box-shadow .15s ease;
+      /* Clip corner top-right */
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+    }
+
+    /* Subtle diagonal texture */
+    .module::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      opacity: .06;
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(255,255,255,.6) 0 1px,
+        transparent 1px 8px
+      );
+      mask-image: linear-gradient(90deg, transparent, black 30%, transparent 95%);
+    }
+
+    .module:hover {
+      transform: translateY(-2px);
+      border-left-color: var(--yellow);
+      border-color: rgba(245,200,0,.35);
+      box-shadow: 0 14px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(245,200,0,.12), inset 0 1px 0 rgba(255,255,255,.05);
+      filter: brightness(1.06);
+    }
+
+    .module:focus-visible {
+      outline: 2px solid var(--yellow);
+      outline-offset: 3px;
+    }
+
+    .module-head {
+      display: grid;
+      grid-template-columns: auto minmax(0,1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .icon {
+      width: 34px; height: 34px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: rgba(245,200,0,.06);
+      border: 1px solid rgba(245,200,0,.18);
+      clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+      flex-shrink: 0;
+    }
+
+    .icon svg {
+      width: 18px; height: 18px;
+      display: block;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .module h3 {
+      margin: 0;
+      min-width: 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(17px, 1.8vw, 21px);
+      font-weight: 600;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      line-height: 1.05;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+
+    .open-mark {
+      width: 26px; height: 26px;
+      display: grid;
+      place-items: center;
+      color: var(--yellow);
+      background: rgba(245,200,0,.06);
+      border: 1px solid rgba(245,200,0,.22);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      flex-shrink: 0;
+      transition: background .15s ease;
+    }
+
+    .module:hover .open-mark {
+      background: rgba(245,200,0,.14);
+    }
+
+    .open-mark svg {
+      width: 13px; height: 13px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .module p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.38;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .module-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: #8acc60;
+    }
+
+    .status::before {
+      content: "";
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(106,173,62,.8);
+    }
+
+    .tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      background: rgba(245,200,0,.08);
+      border: 1px solid rgba(245,200,0,.22);
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+      padding: 4px 9px;
+      white-space: nowrap;
+    }
+
+    /* ── FOOTER ────────────────────────────────────────────────── */
+    .footer {
+      margin: 32px 0 0;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-left: 2px solid rgba(245,200,0,.30);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .08em;
+    }
+
+    .footer strong { color: var(--text); font-weight: 700; }
+
+    /* ── STAGGERED LOAD ANIMATION ──────────────────────────────── */
+    .hero           { animation: fadeUp .4s ease both; }
+    .section-head   { animation: fadeUp .35s ease both; }
+    .module         { animation: fadeUp .35s ease both; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Stagger modules */
+    .grid .module:nth-child(1) { animation-delay: .05s; }
+    .grid .module:nth-child(2) { animation-delay: .10s; }
+    .grid .module:nth-child(3) { animation-delay: .15s; }
+    .grid .module:nth-child(4) { animation-delay: .20s; }
+
+    /* ── RESPONSIVE ────────────────────────────────────────────── */
+    @media (max-width: 980px) {
+      .grid,
+      .grid.team    { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .grid.support { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .shell  { padding: 10px 10px 32px; }
+      .hero   { padding: 22px 18px 22px; margin: 4px 0 16px; }
+      .hero::before { display: none; }
+      .hero-top { margin-bottom: 20px; }
+      .kicker { font-size: 9px; padding: 7px 14px 7px 10px; }
+      .sysline { display: none; }
+      .hero h1 { font-size: 40px; margin-bottom: 10px; }
+      .hero p  { font-size: 16px; }
+      .hero-meta { margin-top: 18px; padding-top: 12px; gap: 6px; }
+      .meta-chip { font-size: 8px; padding: 6px 10px; }
+      .section-head { margin: 22px 0 10px; }
+      .section-title h2 { font-size: 20px; }
+      .grid,
+      .grid.team,
+      .grid.support { grid-template-columns: 1fr; gap: 8px; }
+      .module { min-height: 0; padding: 11px 11px 10px; gap: 7px; clip-path: none; }
+      .module h3 { font-size: 17px; }
+      .module p  { font-size: 12px; -webkit-line-clamp: 1; }
+      .module-foot { display: none; }
+      .icon  { clip-path: none; border-radius: 6px; }
+      .footer { flex-direction: column; align-items: flex-start; padding: 10px 12px; font-size: 9px; }
     }
   </style>
 </head>
 <body>
   <main class="shell">
+
+    <!-- HERO -->
     <section class="hero" aria-label="Command Center">
       <div class="hero-top">
         <div class="kicker">Command Center</div>
@@ -182,6 +604,7 @@
       </div>
     </section>
 
+    <!-- PERSONAL TOOLS -->
     <section id="personal-tools" aria-labelledby="personal-title">
       <div class="section-head">
         <div class="section-title">
@@ -192,38 +615,91 @@
       </div>
       <div class="grid personal">
         <a class="module" href="index.html" target="_blank" rel="noopener" aria-label="Open Coaching">
-          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div><h3>Coaching</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
-          <p>Training, progress and athlete development.</p><div class="module-foot"><span class="status">Ready</span><span class="tag">Training</span></div>
+          <div class="module-head">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div>
+            <h3>Coaching</h3>
+            <div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div>
+          </div>
+          <p>Training, progress and athlete development.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Training</span></div>
         </a>
         <a class="module" href="match.html" target="_blank" rel="noopener" aria-label="Open Match">
-          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11"/><path d="M7 18v-5M12 18V9M17 18v-8"/><path d="M3 18h18"/></svg></div><h3>Match</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
-          <p>Match flow, stages and performance overview.</p><div class="module-foot"><span class="status">Ready</span><span class="tag">Competition</span></div>
+          <div class="module-head">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11"/><path d="M7 18v-5M12 18V9M17 18v-8"/><path d="M3 18h18"/></svg></div>
+            <h3>Match</h3>
+            <div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div>
+          </div>
+          <p>Match flow, stages and performance overview.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Competition</span></div>
         </a>
         <a class="module" href="mental.html" target="_blank" rel="noopener" aria-label="Open Mental Card Deck">
-          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.5 14.5A6 6 0 1 1 15.5 14.5c-.9.8-1.5 1.7-1.5 3.5h-4c0-1.8-.6-2.7-1.5-3.5Z"/><path d="M12 6v3"/></svg></div><h3>Mental Card Deck</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
-          <p>Focus cards and mental preparation.</p><div class="module-foot"><span class="status">Ready</span><span class="tag">Mindset</span></div>
+          <div class="module-head">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.5 14.5A6 6 0 1 1 15.5 14.5c-.9.8-1.5 1.7-1.5 3.5h-4c0-1.8-.6-2.7-1.5-3.5Z"/><path d="M12 6v3"/></svg></div>
+            <h3>Mental Card Deck</h3>
+            <div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div>
+          </div>
+          <p>Focus cards and mental preparation.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Mindset</span></div>
         </a>
       </div>
     </section>
 
+    <!-- TEAM TOOLS -->
     <section aria-labelledby="team-title">
-      <div class="section-head"><div class="section-title"><h2 id="team-title">Team Tools</h2><p>Team-specific resources for Classic Team Norway, rules, EHC schedule and stage analysis.</p></div><div class="section-count">04 Modules</div></div>
+      <div class="section-head">
+        <div class="section-title">
+          <h2 id="team-title">Team Tools</h2>
+          <p>Team-specific resources for Classic Team Norway, rules, EHC schedule and stage analysis.</p>
+        </div>
+        <div class="section-count">04 Modules</div>
+      </div>
       <div class="grid team">
-        <a class="module" href="classic.html" target="_blank" rel="noopener" aria-label="Open Classic Team Norway"><div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4v16"/><path d="M5 5c5-3 9 3 14 0v10c-5 3-9-3-14 0"/><path d="M9 4v12"/><path d="M5 10h14"/></svg></div><h3>Classic Team Norway</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div><p>Team resources and EHC preparation.</p><div class="module-foot"><span class="status">Ready</span><span class="tag">Team</span></div></a>
-        <a class="module" href="rules.html" target="_blank" rel="noopener" aria-label="Open Rule Lookup"><div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h9a3 3 0 0 1 3 3v13H8a2 2 0 0 1-2-2V4Z"/><path d="M8 18h10"/><path d="M9 8h5M9 12h6"/></svg></div><h3>Rule Lookup</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div><p>Fast access to IPSC rules.</p><div class="module-foot"><span class="status">Ready</span><span class="tag">Rules</span></div></a>
-        <a class="module" href="schedule_ech26.html" target="_blank" rel="noopener" aria-label="Open EHC 2026 Schedule"><div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></div><h3>EHC 2026 Schedule</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div><p>Team schedule for EHC 2026.</p><div class="module-foot"><span class="status">Ready</span><span class="tag">Schedule</span></div></a>
-        <a class="module" href="https://esp1ipsc-1911.github.io/EHC2026/" target="_blank" rel="noopener" aria-label="Open EHC 2026 Stage Analysis"><div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M7 15l4-4 3 3 5-7"/><path d="M16 7h3v3"/></svg></div><h3>EHC 2026 Stage Analysis</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div><p>Stage breakdowns and match analysis.</p><div class="module-foot"><span class="status">Ready</span><span class="tag">Analysis</span></div></a>
+        <a class="module" href="classic.html" target="_blank" rel="noopener" aria-label="Open Classic Team Norway">
+          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4v16"/><path d="M5 5c5-3 9 3 14 0v10c-5 3-9-3-14 0"/><path d="M9 4v12"/><path d="M5 10h14"/></svg></div><h3>Classic Team Norway</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
+          <p>Team resources and EHC preparation.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Team</span></div>
+        </a>
+        <a class="module" href="rules.html" target="_blank" rel="noopener" aria-label="Open Rule Lookup">
+          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h9a3 3 0 0 1 3 3v13H8a2 2 0 0 1-2-2V4Z"/><path d="M8 18h10"/><path d="M9 8h5M9 12h6"/></svg></div><h3>Rule Lookup</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
+          <p>Fast access to IPSC rules.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Rules</span></div>
+        </a>
+        <a class="module" href="schedule_ech26.html" target="_blank" rel="noopener" aria-label="Open EHC 2026 Schedule">
+          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></div><h3>EHC 2026 Schedule</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
+          <p>Team schedule for EHC 2026.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Schedule</span></div>
+        </a>
+        <a class="module" href="https://esp1ipsc-1911.github.io/EHC2026/" target="_blank" rel="noopener" aria-label="Open EHC 2026 Stage Analysis">
+          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M7 15l4-4 3 3 5-7"/><path d="M16 7h3v3"/></svg></div><h3>EHC 2026 Stage Analysis</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
+          <p>Stage breakdowns and match analysis.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Analysis</span></div>
+        </a>
       </div>
     </section>
 
+    <!-- SUPPORT -->
     <section aria-labelledby="support-title">
-      <div class="section-head"><div class="section-title"><h2 id="support-title">Support</h2><p>Administrative system access and control.</p></div><div class="section-count">01 Module</div></div>
+      <div class="section-head">
+        <div class="section-title">
+          <h2 id="support-title">Support</h2>
+          <p>Administrative system access and control.</p>
+        </div>
+        <div class="section-count">01 Module</div>
+      </div>
       <div class="grid support">
-        <a class="module" href="admin.html" target="_blank" rel="noopener" aria-label="Open Admin"><div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2 3-.2-.1a1.7 1.7 0 0 0-2 .1 7.7 7.7 0 0 1-1.8.7 1.7 1.7 0 0 0-1.3 1.6V22h-3v-.2a1.7 1.7 0 0 0-1.2-1.6 7.7 7.7 0 0 1-1.8-.7 1.7 1.7 0 0 0-2-.1l-.2.1-2-3 .1-.1A1.7 1.7 0 0 0 4.6 15a7.7 7.7 0 0 1 0-2 1.7 1.7 0 0 0-.3-1.9l-.1-.1 2-3 .2.1a1.7 1.7 0 0 0 2-.1 7.7 7.7 0 0 1 1.8-.7 1.7 1.7 0 0 0 1.3-1.6V5h3v.2a1.7 1.7 0 0 0 1.2 1.6 7.7 7.7 0 0 1 1.8.7 1.7 1.7 0 0 0 2 .1l.2-.1 2 3-.1.1a1.7 1.7 0 0 0-.3 1.9 7.7 7.7 0 0 1 .1 2Z"/></svg></div><h3>Admin</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div><p>System and user administration.</p><div class="module-foot"><span class="status">Ready</span><span class="tag">Control</span></div></a>
+        <a class="module" href="admin.html" target="_blank" rel="noopener" aria-label="Open Admin">
+          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2 3-.2-.1a1.7 1.7 0 0 0-2 .1 7.7 7.7 0 0 1-1.8.7 1.7 1.7 0 0 0-1.3 1.6V22h-3v-.2a1.7 1.7 0 0 0-1.2-1.6 7.7 7.7 0 0 1-1.8-.7 1.7 1.7 0 0 0-2-.1l-.2.1-2-3 .1-.1A1.7 1.7 0 0 0 4.6 15a7.7 7.7 0 0 1 0-2 1.7 1.7 0 0 0-.3-1.9l-.1-.1 2-3 .2.1a1.7 1.7 0 0 0 2-.1 7.7 7.7 0 0 1 1.8-.7 1.7 1.7 0 0 0 1.3-1.6V5h3v.2a1.7 1.7 0 0 0 1.2 1.6 7.7 7.7 0 0 1 1.8.7 1.7 1.7 0 0 0 2 .1l.2-.1 2 3-.1.1a1.7 1.7 0 0 0-.3 1.9 7.7 7.7 0 0 1 .1 2Z"/></svg></div><h3>Admin</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
+          <p>System and user administration.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Control</span></div>
+        </a>
       </div>
     </section>
 
-    <footer class="footer"><div><strong>Insight Dynamics Shooting</strong> · A dynamic shooting portal for shooters committed to going further.</div><div><strong>esp1 design 2026</strong></div></footer>
+    <footer class="footer">
+      <div><strong>Insight Dynamics Shooting</strong> · A dynamic shooting portal for shooters committed to going further.</div>
+      <div><strong>esp1 design 2026</strong></div>
+    </footer>
+
   </main>
 </body>
 </html>

@@ -508,34 +508,58 @@
     .rarity-legendary { color: #ff6b9d; }
 
     .login-wrap {
-      min-height: calc(100vh - 120px);
+      min-height: 100vh;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
-      padding-top: 40px;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
     }
+    .login-wrap::before { content:""; position:absolute; inset:0; background:radial-gradient(ellipse 600px 500px at 50% 30%,rgba(245,200,0,.04),transparent); pointer-events:none; }
 
     .login-card {
       width: 100%;
-      max-width: 360px;
-      background: var(--card);
+      max-width: 400px;
+      background: linear-gradient(160deg, var(--bg3), var(--card));
       border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 24px;
+      box-shadow: var(--shadow), 0 0 80px rgba(245,200,0,.04);
+      padding: 32px 28px 28px;
+      position: relative;
+      overflow: hidden;
     }
-
-    .login-card .modal-title {
-      margin-bottom: 18px;
-      text-align: center;
+    .login-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--stripe);
+      opacity: .85;
     }
-
+    .login-card::after {
+      content: "";
+      position: absolute;
+      top: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 32px 32px 0;
+      border-color: transparent var(--bg) transparent transparent;
+      z-index: 2;
+    }
+    .login-logo { display: block; width: 180px; margin: 0 auto 20px; opacity: .95; }
+    .login-divider { height: 1px; background: linear-gradient(90deg,transparent,rgba(245,200,0,.35),transparent); margin: 0 0 18px; }
+    .login-eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); text-align: center; margin: 0 0 16px; }
+    .login-sysline { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 22px; }
+    .login-sysline::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(106,173,62,.8); animation: blink 3s ease-in-out infinite; flex-shrink: 0; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
     .login-note {
       color: var(--muted);
       font-size: 13px;
       text-align: center;
       margin-bottom: 18px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     @media (max-width: 860px) {
@@ -615,18 +639,20 @@
 
     <div id="loginSection" class="login-wrap">
       <div class="login-card">
-        <div class="modal-title">Admin Login</div>
-        <div class="login-note">Logg inn med admin-brukeren din.</div>
-        <div id="loginError" class="error" style="display:none;"></div>
+        <img src="./Logo_IPSC-insight.png" alt="IPSC Insight" class="login-logo">
+        <div class="login-divider"></div>
+        <p class="login-eyebrow">Admin Portal · Secure Access</p>
+        <div class="login-sysline">All systems operational</div>
+        <div id="loginError" class="error" style="display:none;background:rgba(224,82,82,.10);border:1px solid rgba(224,82,82,.28);border-left:2px solid var(--red);color:#ff9a9a;border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;margin-bottom:14px;"></div>
         <div class="form-group">
-          <label class="form-label">E-post</label>
-          <input id="loginEmail" class="form-input" type="email" placeholder="admin@ipsc.no" />
+          <label class="form-label" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.12em;">Email</label>
+          <input id="loginEmail" class="form-input" type="email" placeholder="admin@ipsc.no" autocomplete="username" name="username" />
         </div>
         <div class="form-group">
-          <label class="form-label">Passord</label>
-          <input id="loginPassword" class="form-input" type="password" placeholder="Passord" />
+          <label class="form-label" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.12em;">Password</label>
+          <input id="loginPassword" class="form-input" type="password" placeholder="Password" autocomplete="current-password" name="password" />
         </div>
-        <button id="loginBtn" class="btn btn-primary" style="width:100%;">Logg inn</button>
+        <button id="loginBtn" class="btn btn-primary" style="width:100%;font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;min-height:44px;">Sign In</button>
       </div>
     </div>
 

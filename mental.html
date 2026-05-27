@@ -25,18 +25,21 @@
     h1,h2,h3,h4{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em}
     .hidden{display:none!important}
     .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1}
-    .login-card{width:100%;max-width:390px;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--stroke);border-left:3px solid var(--gold);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;position:relative;overflow:hidden}
-    .login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--stripe);opacity:.8}
-    .brandmark{width:52px;height:52px;margin:0 auto 14px;display:grid;place-items:center;background:rgba(245,200,0,.10);border:1px solid rgba(245,200,0,.35);clip-path:polygon(15% 0%,85% 0%,100% 50%,85% 100%,15% 100%,0% 50%);font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;letter-spacing:.05em}
-    .brandmark span:first-child{color:#fff} .brandmark span:last-child{color:var(--gold)}
-    .eyebrow{margin:0 0 8px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.20em;text-transform:uppercase;font-weight:400;color:var(--gold);text-align:center}
-    .login-card h1{margin:0 0 10px;font-family:'Oswald',sans-serif;font-size:26px;letter-spacing:.04em;text-transform:uppercase;text-align:center}
-    .login-note,.login-hint{color:var(--muted);font-size:13px;line-height:1.45;text-align:center;margin:0 0 18px}
-    .login-hint{margin-top:14px;margin-bottom:0;font-size:12px}
+    .login-wrap::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 600px 500px at 50% 30%,rgba(245,200,0,.04),transparent);pointer-events:none}
+    .login-card{width:100%;max-width:400px;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--stroke);border-left:3px solid var(--gold);border-radius:var(--radius);box-shadow:var(--shadow),0 0 80px rgba(245,200,0,.04);padding:32px 28px 28px;position:relative;overflow:hidden}
+    .login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--stripe);opacity:.85}
+    .login-card::after{content:"";position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 32px 32px 0;border-color:transparent var(--bg) transparent transparent;z-index:2}
+    .login-logo{display:block;width:180px;margin:0 auto 20px;opacity:.95}
+    .login-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(245,200,0,.35),transparent);margin:0 0 18px}
+    .login-eyebrow{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);text-align:center;margin:0 0 16px}
+    .login-sysline{display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}
+    .login-sysline::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(106,173,62,.8);animation:blink 3s ease-in-out infinite;flex-shrink:0}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
     .login-field{margin-bottom:14px}
     .login-field label{display:block;margin-bottom:6px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
-    .login-field input{width:100%;min-height:44px;border-radius:var(--radius-sm);border:1px solid var(--stroke);background:rgba(0,0,0,.3);color:var(--text);padding:11px 14px;outline:none;font-family:'Rajdhani',sans-serif}
+    .login-field input{width:100%;min-height:44px;border-radius:var(--radius-sm);border:1px solid var(--stroke);background:rgba(0,0,0,.3);color:var(--text);padding:11px 14px;outline:none;font-family:'Rajdhani',sans-serif;font-size:15px;transition:border-color .15s,box-shadow .15s}
     .login-field input:focus{border-color:rgba(245,200,0,.55);box-shadow:0 0 0 3px rgba(245,200,0,.08)}
+    .login-field input::placeholder{color:var(--dim);font-size:13px}
     .login-btn,.primary,.secondary{border:0;border-radius:var(--radius-sm);min-height:44px;padding:11px 18px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:transform .15s ease,filter .15s ease}
     .login-btn:active,.primary:active,.secondary:active{transform:translateY(1px)}
     .login-btn,.primary{background:var(--gold);color:#0a0c0e;width:100%}
@@ -111,17 +114,16 @@
   </style>
 </head>
 <body>
-  <section id="loginSection" class="login-wrap" aria-label="Innlogging">
+  <section id="loginSection" class="login-wrap" aria-label="Sign in">
     <div class="login-card">
-      <div class="brandmark"><span>I</span><span>M</span></div>
-      <p class="eyebrow" style="text-align:center">IPSC MENTAL DECK</p>
-      <h1>Logg inn</h1>
-      <p class="login-note">Trekk mentale IPSC-kort og tren én robust respons av gangen.</p>
+      <img src="./Logo_IPSC-insight.png" alt="IPSC Insight" class="login-logo">
+      <div class="login-divider"></div>
+      <p class="login-eyebrow">Mental Deck · Secure Access</p>
+      <div class="login-sysline">All systems operational</div>
       <div id="loginError" class="login-error"></div>
-      <div class="login-field"><label for="loginEmail">E-post</label><input id="loginEmail" type="email" autocomplete="email" placeholder="navn@klubb.no"></div>
-      <div class="login-field"><label for="loginPassword">Passord</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Passord"></div>
-      <button id="loginBtn" class="login-btn" type="button">Logg inn</button>
-      <p class="login-hint">Tilgang krever rollen user eller admin.</p>
+      <div class="login-field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" name="username" placeholder="name@club.no"></div>
+      <div class="login-field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" name="password" placeholder="Password"></div>
+      <button id="loginBtn" class="login-btn" type="button">Sign In</button>
     </div>
   </section>
 

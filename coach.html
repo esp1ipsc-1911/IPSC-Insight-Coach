@@ -22,7 +22,7 @@
     h1,h2,h3,h4{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em}
 
     /* ── TOPBAR ── */
-    .topbar{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;gap:12px;}
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;gap:16px;}
     .topbar-brand{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
     .topbar-brand span{color:var(--accent);}
     .topbar-match{flex:1;min-width:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -48,7 +48,7 @@
     .login-logo{display:block;width:180px;margin:0 auto 20px;opacity:.95;}
     .login-logo span{color:var(--accent);}
     .login-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);text-align:center;margin:0 0 6px;}.login-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(245,200,0,.35),transparent);margin:0 0 18px}.login-sysline{display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}.login-sysline::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(106,173,62,.8);animation:blink 3s ease-in-out infinite;flex-shrink:0}@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-    .form-group{margin-bottom:16px;}
+    .form-group{margin-bottom:18px;}
     .form-label{display:block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;}
     .form-input,.form-select{width:100%;min-height:42px;padding:10px 13px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;}
     .form-input:focus,.form-select:focus{outline:none;border-color:rgba(245,200,0,.55);box-shadow:0 0 0 3px rgba(245,200,0,.08);}
@@ -66,7 +66,7 @@
 
     /* ── MATCH HEADER ── */
     .match-header{background:linear-gradient(135deg,#13172000,#1a1e2888);border-bottom:1px solid var(--border);padding:14px 16px;}
-    .match-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+    .match-header-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:10px;}
     .match-title{font-size:20px;font-weight:800;letter-spacing:-.01em;}
     .match-title span{color:var(--accent);}
     .match-meta{font-size:12px;color:var(--muted);margin-top:2px;}
@@ -87,7 +87,7 @@
     .s-chip-pct{color:var(--muted);}
 
     /* ── SHOOTER GRID ── */
-    .shooter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;padding:14px 16px;}
+    .shooter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;padding:14px 16px;}
 
     /* ── SHOOTER CARD ── */
     .scard{background:linear-gradient(160deg,#1c2030,#161a24);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;}
@@ -168,11 +168,11 @@
     .scard-foot{padding:8px 14px;display:flex;gap:6px;margin-top:auto;}
 
     /* ── MODAL ── */
-    .modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.82);padding:16px;align-items:center;justify-content:center;}
+    .modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.82);padding:20px;align-items:center;justify-content:center;}
     .modal.open{display:flex;}
     .modal-content{width:100%;max-width:520px;max-height:92vh;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;-webkit-overflow-scrolling:touch;}
     .modal-title{font-size:18px;font-weight:800;margin-bottom:4px;}
-    .modal-sub{color:var(--muted);font-size:13px;margin-bottom:16px;}
+    .modal-sub{color:var(--muted);font-size:13px;margin-bottom:18px;}
     .form-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
     .hit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;}
     .calc-row{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:var(--bg3);border-radius:var(--radius-sm);margin-top:8px;font-size:13px;}
@@ -679,12 +679,12 @@ function renderMatchSection(match) {
   return `
     <div class="match-section" id="msec-${escA(mid)}" style="margin-bottom:28px;">
       <!-- Match header -->
-      <div style="background:linear-gradient(135deg,rgba(19,23,32,0),rgba(26,30,40,.6));border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div style="background:linear-gradient(135deg,rgba(19,23,32,0),rgba(26,30,40,.6));border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
         <div>
           <div style="font-size:18px;font-weight:800;">${escH(match.name||match.id)}</div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px;">${escH([match.date,match.location,match.type].filter(Boolean).join(' · '))}</div>
         </div>
-        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
           <div class="mstat"><div class="mstat-val">${stageDefs.length}</div><div class="mstat-lbl">Stages</div></div>
           <div class="mstat"><div class="mstat-val">${myShooters.length}</div><div class="mstat-lbl">Skyttere</div></div>
           <div class="mstat"><div class="mstat-val" style="color:var(--green);">${avgShot}</div><div class="mstat-lbl">Snitt skutt</div></div>

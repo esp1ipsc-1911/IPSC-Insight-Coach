@@ -130,221 +130,125 @@ e.innerHTML=`
  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  :root {
   --accent: #D4AF37; --accent2: #B8912E;
-  --bg: #0d0e10; --card: #181a1c;
+  --bg: #0d0e10; --bg2: #111314; --bg3: #161819;
   --border: rgba(255,255,255,0.08); --border-gold: rgba(212,175,55,0.28);
   --text: #eef0ec; --muted: rgba(255,255,255,0.38);
+  --green: #6aad3e; --red: #ef4444; --radius: 8px; --radius-sm: 6px;
   --stripe: repeating-linear-gradient(-55deg,#D4AF37 0px,#D4AF37 7px,transparent 7px,transparent 14px);
+  --shadow: 0 24px 70px rgba(0,0,0,.55);
  }
  html, body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; min-height: 100vh; }
- .login-page {
-  min-height: 100vh; width: 100%;
-  background: #0d0e10;
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 42.7 L30 60 L0 42.7 L0 17.3Z' fill='none' stroke='rgba(212,175,55,0.04)' stroke-width='0.5'/%3E%3C/svg%3E");
-  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px;
- }
+
+ /* === LOGIN PAGE === */
+ .login-page { min-height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; background: var(--bg); }
  .login-shell { width: 100%; max-width: 400px; }
- .login-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
- .login-logo { display: block; width: 160px; height: auto; margin: 0 auto 18px; opacity: .92; }
- .login-lang { display: flex; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
- .lang-btn { background: transparent; border: none; padding: 8px 14px; font-size: 17px; cursor: pointer; line-height: 1; transition: background 0.15s; }
- .lang-btn.active { background: rgba(212,175,55,0.15); color: #D4AF37; }
+
+ /* Card */
+ .login-card { width: 100%; background: linear-gradient(160deg,#1c1e20,#181a1c); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; box-shadow: var(--shadow), 0 0 80px rgba(212,175,55,.04); padding: 32px 28px 28px; position: relative; overflow: hidden; }
+ .login-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--stripe); opacity: .85; }
+ .login-card::after { content: ""; position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 32px 32px 0; border-color: transparent var(--bg) transparent transparent; z-index: 2; }
+
+ /* Logo */
+ .login-logo-img { text-align: center; margin: 0 auto 16px; } .login-logo-img img { width: 180px; height: auto; display: block; margin: 0 auto; opacity: .95; }
+ .login-logo-text span { color: var(--accent); }
+
+ /* Lang toggle */
+ .login-lang { position: absolute; top: 14px; right: 14px; display: flex; background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; z-index: 3; }
+ .lang-btn { background: transparent; border: none; padding: 6px 10px; font-size: 15px; cursor: pointer; line-height: 1; transition: background 0.15s; }
+ .lang-btn.active { background: rgba(212,175,55,.15); }
  .lang-btn:first-child { border-right: 1px solid var(--border); }
- .login-hero { margin-bottom: 24px; }
- .login-title { font-family: 'Outfit', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
- .login-title .white { color: var(--text); }
- .login-title .gold { color: var(--accent); }
- .login-tagline { font-family: 'Outfit', sans-serif; font-size: 10px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; margin-top: 10px; }
- .login-status { display: flex; align-items: center; gap: 8px; background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.20); border-left: 2px solid #6aad3e; clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); padding: 9px 14px; margin-bottom: 18px; }
- .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
- .status-text { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.14em; color: rgba(255,255,255,0.55); text-transform: uppercase; }
- .login-card { background: linear-gradient(160deg,#1c1e20,#181a1c); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 32px 28px 28px; position: relative; overflow: hidden; } .login-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--stripe); opacity: .85; } .login-card::after { content: ""; position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 28px 28px 0; border-color: transparent var(--bg) transparent transparent; z-index: 2; }
- .field-group { margin-bottom: 14px; }
- .field-lbl { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 400; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; display: flex; align-items: center; gap: 6px; }
- .field-lbl svg { width: 11px; height: 11px; stroke: var(--muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
- .field-wrap { position: relative; }
- .field-ico { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); display: flex; pointer-events: none; }
- .field-ico svg { width: 14px; height: 14px; stroke: rgba(255,255,255,0.25); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
- .field { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 15px; padding: 12px 14px 12px 40px; outline: none; transition: border-color 0.15s, background 0.15s; -webkit-appearance: none; }
- .field.no-ico { padding-left: 14px; }
- .field:focus { border-color: rgba(212,175,55,0.55); background: rgba(255,255,255,0.05); box-shadow: 0 0 0 3px rgba(212,175,55,0.08); }
- .field::placeholder { color: rgba(255,255,255,0.18); }
- select.field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
- select.field option { background: #181a1c; color: var(--text); }
- input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0 100px #181a1c inset !important; -webkit-text-fill-color: #f0f2f5 !important; caret-color: #f0f2f5 !important; transition: background-color 9999s !important; }
- .pw-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
- .pw-toggle svg { width: 16px; height: 16px; stroke: rgba(255,255,255,0.3); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
- .pw-strength-wrap { margin-top: 6px; display: flex; align-items: center; gap: 8px; }
- .pw-strength-track { flex: 1; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
- #passwordStrengthBar { height: 100%; width: 0; border-radius: 2px; transition: width 0.3s, background 0.3s; }
- #passwordStrengthText { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; min-width: 70px; text-align: right; color: var(--muted); }
- .btn-primary { width: 100%; padding: 12px; background: var(--accent); color: #0a0c0e; border: none; border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; margin-top: 6px; transition: filter 0.15s, transform 0.12s; } .btn-primary:hover { filter: brightness(1.08); } .btn-primary:active { transform: translateY(1px); }
- .btn-primary:hover { opacity: 0.88; }
- .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
- .btn-secondary { width: 100%; padding: 11px; background: transparent; color: var(--accent); border: 1px solid rgba(212,175,55,0.30); border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
- .btn-secondary:hover { background: rgba(212,175,55,0.08); }
- .btn-ghost { width: 100%; padding: 10px; background: transparent; color: var(--muted); border: none; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; text-transform: uppercase; margin-top: 4px; }
- .or-row { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
- .or-row::before, .or-row::after { content: ''; flex: 1; height: 1px; background: var(--border); }
- #separatorText { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
- .error-text { color: #ef4444; font-size: 12px; font-weight: 500; margin-top: 10px; min-height: 16px; text-align: center; }
- .login-section { display: block; }
- .register-section { display: none; }
- .login-section.active { display: block; }
- .register-section.active { display: block; }
+
+ /* Divider + subtitle */
+ .login-divider { height: 1px; background: linear-gradient(90deg,transparent,rgba(212,175,55,.35),transparent); margin: 0 0 14px; }
+ .login-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); text-align: center; margin: 0 0 8px; }
+ .login-sysline { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 22px; }
+ .login-sysline::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(106,173,62,.8); animation: blink 3s ease-in-out infinite; flex-shrink: 0; }
+ @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+ /* Fields */
+ .form-group { margin-bottom: 16px; }
+ .form-label { display: block; font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px; }
+ .form-input, .form-select { width: 100%; min-height: 42px; padding: 10px 13px; background: var(--bg3); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 14px; outline: none; transition: border-color .15s, box-shadow .15s; -webkit-appearance: none; }
+ .form-input:focus, .form-select:focus { border-color: rgba(212,175,55,.55); box-shadow: 0 0 0 3px rgba(212,175,55,.08); }
+ .form-input::placeholder { color: var(--muted); font-size: 13px; }
  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
- .pf-row { display: flex; gap: 8px; margin-top: 4px; }
- .pf-btn { flex: 1; padding: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; text-align: center; }
- .pf-btn.selected { background: rgba(212,175,55,0.10); border-color: var(--accent); color: var(--accent); }
- .gdpr-row { display: flex; align-items: flex-start; gap: 10px; margin: 12px 0; }
- .gdpr-row input[type=checkbox] { width: 17px; height: 17px; flex-shrink: 0; accent-color: var(--accent); margin-top: 2px; cursor: pointer; }
- .gdpr-row label { font-size: 12px; color: var(--muted); line-height: 1.5; cursor: pointer; }
- .gdpr-row label a { color: var(--accent); text-decoration: none; font-weight: 600; }
- .gdpr-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px; }
- .gdpr-modal.open { display: flex; }
- .gdpr-modal-inner { background: #181a1c; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 22px; }
- .gdpr-modal-inner h2 { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.02em; color: var(--text); margin-bottom: 14px; text-transform: uppercase; }
- .gdpr-modal-inner h3 { font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 400; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin: 14px 0 5px; }
- .gdpr-modal-inner p, .gdpr-modal-inner li { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
- .gdpr-modal-inner ul { padding-left: 16px; margin: 4px 0; }
- .gdpr-close { width: 100%; margin-top: 18px; padding: 12px; background: var(--accent); color: #0a0c0e; border: none; border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
 
- .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; align-items: flex-end; justify-content: center; padding: 0; }
- .modal-overlay.open { display: flex; }
- .modal-sheet { background: var(--card); border-top: 2px solid var(--accent); border-radius: 10px 10px 0 0; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 20px 20px 40px; }
- .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
- .modal-title { font-size: 13px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
- .modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 4px 8px; }
- .modal-body { display: flex; flex-direction: column; gap: 14px; }
- .field-group { display: flex; flex-direction: column; gap: 6px; }
- .field-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
- .field-input { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 14px; width: 100%; }
- .field-select { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 14px; width: 100%; }
- .field-input:focus, .field-select:focus { outline: none; border-color: var(--accent); }
+ /* Password toggle */
+ .pw-wrap { position: relative; }
+ .pw-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 4px; color: var(--muted); display: flex; align-items: center; }
+ .pw-toggle svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-
- /* B1 unified login/register visual harmonization — CSS only, no auth/registration logic changed */
- .login-page {
-  background:
-   radial-gradient(ellipse 900px 400px at 80% -10%, rgba(212,175,55,.06), transparent),
-   radial-gradient(ellipse 600px 500px at -5% 40%, rgba(74,92,42,.08), transparent),
-   linear-gradient(180deg, #0f1210 0%, #0d0e10 48%, #080909 100%);
- }
- .login-page::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,.06) 3px, rgba(0,0,0,.06) 4px);
- }
- .login-shell {
-  position: relative;
-  z-index: 1;
-  max-width: 400px;
-  background: linear-gradient(160deg,#1c1e20,#181a1c);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 8px;
-  box-shadow: 0 14px 40px rgba(0,0,0,.35), 0 0 80px rgba(212,175,55,.04);
-  padding: 32px 28px 28px;
-  overflow: hidden;
- }
- .login-shell::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--stripe);
-  opacity: .85;
- }
- .login-shell::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 32px 32px 0;
-  border-color: transparent var(--bg) transparent transparent;
-  z-index: 2;
- }
- .login-topbar { margin-bottom: 18px; position: relative; z-index: 3; }
- .login-logo { margin: 0 auto; }
- .login-logo img { max-width: 180px; }
- .login-lang { position: absolute; right: 0; top: 0; background: rgba(255,255,255,.04); }
- .lang-btn.active { background: rgba(212,175,55,.14); color: var(--accent); }
- .login-hero { text-align: center; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid rgba(212,175,55,.16); }
- .login-title { font-size: 28px; letter-spacing: .03em; text-transform: uppercase; }
- .login-tagline { font-family: 'Outfit', sans-serif; color: var(--accent); letter-spacing: .18em; }
- .login-status { justify-content: center; background: transparent; border: 0; clip-path: none; padding: 0; margin-bottom: 22px; }
- .status-text { font-family: 'Outfit', sans-serif; color: var(--muted); }
- .login-card { background: transparent; border: 0; border-left: 0; border-radius: 0; padding: 0; overflow: visible; box-shadow: none; }
- .login-card::before, .login-card::after { display: none; }
- .field-lbl, .field-label, .gdpr-modal-inner h3 { font-family: 'Outfit', sans-serif; }
- .field { min-height: 44px; background: rgba(0,0,0,.30); }
- .field:focus { border-color: rgba(212,175,55,.55); box-shadow: 0 0 0 3px rgba(212,175,55,.08); }
- .btn-primary, .gdpr-close {
-  background: linear-gradient(180deg, #D4AF37 0%, #B8912E 100%);
-  color: #0a0c0e;
- }
- .btn-primary:hover, .gdpr-close:hover { filter: brightness(1.07); opacity: 1; }
- .btn-secondary { color: var(--accent); border-color: rgba(212,175,55,.30); }
+ /* Buttons */
+ .btn-primary { width: 100%; min-height: 42px; padding: 10px 18px; background: var(--accent); color: #0a0c0e; border: none; border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: filter .15s; }
+ .btn-primary:hover { filter: brightness(1.08); }
+ .btn-primary:disabled { opacity: .65; cursor: wait; }
+ .btn-secondary { width: 100%; min-height: 38px; padding: 9px 18px; background: transparent; color: var(--accent); border: 1px solid rgba(212,175,55,.30); border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: background .15s; }
  .btn-secondary:hover { background: rgba(212,175,55,.08); }
+ .btn-ghost { width: 100%; min-height: 36px; padding: 8px 18px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 12px; cursor: pointer; }
+ .btn-ghost:hover { border-color: rgba(255,255,255,.18); color: var(--text); }
+
+ /* Or row */
+ .or-row { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+ .or-row::before, .or-row::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+ .or-row span { font-size: 11px; color: var(--muted); }
+
+ /* Error */
+ .error-text { color: var(--red); font-size: 13px; margin-top: 10px; text-align: center; min-height: 18px; }
+ .error-box { background: rgba(224,82,82,.12); border: 1px solid rgba(224,82,82,.25); color: var(--red); padding: 10px 13px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 14px; }
+
+ /* Login/register section visibility */
+ .login-section, .register-section { display: none; }
+ .login-section.active, .register-section.active { display: block; }
+
+ /* Password strength */
+ .pw-strength-wrap { margin-top: 6px; }
+ .pw-strength-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+ .pw-strength-track div { height: 100%; border-radius: 2px; transition: width .3s, background .3s; width: 0; }
+ #passwordStrengthText { font-size: 10px; color: var(--muted); font-family: 'Share Tech Mono', monospace; letter-spacing: .06em; }
+
+ /* Power factor */
+ .pf-row { display: flex; gap: 8px; }
+ .pf-btn { flex: 1; padding: 9px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--muted); font-size: 12px; font-weight: 600; text-align: center; cursor: pointer; transition: border-color .15s, color .15s, background .15s; }
  .pf-btn.selected { background: rgba(212,175,55,.10); border-color: var(--accent); color: var(--accent); }
- @media (max-width: 520px) {
-  .login-shell { max-width: 100%; padding: 28px 22px 24px; }
-  .login-title { font-size: 24px; }
+
+ /* GDPR modal */
+ .gdpr-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+ .gdpr-modal.open { display: flex; }
+ .gdpr-modal-inner { background: #1c1e20; border: 1px solid var(--border); border-radius: var(--radius); max-width: 560px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 28px; }
+ .gdpr-modal-inner h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--accent); }
+ .gdpr-close { background: var(--accent); color: #0a0c0e; border: none; border-radius: var(--radius-sm); padding: 10px 20px; font-weight: 700; cursor: pointer; font-size: 13px; margin-top: 20px; }
+
+ @media (max-width: 480px) {
+  .login-card { padding: 26px 18px 22px; }
   .form-row { grid-template-columns: 1fr; }
  }
 </style>
 
 <div class="login-page" id="loginPage">
  <div class="login-shell">
+  <div class="login-card">
 
-  <div class="login-topbar">
-   <div class="login-logo">
-    <img src="./Logo_IPSC-insight.png" alt="IPSC Insight" style="width:160px;height:auto;display:block;margin:0 auto;" />
-   </div>
    <div class="login-lang">
     <button class="lang-btn" id="langNo" onclick="">🇳🇴</button>
     <button class="lang-btn" id="langEn" onclick="">🇺🇸</button>
    </div>
-  </div>
 
-  <div class="login-hero">
-   <div class="login-title"><span class="white">INSIGHT</span><br><span class="gold">DYNAMICS</span></div>
-   <div class="login-tagline" id="brandSubtitle">Performance. Precision. Progress.</div>
-  </div>
-
-  <div class="login-status">
-   <div class="status-dot"></div>
-   <div class="status-text">System Online</div>
-  </div>
-
-  <div class="login-card">
+   <div class="login-logo-img"><img src="./Logo_IPSC-insight.png" alt="Insight Dynamics Shooting" /></div>
+   <div class="login-divider"></div>
+   <div class="login-sub" id="brandSubtitle">Performance. Precision. Progress.</div>
+   <div class="login-sysline">All systems operational</div>
 
    <!-- LOGIN SECTION -->
    <form id="loginSection" class="login-section active" onsubmit="return false;" autocomplete="on">
-    
- <div class="field-group">
-     <div class="field-lbl" id="loginEmailLabel">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>Email
-     </div>
-     <div class="field-wrap">
-      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg></div>
-      <input id="loginEmail" class="field" type="email" placeholder="name@email.com" autocomplete="username" />
-     </div>
+    <div id="error" class="error-text"></div>
+    <div class="form-group">
+     <label class="form-label" id="loginEmailLabel">Email</label>
+     <input id="loginEmail" class="form-input" type="email" placeholder="name@email.com" autocomplete="username" name="username" />
     </div>
-    <div class="field-group">
-     <div class="field-lbl" id="loginPasswordLabel">
-      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Password
-     </div>
-     <div class="field-wrap">
-      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <input id="loginPassword" class="field" type="password" placeholder="Password" autocomplete="current-password" name="password" />
+    <div class="form-group">
+     <label class="form-label" id="loginPasswordLabel">Password</label>
+     <div class="pw-wrap">
+      <input id="loginPassword" class="form-input" type="password" placeholder="Password" autocomplete="current-password" name="password" style="padding-right:38px;" />
       <button class="pw-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
      </div>
     </div>
@@ -356,38 +260,27 @@ e.innerHTML=`
    <!-- REGISTER SECTION -->
    <div id="registerSection" class="register-section">
     <div class="form-row">
-     <div class="field-group">
-      <div class="field-lbl" id="registerFirstNameLabel">First Name</div>
-      <input id="registerFirstName" class="field no-ico" type="text" placeholder="First name" autocomplete="given-name" />
+     <div class="form-group">
+      <label class="form-label" id="registerFirstNameLabel">First Name</label>
+      <input id="registerFirstName" class="form-input" type="text" placeholder="First name" autocomplete="given-name" />
      </div>
-     <div class="field-group">
-      <div class="field-lbl" id="registerLastNameLabel">Last Name</div>
-      <input id="registerLastName" class="field no-ico" type="text" placeholder="Last name" autocomplete="family-name" />
-     </div>
-    </div>
-    <div class="field-group">
-     <div class="field-lbl" id="registerEmailLabel">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg>Email
-     </div>
-     <div class="field-wrap">
-      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg></div>
-      <input id="registerEmail" class="field" type="email" placeholder="name@email.com" autocomplete="email" />
+     <div class="form-group">
+      <label class="form-label" id="registerLastNameLabel">Last Name</label>
+      <input id="registerLastName" class="form-input" type="text" placeholder="Last name" autocomplete="family-name" />
      </div>
     </div>
-    <div class="field-group">
-     <div class="field-lbl" id="registerEmailConfirmLabel">Confirm Email Address</div>
-     <div class="field-wrap">
-      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,5 12,13 21,5"/></svg></div>
-      <input id="registerEmailConfirm" class="field" type="email" placeholder="Re-enter email" autocomplete="email" />
-     </div>
+    <div class="form-group">
+     <label class="form-label" id="registerEmailLabel">Email</label>
+     <input id="registerEmail" class="form-input" type="email" placeholder="name@email.com" autocomplete="email" />
     </div>
-    <div class="field-group">
-     <div class="field-lbl" id="registerPasswordLabel">
-      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Password
-     </div>
-     <div class="field-wrap">
-      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <input id="registerPassword" class="field" type="password" placeholder="Password" autocomplete="new-password" />
+    <div class="form-group">
+     <label class="form-label" id="registerEmailConfirmLabel">Confirm Email</label>
+     <input id="registerEmailConfirm" class="form-input" type="email" placeholder="Re-enter email" autocomplete="email" />
+    </div>
+    <div class="form-group">
+     <label class="form-label" id="registerPasswordLabel">Password</label>
+     <div class="pw-wrap">
+      <input id="registerPassword" class="form-input" type="password" placeholder="Password" autocomplete="new-password" style="padding-right:38px;" />
       <button class="pw-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
      </div>
      <div class="pw-strength-wrap">
@@ -395,17 +288,16 @@ e.innerHTML=`
       <div id="passwordStrengthText"></div>
      </div>
     </div>
-    <div class="field-group">
-     <div class="field-lbl" id="registerPasswordConfirmLabel">Re-enter Password</div>
-     <div class="field-wrap">
-      <div class="field-ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <input id="registerPasswordConfirm" class="field" type="password" placeholder="Re-enter password" autocomplete="new-password" />
+    <div class="form-group">
+     <label class="form-label" id="registerPasswordConfirmLabel">Confirm Password</label>
+     <div class="pw-wrap">
+      <input id="registerPasswordConfirm" class="form-input" type="password" placeholder="Re-enter password" autocomplete="new-password" style="padding-right:38px;" />
       <button class="pw-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
      </div>
     </div>
-    <div class="field-group">
-     <div class="field-lbl" id="registerDivisionLabel">Division</div>
-     <select id="registerDivision" class="field no-ico">
+    <div class="form-group">
+     <label class="form-label" id="registerDivisionLabel">Division</label>
+     <select id="registerDivision" class="form-select">
       <option value="">Select division…</option>
       <option value="Open">Open</option>
       <option value="Standard">Standard</option>
@@ -418,9 +310,9 @@ e.innerHTML=`
      </select>
     </div>
     <div class="form-row">
-     <div class="field-group">
-      <div class="field-lbl" id="registerCategoryLabel">Category</div>
-      <select id="registerCategory" class="field no-ico">
+     <div class="form-group">
+      <label class="form-label" id="registerCategoryLabel">Category</label>
+      <select id="registerCategory" class="form-select">
        <option value="">Optional</option>
        <option value="Lady">Lady</option>
        <option value="Junior">Junior</option>
@@ -428,14 +320,14 @@ e.innerHTML=`
        <option value="Super Senior">Super Senior</option>
       </select>
      </div>
-     <div class="field-group">
-      <div class="field-lbl" id="registerClubLabel">Club</div>
-      <input id="registerClub" class="field no-ico" type="text" placeholder="Club (optional)" />
+     <div class="form-group">
+      <label class="form-label" id="registerClubLabel">Club</label>
+      <input id="registerClub" class="form-input" type="text" placeholder="Club (optional)" />
      </div>
     </div>
-    <div class="field-group">
-     <div class="field-lbl" id="registerRegionLabel">Region / Nation</div>
-     <select id="registerRegion" class="field no-ico">
+    <div class="form-group">
+     <label class="form-label" id="registerRegionLabel">Region / Nation</label>
+     <select id="registerRegion" class="form-select">
       <option value="">Select nation (optional)</option>
       <option value="🇦🇺 Australia">🇦🇺 Australia</option>
       <option value="🇦🇹 Austria">🇦🇹 Austria</option>
@@ -481,30 +373,23 @@ e.innerHTML=`
       <option value="🇺🇸 United States">🇺🇸 United States</option>
      </select>
     </div>
-    <div class="field-group">
-     <div class="field-lbl" id="registerPowerFactorLabel">Power Factor</div>
+    <div class="form-group">
+     <label class="form-label" id="registerPowerFactorLabel">Power Factor</label>
      <div class="pf-row">
       <div class="pf-btn selected" id="pfMinor">Minor</div>
       <div class="pf-btn" id="pfMajor">Major</div>
      </div>
     </div>
-    <div class="field-group">
-     <div class="field-lbl" id="registerCodeLabel">
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Invitation Code
-     </div>
-     <div class="field-wrap">
-      <div class="field-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-      <input id="registerCode" class="field" type="text" placeholder="Invitation code (required)" />
-     </div>
+    <div class="form-group">
+     <label class="form-label" id="registerCodeLabel">Invitation Code</label>
+     <input id="registerCode" class="form-input" type="text" placeholder="Invitation code (required)" />
     </div>
     <div id="gdprCheckboxContainer"></div>
     <button class="btn-primary" id="registerBtn">Create an Account</button>
     <button class="btn-ghost" id="cancelRegisterBtn">Cancel</button>
    </div>
 
-   <div id="error" class="error-text"></div>
   </div>
-
  </div>
 </div>
 

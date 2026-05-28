@@ -447,7 +447,7 @@ async function removeEditMatchShooter(e){const i=$.find(n=>n.id!=null&&n.id.toSt
 var _st=document.createElement("style");
 _st.textContent="\
 :root{--accent:#f5c800;--accent2:#d9ae00;--accent-fade:rgba(245,200,0,0.10);--accent-glow:rgba(245,200,0,0.25);--bg:#0d0e10;--bg2:#111314;--bg3:#161819;--card:#181a1c;--card2:#1c1e20;--border:rgba(255,255,255,0.08);--border-gold:rgba(245,200,0,0.28);--text:#eef0ec;--muted:rgba(255,255,255,0.38);--green:#6aad3e;--red:#ef4444;--radius:8px;--radius-sm:6px;--stripe:repeating-linear-gradient(-55deg,#f5c800 0px,#f5c800 7px,transparent 7px,transparent 14px);}\
-html,body,*{background-color:inherit;font-family:"Outfit",sans-serif!important;}html,body{background:var(--bg)!important;color:var(--text)!important;}\
+html,body,*{background-color:inherit;font-family:'Outfit',sans-serif!important;}html,body{background:var(--bg)!important;color:var(--text)!important;}\
 .screen{background:var(--bg)!important;min-height:100vh;display:none;}\
 .screen.active{display:block;}\
 /* === TABULAR NUMS on all data === */\

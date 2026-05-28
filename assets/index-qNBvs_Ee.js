@@ -1859,7 +1859,7 @@ function icRenderRewards() {
         html += '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">';
         html += '<span style="font-size:9px;background:rgba(116,191,255,0.2);color:#74BFFF;padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:0.06em;border:1px solid rgba(116,191,255,0.3);">NORGE</span>';
         html += '<span style="font-size:9px;background:rgba(116,191,255,0.2);color:#74BFFF;padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:0.06em;border:1px solid rgba(116,191,255,0.3);">CLASSIC</span>';
-        html += '<span style="font-size:9px;background:rgba(212,175,55,0.12);color:#B8912E;padding:2px 8px;border-radius:4px;font-family:"Share Tech Mono",monospace;font-weight:400;letter-spacing:0.10em;border:1px solid rgba(212,175,55,0.25);">LANDSLAGET</span>';
+        html += '<span style="font-size:9px;background:rgba(212,175,55,0.12);color:#B8912E;padding:2px 8px;border-radius:4px;font-family:'Share Tech Mono',monospace;font-weight:400;letter-spacing:0.10em;border:1px solid rgba(212,175,55,0.25);">LANDSLAGET</span>';
         html += '</div></div></div>';
         return;
       }

@@ -526,7 +526,7 @@ async function removeEditMatchShooter(e){const i=$.find(n=>n.id!=null&&n.id.toSt
 var _st=document.createElement("style");
 _st.textContent="\
 :root{--accent:#D4AF37;--accent2:#B8912E;--accent-fade:rgba(212,175,55,0.10);--accent-glow:rgba(212,175,55,0.25);--bg:#0d0e10;--bg2:#111314;--bg3:#161819;--card:#181a1c;--card2:#1c1e20;--border:rgba(255,255,255,0.08);--border-gold:rgba(212,175,55,0.28);--text:#eef0ec;--muted:rgba(255,255,255,0.38);--green:#6aad3e;--red:#ef4444;--radius:8px;--radius-sm:6px;--stripe:repeating-linear-gradient(-55deg,#D4AF37 0px,#D4AF37 7px,transparent 7px,transparent 14px);}\
-html,body,*{background-color:inherit;font-family:'Outfit',sans-serif!important;}html,body{background:var(--bg)!important;color:var(--text)!important;}\
+html,body,*{background-color:inherit;font-family:\"Outfit\",sans-serif!important;}html,body{background:var(--bg)!important;color:var(--text)!important;}\
 .screen{background:var(--bg)!important;min-height:100vh;display:none;}\
 .screen.active{display:block;}\
 /* === TABULAR NUMS on all data === */\
@@ -546,7 +546,7 @@ html,body,*{background-color:inherit;font-family:'Outfit',sans-serif!important;}
 .nav-refresh-btn svg{width:18px!important;height:18px!important;stroke:currentColor!important;fill:none!important;stroke-width:2.2!important;stroke-linecap:round!important;stroke-linejoin:round!important;}\
 /* === TAB BAR === */\
 .tab-bar{background:var(--bg)!important;border-top:1px solid var(--border)!important;padding:10px 0 22px!important;}\
-.tab-item{color:var(--muted)!important;font-family:'Share Tech Mono',monospace!important;font-size:7.5px!important;font-weight:400!important;letter-spacing:0.08em!important;text-transform:uppercase!important;transition:color 0.15s!important;position:relative!important;padding:2px 0!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;}\
+.tab-item{color:var(--muted)!important;font-family:\"Share Tech Mono\",monospace!important;font-size:7.5px!important;font-weight:400!important;letter-spacing:0.08em!important;text-transform:uppercase!important;transition:color 0.15s!important;position:relative!important;padding:2px 0!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;}\
 .tab-item.active{color:var(--accent)!important;background:none!important;border-radius:0!important;}\
 .tab-item.active::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--accent);border-radius:2px;}\
 .tab-icon svg{stroke:currentColor!important;fill:none!important;}\
@@ -554,7 +554,7 @@ html,body,*{background-color:inherit;font-family:'Outfit',sans-serif!important;}
 .filter-chip{background:rgba(255,255,255,0.04)!important;border:1px solid rgba(255,255,255,0.08)!important;border-radius:20px!important;color:var(--muted)!important;font-size:10px!important;font-weight:700!important;letter-spacing:0.08em!important;text-transform:uppercase!important;padding:5px 13px!important;transition:all 0.15s!important;}\
 .filter-chip.active{background:var(--accent-fade)!important;border-color:var(--accent)!important;color:var(--accent)!important;}\
 /* === BUTTONS === */\
-.btn-primary,.primary-btn{background:var(--accent)!important;color:#0a0c0e!important;border:none!important;border-radius:var(--radius-sm)!important;font-family:'Outfit',sans-serif!important;font-weight:800!important;font-size:12px!important;letter-spacing:0.12em!important;text-transform:uppercase!important;padding:12px 18px!important;cursor:pointer!important;transition:opacity 0.15s!important;}\
+.btn-primary,.primary-btn{background:var(--accent)!important;color:#0a0c0e!important;border:none!important;border-radius:var(--radius-sm)!important;font-family:\"Outfit\",sans-serif!important;font-weight:800!important;font-size:12px!important;letter-spacing:0.12em!important;text-transform:uppercase!important;padding:12px 18px!important;cursor:pointer!important;transition:opacity 0.15s!important;}\
 .btn-primary:hover,.primary-btn:hover{opacity:0.88!important;}\
 .btn-secondary,.secondary-btn{background:transparent!important;border:1px solid rgba(212,175,55,0.28)!important;border-radius:var(--radius-sm)!important;color:var(--accent)!important;font-size:11px!important;font-weight:700!important;letter-spacing:0.08em!important;text-transform:uppercase!important;padding:8px 12px!important;cursor:pointer!important;transition:background 0.15s,border-color 0.15s!important;}\
 .btn-secondary:hover{background:var(--accent-fade)!important;border-color:rgba(212,175,55,0.50)!important;}\
@@ -666,11 +666,11 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .hero-goal-wrap{}\
 #hero-goal-input:focus{border-color:rgba(212,175,55,0.55);box-shadow:0 0 0 2px rgba(212,175,55,0.10);}\
 .home-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 40%,rgba(212,175,55,0.07),transparent 65%);pointer-events:none;}\
-.home-hero-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}\
-.home-hero-title{font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.01em;color:var(--text);margin-bottom:8px;}\
+.home-hero-label{font-family:\"Share Tech Mono\",monospace;font-size:10px;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}\
+.home-hero-title{font-family:\"Outfit\",sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.01em;color:var(--text);margin-bottom:8px;}\
 .home-hero-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:0;}\
 .home-hero-actions{display:flex;gap:10px;flex-wrap:wrap;}\
-.hero-btn-p{background:var(--accent);color:#0a0c0e;border:none;border-radius:6px;padding:10px 20px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;}\
+.hero-btn-p{background:var(--accent);color:#0a0c0e;border:none;border-radius:6px;padding:10px 20px;font-family:\"Outfit\",sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;}\
 .hero-btn-p:hover{opacity:0.88;}\
 .hero-btn-g{background:rgba(255,255,255,0.06);color:var(--text);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 20px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}\
 .hero-btn-g:hover{background:rgba(255,255,255,0.1);}\

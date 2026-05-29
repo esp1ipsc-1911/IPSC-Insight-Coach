@@ -12,7 +12,9 @@ body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--ink); ba
 .bg { min-height:100vh; background-image: radial-gradient(circle at 18% 15%, rgba(255,255,255,.12), transparent 22%), repeating-linear-gradient(88deg, rgba(0,0,0,.16) 0 2px, transparent 2px 72px); }
 header { padding:28px 28px 18px; border-bottom:4px solid rgba(255,255,255,.18); background:rgba(0,0,0,.38); position:relative; overflow:hidden; }
 header:after { content:""; position:absolute; inset:auto -5% -60px 40%; height:140px; transform:rotate(-8deg); background:linear-gradient(90deg, transparent, rgba(255,255,255,.9), rgba(0,36,125,.9), rgba(255,255,255,.9), rgba(200,16,46,.95)); opacity:.35; }
-.hero { position:relative; z-index:1; display:flex; align-items:center; gap:24px; max-width:1400px; margin:0 auto; }
+.hero { position:relative; z-index:1; display:grid; grid-template-columns:112px minmax(0,1fr) 112px; align-items:start; gap:24px; max-width:1400px; margin:0 auto; }
+.hero > :nth-child(2) { min-width:0; }
+.hero > .logo:last-child { justify-self:end; }
 .logo { background:#fff; border-radius:50%; padding:8px; width:112px; height:112px; object-fit:contain; box-shadow:0 8px 20px rgba(0,0,0,.35); }
 .logo.ehc { border-radius:18px; }
 h1 { margin:0; font-size:clamp(2rem,4vw,4.2rem); letter-spacing:.04em; text-transform:uppercase; line-height:1; }
@@ -61,7 +63,7 @@ tr.off td { background:rgba(242,193,78,.16); color:#fff; }
 @media print { .elo-box { background:#fff8dc; border-color:#999; } .elo-metric div { background:#fff; } }
 
 footer { max-width:1400px; margin:0 auto; padding:0 18px 30px; color:#f3f3f3; opacity:.88; font-size:.85rem; }
-@media (max-width: 900px) { .hero { flex-wrap:wrap; } .logo { width:86px; height:86px; } .grid { grid-template-columns:1fr; } .athletes { border-right:none; border-bottom:1px solid rgba(255,255,255,.14); } table { font-size:.82rem; } th:nth-child(5),td:nth-child(5){display:none;} }
+@media (max-width: 900px) { .hero { grid-template-columns:86px minmax(0,1fr) 86px; gap:16px; } .logo { width:86px; height:86px; } .grid { grid-template-columns:1fr; } .athletes { border-right:none; border-bottom:1px solid rgba(255,255,255,.14); } table { font-size:.82rem; } th:nth-child(5),td:nth-child(5){display:none;} }
 @media print { body { background:#fff; color:#111; } .bg, header, main, footer { background:#fff; color:#111; } header { color:#111; border-bottom:2px solid #111; } .card, .overview, .note { box-shadow:none; border:1px solid #999; background:#fff; color:#111; break-inside:avoid; } .overview-head, .card-head { background:#eee; color:#111; } .pill, .summary span { color:#111; border-color:#555; background:#fff; } th { color:#111; background:#eee; } td,th { border-color:#bbb; } }
 
 /* Kollapsbare lagkort */
@@ -362,9 +364,7 @@ details.card:not([open]) > summary.card-head { border-bottom:none; }
 </div>
 </details>
 </main>
-<footer>
-  Kildegrunnlag: EHG-2026-HUNGARY-Squadding-MAIN-MATCH_29may2026.pdf og Schedule-MAIN-MATCH-EHG-2026-with-day-off-2.pdf. Generert for intern kontroll og publisering.
-</footer>
+
 </div>
 <script>
 (function(){

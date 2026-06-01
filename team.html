@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0b0d">
+<title>EHC 2026 — Team Standings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0a0b0d;
+  --surface:  #13151a;
+  --card:     #1a1d24;
+  --border:   #252830;
+  --accent:   #c9a227;
+  --accent2:  #e8b84b;
+  --text:     #e8eaf0;
+  --muted:    #6b7280;
+  --success:  #22c55e;
+  --danger:   #ef4444;
+  --gold:     #c9a227;
+  --silver:   #94a3b8;
+  --bronze:   #cd7f32;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh}
+.header{background:linear-gradient(135deg,#0d0f14 0%,#13151a 100%);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
+.header-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.header-title{font-size:17px;font-weight:700;letter-spacing:.3px}
+.header-sub{font-size:12px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+.header-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 10px;font-size:12px}
+.btn-danger{background:#3f1a1a;color:var(--danger);border:1px solid #5a2020}
+.btn-danger:hover{background:#5a2020}
+
+/* Auth */
+#auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;gap:20px}
+#auth-screen .auth-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:380px;text-align:center}
+#auth-screen .auth-card h2{font-size:20px;font-weight:700;margin-bottom:8px}
+#auth-screen .auth-card p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.field-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;margin-bottom:12px}
+.field-input:focus{border-color:var(--accent)}
+.auth-error{color:var(--danger);font-size:13px;margin-top:8px}
+
+/* Main layout */
+#main{display:none;flex-direction:column}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px}
+.tab{padding:14px 16px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none;padding:16px}
+.tab-content.active{display:block}
+
+/* Match selector */
+.match-selector{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.match-selector label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:.5px}
+.field-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;cursor:pointer}
+.field-select:focus{border-color:var(--accent)}
+
+/* Standings */
+.div-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.div-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:var(--card);transition:all .15s}
+.div-chip.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.standings-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.standings-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.standings-header h3{font-size:14px;font-weight:700;flex:1}
+.standings-header .div-badge{font-size:11px;font-family:'Share Tech Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;color:var(--muted)}
+.team-row{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);gap:12px;cursor:pointer;transition:background .1s}
+.team-row:last-child{border-bottom:none}
+.team-row:hover{background:rgba(201,162,39,.05)}
+.team-row.expanded{background:rgba(201,162,39,.04)}
+.rank-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.rank-1{background:linear-gradient(135deg,#b8860b,var(--gold));color:#000}
+.rank-2{background:linear-gradient(135deg,#708090,var(--silver));color:#000}
+.rank-3{background:linear-gradient(135deg,#8b4513,var(--bronze));color:#fff}
+.rank-n{background:var(--surface);color:var(--muted)}
+.team-flag{font-size:20px;flex-shrink:0}
+.team-info{flex:1;min-width:0}
+.team-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.team-country{font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+.team-pts{text-align:right;flex-shrink:0}
+.team-pts-val{font-size:16px;font-weight:800;color:var(--accent);font-family:'Share Tech Mono',monospace}
+.team-pts-label{font-size:10px;color:var(--muted);text-align:right}
+.team-bar-wrap{width:80px;flex-shrink:0}
+.team-bar{height:6px;background:var(--surface);border-radius:3px;overflow:hidden}
+.team-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease}
+
+/* Team detail */
+.team-detail{display:none;padding:12px 16px;background:var(--surface);border-top:1px solid var(--border)}
+.team-detail.open{display:block}
+.shooter-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.shooter-row:last-child{border-bottom:none}
+.shooter-counting{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.counting-yes{background:var(--success)}
+.counting-no{background:var(--muted)}
+.shooter-name{flex:1;font-size:13px}
+.shooter-pts{font-size:13px;font-weight:600;color:var(--accent);font-family:'Share Tech Mono',monospace}
+.shooter-dq{font-size:11px;color:var(--danger);font-weight:600}
+.detail-label{font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.detail-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Empty / loading */
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state h3{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Import tab */
+.import-header{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.import-header h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.import-header p{font-size:13px;color:var(--muted);line-height:1.5}
+.import-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center}
+.import-select{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;outline:none}
+.import-select:focus{border-color:var(--accent)}
+.import-search{flex:1;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;outline:none}
+.import-search:focus{border-color:var(--accent)}
+
+.nation-block{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.nation-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.nation-header:hover{background:rgba(255,255,255,.03)}
+.nation-flag{font-size:20px}
+.nation-name{font-size:14px;font-weight:700;flex:1}
+.nation-count{font-size:12px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+.nation-arrow{font-size:12px;color:var(--muted);transition:transform .2s}
+.nation-arrow.open{transform:rotate(90deg)}
+.nation-shooters{display:none;padding:0 16px 12px}
+.nation-shooters.open{display:block}
+.div-group-label{font-size:11px;color:var(--accent);font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:.5px;padding:8px 0 4px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.import-shooter-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.import-shooter-row:last-child{border-bottom:none}
+.import-checkbox{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.import-shooter-name{flex:1;font-size:13px}
+.import-shooter-meta{font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+.import-shooter-cat{font-size:10px;background:var(--surface);padding:2px 5px;border-radius:3px;color:var(--muted)}
+
+.import-footer{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.import-selected-count{font-size:13px;color:var(--muted);flex:1}
+.import-selected-count span{color:var(--accent);font-weight:700}
+.import-progress{font-size:12px;color:var(--muted)}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:14px;font-weight:600;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+.toast.show{opacity:1;pointer-events:auto}
+.toast.success{border-color:var(--success);color:var(--success)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+
+@media(min-width:600px){
+  .tab-content{max-width:700px;margin:0 auto}
+  .import-footer{max-width:700px;margin:0 auto;border-radius:12px;margin-bottom:12px;border:1px solid var(--border)}
+}
+</style>
+</head>
+<body>
+
+<!-- Auth screen -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div style="font-size:36px;margin-bottom:12px">🎯</div>
+    <h2>EHC 2026 Teams</h2>
+    <p>Sign in with your Insight Dynamics account</p>
+    <input class="field-input" type="email" id="auth-email" placeholder="Email" autocomplete="username">
+    <input class="field-input" type="password" id="auth-pass" placeholder="Password" autocomplete="current-password">
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In</button>
+    <div class="auth-error" id="auth-err"></div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="main">
+  <div class="header">
+    <div class="header-icon">🏆</div>
+    <div>
+      <div class="header-title">EHC 2026 — Team Standings</div>
+      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE</div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('standings')">Standings</div>
+    <div class="tab" onclick="switchTab('import')">Import Shooters</div>
+  </div>
+
+  <!-- STANDINGS TAB -->
+  <div class="tab-content active" id="tab-standings">
+    <div class="match-selector">
+      <label>Select match</label>
+      <select class="field-select" id="match-select" onchange="onMatchSelect()">
+        <option value="">Loading matches…</option>
+      </select>
+    </div>
+    <div class="div-filter" id="div-filter"></div>
+    <div id="standings-content">
+      <div class="empty-state"><h3>Select a match</h3><p>Choose a match above to view team standings.</p></div>
+    </div>
+  </div>
+
+  <!-- IMPORT TAB -->
+  <div class="tab-content" id="tab-import">
+    <div class="import-header">
+      <h3>Import EHC Team Shooters</h3>
+      <p>Select shooters from the official EHG 2026 squad list (T-marked). They will be added to the selected match and grouped into national teams per division.</p>
+    </div>
+    <div class="match-selector">
+      <label>Target match</label>
+      <select class="field-select" id="import-match-select">
+        <option value="">Loading matches…</option>
+      </select>
+    </div>
+    <div class="import-controls">
+      <select class="import-select" id="filter-reg" onchange="renderImportList()">
+        <option value="">All Nations</option>
+      </select>
+      <select class="import-select" id="filter-div" onchange="renderImportList()">
+        <option value="">All Divisions</option>
+        <option>Classic</option>
+        <option>Open</option>
+        <option>Optics</option>
+        <option>Production</option>
+        <option>Production Optics</option>
+        <option>Revolver</option>
+        <option>Standard</option>
+      </select>
+      <input class="import-search" id="import-search" placeholder="Search name…" oninput="renderImportList()">
+      <button class="btn btn-secondary btn-sm" onclick="selectAllVisible()">Select all</button>
+      <button class="btn btn-secondary btn-sm" onclick="deselectAll()">Deselect all</button>
+    </div>
+    <div id="import-list"></div>
+    <div class="import-footer">
+      <div class="import-selected-count">Selected: <span id="sel-count">0</span> shooters</div>
+      <div class="import-progress" id="import-progress"></div>
+      <button class="btn btn-primary" onclick="doImport()">Import to match</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot, query, where }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5p7Q",
+  authDomain: "ipsc-insight-coach.firebaseapp.com",
+  projectId: "ipsc-insight-coach",
+  storageBucket: "ipsc-insight-coach.firebasestorage.app",
+  messagingSenderId: "864793320312",
+  appId: "1:864793320312:web:c586e384bbe365444bc68d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let currentUser = null;
+let allMatches = [];
+let selectedMatchId = null;
+let selectedImportMatchId = null;
+let activeDiv = 'All';
+let unsubMatches = null;
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+window.doLogin = async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-err');
+  errEl.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    errEl.textContent = e.message.replace('Firebase: ','').replace(/\(auth\/[^)]+\)/,'');
+  }
+};
+window.doLogout = () => signOut(auth);
+document.getElementById('auth-pass').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  if (user) {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main').style.display = 'flex';
+    loadMatches(user.uid);
+  } else {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('main').style.display = 'none';
+    if (unsubMatches) { unsubMatches(); unsubMatches = null; }
+  }
+});
+
+// ─── Load matches ─────────────────────────────────────────────────────────────
+function loadMatches(uid) {
+  const q = query(collection(db, 'matches'), where('participants', 'array-contains', uid));
+  unsubMatches = onSnapshot(q, snap => {
+    allMatches = [];
+    snap.forEach(d => allMatches.push({id: d.id, ...d.data()}));
+    allMatches.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    populateMatchDropdowns();
+    if (selectedMatchId) renderStandings();
+  });
+}
+
+function populateMatchDropdowns() {
+  const opts = allMatches.map(m =>
+    `<option value="${m.id}">${m.name||'Match #'+m.id} (${(m.shooters||[]).length} shooters, ${(m.teams||[]).length} teams)</option>`
+  ).join('');
+  const empty = '<option value="">— Select match —</option>';
+  document.getElementById('match-select').innerHTML = empty + opts;
+  document.getElementById('import-match-select').innerHTML = empty + opts;
+  if (selectedMatchId) document.getElementById('match-select').value = selectedMatchId;
+  if (selectedImportMatchId) document.getElementById('import-match-select').value = selectedImportMatchId;
+}
+
+// ─── Standings ────────────────────────────────────────────────────────────────
+window.switchTab = (tab) => {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['standings','import'][i]===tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+};
+
+window.onMatchSelect = () => {
+  selectedMatchId = document.getElementById('match-select').value;
+  renderStandings();
+};
+
+function renderStandings() {
+  const match = allMatches.find(m => String(m.id) === String(selectedMatchId));
+  const cont = document.getElementById('standings-content');
+  const filterEl = document.getElementById('div-filter');
+
+  if (!match) {
+    cont.innerHTML = '<div class="empty-state"><h3>Select a match</h3></div>';
+    filterEl.innerHTML = '';
+    return;
+  }
+  if (!match.teams || !match.teams.length) {
+    cont.innerHTML = '<div class="empty-state"><h3>No teams in this match</h3><p>Use the Import tab to add EHC teams, or create teams in the main app.</p></div>';
+    filterEl.innerHTML = '';
+    return;
+  }
+
+  // Collect unique divisions from shooters
+  const divs = ['All', ...new Set((match.shooters||[]).map(s=>s.division).filter(Boolean)).values()].sort();
+  filterEl.innerHTML = divs.map(d =>
+    `<div class="div-chip ${d===activeDiv?'active':''}" onclick="setDiv('${d}')">${d}</div>`
+  ).join('');
+
+  const standings = calcTeamStandings(match);
+  const filtered = activeDiv === 'All' ? standings :
+    standings.filter(t => {
+      const members = (match.shooters||[]).filter(s => t.shooterIds.includes(s.id));
+      return members.some(s => s.division === activeDiv);
+    });
+
+  if (!filtered.length) {
+    cont.innerHTML = '<div class="empty-state"><h3>No teams for this division</h3></div>';
+    return;
+  }
+
+  const topPts = filtered[0]?.totalPts || 0;
+
+  cont.innerHTML = filtered.map((team, i) => {
+    const rank = i + 1;
+    const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-n';
+    const pct = topPts > 0 ? Math.round(team.totalPts / topPts * 100) : 0;
+    const flag = countryFlag(team.country || '');
+
+    const shooterRows = team.shooterSummary.map(s =>
+      `<div class="shooter-row">
+        <div class="shooter-counting ${s.counting&&!s.dq?'counting-yes':'counting-no'}" title="${s.counting?'Counting':'Bench'}"></div>
+        <div class="shooter-name">${s.name}${s.dq?' <span class="shooter-dq">DQ</span>':''}</div>
+        <div class="shooter-pts">${s.total.toFixed(2)}</div>
+      </div>`
+    ).join('');
+
+    return `
+    <div class="standings-card">
+      <div class="team-row" onclick="toggleDetail('td-${i}',this)">
+        <div class="rank-badge ${rankClass}">${rank}</div>
+        <div class="team-flag">${flag}</div>
+        <div class="team-info">
+          <div class="team-name">${team.name}</div>
+          <div class="team-country">${team.country||''}</div>
+        </div>
+        <div class="team-bar-wrap">
+          <div class="team-bar"><div class="team-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="team-pts">
+          <div class="team-pts-val">${team.totalPts.toFixed(2)}</div>
+          <div class="team-pts-label">pts</div>
+        </div>
+      </div>
+      <div class="team-detail" id="td-${i}">
+        <div class="detail-label">Shooters (top 3 of ${team.shooterIds.length} count)</div>
+        ${shooterRows}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.setDiv = (d) => { activeDiv = d; renderStandings(); };
+window.toggleDetail = (id, row) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const open = el.classList.toggle('open');
+  row.classList.toggle('expanded', open);
+};
+
+// ─── Team standings calculation (mirrors icTeamStandings) ────────────────────
+function calcTeamStandings(match) {
+  if (!match?.teams?.length) return [];
+  const stages = getStageDefs(match);
+  const dqIds = new Set((match.shooters||[]).filter(s=>s.dq).map(s=>String(s.id)));
+
+  return match.teams.map(team => {
+    const shooterIds = team.shooterIds || [];
+    const allShooters = (match.shooters||[]).filter(s => shooterIds.includes(s.id));
+
+    // Total stage points per shooter across all stages
+    const totals = {};
+    shooterIds.forEach(id => totals[id] = 0);
+    stages.forEach(stage => {
+      const metrics = stageMetrics(match, stage);
+      shooterIds.forEach(id => {
+        if (dqIds.has(String(id))) return;
+        const m = metrics.find(mm => String(mm.id) === String(id));
+        if (m) totals[id] += (m.stagePts || 0);
+      });
+    });
+
+    const ranked = shooterIds.map(id => ({id, total: totals[id]||0})).sort((a,b)=>b.total-a.total);
+    const top3 = ranked.slice(0,3).map(r=>r.id);
+
+    let totalPts = 0;
+    stages.forEach(stage => {
+      const metrics = stageMetrics(match, stage);
+      top3.forEach(id => {
+        const m = metrics.find(mm => String(mm.id) === String(id));
+        if (!dqIds.has(String(id)) && m) totalPts += (m.stagePts||0);
+      });
+    });
+
+    const shooterSummary = ranked.map((r,ri) => {
+      const s = allShooters.find(sh=>String(sh.id)===String(r.id));
+      return {id:r.id, name:s?`${s.firstName||''} ${s.lastName||''}`.trim():'?', total:r.total, counting:ri<3, dq:dqIds.has(String(r.id))};
+    });
+
+    return {id:team.id, name:team.name, country:team.country||'', shooterIds, totalPts, shooterSummary, top3Ids:top3};
+  }).sort((a,b)=>b.totalPts-a.totalPts);
+}
+
+function getStageDefs(match) {
+  const seen = new Set();
+  const stages = [];
+  (match.shooters||[]).forEach(s => {
+    (s.stages||[]).forEach(st => {
+      const n = st.num||st.number;
+      if (!seen.has(n)) { seen.add(n); stages.push({number:n, name:st.name||'Stage '+n}); }
+    });
+  });
+  return stages.sort((a,b)=>(a.number||0)-(b.number||0));
+}
+
+function stageMetrics(match, stage) {
+  const stageNum = stage.number;
+  const results = [];
+  (match.shooters||[]).forEach(shooter => {
+    const st = (shooter.stages||[]).find(s=>(s.num||s.number)===stageNum);
+    if (!st) return;
+    const hf = st.hf || 0;
+    const pts = st.pts || 0;
+    const time = st.time || 0;
+    results.push({id: shooter.id, hf, pts, time});
+  });
+
+  // Calculate stage points as % of top HF
+  const topHF = Math.max(...results.map(r=>r.hf), 0);
+  return results.map(r => ({
+    ...r,
+    stagePts: topHF > 0 ? (r.hf / topHF) * 100 : 0
+  }));
+}
+
+// ─── Country flag emoji ───────────────────────────────────────────────────────
+const flagMap = {
+  AUT:'🇦🇹',BEL:'🇧🇪',BIH:'🇧🇦',BUL:'🇧🇬',CAN:'🇨🇦',CHN:'🇨🇳',CRO:'🇭🇷',
+  CYP:'🇨🇾',CZE:'🇨🇿',DEN:'🇩🇰',ECU:'🇪🇨',ESP:'🇪🇸',EST:'🇪🇪',FIN:'🇫🇮',
+  FRA:'🇫🇷',GBR:'🇬🇧',GER:'🇩🇪',GIB:'🇬🇮',GRE:'🇬🇷',HKG:'🇭🇰',HUN:'🇭🇺',
+  ISR:'🇮🇱',ITA:'🇮🇹',JAM:'🇯🇲',KAZ:'🇰🇿',KOR:'🇰🇷',KSA:'🇸🇦',LTU:'🇱🇹',
+  LUX:'🇱🇺',MDA:'🇲🇩',MON:'🇲🇨',MTO:'🇲🇪',NED:'🇳🇱',NIR:'🇬🇧',NOR:'🇳🇴',
+  PHI:'🇵🇭',POL:'🇵🇱',POR:'🇵🇹',ROU:'🇷🇴',RSA:'🇿🇦',SER:'🇷🇸',SLO:'🇸🇮',
+  SUI:'🇨🇭',SVK:'🇸🇰',SWE:'🇸🇪',TRI:'🇹🇹',TUR:'🇹🇷',UKR:'🇺🇦',USA:'🇺🇸',ZIM:'🇿🇼',
+  AND:'🇦🇩',ARG:'🇦🇷',AUS:'🇦🇺',BRA:'🇧🇷'
+};
+function countryFlag(code) { return flagMap[code.toUpperCase()] || '🏳️'; }
+
+// ─── EHC Shooter data ────────────────────────────────────────────────────────
+const EHC_SHOOTERS = [
+  {num:"755",lastName:"Reiter",firstName:"Gerald",div:"Revolver",cat:"S",reg:"AUT"},
+  {num:"1054",lastName:"Csucska",firstName:"Peter",div:"Revolver",cat:"",reg:"HUN"},
+  {num:"1541",lastName:"Anesa",firstName:"Vittorio",div:"Classic",cat:"",reg:"ITA"},
+  {num:"266",lastName:"Fiskebeck",firstName:"Espen",div:"Classic",cat:"",reg:"NOR"},
+  {num:"586",lastName:"Iosifidis",firstName:"Konstantinos",div:"Classic",cat:"S",reg:"GRE"},
+  {num:"756",lastName:"Stelzmueller",firstName:"Nikolaus",div:"Revolver",cat:"",reg:"AUT"},
+  {num:"1055",lastName:"Szarvas",firstName:"Peter",div:"Revolver",cat:"S",reg:"HUN"},
+  {num:"1542",lastName:"Losi",firstName:"Francesco",div:"Classic",cat:"",reg:"ITA"},
+  {num:"381",lastName:"Fiskerstrand",firstName:"Jan Stian",div:"Classic",cat:"S",reg:"NOR"},
+  {num:"626",lastName:"GKOGKAKIS",firstName:"ATHANASIOS",div:"Classic",cat:"",reg:"GRE"},
+  {num:"757",lastName:"Kroiss",firstName:"Robert",div:"Revolver",cat:"S",reg:"AUT"},
+  {num:"1056",lastName:"Wittinger",firstName:"Gabor Alex",div:"Revolver",cat:"",reg:"HUN"},
+  {num:"1543",lastName:"Mundo",firstName:"Vincenzo",div:"Classic",cat:"",reg:"ITA"},
+  {num:"268",lastName:"Johansen",firstName:"Henrik",div:"Classic",cat:"",reg:"NOR"},
+  {num:"627",lastName:"Vlachos",firstName:"Kostas",div:"Classic",cat:"",reg:"GRE"},
+  {num:"758",lastName:"Lang",firstName:"Johann",div:"Revolver",cat:"S",reg:"AUT"},
+  {num:"1651",lastName:"Sárközy",firstName:"Károly",div:"Revolver",cat:"",reg:"HUN"},
+  {num:"1544",lastName:"Masieri",firstName:"Lorenzo",div:"Classic",cat:"",reg:"ITA"},
+  {num:"365",lastName:"Aarmo",firstName:"Stig",div:"Classic",cat:"",reg:"NOR"},
+  {num:"760",lastName:"Fragos",firstName:"Dimitris",div:"Classic",cat:"S",reg:"GRE"},
+  {num:"56",lastName:"Knaus",firstName:"Günther",div:"Revolver",cat:"S",reg:"GER"},
+  {num:"336",lastName:"Marjoniemi",firstName:"Esa",div:"Classic",cat:"S",reg:"FIN"},
+  {num:"821",lastName:"Marx",firstName:"Jakub",div:"Classic",cat:"",reg:"CZE"},
+  {num:"134",lastName:"Hansen",firstName:"Gert Erling",div:"Classic",cat:"SS",reg:"DEN"},
+  {num:"140",lastName:"Slim",firstName:"Marcel",div:"Classic",cat:"SS",reg:"NED"},
+  {num:"59",lastName:"Füger",firstName:"Christian",div:"Revolver",cat:"",reg:"GER"},
+  {num:"337",lastName:"Mattila",firstName:"Sampo",div:"Classic",cat:"S",reg:"FIN"},
+  {num:"878",lastName:"Novotný",firstName:"Zdeněk",div:"Classic",cat:"",reg:"CZE"},
+  {num:"135",lastName:"Frandsen",firstName:"Kim",div:"Classic",cat:"",reg:"DEN"},
+  {num:"156",lastName:"Thijssen",firstName:"Jan-Wouter",div:"Classic",cat:"",reg:"NED"},
+  {num:"60",lastName:"Schmid",firstName:"Michael",div:"Revolver",cat:"",reg:"GER"},
+  {num:"338",lastName:"Tukiainen",firstName:"Antti",div:"Classic",cat:"",reg:"FIN"},
+  {num:"880",lastName:"Zvěřina",firstName:"David",div:"Classic",cat:"",reg:"CZE"},
+  {num:"136",lastName:"Bach",firstName:"Mads Peter",div:"Classic",cat:"S",reg:"DEN"},
+  {num:"759",lastName:"Warmerdam",firstName:"Rene",div:"Classic",cat:"S",reg:"NED"},
+  {num:"1678",lastName:"Steinert",firstName:"Benjamin",div:"Revolver",cat:"",reg:"GER"},
+  {num:"1545",lastName:"Sciurpi",firstName:"Antonio",div:"Classic",cat:"S",reg:"ITA"},
+  {num:"448",lastName:"Manosalvas",firstName:"Francisco",div:"Classic",cat:"S",reg:"ESP"},
+  {num:"1546",lastName:"Di Giulio",firstName:"Giovanni",div:"Classic",cat:"S",reg:"ITA"},
+  {num:"449",lastName:"Arroyo Navidad",firstName:"Nicolas",div:"Classic",cat:"S",reg:"ESP"},
+  {num:"1547",lastName:"Farnetani",firstName:"Marco",div:"Classic",cat:"S",reg:"ITA"},
+  {num:"450",lastName:"CASES",firstName:"ANTONIO",div:"Classic",cat:"SS",reg:"ESP"},
+  {num:"1548",lastName:"Pedroli",firstName:"Nicola",div:"Classic",cat:"SS",reg:"ITA"},
+  {num:"550",lastName:"CONDE GALA",firstName:"FEDERICO",div:"Classic",cat:"SS",reg:"ESP"},
+  {num:"1066",lastName:"Donka",firstName:"Imre",div:"Classic",cat:"S",reg:"HUN"},
+  {num:"5",lastName:"Graner",firstName:"Arno",div:"Classic",cat:"S",reg:"GER"},
+  {num:"1067",lastName:"Bobaly",firstName:"Mihaly",div:"Classic",cat:"S",reg:"HUN"},
+  {num:"6",lastName:"Kaiser",firstName:"Marcus",div:"Classic",cat:"S",reg:"GER"},
+  {num:"1068",lastName:"Miglecz",firstName:"Gyula",div:"Classic",cat:"S",reg:"HUN"},
+  {num:"1069",lastName:"Batki",firstName:"György",div:"Classic",cat:"S",reg:"HUN"},
+  {num:"1562",lastName:"Ciocconi",firstName:"Maurizio",div:"Open",cat:"S",reg:"ITA"},
+  {num:"1658",lastName:"Checcucci",firstName:"Federico",div:"Open",cat:"S",reg:"ITA"},
+  {num:"1563",lastName:"Barbizzi",firstName:"Daniele",div:"Open",cat:"SS",reg:"ITA"},
+  {num:"813",lastName:"Kamenicek",firstName:"Martin",div:"Production Optics",cat:"",reg:"CZE"},
+  {num:"1684",lastName:"Grauffel",firstName:"Robin",div:"Production Optics",cat:"J",reg:"FRA"},
+  {num:"1534",lastName:"Indizio",firstName:"Davide",div:"Production Optics",cat:"",reg:"ITA"},
+  {num:"21",lastName:"Ehrhardt",firstName:"Luis",div:"Production Optics",cat:"",reg:"GER"},
+  {num:"107",lastName:"Keppel",firstName:"Dylan",div:"Production Optics",cat:"",reg:"NED"},
+  {num:"277",lastName:"Granbo",firstName:"Steinar",div:"Production Optics",cat:"",reg:"NOR"},
+  {num:"814",lastName:"Koudelka",firstName:"Dan",div:"Production Optics",cat:"J",reg:"CZE"},
+  {num:"1685",lastName:"Obriot",firstName:"Emile",div:"Production Optics",cat:"",reg:"FRA"},
+  {num:"1535",lastName:"Giacomini",firstName:"Cristian",div:"Production Optics",cat:"",reg:"ITA"},
+  {num:"22",lastName:"Ross",firstName:"Christopher",div:"Production Optics",cat:"",reg:"GER"},
+  {num:"108",lastName:"Wauben",firstName:"Cheyenne",div:"Production Optics",cat:"L",reg:"NED"},
+  {num:"278",lastName:"Grimli",firstName:"Alexander",div:"Production Optics",cat:"",reg:"NOR"},
+  {num:"815",lastName:"Novotný",firstName:"Robert",div:"Production Optics",cat:"SJ",reg:"CZE"},
+  {num:"1693",lastName:"Armendariz",firstName:"Sebastien",div:"Production Optics",cat:"",reg:"FRA"},
+  {num:"1536",lastName:"Masserdotti",firstName:"Manuel",div:"Production Optics",cat:"",reg:"ITA"},
+  {num:"23",lastName:"Eggert",firstName:"Timm",div:"Production Optics",cat:"",reg:"GER"},
+  {num:"132",lastName:"Souhuwat",firstName:"Marcel Timothy",div:"Production Optics",cat:"",reg:"NED"},
+  {num:"279",lastName:"Norr",firstName:"Aleksander",div:"Production Optics",cat:"",reg:"NOR"},
+  {num:"816",lastName:"Gabriel",firstName:"Livia",div:"Production Optics",cat:"LJ",reg:"CZE"},
+  {num:"1695",lastName:"Denoyelles",firstName:"Morgan",div:"Production Optics",cat:"",reg:"FRA"},
+  {num:"1537",lastName:"Vicari",firstName:"Michael",div:"Production Optics",cat:"",reg:"ITA"},
+  {num:"63",lastName:"Udvary",firstName:"David",div:"Production Optics",cat:"",reg:"GER"},
+  {num:"924",lastName:"Peniche",firstName:"Rafael",div:"Production Optics",cat:"",reg:"POR"},
+  {num:"684",lastName:"Andersen",firstName:"Terje",div:"Production Optics",cat:"",reg:"NOR"},
+  {num:"981",lastName:"Levin",firstName:"David",div:"Production Optics",cat:"",reg:"SWE"},
+  {num:"244",lastName:"Suoninen",firstName:"Mikko",div:"Production Optics",cat:"",reg:"FIN"},
+  {num:"1378",lastName:"Palka",firstName:"Jan",div:"Production Optics",cat:"SS",reg:"SVK"},
+  {num:"1213",lastName:"Tausiewicz",firstName:"Marcin",div:"Production Optics",cat:"",reg:"POL"},
+  {num:"927",lastName:"Mendes",firstName:"Robert",div:"Production Optics",cat:"S",reg:"POR"},
+  {num:"982",lastName:"Gyllenberg",firstName:"Rasmus",div:"Production Optics",cat:"",reg:"SWE"},
+  {num:"245",lastName:"Pennanen",firstName:"Pasi",div:"Production Optics",cat:"",reg:"FIN"},
+  {num:"1391",lastName:"Bednarik",firstName:"Marian",div:"Production Optics",cat:"",reg:"SVK"},
+  {num:"1289",lastName:"Ratynski",firstName:"Lukas",div:"Production Optics",cat:"",reg:"POL"},
+  {num:"929",lastName:"Bastos",firstName:"Joao",div:"Production Optics",cat:"S",reg:"POR"},
+  {num:"983",lastName:"Johnson",firstName:"Daniel",div:"Production Optics",cat:"",reg:"SWE"},
+  {num:"246",lastName:"Tiili",firstName:"Samuel",div:"Production Optics",cat:"",reg:"FIN"},
+  {num:"1394",lastName:"Drienik",firstName:"Vojtech",div:"Production Optics",cat:"",reg:"SVK"},
+  {num:"1293",lastName:"Wysocki",firstName:"Nikodem",div:"Production Optics",cat:"",reg:"POL"},
+  {num:"932",lastName:"Mendes",firstName:"Joao",div:"Production Optics",cat:"",reg:"POR"},
+  {num:"1357",lastName:"Åström",firstName:"Tobias",div:"Production Optics",cat:"",reg:"SWE"},
+  {num:"310",lastName:"Jetsonen",firstName:"Timo",div:"Production Optics",cat:"",reg:"FIN"},
+  {num:"1307",lastName:"Sviridov",firstName:"Denys",div:"Production Optics",cat:"",reg:"POL"},
+  {num:"488",lastName:"Alcaraz",firstName:"Enrique",div:"Production Optics",cat:"",reg:"ESP"},
+  {num:"622",lastName:"KOUIMTSIDIS",firstName:"THEODOROS",div:"Production Optics",cat:"",reg:"GRE"},
+  {num:"347",lastName:"Baksa",firstName:"Giedrius",div:"Production Optics",cat:"",reg:"LTU"},
+  {num:"524",lastName:"Wuyts",firstName:"Nic",div:"Production Optics",cat:"",reg:"BEL"},
+  {num:"151",lastName:"Bankovic",firstName:"Luka",div:"Production Optics",cat:"",reg:"SER"},
+  {num:"489",lastName:"Tomas Forne",firstName:"Miquel Angel",div:"Production Optics",cat:"",reg:"ESP"},
+  {num:"623",lastName:"Tsantalis",firstName:"Nikolaos",div:"Production Optics",cat:"",reg:"GRE"},
+  {num:"355",lastName:"Ribokas",firstName:"Donatas",div:"Production Optics",cat:"",reg:"LTU"},
+  {num:"525",lastName:"Desmedt",firstName:"Mike",div:"Production Optics",cat:"",reg:"BEL"},
+  {num:"669",lastName:"Bulatović",firstName:"Branislav",div:"Production Optics",cat:"",reg:"SER"},
+  {num:"490",lastName:"Alcaraz",firstName:"Victor",div:"Production Optics",cat:"",reg:"ESP"},
+  {num:"358",lastName:"Šukys",firstName:"Tautvydas",div:"Production Optics",cat:"",reg:"LTU"},
+  {num:"526",lastName:"Proost",firstName:"Maarten",div:"Production Optics",cat:"",reg:"BEL"},
+  {num:"670",lastName:"Stamenković",firstName:"Dejan",div:"Production Optics",cat:"",reg:"SER"},
+  {num:"573",lastName:"Roldán Blázquez",firstName:"Francisco",div:"Production Optics",cat:"",reg:"ESP"},
+  {num:"625",lastName:"Karavergos",firstName:"Athanasios",div:"Production Optics",cat:"S",reg:"GRE"},
+  {num:"1123",lastName:"Lukenda",firstName:"Davor",div:"Production Optics",cat:"",reg:"CRO"},
+  {num:"534",lastName:"Peeters",firstName:"Sven",div:"Production Optics",cat:"",reg:"BEL"},
+  {num:"1026",lastName:"Džonić",firstName:"Marjan",div:"Production Optics",cat:"",reg:"SER"},
+  {num:"952",lastName:"Vilokas",firstName:"Kaido",div:"Production Optics",cat:"S",reg:"EST"},
+  {num:"1270",lastName:"Yu",firstName:"Hongji",div:"Production Optics",cat:"",reg:"GBR"},
+  {num:"1124",lastName:"Marinović",firstName:"Marin",div:"Production Optics",cat:"",reg:"CRO"},
+  {num:"1058",lastName:"Obermajer",firstName:"Attila",div:"Production Optics",cat:"",reg:"HUN"},
+  {num:"1011",lastName:"Dudenko",firstName:"Oleksii",div:"Production Optics",cat:"",reg:"UKR"},
+  {num:"961",lastName:"Kivi",firstName:"Erkki",div:"Production Optics",cat:"",reg:"EST"},
+  {num:"1272",lastName:"Titcumb",firstName:"James",div:"Production Optics",cat:"",reg:"GBR"},
+  {num:"1125",lastName:"Međugorac",firstName:"Robert",div:"Production Optics",cat:"S",reg:"CRO"},
+  {num:"1059",lastName:"Kovacs",firstName:"Attila",div:"Production Optics",cat:"",reg:"HUN"},
+  {num:"1012",lastName:"Varhanov",firstName:"Pavlo",div:"Production Optics",cat:"",reg:"UKR"},
+  {num:"962",lastName:"Kond",firstName:"Jaanus",div:"Production Optics",cat:"",reg:"EST"},
+  {num:"1278",lastName:"Bland",firstName:"Gareth",div:"Production Optics",cat:"",reg:"GBR"},
+  {num:"1060",lastName:"Bükkfejes",firstName:"András",div:"Production Optics",cat:"",reg:"HUN"},
+  {num:"1036",lastName:"Fedorchuk",firstName:"Oleksandr",div:"Production Optics",cat:"",reg:"UKR"},
+  {num:"965",lastName:"Veskimäe",firstName:"Toomas",div:"Production Optics",cat:"S",reg:"EST"},
+  {num:"1280",lastName:"Bland",firstName:"Peter",div:"Production Optics",cat:"",reg:"GBR"},
+  {num:"1061",lastName:"Lázár",firstName:"Zsolt",div:"Production Optics",cat:"S",reg:"HUN"},
+  {num:"1037",lastName:"Senyshyn",firstName:"Orest",div:"Production Optics",cat:"",reg:"UKR"},
+  {num:"1538",lastName:"Vezzoli",firstName:"Roberto",div:"Production Optics",cat:"S",reg:"ITA"},
+  {num:"1266",lastName:"Cooper",firstName:"Justin",div:"Production Optics",cat:"S",reg:"GBR"},
+  {num:"294",lastName:"Nordvi",firstName:"Thomas",div:"Production Optics",cat:"S",reg:"NOR"},
+  {num:"345",lastName:"Karosas",firstName:"Linas",div:"Production Optics",cat:"S",reg:"LTU"},
+  {num:"28",lastName:"Bettermann",firstName:"Heribert",div:"Production Optics",cat:"SS",reg:"GER"},
+  {num:"987",lastName:"Dal",firstName:"Niclas",div:"Production Optics",cat:"SS",reg:"SWE"},
+  {num:"1539",lastName:"Cerniglia",firstName:"Francesco",div:"Production Optics",cat:"S",reg:"ITA"},
+  {num:"1275",lastName:"Bayly",firstName:"Sonny",div:"Production Optics",cat:"S",reg:"GBR"},
+  {num:"295",lastName:"Lee",firstName:"Kyrre",div:"Production Optics",cat:"S",reg:"NOR"},
+  {num:"346",lastName:"Binkevicius",firstName:"Ramunas",div:"Production Optics",cat:"S",reg:"LTU"},
+  {num:"29",lastName:"Fabricius",firstName:"Georg",div:"Production Optics",cat:"SS",reg:"GER"},
+  {num:"988",lastName:"Ekstedt",firstName:"Stefan",div:"Production Optics",cat:"SS",reg:"SWE"},
+  {num:"1540",lastName:"Mulazzani",firstName:"Gianluca",div:"Production Optics",cat:"S",reg:"ITA"},
+  {num:"1283",lastName:"Ingram",firstName:"Richard",div:"Production Optics",cat:"S",reg:"GBR"},
+  {num:"296",lastName:"Toft",firstName:"Rune",div:"Production Optics",cat:"S",reg:"NOR"},
+  {num:"359",lastName:"Palaima",firstName:"Egidijus",div:"Production Optics",cat:"S",reg:"LTU"},
+  {num:"30",lastName:"Haben",firstName:"Jörg",div:"Production Optics",cat:"SS",reg:"GER"},
+  {num:"989",lastName:"Stangvik",firstName:"Kent",div:"Production Optics",cat:"SS",reg:"SWE"},
+  {num:"985",lastName:"Skogstrom",firstName:"Marcus",div:"Production Optics",cat:"S",reg:"SWE"},
+  {num:"1267",lastName:"Mickiewicz",firstName:"Waldek",div:"Production Optics",cat:"S",reg:"GBR"},
+  {num:"516",lastName:"Wulvik",firstName:"Stein Gustav",div:"Production Optics",cat:"S",reg:"NOR"},
+  {num:"360",lastName:"Cimoš",firstName:"Lech",div:"Production Optics",cat:"S",reg:"LTU"},
+  {num:"31",lastName:"Holden",firstName:"Andy",div:"Production Optics",cat:"SS",reg:"GER"},
+  {num:"1220",lastName:"Johannesson",firstName:"Stefan",div:"Production Optics",cat:"SS",reg:"SWE"},
+  {num:"986",lastName:"Nihei",firstName:"Jiro",div:"Production Optics",cat:"S",reg:"SWE"},
+  {num:"25",lastName:"Albrecht",firstName:"Frank",div:"Production Optics",cat:"S",reg:"GER"},
+  {num:"311",lastName:"Laine",firstName:"Esa",div:"Production Optics",cat:"S",reg:"FIN"},
+  {num:"737",lastName:"Hummer",firstName:"Martin",div:"Production Optics",cat:"S",reg:"AUT"},
+  {num:"297",lastName:"Vikeby",firstName:"Rune",div:"Production Optics",cat:"SS",reg:"NOR"},
+  {num:"304",lastName:"Kåsin",firstName:"Sebastian",div:"Production Optics",cat:"SJ",reg:"NOR"},
+  {num:"1215",lastName:"Gren",firstName:"Patrik",div:"Production Optics",cat:"S",reg:"SWE"},
+  {num:"26",lastName:"Lentz",firstName:"Arne",div:"Production Optics",cat:"S",reg:"GER"},
+  {num:"315",lastName:"McKeown",firstName:"Timo",div:"Production Optics",cat:"SS",reg:"FIN"},
+  {num:"738",lastName:"Griessner",firstName:"Wolfgang",div:"Production Optics",cat:"S",reg:"AUT"},
+  {num:"298",lastName:"Torkildsen",firstName:"Karl",div:"Production Optics",cat:"SS",reg:"NOR"},
+  {num:"305",lastName:"Nordhagen Larsen",firstName:"Mathias",div:"Production Optics",cat:"SJ",reg:"NOR"},
+  {num:"27",lastName:"Schuetz",firstName:"Michael",div:"Production Optics",cat:"S",reg:"GER"},
+  {num:"316",lastName:"Lento",firstName:"Mika",div:"Production Optics",cat:"S",reg:"FIN"},
+  {num:"739",lastName:"Fellner",firstName:"Manfred",div:"Production Optics",cat:"S",reg:"AUT"},
+  {num:"299",lastName:"Østreng Tsigakis",firstName:"Tony",div:"Production Optics",cat:"SS",reg:"NOR"},
+  {num:"306",lastName:"Ryen",firstName:"Jakob",div:"Production Optics",cat:"J",reg:"NOR"},
+  {num:"90",lastName:"Möbs",firstName:"Stefan",div:"Production Optics",cat:"SS",reg:"GER"},
+  {num:"339",lastName:"Kumpulainen",firstName:"Pasi",div:"Production Optics",cat:"S",reg:"FIN"},
+  {num:"300",lastName:"Flugstad",firstName:"Lars",div:"Production Optics",cat:"SS",reg:"NOR"},
+  {num:"370",lastName:"Kjøren",firstName:"Per-Kristian",div:"Production Optics",cat:"SJ",reg:"NOR"},
+  {num:"301",lastName:"Sollyst",firstName:"Adelén",div:"Production Optics",cat:"LJ",reg:"NOR"},
+  {num:"302",lastName:"Thorud",firstName:"Henrik B.",div:"Production Optics",cat:"SJ",reg:"NOR"},
+  {num:"303",lastName:"Helland",firstName:"Noah Valentin",div:"Production Optics",cat:"GJ",reg:"NOR"},
+  {num:"369",lastName:"Alforte",firstName:"Aljoneil",div:"Production Optics",cat:"GJ",reg:"NOR"},
+  {num:"478",lastName:"Diaz Alvarez",firstName:"Miguel",div:"Production",cat:"",reg:"ESP"},
+  {num:"809",lastName:"Stepan",firstName:"Michal",div:"Production",cat:"",reg:"CZE"},
+  {num:"17",lastName:"Bost",firstName:"Nikolai",div:"Production",cat:"",reg:"GER"},
+  {num:"281",lastName:"Kristiansen",firstName:"Bard",div:"Production",cat:"",reg:"NOR"},
+  {num:"231",lastName:"BLOM",firstName:"ESA JUKKA",div:"Production",cat:"S",reg:"FIN"},
+  {num:"996",lastName:"Soler",firstName:"Ricardo",div:"Production",cat:"",reg:"SWE"},
+  {num:"481",lastName:"BLANCO CESAR PANES",firstName:"",div:"Production",cat:"",reg:"ESP"},
+  {num:"810",lastName:"Tomolya",firstName:"Štěpán",div:"Production",cat:"",reg:"CZE"},
+  {num:"18",lastName:"Fleischer",firstName:"Alexander",div:"Production",cat:"",reg:"GER"},
+  {num:"282",lastName:"Stenslie",firstName:"Frede",div:"Production",cat:"",reg:"NOR"},
+  {num:"325",lastName:"Kaunisto",firstName:"Vesa",div:"Production",cat:"S",reg:"FIN"},
+  {num:"997",lastName:"Becker",firstName:"Robert",div:"Production",cat:"",reg:"SWE"},
+  {num:"598",lastName:"Palacios Tercero",firstName:"Carlos",div:"Production",cat:"",reg:"ESP"},
+  {num:"811",lastName:"Němcová",firstName:"Petra",div:"Production",cat:"L",reg:"CZE"},
+  {num:"19",lastName:"Prüm",firstName:"Marcel",div:"Production",cat:"",reg:"GER"},
+  {num:"283",lastName:"Følvik",firstName:"Christian",div:"Production",cat:"",reg:"NOR"},
+  {num:"327",lastName:"Åberg",firstName:"Jonas",div:"Production",cat:"",reg:"FIN"},
+  {num:"999",lastName:"Danielson",firstName:"Carl",div:"Production",cat:"",reg:"SWE"},
+  {num:"672",lastName:"GuerreroC",firstName:"Juan",div:"Production",cat:"",reg:"ESP"},
+  {num:"812",lastName:"Mikolášek",firstName:"Daniel",div:"Production",cat:"SJ",reg:"CZE"},
+  {num:"20",lastName:"Rumpler",firstName:"Stefan",div:"Production",cat:"",reg:"GER"},
+  {num:"368",lastName:"Kandal",firstName:"Tor Martin",div:"Production",cat:"",reg:"NOR"},
+  {num:"328",lastName:"Wang",firstName:"Zhe",div:"Production",cat:"",reg:"FIN"},
+  {num:"1369",lastName:"Andersson",firstName:"Jim",div:"Production",cat:"",reg:"SWE"},
+  {num:"150",lastName:"Šunjevarić",firstName:"Saša",div:"Production",cat:"",reg:"SER"},
+  {num:"1523",lastName:"Perazzoli",firstName:"Francesco",div:"Production",cat:"",reg:"ITA"},
+  {num:"1102",lastName:"Vujosevic",firstName:"Sasa",div:"Production",cat:"",reg:"MTO"},
+  {num:"182",lastName:"Sazdov",firstName:"Veselin",div:"Production",cat:"",reg:"BUL"},
+  {num:"348",lastName:"Vaitekūnas",firstName:"Arvydas",div:"Production",cat:"",reg:"LTU"},
+  {num:"1119",lastName:"Tomljanovic",firstName:"Tomislav",div:"Production",cat:"",reg:"CRO"},
+  {num:"153",lastName:"Vasic",firstName:"Predrag",div:"Production",cat:"",reg:"SER"},
+  {num:"1524",lastName:"Perongini",firstName:"Silvio Maria",div:"Production",cat:"",reg:"ITA"},
+  {num:"1103",lastName:"Ramovic",firstName:"Edin",div:"Production",cat:"",reg:"MTO"},
+  {num:"223",lastName:"Krushkov",firstName:"Kostadin",div:"Production",cat:"",reg:"BUL"},
+  {num:"349",lastName:"Pakarnas",firstName:"Mindaugas",div:"Production",cat:"",reg:"LTU"},
+  {num:"1120",lastName:"Majstorović",firstName:"Davor",div:"Production",cat:"",reg:"CRO"},
+  {num:"155",lastName:"Momcilovic",firstName:"Ljubisa",div:"Production",cat:"S",reg:"SER"},
+  {num:"1525",lastName:"Trionfetti",firstName:"Federico",div:"Production",cat:"",reg:"ITA"},
+  {num:"1104",lastName:"Vujovic",firstName:"Nikola",div:"Production",cat:"",reg:"MTO"},
+  {num:"224",lastName:"Krushkov",firstName:"Vasil",div:"Production",cat:"J",reg:"BUL"},
+  {num:"417",lastName:"Grinčenko",firstName:"Vitalijus",div:"Production",cat:"S",reg:"LTU"},
+  {num:"1121",lastName:"Hasanspahic",firstName:"Denis",div:"Production",cat:"",reg:"CRO"},
+  {num:"187",lastName:"Popović",firstName:"Aleksa",div:"Production",cat:"",reg:"SER"},
+  {num:"1526",lastName:"Biagioli",firstName:"Alessandro",div:"Production",cat:"",reg:"ITA"},
+  {num:"779",lastName:"Kalchev",firstName:"Svetlozar",div:"Production",cat:"",reg:"BUL"},
+  {num:"356",lastName:"Cimoš",firstName:"Donatas",div:"Production",cat:"",reg:"LTU"},
+  {num:"1122",lastName:"Marić",firstName:"Hrvoje",div:"Production",cat:"",reg:"CRO"},
+  {num:"631",lastName:"Zounis",firstName:"Theologos",div:"Production",cat:"",reg:"GRE"},
+  {num:"521",lastName:"Deschepper",firstName:"David",div:"Production",cat:"",reg:"BEL"},
+  {num:"427",lastName:"Haeussler",firstName:"Karl",div:"Production",cat:"S",reg:"SUI"},
+  {num:"1527",lastName:"Almici",firstName:"Camilla",div:"Production",cat:"L",reg:"ITA"},
+  {num:"158",lastName:"Momčilović",firstName:"Snežana",div:"Production",cat:"L",reg:"SER"},
+  {num:"1001",lastName:"Shamloo",firstName:"Alexandra",div:"Production",cat:"L",reg:"SWE"},
+  {num:"632",lastName:"Papadakos",firstName:"Athanasios",div:"Production",cat:"",reg:"GRE"},
+  {num:"522",lastName:"Gillis",firstName:"Marc",div:"Production",cat:"",reg:"BEL"},
+  {num:"428",lastName:"Röthenmund",firstName:"Mathias",div:"Production",cat:"S",reg:"SUI"},
+  {num:"1528",lastName:"Di Prospero",firstName:"Lucrezia",div:"Production",cat:"L",reg:"ITA"},
+  {num:"168",lastName:"Vujčić",firstName:"Milica",div:"Production",cat:"L",reg:"SER"},
+  {num:"1453",lastName:"Yousefian Johansson",firstName:"Saga",div:"Production",cat:"L",reg:"SWE"},
+  {num:"633",lastName:"ROUSSOS",firstName:"IOSIF",div:"Production",cat:"SS",reg:"GRE"},
+  {num:"523",lastName:"Vereecke",firstName:"Mathieu",div:"Production",cat:"",reg:"BEL"},
+  {num:"517",lastName:"Bitterli",firstName:"Christoph",div:"Production",cat:"",reg:"SUI"},
+  {num:"1529",lastName:"Rasi Caldogno",firstName:"Monica",div:"Production",cat:"L",reg:"ITA"},
+  {num:"169",lastName:"Djukic",firstName:"Ivana",div:"Production",cat:"L",reg:"SER"},
+  {num:"1520",lastName:"Assenhöj",firstName:"Maria",div:"Production",cat:"L",reg:"SWE"},
+  {num:"634",lastName:"KOSTIDIS",firstName:"ANGELOS",div:"Production",cat:"S",reg:"GRE"},
+  {num:"762",lastName:"Lambeir",firstName:"Cédric",div:"Production",cat:"",reg:"BEL"},
+  {num:"574",lastName:"Schneider",firstName:"Manuel",div:"Production",cat:"",reg:"SUI"},
+  {num:"1530",lastName:"Cattaneo",firstName:"Marta",div:"Production",cat:"L",reg:"ITA"},
+  {num:"777",lastName:"Visi Bujak",firstName:"Ana",div:"Production",cat:"L",reg:"SER"},
+  {num:"734",lastName:"Gasteiger",firstName:"Klaus",div:"Production",cat:"",reg:"AUT"},
+  {num:"128",lastName:"Skaale",firstName:"Sissal",div:"Production",cat:"L",reg:"DEN"},
+  {num:"1375",lastName:"Chmúra",firstName:"Tomáš",div:"Production",cat:"J",reg:"SVK"},
+  {num:"475",lastName:"Rodríguez Domènech",firstName:"Airi",div:"Production",cat:"L",reg:"ESP"},
+  {num:"307",lastName:"Tysnes",firstName:"Tanya Marlene",div:"Production",cat:"L",reg:"NOR"},
+  {num:"735",lastName:"Heiligenbrunner",firstName:"Simon",div:"Production",cat:"",reg:"AUT"},
+  {num:"130",lastName:"Ibenforth",firstName:"Pavel",div:"Production",cat:"",reg:"DEN"},
+  {num:"1377",lastName:"Polák",firstName:"Peter",div:"Production",cat:"SJ",reg:"SVK"},
+  {num:"480",lastName:"Darias",firstName:"Alexandra",div:"Production",cat:"L",reg:"ESP"},
+  {num:"308",lastName:"Hardaway",firstName:"Anne-Kristine",div:"Production",cat:"L",reg:"NOR"},
+  {num:"736",lastName:"Oriol",firstName:"Andreas",div:"Production",cat:"",reg:"AUT"},
+  {num:"133",lastName:"Pedersen",firstName:"Mikkel Sloth",div:"Production",cat:"",reg:"DEN"},
+  {num:"1388",lastName:"Vyšný",firstName:"Marian",div:"Production",cat:"S",reg:"SVK"},
+  {num:"483",lastName:"Domènech Mestres",firstName:"Rosa Maria",div:"Production",cat:"LS",reg:"ESP"},
+  {num:"309",lastName:"Bratli",firstName:"Inger Skjold",div:"Production",cat:"LS",reg:"NOR"},
+  {num:"159",lastName:"Næblerød Herstad",firstName:"Victor",div:"Production",cat:"",reg:"DEN"},
+  {num:"920",lastName:"Arnaiz Larson",firstName:"M Cristina",div:"Production",cat:"L",reg:"ESP"},
+  {num:"1531",lastName:"Iorfino",firstName:"Andrea",div:"Production",cat:"S",reg:"ITA"},
+  {num:"946",lastName:"Männiste",firstName:"Jaago",div:"Production",cat:"S",reg:"EST"},
+  {num:"1099",lastName:"Janjusevic",firstName:"Milorad",div:"Production",cat:"S",reg:"MTO"},
+  {num:"654",lastName:"Legat",firstName:"Niko",div:"Production",cat:"S",reg:"SLO"},
+  {num:"37",lastName:"Bowakow",firstName:"Ludwig",div:"Production",cat:"SS",reg:"GER"},
+  {num:"1532",lastName:"Cozzella",firstName:"Claudio",div:"Production",cat:"S",reg:"ITA"},
+  {num:"477",lastName:"DARIAS MEDINA",firstName:"BUENAVENTURA",div:"Production",cat:"S",reg:"ESP"},
+  {num:"947",lastName:"Brodski",firstName:"Dmitri",div:"Production",cat:"S",reg:"EST"},
+  {num:"1100",lastName:"Pavlicic",firstName:"Nenad",div:"Production",cat:"S",reg:"MTO"},
+  {num:"655",lastName:"Dovžan",firstName:"Viljem",div:"Production",cat:"S",reg:"SLO"},
+  {num:"38",lastName:"Braun",firstName:"Jürgen",div:"Production",cat:"SS",reg:"GER"},
+  {num:"1533",lastName:"Passalia",firstName:"Gianluca",div:"Production",cat:"S",reg:"ITA"},
+  {num:"479",lastName:"Oskoma",firstName:"Sergiy",div:"Production",cat:"S",reg:"ESP"},
+  {num:"948",lastName:"Serenok",firstName:"Aleksandr",div:"Production",cat:"S",reg:"EST"},
+  {num:"1101",lastName:"Krstic",firstName:"Srdjan",div:"Production",cat:"S",reg:"MTO"},
+  {num:"656",lastName:"Stjepanovic",firstName:"Savo",div:"Production",cat:"S",reg:"SLO"},
+  {num:"39",lastName:"Kelterbaum",firstName:"Reinhard",div:"Production",cat:"SS",reg:"GER"},
+  {num:"820",lastName:"Němeček",firstName:"Zdeněk",div:"Production",cat:"SS",reg:"CZE"},
+  {num:"599",lastName:"Luaces leston",firstName:"Peregrino",div:"Production",cat:"S",reg:"ESP"},
+  {num:"977",lastName:"Ivanotsev",firstName:"Sergei",div:"Production",cat:"S",reg:"EST"},
+  {num:"1164",lastName:"Saveljic",firstName:"Boris",div:"Production",cat:"S",reg:"MTO"},
+  {num:"671",lastName:"Šlosar",firstName:"Hubert",div:"Production",cat:"S",reg:"SLO"},
+  {num:"40",lastName:"van Essen",firstName:"Olaf",div:"Production",cat:"SS",reg:"GER"},
+  {num:"887",lastName:"Vinduska",firstName:"Vaclav",div:"Production",cat:"S",reg:"CZE"},
+  {num:"32",lastName:"Hofmann",firstName:"Michael",div:"Production",cat:"S",reg:"GER"},
+  {num:"351",lastName:"Goštautas",firstName:"Audrius",div:"Production",cat:"S",reg:"LTU"},
+  {num:"1304",lastName:"Skorupka",firstName:"Bogdan",div:"Production",cat:"S",reg:"POL"},
+  {num:"291",lastName:"Myrvang",firstName:"Folke",div:"Production",cat:"SS",reg:"NOR"},
+  {num:"888",lastName:"Hanzlicek",firstName:"Ladislav",div:"Production",cat:"S",reg:"CZE"},
+  {num:"34",lastName:"Koch",firstName:"Robert",div:"Production",cat:"S",reg:"GER"},
+  {num:"357",lastName:"Sventickas",firstName:"Ramūnas",div:"Production",cat:"SS",reg:"LTU"},
+  {num:"1305",lastName:"Opechowski",firstName:"Krzysztof",div:"Production",cat:"S",reg:"POL"},
+  {num:"292",lastName:"Kvæl",firstName:"Geir",div:"Production",cat:"SS",reg:"NOR"},
+  {num:"1655",lastName:"ZUCCOLO",firstName:"GIOVANNI",div:"Production",cat:"SS",reg:"ITA"},
+  {num:"35",lastName:"Kunzmann",firstName:"Holger",div:"Production",cat:"S",reg:"GER"},
+  {num:"884",lastName:"Čipkus",firstName:"Žilvinas",div:"Production",cat:"S",reg:"LTU"},
+  {num:"293",lastName:"Stien",firstName:"Eindride",div:"Production",cat:"SS",reg:"NOR"},
+  {num:"36",lastName:"Stobbe",firstName:"Markus",div:"Production",cat:"S",reg:"GER"},
+  {num:"602",lastName:"GALSTYAN",firstName:"HAYKAZ",div:"Standard",cat:"",reg:"GRE"},
+  {num:"1",lastName:"Balogh",firstName:"Flavius",div:"Standard",cat:"",reg:"HUN"},
+  {num:"41",lastName:"Wessels",firstName:"Philipp",div:"Standard",cat:"",reg:"GER"},
+  {num:"141",lastName:"Severin",firstName:"Bjørn",div:"Standard",cat:"",reg:"DEN"},
+  {num:"287",lastName:"Ripnes",firstName:"Pål",div:"Standard",cat:"",reg:"NOR"},
+  {num:"921",lastName:"Joaquim",firstName:"Elsa",div:"Standard",cat:"LS",reg:"POR"},
+  {num:"628",lastName:"Sklavis",firstName:"Alexandros",div:"Standard",cat:"",reg:"GRE"},
+  {num:"2",lastName:"Albrecht",firstName:"Zoltan",div:"Standard",cat:"",reg:"HUN"},
+  {num:"42",lastName:"Daouk",firstName:"Bilal",div:"Standard",cat:"",reg:"GER"},
+  {num:"142",lastName:"Thomsen",firstName:"Henrik",div:"Standard",cat:"",reg:"DEN"},
+  {num:"288",lastName:"Winsnes",firstName:"Stefan",div:"Standard",cat:"",reg:"NOR"},
+  {num:"922",lastName:"Silva",firstName:"Manuel",div:"Standard",cat:"SS",reg:"POR"},
+  {num:"629",lastName:"PAPAFLORATOS",firstName:"DIMITRIS",div:"Standard",cat:"",reg:"GRE"},
+  {num:"3",lastName:"Hua",firstName:"Wei",div:"Standard",cat:"",reg:"HUN"},
+  {num:"43",lastName:"Kahl",firstName:"Michael",div:"Standard",cat:"",reg:"GER"},
+  {num:"143",lastName:"Skoubjerg",firstName:"Runi",div:"Standard",cat:"",reg:"DEN"},
+  {num:"289",lastName:"Ellingsen",firstName:"Kim-ove",div:"Standard",cat:"",reg:"NOR"},
+  {num:"925",lastName:"Reis",firstName:"Mauricio",div:"Standard",cat:"",reg:"POR"},
+  {num:"630",lastName:"KROKAROPOULOU",firstName:"ANTONIA",div:"Standard",cat:"L",reg:"GRE"},
+  {num:"4",lastName:"Denisov",firstName:"Arseniy",div:"Standard",cat:"",reg:"HUN"},
+  {num:"44",lastName:"Mueller",firstName:"Sergej",div:"Standard",cat:"",reg:"GER"},
+  {num:"178",lastName:"Starke",firstName:"Stefan Kryger",div:"Standard",cat:"",reg:"DEN"},
+  {num:"683",lastName:"Lodden",firstName:"Glenn",div:"Standard",cat:"",reg:"NOR"},
+  {num:"928",lastName:"Bastos",firstName:"Luis",div:"Standard",cat:"S",reg:"POR"},
+  {num:"817",lastName:"Rakusan",firstName:"Josef",div:"Standard",cat:"S",reg:"CZE"},
+  {num:"227",lastName:"Pakka",firstName:"Aki",div:"Standard",cat:"",reg:"FIN"},
+  {num:"1296",lastName:"Staszczyk",firstName:"Bartosz",div:"Standard",cat:"",reg:"POL"},
+  {num:"949",lastName:"Maiberg",firstName:"Dagnis",div:"Standard",cat:"",reg:"EST"},
+  {num:"1214",lastName:"Fant",firstName:"Simon",div:"Standard",cat:"",reg:"SWE"},
+  {num:"1383",lastName:"Selucky",firstName:"Patrik",div:"Standard",cat:"SJ",reg:"SVK"},
+  {num:"818",lastName:"Liehne",firstName:"Zdenek",div:"Standard",cat:"",reg:"CZE"},
+  {num:"228",lastName:"Koski",firstName:"Mikko",div:"Standard",cat:"S",reg:"FIN"},
+  {num:"1310",lastName:"Kabatek",firstName:"Emilia",div:"Standard",cat:"L",reg:"POL"},
+  {num:"950",lastName:"Kidjajev",firstName:"Juri",div:"Standard",cat:"S",reg:"EST"},
+  {num:"1224",lastName:"Lo Presti",firstName:"Nicola",div:"Standard",cat:"",reg:"SWE"},
+  {num:"1386",lastName:"Sčensný",firstName:"Dušan",div:"Standard",cat:"SJ",reg:"SVK"},
+  {num:"819",lastName:"Znamenacek",firstName:"Petr",div:"Standard",cat:"S",reg:"CZE"},
+  {num:"236",lastName:"Piili",firstName:"Petri",div:"Standard",cat:"",reg:"FIN"},
+  {num:"1311",lastName:"Murzydło",firstName:"Małgorzata",div:"Standard",cat:"L",reg:"POL"},
+  {num:"951",lastName:"Kuuskla",firstName:"Kert",div:"Standard",cat:"",reg:"EST"},
+  {num:"1225",lastName:"Långberg",firstName:"Anders",div:"Standard",cat:"",reg:"SWE"},
+  {num:"1390",lastName:"Zach",firstName:"Marek",div:"Standard",cat:"",reg:"SVK"},
+  {num:"249",lastName:"Heimonen",firstName:"Henri",div:"Standard",cat:"",reg:"FIN"},
+  {num:"1455",lastName:"Mirzwa",firstName:"Kamil",div:"Standard",cat:"",reg:"POL"},
+  {num:"975",lastName:"Lepikmäe",firstName:"Rain",div:"Standard",cat:"",reg:"EST"},
+  {num:"1463",lastName:"Arbinger",firstName:"Sandra",div:"Standard",cat:"L",reg:"SWE"},
+  {num:"1392",lastName:"Hladik",firstName:"Ryan",div:"Standard",cat:"SJ",reg:"SVK"},
+  {num:"723",lastName:"Ebner",firstName:"Markus",div:"Standard",cat:"",reg:"AUT"},
+  {num:"1557",lastName:"Santarcangelo",firstName:"Adriano Ciro",div:"Standard",cat:"SS",reg:"ITA"},
+  {num:"46",lastName:"Damm",firstName:"Oliver",div:"Standard",cat:"S",reg:"GER"},
+  {num:"889",lastName:"Misanovic",firstName:"Dragan",div:"Standard",cat:"S",reg:"BIH"},
+  {num:"500",lastName:"García",firstName:"Juan Pedro",div:"Standard",cat:"S",reg:"ESP"},
+  {num:"590",lastName:"Krimnianiotis",firstName:"Dimitrios",div:"Standard",cat:"S",reg:"GRE"},
+  {num:"724",lastName:"Koller",firstName:"Hans Georg",div:"Standard",cat:"",reg:"AUT"},
+  {num:"1558",lastName:"Del Rosario",firstName:"Giulio",div:"Standard",cat:"S",reg:"ITA"},
+  {num:"47",lastName:"Melehov",firstName:"Vitalij",div:"Standard",cat:"S",reg:"GER"},
+  {num:"891",lastName:"Časar",firstName:"Boris",div:"Standard",cat:"S",reg:"BIH"},
+  {num:"502",lastName:"Ferreiro Rodriguez",firstName:"Jesus",div:"Standard",cat:"SS",reg:"ESP"},
+  {num:"596",lastName:"Pappas",firstName:"Panagiotis",div:"Standard",cat:"S",reg:"GRE"},
+  {num:"725",lastName:"Kastner",firstName:"Alexander",div:"Standard",cat:"",reg:"AUT"},
+  {num:"1559",lastName:"Bettoni",firstName:"Leonardo",div:"Standard",cat:"S",reg:"ITA"},
+  {num:"48",lastName:"Peschkow",firstName:"Wladislaw",div:"Standard",cat:"S",reg:"GER"},
+  {num:"893",lastName:"Smajlovic",firstName:"Sasa",div:"Standard",cat:"S",reg:"BIH"},
+  {num:"503",lastName:"Montero Bernardino",firstName:"Luis",div:"Standard",cat:"S",reg:"ESP"},
+  {num:"618",lastName:"Michos",firstName:"Georgios",div:"Standard",cat:"S",reg:"GRE"},
+  {num:"726",lastName:"Molitor",firstName:"Kilian",div:"Standard",cat:"SJ",reg:"AUT"},
+  {num:"1639",lastName:"Magli",firstName:"Esterino",div:"Standard",cat:"GS",reg:"ITA"},
+  {num:"49",lastName:"Beck",firstName:"Horst P.",div:"Standard",cat:"SS",reg:"GER"},
+  {num:"170",lastName:"Kostadinov",firstName:"Plamen",div:"Standard",cat:"S",reg:"BUL"},
+  {num:"510",lastName:"TURIEGANO LACARTE",firstName:"Jose Vicente",div:"Standard",cat:"S",reg:"ESP"},
+  {num:"109",lastName:"Verhoog",firstName:"Justin",div:"Standard",cat:"",reg:"NED"},
+  {num:"727",lastName:"Benesch",firstName:"Thomas",div:"Standard",cat:"S",reg:"AUT"},
+  {num:"1221",lastName:"Karlsson",firstName:"Mats",div:"Standard",cat:"S",reg:"SWE"},
+  {num:"173",lastName:"Sakharov",firstName:"Artem",div:"Standard",cat:"S",reg:"BUL"},
+  {num:"229",lastName:"Kinnala",firstName:"Jani",div:"Standard",cat:"S",reg:"FIN"},
+  {num:"149",lastName:"Djukic",firstName:"Vukota",div:"Standard",cat:"S",reg:"SER"},
+  {num:"110",lastName:"van Uitert",firstName:"John",div:"Standard",cat:"SS",reg:"NED"},
+  {num:"728",lastName:"Stranz",firstName:"Jürgen",div:"Standard",cat:"S",reg:"AUT"},
+  {num:"1354",lastName:"Svensson",firstName:"Per-Arne",div:"Standard",cat:"SS",reg:"SWE"},
+  {num:"174",lastName:"Sariev",firstName:"Borislav",div:"Standard",cat:"S",reg:"BUL"},
+  {num:"235",lastName:"Kuisma",firstName:"Mikko",div:"Standard",cat:"S",reg:"FIN"},
+  {num:"152",lastName:"Djukanovic",firstName:"Vladimir",div:"Standard",cat:"S",reg:"SER"},
+  {num:"111",lastName:"Roselaar",firstName:"Maurits",div:"Standard",cat:"",reg:"NED"},
+  {num:"729",lastName:"Handl",firstName:"Reinhard",div:"Standard",cat:"S",reg:"AUT"},
+  {num:"1452",lastName:"Westerlund",firstName:"Kent",div:"Standard",cat:"S",reg:"SWE"},
+  {num:"769",lastName:"Milanov",firstName:"Zlatomir",div:"Standard",cat:"S",reg:"BUL"},
+  {num:"247",lastName:"Kontulainen",firstName:"Mika",div:"Standard",cat:"S",reg:"FIN"},
+  {num:"166",lastName:"Obradović",firstName:"Slavko",div:"Standard",cat:"S",reg:"SER"},
+  {num:"113",lastName:"Koek",firstName:"Nico",div:"Standard",cat:"",reg:"NED"},
+  {num:"1466",lastName:"Andreassen",firstName:"Ronny",div:"Standard",cat:"S",reg:"SWE"},
+  {num:"341",lastName:"Ruohonen",firstName:"Tony",div:"Standard",cat:"S",reg:"FIN"},
+  {num:"167",lastName:"Barasin",firstName:"Dragan",div:"Standard",cat:"S",reg:"SER"},
+  {num:"730",lastName:"Schneider",firstName:"Katharina",div:"Standard",cat:"L",reg:"AUT"},
+  {num:"52",lastName:"Pankalla",firstName:"Uwe",div:"Standard",cat:"SS",reg:"GER"},
+  {num:"731",lastName:"Stundner",firstName:"Christa",div:"Standard",cat:"L",reg:"AUT"},
+  {num:"53",lastName:"Mohr",firstName:"Uwe",div:"Standard",cat:"SS",reg:"GER"},
+  {num:"733",lastName:"Strasser",firstName:"Elisabeth",div:"Standard",cat:"L",reg:"AUT"},
+  {num:"58",lastName:"Gepperth",firstName:"Friedrich",div:"Standard",cat:"SS",reg:"GER"},
+  {num:"233",lastName:"Koski",firstName:"Kaisa",div:"Standard",cat:"L",reg:"FIN"},
+  {num:"234",lastName:"Honkaselkä",firstName:"Tiia",div:"Standard",cat:"L",reg:"FIN"},
+  {num:"594",lastName:"STAMOS",firstName:"IOANNIS",div:"Standard",cat:"SS",reg:"GRE"},
+  {num:"312",lastName:"Blom",firstName:"Emily",div:"Standard",cat:"L",reg:"FIN"},
+  {num:"620",lastName:"MAVROS",firstName:"NIKOLAOS",div:"Standard",cat:"SS",reg:"GRE"},
+  {num:"342",lastName:"Koski",firstName:"Anitra",div:"Standard",cat:"LSJ",reg:"FIN"},
+  {num:"1700",lastName:"Poiret",firstName:"Jerome",div:"Optics",cat:"S",reg:"FRA"},
+  {num:"1724",lastName:"Becret",firstName:"Jean Guy",div:"Optics",cat:"S",reg:"FRA"},
+  {num:"1726",lastName:"BOITTIAUX",firstName:"Bertrand",div:"Optics",cat:"S",reg:"FRA"},
+  {num:"1727",lastName:"Piedade",firstName:"Laurent",div:"Optics",cat:"S",reg:"FRA"},
+  {num:"803",lastName:"Šebo",firstName:"Robin",div:"Open",cat:"",reg:"CZE"},
+  {num:"452",lastName:"Espilez",firstName:"Ivan",div:"Open",cat:"",reg:"ESP"},
+  {num:"269",lastName:"Nerheim",firstName:"Anders",div:"Open",cat:"",reg:"NOR"},
+  {num:"953",lastName:"Rutnik",firstName:"Rait",div:"Open",cat:"S",reg:"EST"},
+  {num:"161",lastName:"Sørensen",firstName:"Jens Martin",div:"Open",cat:"",reg:"DEN"},
+  {num:"104",lastName:"van den Berg",firstName:"Peter",div:"Open",cat:"",reg:"NED"},
+  {num:"804",lastName:"Havlíček",firstName:"Miroslav",div:"Open",cat:"",reg:"CZE"},
+  {num:"454",lastName:"Bernabé Pardo",firstName:"Horaci",div:"Open",cat:"S",reg:"ESP"},
+  {num:"974",lastName:"Papli",firstName:"Rene",div:"Open",cat:"",reg:"EST"},
+  {num:"162",lastName:"Davis",firstName:"Peter",div:"Open",cat:"SS",reg:"DEN"},
+  {num:"105",lastName:"tim gerritsen",firstName:"tim",div:"Open",cat:"",reg:"NED"},
+  {num:"805",lastName:"Šerá",firstName:"Martina",div:"Open",cat:"L",reg:"CZE"},
+  {num:"455",lastName:"MEDINA MESTRES",firstName:"DANIEL",div:"Open",cat:"",reg:"ESP"},
+  {num:"366",lastName:"Busk",firstName:"Nikolai",div:"Open",cat:"",reg:"NOR"},
+  {num:"971",lastName:"Praakli",firstName:"Marko",div:"Open",cat:"",reg:"EST"},
+  {num:"177",lastName:"Johnson",firstName:"Marc",div:"Open",cat:"",reg:"DEN"},
+  {num:"106",lastName:"Van der Wel",firstName:"Richard",div:"Open",cat:"S",reg:"NED"},
+  {num:"1219",lastName:"Hylander",firstName:"Albin",div:"Open",cat:"",reg:"SWE"},
+  {num:"572",lastName:"Honrubia ruiz",firstName:"Francisco Javier",div:"Open",cat:"",reg:"ESP"},
+  {num:"515",lastName:"Kowalczyk",firstName:"Dariusz",div:"Open",cat:"",reg:"NOR"},
+  {num:"1177",lastName:"Holmes",firstName:"John",div:"Open",cat:"S",reg:"GIB"},
+  {num:"186",lastName:"Woudstra",firstName:"Marc",div:"Open",cat:"",reg:"NED"},
+  {num:"1222",lastName:"Kastell",firstName:"Peter",div:"Open",cat:"",reg:"SWE"},
+  {num:"8",lastName:"Dörr",firstName:"Christian",div:"Open",cat:"",reg:"GER"},
+  {num:"614",lastName:"TYRAKIS",firstName:"IOANNIS",div:"Open",cat:"SS",reg:"GRE"},
+  {num:"1206",lastName:"Borge",firstName:"Stephen",div:"Open",cat:"",reg:"GIB"},
+  {num:"331",lastName:"Mäkelä",firstName:"Arttu",div:"Open",cat:"",reg:"FIN"},
+  {num:"422",lastName:"Meier",firstName:"Dominic",div:"Open",cat:"S",reg:"SUI"},
+  {num:"1228",lastName:"Stjernlöf",firstName:"Erik",div:"Open",cat:"",reg:"SWE"},
+  {num:"9",lastName:"Pfeiffer",firstName:"Andreas",div:"Open",cat:"",reg:"GER"},
+  {num:"615",lastName:"SPATOULAS",firstName:"NIKOLAOS",div:"Open",cat:"J",reg:"GRE"},
+  {num:"1212",lastName:"Viagas",firstName:"Rachael",div:"Open",cat:"L",reg:"GIB"},
+  {num:"332",lastName:"Kössi",firstName:"Jani",div:"Open",cat:"",reg:"FIN"},
+  {num:"424",lastName:"Wäfler",firstName:"Dave",div:"Open",cat:"",reg:"SUI"},
+  {num:"1231",lastName:"Vonasek",firstName:"Frans",div:"Open",cat:"",reg:"SWE"},
+  {num:"10",lastName:"Siegle",firstName:"Peter",div:"Open",cat:"",reg:"GER"},
+  {num:"616",lastName:"Tastanidis",firstName:"Nektarios",div:"Open",cat:"",reg:"GRE"},
+  {num:"1176",lastName:"Athey",firstName:"Shane",div:"Open",cat:"SS",reg:"GIB"},
+  {num:"333",lastName:"Uronen",firstName:"Hannu",div:"Open",cat:"S",reg:"FIN"},
+  {num:"425",lastName:"Ryant",firstName:"Erol",div:"Open",cat:"",reg:"SUI"},
+  {num:"62",lastName:"Seiffer",firstName:"Felix",div:"Open",cat:"",reg:"GER"},
+  {num:"334",lastName:"Phancharoen",firstName:"Sanyalak",div:"Open",cat:"",reg:"FIN"},
+  {num:"429",lastName:"Habegger",firstName:"Patrick",div:"Open",cat:"",reg:"SUI"},
+  {num:"11",lastName:"Back",firstName:"Sascha",div:"Open",cat:"S",reg:"GER"},
+  {num:"103",lastName:"van koolwijk",firstName:"Jacky",div:"Open",cat:"SS",reg:"NED"},
+  {num:"806",lastName:"Horejsi",firstName:"Lenka",div:"Open",cat:"L",reg:"CZE"},
+  {num:"719",lastName:"Steurer",firstName:"Margit",div:"Open",cat:"LS",reg:"AUT"},
+  {num:"12",lastName:"Von Borries",firstName:"Roland",div:"Open",cat:"S",reg:"GER"},
+  {num:"248",lastName:"Smits",firstName:"Arno",div:"Open",cat:"SS",reg:"NED"},
+  {num:"807",lastName:"Šustrová",firstName:"Kateřina",div:"Open",cat:"L",reg:"CZE"},
+  {num:"720",lastName:"Ebner",firstName:"Yvonne",div:"Open",cat:"L",reg:"AUT"},
+  {num:"13",lastName:"Winter",firstName:"Thomas",div:"Open",cat:"S",reg:"GER"},
+  {num:"636",lastName:"Faro",firstName:"Rien",div:"Open",cat:"SS",reg:"NED"},
+  {num:"808",lastName:"Novotná",firstName:"Natálie",div:"Open",cat:"L",reg:"CZE"},
+  {num:"721",lastName:"Aigner",firstName:"Edeltraut",div:"Open",cat:"LS",reg:"AUT"},
+  {num:"14",lastName:"Reineck",firstName:"Gregor",div:"Open",cat:"S",reg:"GER"},
+  {num:"1062",lastName:"Barkanyi",firstName:"Laszlo",div:"Open",cat:"S",reg:"HUN"},
+  {num:"1549",lastName:"Esposito",firstName:"Nicole",div:"Open",cat:"LS",reg:"ITA"},
+  {num:"722",lastName:"Nestl-Treiber",firstName:"Doris",div:"Open",cat:"LS",reg:"AUT"},
+  {num:"1216",lastName:"HANSEN",firstName:"JOHAN",div:"Open",cat:"SS",reg:"SWE"},
+  {num:"1063",lastName:"Kretai",firstName:"Levente",div:"Open",cat:"S",reg:"HUN"},
+  {num:"1550",lastName:"PERRUCINO",firstName:"PATRIZIA",div:"Open",cat:"L",reg:"ITA"},
+  {num:"1223",lastName:"Kurttio",firstName:"Jari",div:"Open",cat:"S",reg:"SWE"},
+  {num:"1064",lastName:"Ambrus",firstName:"Oliver",div:"Open",cat:"S",reg:"HUN"},
+  {num:"1551",lastName:"Rossetto",firstName:"Denny",div:"Open",cat:"L",reg:"ITA"},
+  {num:"1350",lastName:"Forsling",firstName:"Per",div:"Open",cat:"S",reg:"SWE"},
+  {num:"1065",lastName:"Maczeovics",firstName:"Zoltan",div:"Open",cat:"S",reg:"HUN"},
+  {num:"1552",lastName:"Villari",firstName:"Giulia",div:"Open",cat:"L",reg:"ITA"},
+  {num:"1451",lastName:"Holmberg",firstName:"Daniel",div:"Open",cat:"S",reg:"SWE"},
+  {num:"1683",lastName:"Grauffel",firstName:"Eric",div:"Optics",cat:"",reg:"FRA"},
+  {num:"1217",lastName:"Hidesand",firstName:"Fredric",div:"Optics",cat:"",reg:"SWE"},
+  {num:"1553",lastName:"Miloro",firstName:"Simone",div:"Optics",cat:"",reg:"ITA"},
+  {num:"15",lastName:"Kummer",firstName:"Patrick",div:"Optics",cat:"",reg:"GER"},
+  {num:"740",lastName:"Ulreich",firstName:"Rainer",div:"Optics",cat:"",reg:"AUT"},
+  {num:"139",lastName:"Milling Varmdag",firstName:"Rasmus",div:"Optics",cat:"",reg:"DEN"},
+  {num:"1686",lastName:"HARDY",firstName:"Pierre",div:"Optics",cat:"",reg:"FRA"},
+  {num:"1349",lastName:"Eriksson",firstName:"Joacim",div:"Optics",cat:"",reg:"SWE"},
+  {num:"1554",lastName:"GEMIGNANI",firstName:"ANDREA",div:"Optics",cat:"",reg:"ITA"},
+  {num:"16",lastName:"Radzivil",firstName:"Mikhail",div:"Optics",cat:"",reg:"GER"},
+  {num:"741",lastName:"Eppensteiner",firstName:"Fabio",div:"Optics",cat:"",reg:"AUT"},
+  {num:"144",lastName:"Fischer",firstName:"Stefan",div:"Optics",cat:"",reg:"DEN"},
+  {num:"1692",lastName:"karbich",firstName:"frederic",div:"Optics",cat:"",reg:"FRA"},
+  {num:"1355",lastName:"With",firstName:"Jimmy",div:"Optics",cat:"",reg:"SWE"},
+  {num:"1555",lastName:"Filippi",firstName:"Matteo",div:"Optics",cat:"",reg:"ITA"},
+  {num:"165",lastName:"Nothnagel",firstName:"Nils",div:"Optics",cat:"",reg:"GER"},
+  {num:"742",lastName:"Dolezal",firstName:"Philipp",div:"Optics",cat:"",reg:"AUT"},
+  {num:"179",lastName:"Grainger",firstName:"David K.",div:"Optics",cat:"",reg:"DEN"},
+  {num:"1694",lastName:"JUHEL",firstName:"Julien",div:"Optics",cat:"",reg:"FRA"},
+  {num:"1467",lastName:"Bäckman",firstName:"Adam",div:"Optics",cat:"",reg:"SWE"},
+  {num:"1556",lastName:"Laghi",firstName:"Lorenzo",div:"Optics",cat:"",reg:"ITA"},
+  {num:"1291",lastName:"Wojcieszek",firstName:"Marcin",div:"Optics",cat:"",reg:"POL"},
+  {num:"1479",lastName:"Teier",firstName:"Lukas",div:"Optics",cat:"",reg:"AUT"},
+  {num:"273",lastName:"Nestvold",firstName:"Ove",div:"Optics",cat:"",reg:"NOR"},
+  {num:"1203",lastName:"Samek",firstName:"Petr",div:"Optics",cat:"",reg:"CZE"},
+  {num:"237",lastName:"Hankaniemi",firstName:"Mikko",div:"Optics",cat:"",reg:"FIN"},
+  {num:"1379",lastName:"Ženčár",firstName:"Pavol",div:"Optics",cat:"",reg:"SVK"},
+  {num:"1292",lastName:"Szczesny",firstName:"Bartosz",div:"Optics",cat:"",reg:"POL"},
+  {num:"775",lastName:"Raykov",firstName:"Boris",div:"Optics",cat:"",reg:"BUL"},
+  {num:"274",lastName:"Natvik",firstName:"Vegard",div:"Optics",cat:"",reg:"NOR"},
+  {num:"1204",lastName:"Cimburek",firstName:"Lukas",div:"Optics",cat:"",reg:"CZE"},
+  {num:"238",lastName:"Tiihonen",firstName:"Samuli",div:"Optics",cat:"",reg:"FIN"},
+  {num:"1382",lastName:"Fedor",firstName:"Marian",div:"Optics",cat:"",reg:"SVK"},
+  {num:"1301",lastName:"Galazka",firstName:"Marcin",div:"Optics",cat:"",reg:"POL"},
+  {num:"776",lastName:"MERDZHANOV",firstName:"Nikola",div:"Optics",cat:"",reg:"BUL"},
+  {num:"275",lastName:"Fosse",firstName:"Daniel Skreros",div:"Optics",cat:"",reg:"NOR"},
+  {num:"1205",lastName:"Slavik",firstName:"Daniel",div:"Optics",cat:"",reg:"CZE"},
+  {num:"239",lastName:"Lehtikevari",firstName:"Timo",div:"Optics",cat:"S",reg:"FIN"},
+  {num:"1385",lastName:"Kubica",firstName:"Dusan",div:"Optics",cat:"",reg:"SVK"},
+  {num:"1306",lastName:"Górski",firstName:"Dominik",div:"Optics",cat:"",reg:"POL"},
+  {num:"778",lastName:"Koussev",firstName:"Alexander",div:"Optics",cat:"",reg:"BUL"},
+  {num:"276",lastName:"Mølmen",firstName:"Henrik",div:"Optics",cat:"",reg:"NOR"},
+  {num:"250",lastName:"Nurmi",firstName:"Iiro",div:"Optics",cat:"",reg:"FIN"},
+  {num:"1387",lastName:"Adamec",firstName:"Ľuboš",div:"Optics",cat:"",reg:"SVK"},
+  {num:"842",lastName:"Nikolov",firstName:"Manuil",div:"Optics",cat:"",reg:"BUL"},
+  {num:"462",lastName:"Camaño Morata",firstName:"Carlos",div:"Optics",cat:"",reg:"ESP"},
+  {num:"457",lastName:"JIMÉNEZ",firstName:"PABLO",div:"Optics",cat:"SS",reg:"ESP"},
+  {num:"469",lastName:"Botella Galiana",firstName:"Natalia",div:"Optics",cat:"L",reg:"ESP"},
+  {num:"744",lastName:"Musil",firstName:"Jacqueline",div:"Optics",cat:"L",reg:"AUT"},
+  {num:"465",lastName:"SANTAMARIA ARANDA",firstName:"JESUS ANGEL",div:"Optics",cat:"",reg:"ESP"},
+  {num:"460",lastName:"de la encarnacion mompel",firstName:"Gonzalo",div:"Optics",cat:"S",reg:"ESP"},
+  {num:"470",lastName:"Jiménez Blázquez",firstName:"María de los Ángeles",div:"Optics",cat:"LS",reg:"ESP"},
+  {num:"745",lastName:"Kastner",firstName:"Kerstin",div:"Optics",cat:"L",reg:"AUT"},
+  {num:"473",lastName:"Kryuchin",firstName:"Nikita",div:"Optics",cat:"",reg:"ESP"},
+  {num:"461",lastName:"Zanón",firstName:"Jose",div:"Optics",cat:"SS",reg:"ESP"},
+  {num:"471",lastName:"Díaz González",firstName:"Yuraima",div:"Optics",cat:"L",reg:"ESP"},
+  {num:"746",lastName:"Leitner",firstName:"Sandra",div:"Optics",cat:"L",reg:"AUT"},
+  {num:"474",lastName:"Sánchez Pardo",firstName:"Carlos Javier",div:"Optics",cat:"",reg:"ESP"},
+  {num:"513",lastName:"De Cobos Abreu",firstName:"Eduardo",div:"Optics",cat:"S",reg:"ESP"},
+  {num:"597",lastName:"Bokuchava",firstName:"Natalia",div:"Optics",cat:"LS",reg:"ESP"},
+  {num:"751",lastName:"Weber",firstName:"Günter",div:"Optics",cat:"SS",reg:"AUT"},
+  {num:"747",lastName:"Gebhardt",firstName:"Jürgen",div:"Optics",cat:"S",reg:"AUT"},
+  {num:"240",lastName:"Mustonen",firstName:"Anastasia",div:"Optics",cat:"L",reg:"FIN"},
+  {num:"752",lastName:"Breitler",firstName:"Christian",div:"Optics",cat:"SS",reg:"AUT"},
+  {num:"748",lastName:"RASOVIC",firstName:"Bosko",div:"Optics",cat:"S",reg:"AUT"},
+  {num:"241",lastName:"Viskari",firstName:"Laura",div:"Optics",cat:"L",reg:"FIN"},
+  {num:"753",lastName:"Willer",firstName:"Helmuth",div:"Optics",cat:"SS",reg:"AUT"},
+  {num:"749",lastName:"Kneringer",firstName:"Mario",div:"Optics",cat:"S",reg:"AUT"},
+  {num:"242",lastName:"Vapanen",firstName:"Annu",div:"Optics",cat:"LS",reg:"FIN"},
+  {num:"754",lastName:"Brugger",firstName:"Stephan",div:"Optics",cat:"SS",reg:"AUT"},
+  {num:"750",lastName:"Hampel",firstName:"Christof",div:"Optics",cat:"S",reg:"AUT"},
+  {num:"243",lastName:"Laakkonen",firstName:"Miia",div:"Optics",cat:"L",reg:"FIN"},
+];
+
+// ─── Import logic ────────────────────────────────────────────────────────────
+let selectedNums = new Set();
+
+// Populate nation dropdown
+const nations = [...new Set(EHC_SHOOTERS.map(s=>s.reg))].sort();
+const regSel = document.getElementById('filter-reg');
+nations.forEach(n => {
+  const o = document.createElement('option');
+  o.value = n; o.textContent = `${countryFlag(n)} ${n}`;
+  regSel.appendChild(o);
+});
+
+window.renderImportList = () => {
+  const filterReg = document.getElementById('filter-reg').value;
+  const filterDiv = document.getElementById('filter-div').value;
+  const search = document.getElementById('import-search').value.toLowerCase();
+
+  let shooters = EHC_SHOOTERS.filter(s => {
+    if (filterReg && s.reg !== filterReg) return false;
+    if (filterDiv && s.div !== filterDiv) return false;
+    if (search && !(`${s.firstName} ${s.lastName}`).toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  // Group by nation then division
+  const byNation = {};
+  shooters.forEach(s => {
+    if (!byNation[s.reg]) byNation[s.reg] = {};
+    if (!byNation[s.reg][s.div]) byNation[s.reg][s.div] = [];
+    byNation[s.reg][s.div].push(s);
+  });
+
+  const container = document.getElementById('import-list');
+  container.innerHTML = Object.keys(byNation).sort().map(reg => {
+    const divs = byNation[reg];
+    const total = Object.values(divs).flat().length;
+    const divHtml = Object.keys(divs).sort().map(div => {
+      const list = divs[div].map(s => {
+        const checked = selectedNums.has(s.num) ? 'checked' : '';
+        return `<div class="import-shooter-row">
+          <input type="checkbox" class="import-checkbox" value="${s.num}" ${checked}
+            onchange="toggleShooter('${s.num}')">
+          <div class="import-shooter-name">${s.firstName} ${s.lastName}</div>
+          <div class="import-shooter-meta">#${s.num}${s.cat?' · '+s.cat:''}</div>
+        </div>`;
+      }).join('');
+      return `<div class="div-group-label">${div}</div>${list}`;
+    }).join('');
+    return `
+    <div class="nation-block">
+      <div class="nation-header" onclick="toggleNation(this)">
+        <div class="nation-flag">${countryFlag(reg)}</div>
+        <div class="nation-name">${reg}</div>
+        <div class="nation-count">${total} shooters</div>
+        <div class="nation-arrow">▶</div>
+      </div>
+      <div class="nation-shooters">${divHtml}</div>
+    </div>`;
+  }).join('');
+
+  updateSelCount();
+};
+
+window.toggleNation = (header) => {
+  const shooters = header.nextElementSibling;
+  const arrow = header.querySelector('.nation-arrow');
+  const open = shooters.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+};
+
+window.toggleShooter = (num) => {
+  if (selectedNums.has(num)) selectedNums.delete(num);
+  else selectedNums.add(num);
+  updateSelCount();
+};
+
+window.selectAllVisible = () => {
+  document.querySelectorAll('#import-list .import-checkbox').forEach(cb => {
+    selectedNums.add(cb.value);
+    cb.checked = true;
+  });
+  updateSelCount();
+};
+
+window.deselectAll = () => {
+  selectedNums.clear();
+  document.querySelectorAll('#import-list .import-checkbox').forEach(cb => cb.checked = false);
+  updateSelCount();
+};
+
+function updateSelCount() {
+  document.getElementById('sel-count').textContent = selectedNums.size;
+}
+
+window.doImport = async () => {
+  const matchId = document.getElementById('import-match-select').value;
+  if (!matchId) { showToast('Select a match first', 'error'); return; }
+  if (!selectedNums.size) { showToast('Select at least one shooter', 'error'); return; }
+
+  const match = allMatches.find(m => String(m.id) === String(matchId));
+  if (!match) { showToast('Match not found', 'error'); return; }
+
+  const toImport = EHC_SHOOTERS.filter(s => selectedNums.has(s.num));
+  const existingShooters = [...(match.shooters || [])];
+  const existingTeams = [...(match.teams || [])];
+
+  // Build shooter objects for new shooters only
+  const existingNums = new Set(existingShooters.map(s => s.ehcNum).filter(Boolean));
+  const newShooters = toImport.filter(s => !existingNums.has(s.num)).map(s => ({
+    id: 'ehc_' + s.num,
+    isMe: false,
+    uid: null,
+    firstName: s.firstName,
+    lastName: s.lastName,
+    division: s.div,
+    pf: 'minor',
+    club: '',
+    ehcNum: s.num,
+    ehcReg: s.reg,
+    stages: []
+  }));
+
+  // Build/update teams: one team per (nation, division)
+  const teamMap = {};
+  existingTeams.forEach(t => { if (t.ehcKey) teamMap[t.ehcKey] = t; });
+
+  toImport.forEach(s => {
+    const key = `${s.reg}_${s.div}`;
+    if (!teamMap[key]) {
+      teamMap[key] = {
+        id: 'ehcteam_' + key,
+        name: `${s.reg} ${s.div}`,
+        country: s.reg,
+        shooterIds: [],
+        ehcKey: key
+      };
+    }
+    const shooterId = 'ehc_' + s.num;
+    if (!teamMap[key].shooterIds.includes(shooterId)) {
+      teamMap[key].shooterIds.push(shooterId);
+    }
+  });
+
+  // Enforce max 4 per team (keep first 4)
+  Object.values(teamMap).forEach(t => { if (t.shooterIds.length > 4) t.shooterIds = t.shooterIds.slice(0,4); });
+
+  const updatedShooters = [...existingShooters, ...newShooters];
+  const updatedTeams = Object.values(teamMap);
+
+  const progEl = document.getElementById('import-progress');
+  progEl.textContent = 'Saving…';
+
+  try {
+    await updateDoc(doc(db, 'matches', matchId.toString()), {
+      shooters: updatedShooters,
+      teams: updatedTeams
+    });
+    showToast(`✓ Imported ${newShooters.length} shooters, ${updatedTeams.length} teams`, 'success');
+    progEl.textContent = '';
+    selectedNums.clear();
+    renderImportList();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+    progEl.textContent = '';
+  }
+};
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ─── Init import list ─────────────────────────────────────────────────────────
+renderImportList();
+
+</script>
+</body>
+</html>

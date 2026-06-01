@@ -206,8 +206,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   <!-- IMPORT TAB -->
   <div class="tab-content" id="tab-import">
     <div class="import-header">
-      <h3>Import EHC Team Shooters</h3>
-      <p>Select shooters from the official EHG 2026 squad list (T-marked). They will be added to the selected match and grouped into national teams per division.</p>
+      <h3>🇳🇴 Import NOR EHC Shooters</h3>
+      <p>Norske skyttere fra EHG 2026. T-merkede skyttere legges automatisk i riktig lag (divisjon + kategori). Øvrige importeres som individuelle skyttere.</p>
     </div>
     <div class="match-selector">
       <label>Target match</label>
@@ -216,9 +216,6 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
       </select>
     </div>
     <div class="import-controls">
-      <select class="import-select" id="filter-reg" onchange="renderImportList()">
-        <option value="">All Nations</option>
-      </select>
       <select class="import-select" id="filter-div" onchange="renderImportList()">
         <option value="">All Divisions</option>
         <option>Classic</option>
@@ -226,7 +223,6 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
         <option>Optics</option>
         <option>Production</option>
         <option>Production Optics</option>
-        <option>Revolver</option>
         <option>Standard</option>
       </select>
       <input class="import-search" id="import-search" placeholder="Search name…" oninput="renderImportList()">
@@ -352,61 +348,104 @@ function renderStandings() {
     return;
   }
 
-  // Collect unique divisions from shooters
-  const divs = ['All', ...new Set((match.shooters||[]).map(s=>s.division).filter(Boolean)).values()].sort();
+  // Collect unique divisions
+  const divSet = new Set(match.teams.map(t => t.ehcDiv || '').filter(Boolean));
+  // Also infer from ALL_TEAMS by matching team key
+  match.teams.forEach(t => {
+    const def = ALL_TEAMS.find(d => d.key === t.ehcKey);
+    if (def) divSet.add(def.div);
+  });
+  const divs = ['All', ...Array.from(divSet).sort()];
   filterEl.innerHTML = divs.map(d =>
     `<div class="div-chip ${d===activeDiv?'active':''}" onclick="setDiv('${d}')">${d}</div>`
   ).join('');
 
-  const standings = calcTeamStandings(match);
-  const filtered = activeDiv === 'All' ? standings :
-    standings.filter(t => {
-      const members = (match.shooters||[]).filter(s => t.shooterIds.includes(s.id));
-      return members.some(s => s.division === activeDiv);
-    });
+  // Compute standings per team using match results
+  const allStandings = calcTeamStandings(match);
 
-  if (!filtered.length) {
+  // Group teams by div+cat using ALL_TEAMS lookup
+  const groups = {};
+  allStandings.forEach(team => {
+    const def = ALL_TEAMS.find(d => d.key === team.ehcKey);
+    const div = def ? def.div : (team.ehcDiv || 'Unknown');
+    const cat = def ? def.cat : (team.ehcCat || '');
+    if (activeDiv !== 'All' && div !== activeDiv) return;
+    const groupKey = `${div}||${cat}`;
+    if (!groups[groupKey]) groups[groupKey] = {div, cat, teams: []};
+    groups[groupKey].teams.push(team);
+  });
+
+  if (!Object.keys(groups).length) {
     cont.innerHTML = '<div class="empty-state"><h3>No teams for this division</h3></div>';
     return;
   }
 
-  const topPts = filtered[0]?.totalPts || 0;
+  const catLabel = c => c === '' ? 'Overall' : c;
+  const divOrder = ['Classic','Open','Optics','Production','Production Optics','Revolver','Standard','Unknown'];
+  const catOrder = ['','S','SS','J','SJ','L','LS','LJ','LSJ','GJ','GS','LSJ'];
 
-  cont.innerHTML = filtered.map((team, i) => {
-    const rank = i + 1;
-    const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-n';
-    const pct = topPts > 0 ? Math.round(team.totalPts / topPts * 100) : 0;
-    const flag = countryFlag(team.country || '');
+  const sortedGroups = Object.values(groups).sort((a,b) => {
+    const di = divOrder.indexOf(a.div) - divOrder.indexOf(b.div);
+    if (di !== 0) return di;
+    return catOrder.indexOf(a.cat) - catOrder.indexOf(b.cat);
+  });
 
-    const shooterRows = team.shooterSummary.map(s =>
-      `<div class="shooter-row">
-        <div class="shooter-counting ${s.counting&&!s.dq?'counting-yes':'counting-no'}" title="${s.counting?'Counting':'Bench'}"></div>
-        <div class="shooter-name">${s.name}${s.dq?' <span class="shooter-dq">DQ</span>':''}</div>
-        <div class="shooter-pts">${s.total.toFixed(2)}</div>
-      </div>`
-    ).join('');
+  cont.innerHTML = sortedGroups.map(group => {
+    const topPts = group.teams[0]?.totalPts || 0;
+    const isNorHighlighted = group.teams.some(t => {
+      const def = ALL_TEAMS.find(d => d.key === t.ehcKey);
+      return def && def.reg === 'NOR';
+    });
+
+    const teamRows = group.teams.map((team, i) => {
+      const def = ALL_TEAMS.find(d => d.key === team.ehcKey);
+      const reg = def ? def.reg : team.country || '';
+      const rank = i + 1;
+      const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-n';
+      const pct = topPts > 0 ? Math.round(team.totalPts / topPts * 100) : 0;
+      const isNOR = reg === 'NOR';
+
+      const shooterRows = team.shooterSummary.map(s =>
+        `<div class="shooter-row">
+          <div class="shooter-counting ${s.counting&&!s.dq?'counting-yes':'counting-no'}"></div>
+          <div class="shooter-name">${s.name}${s.dq?' <span class="shooter-dq">DQ</span>':''}</div>
+          <div class="shooter-pts">${s.total.toFixed(2)}</div>
+        </div>`
+      ).join('');
+
+      return `
+      <div class="standings-card" style="${isNOR?'border-color:var(--accent);':''}">
+        <div class="team-row" onclick="toggleDetail('td-${group.div.replace(/ /g,'_')}-${group.cat}-${i}',this)">
+          <div class="rank-badge ${rankClass}">${rank}</div>
+          <div class="team-flag">${countryFlag(reg)}</div>
+          <div class="team-info">
+            <div class="team-name">${team.name}${isNOR?' 🇳🇴':''}</div>
+            <div class="team-country">${reg}</div>
+          </div>
+          <div class="team-bar-wrap">
+            <div class="team-bar"><div class="team-bar-fill" style="width:${pct}%"></div></div>
+          </div>
+          <div class="team-pts">
+            <div class="team-pts-val">${team.totalPts.toFixed(2)}</div>
+            <div class="team-pts-label">pts</div>
+          </div>
+        </div>
+        <div class="team-detail" id="td-${group.div.replace(/ /g,'_')}-${group.cat}-${i}">
+          <div class="detail-label">Shooters (top 3 of ${team.shooterIds.length} count)</div>
+          ${shooterRows}
+        </div>
+      </div>`;
+    }).join('');
 
     return `
-    <div class="standings-card">
-      <div class="team-row" onclick="toggleDetail('td-${i}',this)">
-        <div class="rank-badge ${rankClass}">${rank}</div>
-        <div class="team-flag">${flag}</div>
-        <div class="team-info">
-          <div class="team-name">${team.name}</div>
-          <div class="team-country">${team.country||''}</div>
-        </div>
-        <div class="team-bar-wrap">
-          <div class="team-bar"><div class="team-bar-fill" style="width:${pct}%"></div></div>
-        </div>
-        <div class="team-pts">
-          <div class="team-pts-val">${team.totalPts.toFixed(2)}</div>
-          <div class="team-pts-label">pts</div>
-        </div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;font-family:'Share Tech Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;padding:8px 0 6px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <span>${group.div}</span>
+        <span style="color:var(--muted)">·</span>
+        <span style="color:var(--text)">${catLabel(group.cat)}</span>
+        <span style="color:var(--muted);margin-left:auto">${group.teams.length} nations</span>
       </div>
-      <div class="team-detail" id="td-${i}">
-        <div class="detail-label">Shooters (top 3 of ${team.shooterIds.length} count)</div>
-        ${shooterRows}
-      </div>
+      ${teamRows}
     </div>`;
   }).join('');
 }
@@ -458,7 +497,7 @@ function calcTeamStandings(match) {
       return {id:r.id, name:s?`${s.firstName||''} ${s.lastName||''}`.trim():'?', total:r.total, counting:ri<3, dq:dqIds.has(String(r.id))};
     });
 
-    return {id:team.id, name:team.name, country:team.country||'', shooterIds, totalPts, shooterSummary, top3Ids:top3};
+    return {id:team.id, name:team.name, country:team.country||'', ehcKey:team.ehcKey||null, shooterIds, totalPts, shooterSummary, top3Ids:top3};
   }).sort((a,b)=>b.totalPts-a.totalPts);
 }
 
@@ -507,625 +546,339 @@ const flagMap = {
 };
 function countryFlag(code) { return flagMap[code.toUpperCase()] || '🏳️'; }
 
-// ─── EHC Shooter data ────────────────────────────────────────────────────────
-const EHC_SHOOTERS = [
-  {num:"755",lastName:"Reiter",firstName:"Gerald",div:"Revolver",cat:"S",reg:"AUT"},
-  {num:"1054",lastName:"Csucska",firstName:"Peter",div:"Revolver",cat:"",reg:"HUN"},
-  {num:"1541",lastName:"Anesa",firstName:"Vittorio",div:"Classic",cat:"",reg:"ITA"},
-  {num:"266",lastName:"Fiskebeck",firstName:"Espen",div:"Classic",cat:"",reg:"NOR"},
-  {num:"586",lastName:"Iosifidis",firstName:"Konstantinos",div:"Classic",cat:"S",reg:"GRE"},
-  {num:"756",lastName:"Stelzmueller",firstName:"Nikolaus",div:"Revolver",cat:"",reg:"AUT"},
-  {num:"1055",lastName:"Szarvas",firstName:"Peter",div:"Revolver",cat:"S",reg:"HUN"},
-  {num:"1542",lastName:"Losi",firstName:"Francesco",div:"Classic",cat:"",reg:"ITA"},
-  {num:"381",lastName:"Fiskerstrand",firstName:"Jan Stian",div:"Classic",cat:"S",reg:"NOR"},
-  {num:"626",lastName:"GKOGKAKIS",firstName:"ATHANASIOS",div:"Classic",cat:"",reg:"GRE"},
-  {num:"757",lastName:"Kroiss",firstName:"Robert",div:"Revolver",cat:"S",reg:"AUT"},
-  {num:"1056",lastName:"Wittinger",firstName:"Gabor Alex",div:"Revolver",cat:"",reg:"HUN"},
-  {num:"1543",lastName:"Mundo",firstName:"Vincenzo",div:"Classic",cat:"",reg:"ITA"},
-  {num:"268",lastName:"Johansen",firstName:"Henrik",div:"Classic",cat:"",reg:"NOR"},
-  {num:"627",lastName:"Vlachos",firstName:"Kostas",div:"Classic",cat:"",reg:"GRE"},
-  {num:"758",lastName:"Lang",firstName:"Johann",div:"Revolver",cat:"S",reg:"AUT"},
-  {num:"1651",lastName:"Sárközy",firstName:"Károly",div:"Revolver",cat:"",reg:"HUN"},
-  {num:"1544",lastName:"Masieri",firstName:"Lorenzo",div:"Classic",cat:"",reg:"ITA"},
-  {num:"365",lastName:"Aarmo",firstName:"Stig",div:"Classic",cat:"",reg:"NOR"},
-  {num:"760",lastName:"Fragos",firstName:"Dimitris",div:"Classic",cat:"S",reg:"GRE"},
-  {num:"56",lastName:"Knaus",firstName:"Günther",div:"Revolver",cat:"S",reg:"GER"},
-  {num:"336",lastName:"Marjoniemi",firstName:"Esa",div:"Classic",cat:"S",reg:"FIN"},
-  {num:"821",lastName:"Marx",firstName:"Jakub",div:"Classic",cat:"",reg:"CZE"},
-  {num:"134",lastName:"Hansen",firstName:"Gert Erling",div:"Classic",cat:"SS",reg:"DEN"},
-  {num:"140",lastName:"Slim",firstName:"Marcel",div:"Classic",cat:"SS",reg:"NED"},
-  {num:"59",lastName:"Füger",firstName:"Christian",div:"Revolver",cat:"",reg:"GER"},
-  {num:"337",lastName:"Mattila",firstName:"Sampo",div:"Classic",cat:"S",reg:"FIN"},
-  {num:"878",lastName:"Novotný",firstName:"Zdeněk",div:"Classic",cat:"",reg:"CZE"},
-  {num:"135",lastName:"Frandsen",firstName:"Kim",div:"Classic",cat:"",reg:"DEN"},
-  {num:"156",lastName:"Thijssen",firstName:"Jan-Wouter",div:"Classic",cat:"",reg:"NED"},
-  {num:"60",lastName:"Schmid",firstName:"Michael",div:"Revolver",cat:"",reg:"GER"},
-  {num:"338",lastName:"Tukiainen",firstName:"Antti",div:"Classic",cat:"",reg:"FIN"},
-  {num:"880",lastName:"Zvěřina",firstName:"David",div:"Classic",cat:"",reg:"CZE"},
-  {num:"136",lastName:"Bach",firstName:"Mads Peter",div:"Classic",cat:"S",reg:"DEN"},
-  {num:"759",lastName:"Warmerdam",firstName:"Rene",div:"Classic",cat:"S",reg:"NED"},
-  {num:"1678",lastName:"Steinert",firstName:"Benjamin",div:"Revolver",cat:"",reg:"GER"},
-  {num:"1545",lastName:"Sciurpi",firstName:"Antonio",div:"Classic",cat:"S",reg:"ITA"},
-  {num:"448",lastName:"Manosalvas",firstName:"Francisco",div:"Classic",cat:"S",reg:"ESP"},
-  {num:"1546",lastName:"Di Giulio",firstName:"Giovanni",div:"Classic",cat:"S",reg:"ITA"},
-  {num:"449",lastName:"Arroyo Navidad",firstName:"Nicolas",div:"Classic",cat:"S",reg:"ESP"},
-  {num:"1547",lastName:"Farnetani",firstName:"Marco",div:"Classic",cat:"S",reg:"ITA"},
-  {num:"450",lastName:"CASES",firstName:"ANTONIO",div:"Classic",cat:"SS",reg:"ESP"},
-  {num:"1548",lastName:"Pedroli",firstName:"Nicola",div:"Classic",cat:"SS",reg:"ITA"},
-  {num:"550",lastName:"CONDE GALA",firstName:"FEDERICO",div:"Classic",cat:"SS",reg:"ESP"},
-  {num:"1066",lastName:"Donka",firstName:"Imre",div:"Classic",cat:"S",reg:"HUN"},
-  {num:"5",lastName:"Graner",firstName:"Arno",div:"Classic",cat:"S",reg:"GER"},
-  {num:"1067",lastName:"Bobaly",firstName:"Mihaly",div:"Classic",cat:"S",reg:"HUN"},
-  {num:"6",lastName:"Kaiser",firstName:"Marcus",div:"Classic",cat:"S",reg:"GER"},
-  {num:"1068",lastName:"Miglecz",firstName:"Gyula",div:"Classic",cat:"S",reg:"HUN"},
-  {num:"1069",lastName:"Batki",firstName:"György",div:"Classic",cat:"S",reg:"HUN"},
-  {num:"1562",lastName:"Ciocconi",firstName:"Maurizio",div:"Open",cat:"S",reg:"ITA"},
-  {num:"1658",lastName:"Checcucci",firstName:"Federico",div:"Open",cat:"S",reg:"ITA"},
-  {num:"1563",lastName:"Barbizzi",firstName:"Daniele",div:"Open",cat:"SS",reg:"ITA"},
-  {num:"813",lastName:"Kamenicek",firstName:"Martin",div:"Production Optics",cat:"",reg:"CZE"},
-  {num:"1684",lastName:"Grauffel",firstName:"Robin",div:"Production Optics",cat:"J",reg:"FRA"},
-  {num:"1534",lastName:"Indizio",firstName:"Davide",div:"Production Optics",cat:"",reg:"ITA"},
-  {num:"21",lastName:"Ehrhardt",firstName:"Luis",div:"Production Optics",cat:"",reg:"GER"},
-  {num:"107",lastName:"Keppel",firstName:"Dylan",div:"Production Optics",cat:"",reg:"NED"},
-  {num:"277",lastName:"Granbo",firstName:"Steinar",div:"Production Optics",cat:"",reg:"NOR"},
-  {num:"814",lastName:"Koudelka",firstName:"Dan",div:"Production Optics",cat:"J",reg:"CZE"},
-  {num:"1685",lastName:"Obriot",firstName:"Emile",div:"Production Optics",cat:"",reg:"FRA"},
-  {num:"1535",lastName:"Giacomini",firstName:"Cristian",div:"Production Optics",cat:"",reg:"ITA"},
-  {num:"22",lastName:"Ross",firstName:"Christopher",div:"Production Optics",cat:"",reg:"GER"},
-  {num:"108",lastName:"Wauben",firstName:"Cheyenne",div:"Production Optics",cat:"L",reg:"NED"},
-  {num:"278",lastName:"Grimli",firstName:"Alexander",div:"Production Optics",cat:"",reg:"NOR"},
-  {num:"815",lastName:"Novotný",firstName:"Robert",div:"Production Optics",cat:"SJ",reg:"CZE"},
-  {num:"1693",lastName:"Armendariz",firstName:"Sebastien",div:"Production Optics",cat:"",reg:"FRA"},
-  {num:"1536",lastName:"Masserdotti",firstName:"Manuel",div:"Production Optics",cat:"",reg:"ITA"},
-  {num:"23",lastName:"Eggert",firstName:"Timm",div:"Production Optics",cat:"",reg:"GER"},
-  {num:"132",lastName:"Souhuwat",firstName:"Marcel Timothy",div:"Production Optics",cat:"",reg:"NED"},
-  {num:"279",lastName:"Norr",firstName:"Aleksander",div:"Production Optics",cat:"",reg:"NOR"},
-  {num:"816",lastName:"Gabriel",firstName:"Livia",div:"Production Optics",cat:"LJ",reg:"CZE"},
-  {num:"1695",lastName:"Denoyelles",firstName:"Morgan",div:"Production Optics",cat:"",reg:"FRA"},
-  {num:"1537",lastName:"Vicari",firstName:"Michael",div:"Production Optics",cat:"",reg:"ITA"},
-  {num:"63",lastName:"Udvary",firstName:"David",div:"Production Optics",cat:"",reg:"GER"},
-  {num:"924",lastName:"Peniche",firstName:"Rafael",div:"Production Optics",cat:"",reg:"POR"},
-  {num:"684",lastName:"Andersen",firstName:"Terje",div:"Production Optics",cat:"",reg:"NOR"},
-  {num:"981",lastName:"Levin",firstName:"David",div:"Production Optics",cat:"",reg:"SWE"},
-  {num:"244",lastName:"Suoninen",firstName:"Mikko",div:"Production Optics",cat:"",reg:"FIN"},
-  {num:"1378",lastName:"Palka",firstName:"Jan",div:"Production Optics",cat:"SS",reg:"SVK"},
-  {num:"1213",lastName:"Tausiewicz",firstName:"Marcin",div:"Production Optics",cat:"",reg:"POL"},
-  {num:"927",lastName:"Mendes",firstName:"Robert",div:"Production Optics",cat:"S",reg:"POR"},
-  {num:"982",lastName:"Gyllenberg",firstName:"Rasmus",div:"Production Optics",cat:"",reg:"SWE"},
-  {num:"245",lastName:"Pennanen",firstName:"Pasi",div:"Production Optics",cat:"",reg:"FIN"},
-  {num:"1391",lastName:"Bednarik",firstName:"Marian",div:"Production Optics",cat:"",reg:"SVK"},
-  {num:"1289",lastName:"Ratynski",firstName:"Lukas",div:"Production Optics",cat:"",reg:"POL"},
-  {num:"929",lastName:"Bastos",firstName:"Joao",div:"Production Optics",cat:"S",reg:"POR"},
-  {num:"983",lastName:"Johnson",firstName:"Daniel",div:"Production Optics",cat:"",reg:"SWE"},
-  {num:"246",lastName:"Tiili",firstName:"Samuel",div:"Production Optics",cat:"",reg:"FIN"},
-  {num:"1394",lastName:"Drienik",firstName:"Vojtech",div:"Production Optics",cat:"",reg:"SVK"},
-  {num:"1293",lastName:"Wysocki",firstName:"Nikodem",div:"Production Optics",cat:"",reg:"POL"},
-  {num:"932",lastName:"Mendes",firstName:"Joao",div:"Production Optics",cat:"",reg:"POR"},
-  {num:"1357",lastName:"Åström",firstName:"Tobias",div:"Production Optics",cat:"",reg:"SWE"},
-  {num:"310",lastName:"Jetsonen",firstName:"Timo",div:"Production Optics",cat:"",reg:"FIN"},
-  {num:"1307",lastName:"Sviridov",firstName:"Denys",div:"Production Optics",cat:"",reg:"POL"},
-  {num:"488",lastName:"Alcaraz",firstName:"Enrique",div:"Production Optics",cat:"",reg:"ESP"},
-  {num:"622",lastName:"KOUIMTSIDIS",firstName:"THEODOROS",div:"Production Optics",cat:"",reg:"GRE"},
-  {num:"347",lastName:"Baksa",firstName:"Giedrius",div:"Production Optics",cat:"",reg:"LTU"},
-  {num:"524",lastName:"Wuyts",firstName:"Nic",div:"Production Optics",cat:"",reg:"BEL"},
-  {num:"151",lastName:"Bankovic",firstName:"Luka",div:"Production Optics",cat:"",reg:"SER"},
-  {num:"489",lastName:"Tomas Forne",firstName:"Miquel Angel",div:"Production Optics",cat:"",reg:"ESP"},
-  {num:"623",lastName:"Tsantalis",firstName:"Nikolaos",div:"Production Optics",cat:"",reg:"GRE"},
-  {num:"355",lastName:"Ribokas",firstName:"Donatas",div:"Production Optics",cat:"",reg:"LTU"},
-  {num:"525",lastName:"Desmedt",firstName:"Mike",div:"Production Optics",cat:"",reg:"BEL"},
-  {num:"669",lastName:"Bulatović",firstName:"Branislav",div:"Production Optics",cat:"",reg:"SER"},
-  {num:"490",lastName:"Alcaraz",firstName:"Victor",div:"Production Optics",cat:"",reg:"ESP"},
-  {num:"358",lastName:"Šukys",firstName:"Tautvydas",div:"Production Optics",cat:"",reg:"LTU"},
-  {num:"526",lastName:"Proost",firstName:"Maarten",div:"Production Optics",cat:"",reg:"BEL"},
-  {num:"670",lastName:"Stamenković",firstName:"Dejan",div:"Production Optics",cat:"",reg:"SER"},
-  {num:"573",lastName:"Roldán Blázquez",firstName:"Francisco",div:"Production Optics",cat:"",reg:"ESP"},
-  {num:"625",lastName:"Karavergos",firstName:"Athanasios",div:"Production Optics",cat:"S",reg:"GRE"},
-  {num:"1123",lastName:"Lukenda",firstName:"Davor",div:"Production Optics",cat:"",reg:"CRO"},
-  {num:"534",lastName:"Peeters",firstName:"Sven",div:"Production Optics",cat:"",reg:"BEL"},
-  {num:"1026",lastName:"Džonić",firstName:"Marjan",div:"Production Optics",cat:"",reg:"SER"},
-  {num:"952",lastName:"Vilokas",firstName:"Kaido",div:"Production Optics",cat:"S",reg:"EST"},
-  {num:"1270",lastName:"Yu",firstName:"Hongji",div:"Production Optics",cat:"",reg:"GBR"},
-  {num:"1124",lastName:"Marinović",firstName:"Marin",div:"Production Optics",cat:"",reg:"CRO"},
-  {num:"1058",lastName:"Obermajer",firstName:"Attila",div:"Production Optics",cat:"",reg:"HUN"},
-  {num:"1011",lastName:"Dudenko",firstName:"Oleksii",div:"Production Optics",cat:"",reg:"UKR"},
-  {num:"961",lastName:"Kivi",firstName:"Erkki",div:"Production Optics",cat:"",reg:"EST"},
-  {num:"1272",lastName:"Titcumb",firstName:"James",div:"Production Optics",cat:"",reg:"GBR"},
-  {num:"1125",lastName:"Međugorac",firstName:"Robert",div:"Production Optics",cat:"S",reg:"CRO"},
-  {num:"1059",lastName:"Kovacs",firstName:"Attila",div:"Production Optics",cat:"",reg:"HUN"},
-  {num:"1012",lastName:"Varhanov",firstName:"Pavlo",div:"Production Optics",cat:"",reg:"UKR"},
-  {num:"962",lastName:"Kond",firstName:"Jaanus",div:"Production Optics",cat:"",reg:"EST"},
-  {num:"1278",lastName:"Bland",firstName:"Gareth",div:"Production Optics",cat:"",reg:"GBR"},
-  {num:"1060",lastName:"Bükkfejes",firstName:"András",div:"Production Optics",cat:"",reg:"HUN"},
-  {num:"1036",lastName:"Fedorchuk",firstName:"Oleksandr",div:"Production Optics",cat:"",reg:"UKR"},
-  {num:"965",lastName:"Veskimäe",firstName:"Toomas",div:"Production Optics",cat:"S",reg:"EST"},
-  {num:"1280",lastName:"Bland",firstName:"Peter",div:"Production Optics",cat:"",reg:"GBR"},
-  {num:"1061",lastName:"Lázár",firstName:"Zsolt",div:"Production Optics",cat:"S",reg:"HUN"},
-  {num:"1037",lastName:"Senyshyn",firstName:"Orest",div:"Production Optics",cat:"",reg:"UKR"},
-  {num:"1538",lastName:"Vezzoli",firstName:"Roberto",div:"Production Optics",cat:"S",reg:"ITA"},
-  {num:"1266",lastName:"Cooper",firstName:"Justin",div:"Production Optics",cat:"S",reg:"GBR"},
-  {num:"294",lastName:"Nordvi",firstName:"Thomas",div:"Production Optics",cat:"S",reg:"NOR"},
-  {num:"345",lastName:"Karosas",firstName:"Linas",div:"Production Optics",cat:"S",reg:"LTU"},
-  {num:"28",lastName:"Bettermann",firstName:"Heribert",div:"Production Optics",cat:"SS",reg:"GER"},
-  {num:"987",lastName:"Dal",firstName:"Niclas",div:"Production Optics",cat:"SS",reg:"SWE"},
-  {num:"1539",lastName:"Cerniglia",firstName:"Francesco",div:"Production Optics",cat:"S",reg:"ITA"},
-  {num:"1275",lastName:"Bayly",firstName:"Sonny",div:"Production Optics",cat:"S",reg:"GBR"},
-  {num:"295",lastName:"Lee",firstName:"Kyrre",div:"Production Optics",cat:"S",reg:"NOR"},
-  {num:"346",lastName:"Binkevicius",firstName:"Ramunas",div:"Production Optics",cat:"S",reg:"LTU"},
-  {num:"29",lastName:"Fabricius",firstName:"Georg",div:"Production Optics",cat:"SS",reg:"GER"},
-  {num:"988",lastName:"Ekstedt",firstName:"Stefan",div:"Production Optics",cat:"SS",reg:"SWE"},
-  {num:"1540",lastName:"Mulazzani",firstName:"Gianluca",div:"Production Optics",cat:"S",reg:"ITA"},
-  {num:"1283",lastName:"Ingram",firstName:"Richard",div:"Production Optics",cat:"S",reg:"GBR"},
-  {num:"296",lastName:"Toft",firstName:"Rune",div:"Production Optics",cat:"S",reg:"NOR"},
-  {num:"359",lastName:"Palaima",firstName:"Egidijus",div:"Production Optics",cat:"S",reg:"LTU"},
-  {num:"30",lastName:"Haben",firstName:"Jörg",div:"Production Optics",cat:"SS",reg:"GER"},
-  {num:"989",lastName:"Stangvik",firstName:"Kent",div:"Production Optics",cat:"SS",reg:"SWE"},
-  {num:"985",lastName:"Skogstrom",firstName:"Marcus",div:"Production Optics",cat:"S",reg:"SWE"},
-  {num:"1267",lastName:"Mickiewicz",firstName:"Waldek",div:"Production Optics",cat:"S",reg:"GBR"},
-  {num:"516",lastName:"Wulvik",firstName:"Stein Gustav",div:"Production Optics",cat:"S",reg:"NOR"},
-  {num:"360",lastName:"Cimoš",firstName:"Lech",div:"Production Optics",cat:"S",reg:"LTU"},
-  {num:"31",lastName:"Holden",firstName:"Andy",div:"Production Optics",cat:"SS",reg:"GER"},
-  {num:"1220",lastName:"Johannesson",firstName:"Stefan",div:"Production Optics",cat:"SS",reg:"SWE"},
-  {num:"986",lastName:"Nihei",firstName:"Jiro",div:"Production Optics",cat:"S",reg:"SWE"},
-  {num:"25",lastName:"Albrecht",firstName:"Frank",div:"Production Optics",cat:"S",reg:"GER"},
-  {num:"311",lastName:"Laine",firstName:"Esa",div:"Production Optics",cat:"S",reg:"FIN"},
-  {num:"737",lastName:"Hummer",firstName:"Martin",div:"Production Optics",cat:"S",reg:"AUT"},
-  {num:"297",lastName:"Vikeby",firstName:"Rune",div:"Production Optics",cat:"SS",reg:"NOR"},
-  {num:"304",lastName:"Kåsin",firstName:"Sebastian",div:"Production Optics",cat:"SJ",reg:"NOR"},
-  {num:"1215",lastName:"Gren",firstName:"Patrik",div:"Production Optics",cat:"S",reg:"SWE"},
-  {num:"26",lastName:"Lentz",firstName:"Arne",div:"Production Optics",cat:"S",reg:"GER"},
-  {num:"315",lastName:"McKeown",firstName:"Timo",div:"Production Optics",cat:"SS",reg:"FIN"},
-  {num:"738",lastName:"Griessner",firstName:"Wolfgang",div:"Production Optics",cat:"S",reg:"AUT"},
-  {num:"298",lastName:"Torkildsen",firstName:"Karl",div:"Production Optics",cat:"SS",reg:"NOR"},
-  {num:"305",lastName:"Nordhagen Larsen",firstName:"Mathias",div:"Production Optics",cat:"SJ",reg:"NOR"},
-  {num:"27",lastName:"Schuetz",firstName:"Michael",div:"Production Optics",cat:"S",reg:"GER"},
-  {num:"316",lastName:"Lento",firstName:"Mika",div:"Production Optics",cat:"S",reg:"FIN"},
-  {num:"739",lastName:"Fellner",firstName:"Manfred",div:"Production Optics",cat:"S",reg:"AUT"},
-  {num:"299",lastName:"Østreng Tsigakis",firstName:"Tony",div:"Production Optics",cat:"SS",reg:"NOR"},
-  {num:"306",lastName:"Ryen",firstName:"Jakob",div:"Production Optics",cat:"J",reg:"NOR"},
-  {num:"90",lastName:"Möbs",firstName:"Stefan",div:"Production Optics",cat:"SS",reg:"GER"},
-  {num:"339",lastName:"Kumpulainen",firstName:"Pasi",div:"Production Optics",cat:"S",reg:"FIN"},
-  {num:"300",lastName:"Flugstad",firstName:"Lars",div:"Production Optics",cat:"SS",reg:"NOR"},
-  {num:"370",lastName:"Kjøren",firstName:"Per-Kristian",div:"Production Optics",cat:"SJ",reg:"NOR"},
-  {num:"301",lastName:"Sollyst",firstName:"Adelén",div:"Production Optics",cat:"LJ",reg:"NOR"},
-  {num:"302",lastName:"Thorud",firstName:"Henrik B.",div:"Production Optics",cat:"SJ",reg:"NOR"},
-  {num:"303",lastName:"Helland",firstName:"Noah Valentin",div:"Production Optics",cat:"GJ",reg:"NOR"},
-  {num:"369",lastName:"Alforte",firstName:"Aljoneil",div:"Production Optics",cat:"GJ",reg:"NOR"},
-  {num:"478",lastName:"Diaz Alvarez",firstName:"Miguel",div:"Production",cat:"",reg:"ESP"},
-  {num:"809",lastName:"Stepan",firstName:"Michal",div:"Production",cat:"",reg:"CZE"},
-  {num:"17",lastName:"Bost",firstName:"Nikolai",div:"Production",cat:"",reg:"GER"},
-  {num:"281",lastName:"Kristiansen",firstName:"Bard",div:"Production",cat:"",reg:"NOR"},
-  {num:"231",lastName:"BLOM",firstName:"ESA JUKKA",div:"Production",cat:"S",reg:"FIN"},
-  {num:"996",lastName:"Soler",firstName:"Ricardo",div:"Production",cat:"",reg:"SWE"},
-  {num:"481",lastName:"BLANCO CESAR PANES",firstName:"",div:"Production",cat:"",reg:"ESP"},
-  {num:"810",lastName:"Tomolya",firstName:"Štěpán",div:"Production",cat:"",reg:"CZE"},
-  {num:"18",lastName:"Fleischer",firstName:"Alexander",div:"Production",cat:"",reg:"GER"},
-  {num:"282",lastName:"Stenslie",firstName:"Frede",div:"Production",cat:"",reg:"NOR"},
-  {num:"325",lastName:"Kaunisto",firstName:"Vesa",div:"Production",cat:"S",reg:"FIN"},
-  {num:"997",lastName:"Becker",firstName:"Robert",div:"Production",cat:"",reg:"SWE"},
-  {num:"598",lastName:"Palacios Tercero",firstName:"Carlos",div:"Production",cat:"",reg:"ESP"},
-  {num:"811",lastName:"Němcová",firstName:"Petra",div:"Production",cat:"L",reg:"CZE"},
-  {num:"19",lastName:"Prüm",firstName:"Marcel",div:"Production",cat:"",reg:"GER"},
-  {num:"283",lastName:"Følvik",firstName:"Christian",div:"Production",cat:"",reg:"NOR"},
-  {num:"327",lastName:"Åberg",firstName:"Jonas",div:"Production",cat:"",reg:"FIN"},
-  {num:"999",lastName:"Danielson",firstName:"Carl",div:"Production",cat:"",reg:"SWE"},
-  {num:"672",lastName:"GuerreroC",firstName:"Juan",div:"Production",cat:"",reg:"ESP"},
-  {num:"812",lastName:"Mikolášek",firstName:"Daniel",div:"Production",cat:"SJ",reg:"CZE"},
-  {num:"20",lastName:"Rumpler",firstName:"Stefan",div:"Production",cat:"",reg:"GER"},
-  {num:"368",lastName:"Kandal",firstName:"Tor Martin",div:"Production",cat:"",reg:"NOR"},
-  {num:"328",lastName:"Wang",firstName:"Zhe",div:"Production",cat:"",reg:"FIN"},
-  {num:"1369",lastName:"Andersson",firstName:"Jim",div:"Production",cat:"",reg:"SWE"},
-  {num:"150",lastName:"Šunjevarić",firstName:"Saša",div:"Production",cat:"",reg:"SER"},
-  {num:"1523",lastName:"Perazzoli",firstName:"Francesco",div:"Production",cat:"",reg:"ITA"},
-  {num:"1102",lastName:"Vujosevic",firstName:"Sasa",div:"Production",cat:"",reg:"MTO"},
-  {num:"182",lastName:"Sazdov",firstName:"Veselin",div:"Production",cat:"",reg:"BUL"},
-  {num:"348",lastName:"Vaitekūnas",firstName:"Arvydas",div:"Production",cat:"",reg:"LTU"},
-  {num:"1119",lastName:"Tomljanovic",firstName:"Tomislav",div:"Production",cat:"",reg:"CRO"},
-  {num:"153",lastName:"Vasic",firstName:"Predrag",div:"Production",cat:"",reg:"SER"},
-  {num:"1524",lastName:"Perongini",firstName:"Silvio Maria",div:"Production",cat:"",reg:"ITA"},
-  {num:"1103",lastName:"Ramovic",firstName:"Edin",div:"Production",cat:"",reg:"MTO"},
-  {num:"223",lastName:"Krushkov",firstName:"Kostadin",div:"Production",cat:"",reg:"BUL"},
-  {num:"349",lastName:"Pakarnas",firstName:"Mindaugas",div:"Production",cat:"",reg:"LTU"},
-  {num:"1120",lastName:"Majstorović",firstName:"Davor",div:"Production",cat:"",reg:"CRO"},
-  {num:"155",lastName:"Momcilovic",firstName:"Ljubisa",div:"Production",cat:"S",reg:"SER"},
-  {num:"1525",lastName:"Trionfetti",firstName:"Federico",div:"Production",cat:"",reg:"ITA"},
-  {num:"1104",lastName:"Vujovic",firstName:"Nikola",div:"Production",cat:"",reg:"MTO"},
-  {num:"224",lastName:"Krushkov",firstName:"Vasil",div:"Production",cat:"J",reg:"BUL"},
-  {num:"417",lastName:"Grinčenko",firstName:"Vitalijus",div:"Production",cat:"S",reg:"LTU"},
-  {num:"1121",lastName:"Hasanspahic",firstName:"Denis",div:"Production",cat:"",reg:"CRO"},
-  {num:"187",lastName:"Popović",firstName:"Aleksa",div:"Production",cat:"",reg:"SER"},
-  {num:"1526",lastName:"Biagioli",firstName:"Alessandro",div:"Production",cat:"",reg:"ITA"},
-  {num:"779",lastName:"Kalchev",firstName:"Svetlozar",div:"Production",cat:"",reg:"BUL"},
-  {num:"356",lastName:"Cimoš",firstName:"Donatas",div:"Production",cat:"",reg:"LTU"},
-  {num:"1122",lastName:"Marić",firstName:"Hrvoje",div:"Production",cat:"",reg:"CRO"},
-  {num:"631",lastName:"Zounis",firstName:"Theologos",div:"Production",cat:"",reg:"GRE"},
-  {num:"521",lastName:"Deschepper",firstName:"David",div:"Production",cat:"",reg:"BEL"},
-  {num:"427",lastName:"Haeussler",firstName:"Karl",div:"Production",cat:"S",reg:"SUI"},
-  {num:"1527",lastName:"Almici",firstName:"Camilla",div:"Production",cat:"L",reg:"ITA"},
-  {num:"158",lastName:"Momčilović",firstName:"Snežana",div:"Production",cat:"L",reg:"SER"},
-  {num:"1001",lastName:"Shamloo",firstName:"Alexandra",div:"Production",cat:"L",reg:"SWE"},
-  {num:"632",lastName:"Papadakos",firstName:"Athanasios",div:"Production",cat:"",reg:"GRE"},
-  {num:"522",lastName:"Gillis",firstName:"Marc",div:"Production",cat:"",reg:"BEL"},
-  {num:"428",lastName:"Röthenmund",firstName:"Mathias",div:"Production",cat:"S",reg:"SUI"},
-  {num:"1528",lastName:"Di Prospero",firstName:"Lucrezia",div:"Production",cat:"L",reg:"ITA"},
-  {num:"168",lastName:"Vujčić",firstName:"Milica",div:"Production",cat:"L",reg:"SER"},
-  {num:"1453",lastName:"Yousefian Johansson",firstName:"Saga",div:"Production",cat:"L",reg:"SWE"},
-  {num:"633",lastName:"ROUSSOS",firstName:"IOSIF",div:"Production",cat:"SS",reg:"GRE"},
-  {num:"523",lastName:"Vereecke",firstName:"Mathieu",div:"Production",cat:"",reg:"BEL"},
-  {num:"517",lastName:"Bitterli",firstName:"Christoph",div:"Production",cat:"",reg:"SUI"},
-  {num:"1529",lastName:"Rasi Caldogno",firstName:"Monica",div:"Production",cat:"L",reg:"ITA"},
-  {num:"169",lastName:"Djukic",firstName:"Ivana",div:"Production",cat:"L",reg:"SER"},
-  {num:"1520",lastName:"Assenhöj",firstName:"Maria",div:"Production",cat:"L",reg:"SWE"},
-  {num:"634",lastName:"KOSTIDIS",firstName:"ANGELOS",div:"Production",cat:"S",reg:"GRE"},
-  {num:"762",lastName:"Lambeir",firstName:"Cédric",div:"Production",cat:"",reg:"BEL"},
-  {num:"574",lastName:"Schneider",firstName:"Manuel",div:"Production",cat:"",reg:"SUI"},
-  {num:"1530",lastName:"Cattaneo",firstName:"Marta",div:"Production",cat:"L",reg:"ITA"},
-  {num:"777",lastName:"Visi Bujak",firstName:"Ana",div:"Production",cat:"L",reg:"SER"},
-  {num:"734",lastName:"Gasteiger",firstName:"Klaus",div:"Production",cat:"",reg:"AUT"},
-  {num:"128",lastName:"Skaale",firstName:"Sissal",div:"Production",cat:"L",reg:"DEN"},
-  {num:"1375",lastName:"Chmúra",firstName:"Tomáš",div:"Production",cat:"J",reg:"SVK"},
-  {num:"475",lastName:"Rodríguez Domènech",firstName:"Airi",div:"Production",cat:"L",reg:"ESP"},
-  {num:"307",lastName:"Tysnes",firstName:"Tanya Marlene",div:"Production",cat:"L",reg:"NOR"},
-  {num:"735",lastName:"Heiligenbrunner",firstName:"Simon",div:"Production",cat:"",reg:"AUT"},
-  {num:"130",lastName:"Ibenforth",firstName:"Pavel",div:"Production",cat:"",reg:"DEN"},
-  {num:"1377",lastName:"Polák",firstName:"Peter",div:"Production",cat:"SJ",reg:"SVK"},
-  {num:"480",lastName:"Darias",firstName:"Alexandra",div:"Production",cat:"L",reg:"ESP"},
-  {num:"308",lastName:"Hardaway",firstName:"Anne-Kristine",div:"Production",cat:"L",reg:"NOR"},
-  {num:"736",lastName:"Oriol",firstName:"Andreas",div:"Production",cat:"",reg:"AUT"},
-  {num:"133",lastName:"Pedersen",firstName:"Mikkel Sloth",div:"Production",cat:"",reg:"DEN"},
-  {num:"1388",lastName:"Vyšný",firstName:"Marian",div:"Production",cat:"S",reg:"SVK"},
-  {num:"483",lastName:"Domènech Mestres",firstName:"Rosa Maria",div:"Production",cat:"LS",reg:"ESP"},
-  {num:"309",lastName:"Bratli",firstName:"Inger Skjold",div:"Production",cat:"LS",reg:"NOR"},
-  {num:"159",lastName:"Næblerød Herstad",firstName:"Victor",div:"Production",cat:"",reg:"DEN"},
-  {num:"920",lastName:"Arnaiz Larson",firstName:"M Cristina",div:"Production",cat:"L",reg:"ESP"},
-  {num:"1531",lastName:"Iorfino",firstName:"Andrea",div:"Production",cat:"S",reg:"ITA"},
-  {num:"946",lastName:"Männiste",firstName:"Jaago",div:"Production",cat:"S",reg:"EST"},
-  {num:"1099",lastName:"Janjusevic",firstName:"Milorad",div:"Production",cat:"S",reg:"MTO"},
-  {num:"654",lastName:"Legat",firstName:"Niko",div:"Production",cat:"S",reg:"SLO"},
-  {num:"37",lastName:"Bowakow",firstName:"Ludwig",div:"Production",cat:"SS",reg:"GER"},
-  {num:"1532",lastName:"Cozzella",firstName:"Claudio",div:"Production",cat:"S",reg:"ITA"},
-  {num:"477",lastName:"DARIAS MEDINA",firstName:"BUENAVENTURA",div:"Production",cat:"S",reg:"ESP"},
-  {num:"947",lastName:"Brodski",firstName:"Dmitri",div:"Production",cat:"S",reg:"EST"},
-  {num:"1100",lastName:"Pavlicic",firstName:"Nenad",div:"Production",cat:"S",reg:"MTO"},
-  {num:"655",lastName:"Dovžan",firstName:"Viljem",div:"Production",cat:"S",reg:"SLO"},
-  {num:"38",lastName:"Braun",firstName:"Jürgen",div:"Production",cat:"SS",reg:"GER"},
-  {num:"1533",lastName:"Passalia",firstName:"Gianluca",div:"Production",cat:"S",reg:"ITA"},
-  {num:"479",lastName:"Oskoma",firstName:"Sergiy",div:"Production",cat:"S",reg:"ESP"},
-  {num:"948",lastName:"Serenok",firstName:"Aleksandr",div:"Production",cat:"S",reg:"EST"},
-  {num:"1101",lastName:"Krstic",firstName:"Srdjan",div:"Production",cat:"S",reg:"MTO"},
-  {num:"656",lastName:"Stjepanovic",firstName:"Savo",div:"Production",cat:"S",reg:"SLO"},
-  {num:"39",lastName:"Kelterbaum",firstName:"Reinhard",div:"Production",cat:"SS",reg:"GER"},
-  {num:"820",lastName:"Němeček",firstName:"Zdeněk",div:"Production",cat:"SS",reg:"CZE"},
-  {num:"599",lastName:"Luaces leston",firstName:"Peregrino",div:"Production",cat:"S",reg:"ESP"},
-  {num:"977",lastName:"Ivanotsev",firstName:"Sergei",div:"Production",cat:"S",reg:"EST"},
-  {num:"1164",lastName:"Saveljic",firstName:"Boris",div:"Production",cat:"S",reg:"MTO"},
-  {num:"671",lastName:"Šlosar",firstName:"Hubert",div:"Production",cat:"S",reg:"SLO"},
-  {num:"40",lastName:"van Essen",firstName:"Olaf",div:"Production",cat:"SS",reg:"GER"},
-  {num:"887",lastName:"Vinduska",firstName:"Vaclav",div:"Production",cat:"S",reg:"CZE"},
-  {num:"32",lastName:"Hofmann",firstName:"Michael",div:"Production",cat:"S",reg:"GER"},
-  {num:"351",lastName:"Goštautas",firstName:"Audrius",div:"Production",cat:"S",reg:"LTU"},
-  {num:"1304",lastName:"Skorupka",firstName:"Bogdan",div:"Production",cat:"S",reg:"POL"},
-  {num:"291",lastName:"Myrvang",firstName:"Folke",div:"Production",cat:"SS",reg:"NOR"},
-  {num:"888",lastName:"Hanzlicek",firstName:"Ladislav",div:"Production",cat:"S",reg:"CZE"},
-  {num:"34",lastName:"Koch",firstName:"Robert",div:"Production",cat:"S",reg:"GER"},
-  {num:"357",lastName:"Sventickas",firstName:"Ramūnas",div:"Production",cat:"SS",reg:"LTU"},
-  {num:"1305",lastName:"Opechowski",firstName:"Krzysztof",div:"Production",cat:"S",reg:"POL"},
-  {num:"292",lastName:"Kvæl",firstName:"Geir",div:"Production",cat:"SS",reg:"NOR"},
-  {num:"1655",lastName:"ZUCCOLO",firstName:"GIOVANNI",div:"Production",cat:"SS",reg:"ITA"},
-  {num:"35",lastName:"Kunzmann",firstName:"Holger",div:"Production",cat:"S",reg:"GER"},
-  {num:"884",lastName:"Čipkus",firstName:"Žilvinas",div:"Production",cat:"S",reg:"LTU"},
-  {num:"293",lastName:"Stien",firstName:"Eindride",div:"Production",cat:"SS",reg:"NOR"},
-  {num:"36",lastName:"Stobbe",firstName:"Markus",div:"Production",cat:"S",reg:"GER"},
-  {num:"602",lastName:"GALSTYAN",firstName:"HAYKAZ",div:"Standard",cat:"",reg:"GRE"},
-  {num:"1",lastName:"Balogh",firstName:"Flavius",div:"Standard",cat:"",reg:"HUN"},
-  {num:"41",lastName:"Wessels",firstName:"Philipp",div:"Standard",cat:"",reg:"GER"},
-  {num:"141",lastName:"Severin",firstName:"Bjørn",div:"Standard",cat:"",reg:"DEN"},
-  {num:"287",lastName:"Ripnes",firstName:"Pål",div:"Standard",cat:"",reg:"NOR"},
-  {num:"921",lastName:"Joaquim",firstName:"Elsa",div:"Standard",cat:"LS",reg:"POR"},
-  {num:"628",lastName:"Sklavis",firstName:"Alexandros",div:"Standard",cat:"",reg:"GRE"},
-  {num:"2",lastName:"Albrecht",firstName:"Zoltan",div:"Standard",cat:"",reg:"HUN"},
-  {num:"42",lastName:"Daouk",firstName:"Bilal",div:"Standard",cat:"",reg:"GER"},
-  {num:"142",lastName:"Thomsen",firstName:"Henrik",div:"Standard",cat:"",reg:"DEN"},
-  {num:"288",lastName:"Winsnes",firstName:"Stefan",div:"Standard",cat:"",reg:"NOR"},
-  {num:"922",lastName:"Silva",firstName:"Manuel",div:"Standard",cat:"SS",reg:"POR"},
-  {num:"629",lastName:"PAPAFLORATOS",firstName:"DIMITRIS",div:"Standard",cat:"",reg:"GRE"},
-  {num:"3",lastName:"Hua",firstName:"Wei",div:"Standard",cat:"",reg:"HUN"},
-  {num:"43",lastName:"Kahl",firstName:"Michael",div:"Standard",cat:"",reg:"GER"},
-  {num:"143",lastName:"Skoubjerg",firstName:"Runi",div:"Standard",cat:"",reg:"DEN"},
-  {num:"289",lastName:"Ellingsen",firstName:"Kim-ove",div:"Standard",cat:"",reg:"NOR"},
-  {num:"925",lastName:"Reis",firstName:"Mauricio",div:"Standard",cat:"",reg:"POR"},
-  {num:"630",lastName:"KROKAROPOULOU",firstName:"ANTONIA",div:"Standard",cat:"L",reg:"GRE"},
-  {num:"4",lastName:"Denisov",firstName:"Arseniy",div:"Standard",cat:"",reg:"HUN"},
-  {num:"44",lastName:"Mueller",firstName:"Sergej",div:"Standard",cat:"",reg:"GER"},
-  {num:"178",lastName:"Starke",firstName:"Stefan Kryger",div:"Standard",cat:"",reg:"DEN"},
-  {num:"683",lastName:"Lodden",firstName:"Glenn",div:"Standard",cat:"",reg:"NOR"},
-  {num:"928",lastName:"Bastos",firstName:"Luis",div:"Standard",cat:"S",reg:"POR"},
-  {num:"817",lastName:"Rakusan",firstName:"Josef",div:"Standard",cat:"S",reg:"CZE"},
-  {num:"227",lastName:"Pakka",firstName:"Aki",div:"Standard",cat:"",reg:"FIN"},
-  {num:"1296",lastName:"Staszczyk",firstName:"Bartosz",div:"Standard",cat:"",reg:"POL"},
-  {num:"949",lastName:"Maiberg",firstName:"Dagnis",div:"Standard",cat:"",reg:"EST"},
-  {num:"1214",lastName:"Fant",firstName:"Simon",div:"Standard",cat:"",reg:"SWE"},
-  {num:"1383",lastName:"Selucky",firstName:"Patrik",div:"Standard",cat:"SJ",reg:"SVK"},
-  {num:"818",lastName:"Liehne",firstName:"Zdenek",div:"Standard",cat:"",reg:"CZE"},
-  {num:"228",lastName:"Koski",firstName:"Mikko",div:"Standard",cat:"S",reg:"FIN"},
-  {num:"1310",lastName:"Kabatek",firstName:"Emilia",div:"Standard",cat:"L",reg:"POL"},
-  {num:"950",lastName:"Kidjajev",firstName:"Juri",div:"Standard",cat:"S",reg:"EST"},
-  {num:"1224",lastName:"Lo Presti",firstName:"Nicola",div:"Standard",cat:"",reg:"SWE"},
-  {num:"1386",lastName:"Sčensný",firstName:"Dušan",div:"Standard",cat:"SJ",reg:"SVK"},
-  {num:"819",lastName:"Znamenacek",firstName:"Petr",div:"Standard",cat:"S",reg:"CZE"},
-  {num:"236",lastName:"Piili",firstName:"Petri",div:"Standard",cat:"",reg:"FIN"},
-  {num:"1311",lastName:"Murzydło",firstName:"Małgorzata",div:"Standard",cat:"L",reg:"POL"},
-  {num:"951",lastName:"Kuuskla",firstName:"Kert",div:"Standard",cat:"",reg:"EST"},
-  {num:"1225",lastName:"Långberg",firstName:"Anders",div:"Standard",cat:"",reg:"SWE"},
-  {num:"1390",lastName:"Zach",firstName:"Marek",div:"Standard",cat:"",reg:"SVK"},
-  {num:"249",lastName:"Heimonen",firstName:"Henri",div:"Standard",cat:"",reg:"FIN"},
-  {num:"1455",lastName:"Mirzwa",firstName:"Kamil",div:"Standard",cat:"",reg:"POL"},
-  {num:"975",lastName:"Lepikmäe",firstName:"Rain",div:"Standard",cat:"",reg:"EST"},
-  {num:"1463",lastName:"Arbinger",firstName:"Sandra",div:"Standard",cat:"L",reg:"SWE"},
-  {num:"1392",lastName:"Hladik",firstName:"Ryan",div:"Standard",cat:"SJ",reg:"SVK"},
-  {num:"723",lastName:"Ebner",firstName:"Markus",div:"Standard",cat:"",reg:"AUT"},
-  {num:"1557",lastName:"Santarcangelo",firstName:"Adriano Ciro",div:"Standard",cat:"SS",reg:"ITA"},
-  {num:"46",lastName:"Damm",firstName:"Oliver",div:"Standard",cat:"S",reg:"GER"},
-  {num:"889",lastName:"Misanovic",firstName:"Dragan",div:"Standard",cat:"S",reg:"BIH"},
-  {num:"500",lastName:"García",firstName:"Juan Pedro",div:"Standard",cat:"S",reg:"ESP"},
-  {num:"590",lastName:"Krimnianiotis",firstName:"Dimitrios",div:"Standard",cat:"S",reg:"GRE"},
-  {num:"724",lastName:"Koller",firstName:"Hans Georg",div:"Standard",cat:"",reg:"AUT"},
-  {num:"1558",lastName:"Del Rosario",firstName:"Giulio",div:"Standard",cat:"S",reg:"ITA"},
-  {num:"47",lastName:"Melehov",firstName:"Vitalij",div:"Standard",cat:"S",reg:"GER"},
-  {num:"891",lastName:"Časar",firstName:"Boris",div:"Standard",cat:"S",reg:"BIH"},
-  {num:"502",lastName:"Ferreiro Rodriguez",firstName:"Jesus",div:"Standard",cat:"SS",reg:"ESP"},
-  {num:"596",lastName:"Pappas",firstName:"Panagiotis",div:"Standard",cat:"S",reg:"GRE"},
-  {num:"725",lastName:"Kastner",firstName:"Alexander",div:"Standard",cat:"",reg:"AUT"},
-  {num:"1559",lastName:"Bettoni",firstName:"Leonardo",div:"Standard",cat:"S",reg:"ITA"},
-  {num:"48",lastName:"Peschkow",firstName:"Wladislaw",div:"Standard",cat:"S",reg:"GER"},
-  {num:"893",lastName:"Smajlovic",firstName:"Sasa",div:"Standard",cat:"S",reg:"BIH"},
-  {num:"503",lastName:"Montero Bernardino",firstName:"Luis",div:"Standard",cat:"S",reg:"ESP"},
-  {num:"618",lastName:"Michos",firstName:"Georgios",div:"Standard",cat:"S",reg:"GRE"},
-  {num:"726",lastName:"Molitor",firstName:"Kilian",div:"Standard",cat:"SJ",reg:"AUT"},
-  {num:"1639",lastName:"Magli",firstName:"Esterino",div:"Standard",cat:"GS",reg:"ITA"},
-  {num:"49",lastName:"Beck",firstName:"Horst P.",div:"Standard",cat:"SS",reg:"GER"},
-  {num:"170",lastName:"Kostadinov",firstName:"Plamen",div:"Standard",cat:"S",reg:"BUL"},
-  {num:"510",lastName:"TURIEGANO LACARTE",firstName:"Jose Vicente",div:"Standard",cat:"S",reg:"ESP"},
-  {num:"109",lastName:"Verhoog",firstName:"Justin",div:"Standard",cat:"",reg:"NED"},
-  {num:"727",lastName:"Benesch",firstName:"Thomas",div:"Standard",cat:"S",reg:"AUT"},
-  {num:"1221",lastName:"Karlsson",firstName:"Mats",div:"Standard",cat:"S",reg:"SWE"},
-  {num:"173",lastName:"Sakharov",firstName:"Artem",div:"Standard",cat:"S",reg:"BUL"},
-  {num:"229",lastName:"Kinnala",firstName:"Jani",div:"Standard",cat:"S",reg:"FIN"},
-  {num:"149",lastName:"Djukic",firstName:"Vukota",div:"Standard",cat:"S",reg:"SER"},
-  {num:"110",lastName:"van Uitert",firstName:"John",div:"Standard",cat:"SS",reg:"NED"},
-  {num:"728",lastName:"Stranz",firstName:"Jürgen",div:"Standard",cat:"S",reg:"AUT"},
-  {num:"1354",lastName:"Svensson",firstName:"Per-Arne",div:"Standard",cat:"SS",reg:"SWE"},
-  {num:"174",lastName:"Sariev",firstName:"Borislav",div:"Standard",cat:"S",reg:"BUL"},
-  {num:"235",lastName:"Kuisma",firstName:"Mikko",div:"Standard",cat:"S",reg:"FIN"},
-  {num:"152",lastName:"Djukanovic",firstName:"Vladimir",div:"Standard",cat:"S",reg:"SER"},
-  {num:"111",lastName:"Roselaar",firstName:"Maurits",div:"Standard",cat:"",reg:"NED"},
-  {num:"729",lastName:"Handl",firstName:"Reinhard",div:"Standard",cat:"S",reg:"AUT"},
-  {num:"1452",lastName:"Westerlund",firstName:"Kent",div:"Standard",cat:"S",reg:"SWE"},
-  {num:"769",lastName:"Milanov",firstName:"Zlatomir",div:"Standard",cat:"S",reg:"BUL"},
-  {num:"247",lastName:"Kontulainen",firstName:"Mika",div:"Standard",cat:"S",reg:"FIN"},
-  {num:"166",lastName:"Obradović",firstName:"Slavko",div:"Standard",cat:"S",reg:"SER"},
-  {num:"113",lastName:"Koek",firstName:"Nico",div:"Standard",cat:"",reg:"NED"},
-  {num:"1466",lastName:"Andreassen",firstName:"Ronny",div:"Standard",cat:"S",reg:"SWE"},
-  {num:"341",lastName:"Ruohonen",firstName:"Tony",div:"Standard",cat:"S",reg:"FIN"},
-  {num:"167",lastName:"Barasin",firstName:"Dragan",div:"Standard",cat:"S",reg:"SER"},
-  {num:"730",lastName:"Schneider",firstName:"Katharina",div:"Standard",cat:"L",reg:"AUT"},
-  {num:"52",lastName:"Pankalla",firstName:"Uwe",div:"Standard",cat:"SS",reg:"GER"},
-  {num:"731",lastName:"Stundner",firstName:"Christa",div:"Standard",cat:"L",reg:"AUT"},
-  {num:"53",lastName:"Mohr",firstName:"Uwe",div:"Standard",cat:"SS",reg:"GER"},
-  {num:"733",lastName:"Strasser",firstName:"Elisabeth",div:"Standard",cat:"L",reg:"AUT"},
-  {num:"58",lastName:"Gepperth",firstName:"Friedrich",div:"Standard",cat:"SS",reg:"GER"},
-  {num:"233",lastName:"Koski",firstName:"Kaisa",div:"Standard",cat:"L",reg:"FIN"},
-  {num:"234",lastName:"Honkaselkä",firstName:"Tiia",div:"Standard",cat:"L",reg:"FIN"},
-  {num:"594",lastName:"STAMOS",firstName:"IOANNIS",div:"Standard",cat:"SS",reg:"GRE"},
-  {num:"312",lastName:"Blom",firstName:"Emily",div:"Standard",cat:"L",reg:"FIN"},
-  {num:"620",lastName:"MAVROS",firstName:"NIKOLAOS",div:"Standard",cat:"SS",reg:"GRE"},
-  {num:"342",lastName:"Koski",firstName:"Anitra",div:"Standard",cat:"LSJ",reg:"FIN"},
-  {num:"1700",lastName:"Poiret",firstName:"Jerome",div:"Optics",cat:"S",reg:"FRA"},
-  {num:"1724",lastName:"Becret",firstName:"Jean Guy",div:"Optics",cat:"S",reg:"FRA"},
-  {num:"1726",lastName:"BOITTIAUX",firstName:"Bertrand",div:"Optics",cat:"S",reg:"FRA"},
-  {num:"1727",lastName:"Piedade",firstName:"Laurent",div:"Optics",cat:"S",reg:"FRA"},
-  {num:"803",lastName:"Šebo",firstName:"Robin",div:"Open",cat:"",reg:"CZE"},
-  {num:"452",lastName:"Espilez",firstName:"Ivan",div:"Open",cat:"",reg:"ESP"},
-  {num:"269",lastName:"Nerheim",firstName:"Anders",div:"Open",cat:"",reg:"NOR"},
-  {num:"953",lastName:"Rutnik",firstName:"Rait",div:"Open",cat:"S",reg:"EST"},
-  {num:"161",lastName:"Sørensen",firstName:"Jens Martin",div:"Open",cat:"",reg:"DEN"},
-  {num:"104",lastName:"van den Berg",firstName:"Peter",div:"Open",cat:"",reg:"NED"},
-  {num:"804",lastName:"Havlíček",firstName:"Miroslav",div:"Open",cat:"",reg:"CZE"},
-  {num:"454",lastName:"Bernabé Pardo",firstName:"Horaci",div:"Open",cat:"S",reg:"ESP"},
-  {num:"974",lastName:"Papli",firstName:"Rene",div:"Open",cat:"",reg:"EST"},
-  {num:"162",lastName:"Davis",firstName:"Peter",div:"Open",cat:"SS",reg:"DEN"},
-  {num:"105",lastName:"tim gerritsen",firstName:"tim",div:"Open",cat:"",reg:"NED"},
-  {num:"805",lastName:"Šerá",firstName:"Martina",div:"Open",cat:"L",reg:"CZE"},
-  {num:"455",lastName:"MEDINA MESTRES",firstName:"DANIEL",div:"Open",cat:"",reg:"ESP"},
-  {num:"366",lastName:"Busk",firstName:"Nikolai",div:"Open",cat:"",reg:"NOR"},
-  {num:"971",lastName:"Praakli",firstName:"Marko",div:"Open",cat:"",reg:"EST"},
-  {num:"177",lastName:"Johnson",firstName:"Marc",div:"Open",cat:"",reg:"DEN"},
-  {num:"106",lastName:"Van der Wel",firstName:"Richard",div:"Open",cat:"S",reg:"NED"},
-  {num:"1219",lastName:"Hylander",firstName:"Albin",div:"Open",cat:"",reg:"SWE"},
-  {num:"572",lastName:"Honrubia ruiz",firstName:"Francisco Javier",div:"Open",cat:"",reg:"ESP"},
-  {num:"515",lastName:"Kowalczyk",firstName:"Dariusz",div:"Open",cat:"",reg:"NOR"},
-  {num:"1177",lastName:"Holmes",firstName:"John",div:"Open",cat:"S",reg:"GIB"},
-  {num:"186",lastName:"Woudstra",firstName:"Marc",div:"Open",cat:"",reg:"NED"},
-  {num:"1222",lastName:"Kastell",firstName:"Peter",div:"Open",cat:"",reg:"SWE"},
-  {num:"8",lastName:"Dörr",firstName:"Christian",div:"Open",cat:"",reg:"GER"},
-  {num:"614",lastName:"TYRAKIS",firstName:"IOANNIS",div:"Open",cat:"SS",reg:"GRE"},
-  {num:"1206",lastName:"Borge",firstName:"Stephen",div:"Open",cat:"",reg:"GIB"},
-  {num:"331",lastName:"Mäkelä",firstName:"Arttu",div:"Open",cat:"",reg:"FIN"},
-  {num:"422",lastName:"Meier",firstName:"Dominic",div:"Open",cat:"S",reg:"SUI"},
-  {num:"1228",lastName:"Stjernlöf",firstName:"Erik",div:"Open",cat:"",reg:"SWE"},
-  {num:"9",lastName:"Pfeiffer",firstName:"Andreas",div:"Open",cat:"",reg:"GER"},
-  {num:"615",lastName:"SPATOULAS",firstName:"NIKOLAOS",div:"Open",cat:"J",reg:"GRE"},
-  {num:"1212",lastName:"Viagas",firstName:"Rachael",div:"Open",cat:"L",reg:"GIB"},
-  {num:"332",lastName:"Kössi",firstName:"Jani",div:"Open",cat:"",reg:"FIN"},
-  {num:"424",lastName:"Wäfler",firstName:"Dave",div:"Open",cat:"",reg:"SUI"},
-  {num:"1231",lastName:"Vonasek",firstName:"Frans",div:"Open",cat:"",reg:"SWE"},
-  {num:"10",lastName:"Siegle",firstName:"Peter",div:"Open",cat:"",reg:"GER"},
-  {num:"616",lastName:"Tastanidis",firstName:"Nektarios",div:"Open",cat:"",reg:"GRE"},
-  {num:"1176",lastName:"Athey",firstName:"Shane",div:"Open",cat:"SS",reg:"GIB"},
-  {num:"333",lastName:"Uronen",firstName:"Hannu",div:"Open",cat:"S",reg:"FIN"},
-  {num:"425",lastName:"Ryant",firstName:"Erol",div:"Open",cat:"",reg:"SUI"},
-  {num:"62",lastName:"Seiffer",firstName:"Felix",div:"Open",cat:"",reg:"GER"},
-  {num:"334",lastName:"Phancharoen",firstName:"Sanyalak",div:"Open",cat:"",reg:"FIN"},
-  {num:"429",lastName:"Habegger",firstName:"Patrick",div:"Open",cat:"",reg:"SUI"},
-  {num:"11",lastName:"Back",firstName:"Sascha",div:"Open",cat:"S",reg:"GER"},
-  {num:"103",lastName:"van koolwijk",firstName:"Jacky",div:"Open",cat:"SS",reg:"NED"},
-  {num:"806",lastName:"Horejsi",firstName:"Lenka",div:"Open",cat:"L",reg:"CZE"},
-  {num:"719",lastName:"Steurer",firstName:"Margit",div:"Open",cat:"LS",reg:"AUT"},
-  {num:"12",lastName:"Von Borries",firstName:"Roland",div:"Open",cat:"S",reg:"GER"},
-  {num:"248",lastName:"Smits",firstName:"Arno",div:"Open",cat:"SS",reg:"NED"},
-  {num:"807",lastName:"Šustrová",firstName:"Kateřina",div:"Open",cat:"L",reg:"CZE"},
-  {num:"720",lastName:"Ebner",firstName:"Yvonne",div:"Open",cat:"L",reg:"AUT"},
-  {num:"13",lastName:"Winter",firstName:"Thomas",div:"Open",cat:"S",reg:"GER"},
-  {num:"636",lastName:"Faro",firstName:"Rien",div:"Open",cat:"SS",reg:"NED"},
-  {num:"808",lastName:"Novotná",firstName:"Natálie",div:"Open",cat:"L",reg:"CZE"},
-  {num:"721",lastName:"Aigner",firstName:"Edeltraut",div:"Open",cat:"LS",reg:"AUT"},
-  {num:"14",lastName:"Reineck",firstName:"Gregor",div:"Open",cat:"S",reg:"GER"},
-  {num:"1062",lastName:"Barkanyi",firstName:"Laszlo",div:"Open",cat:"S",reg:"HUN"},
-  {num:"1549",lastName:"Esposito",firstName:"Nicole",div:"Open",cat:"LS",reg:"ITA"},
-  {num:"722",lastName:"Nestl-Treiber",firstName:"Doris",div:"Open",cat:"LS",reg:"AUT"},
-  {num:"1216",lastName:"HANSEN",firstName:"JOHAN",div:"Open",cat:"SS",reg:"SWE"},
-  {num:"1063",lastName:"Kretai",firstName:"Levente",div:"Open",cat:"S",reg:"HUN"},
-  {num:"1550",lastName:"PERRUCINO",firstName:"PATRIZIA",div:"Open",cat:"L",reg:"ITA"},
-  {num:"1223",lastName:"Kurttio",firstName:"Jari",div:"Open",cat:"S",reg:"SWE"},
-  {num:"1064",lastName:"Ambrus",firstName:"Oliver",div:"Open",cat:"S",reg:"HUN"},
-  {num:"1551",lastName:"Rossetto",firstName:"Denny",div:"Open",cat:"L",reg:"ITA"},
-  {num:"1350",lastName:"Forsling",firstName:"Per",div:"Open",cat:"S",reg:"SWE"},
-  {num:"1065",lastName:"Maczeovics",firstName:"Zoltan",div:"Open",cat:"S",reg:"HUN"},
-  {num:"1552",lastName:"Villari",firstName:"Giulia",div:"Open",cat:"L",reg:"ITA"},
-  {num:"1451",lastName:"Holmberg",firstName:"Daniel",div:"Open",cat:"S",reg:"SWE"},
-  {num:"1683",lastName:"Grauffel",firstName:"Eric",div:"Optics",cat:"",reg:"FRA"},
-  {num:"1217",lastName:"Hidesand",firstName:"Fredric",div:"Optics",cat:"",reg:"SWE"},
-  {num:"1553",lastName:"Miloro",firstName:"Simone",div:"Optics",cat:"",reg:"ITA"},
-  {num:"15",lastName:"Kummer",firstName:"Patrick",div:"Optics",cat:"",reg:"GER"},
-  {num:"740",lastName:"Ulreich",firstName:"Rainer",div:"Optics",cat:"",reg:"AUT"},
-  {num:"139",lastName:"Milling Varmdag",firstName:"Rasmus",div:"Optics",cat:"",reg:"DEN"},
-  {num:"1686",lastName:"HARDY",firstName:"Pierre",div:"Optics",cat:"",reg:"FRA"},
-  {num:"1349",lastName:"Eriksson",firstName:"Joacim",div:"Optics",cat:"",reg:"SWE"},
-  {num:"1554",lastName:"GEMIGNANI",firstName:"ANDREA",div:"Optics",cat:"",reg:"ITA"},
-  {num:"16",lastName:"Radzivil",firstName:"Mikhail",div:"Optics",cat:"",reg:"GER"},
-  {num:"741",lastName:"Eppensteiner",firstName:"Fabio",div:"Optics",cat:"",reg:"AUT"},
-  {num:"144",lastName:"Fischer",firstName:"Stefan",div:"Optics",cat:"",reg:"DEN"},
-  {num:"1692",lastName:"karbich",firstName:"frederic",div:"Optics",cat:"",reg:"FRA"},
-  {num:"1355",lastName:"With",firstName:"Jimmy",div:"Optics",cat:"",reg:"SWE"},
-  {num:"1555",lastName:"Filippi",firstName:"Matteo",div:"Optics",cat:"",reg:"ITA"},
-  {num:"165",lastName:"Nothnagel",firstName:"Nils",div:"Optics",cat:"",reg:"GER"},
-  {num:"742",lastName:"Dolezal",firstName:"Philipp",div:"Optics",cat:"",reg:"AUT"},
-  {num:"179",lastName:"Grainger",firstName:"David K.",div:"Optics",cat:"",reg:"DEN"},
-  {num:"1694",lastName:"JUHEL",firstName:"Julien",div:"Optics",cat:"",reg:"FRA"},
-  {num:"1467",lastName:"Bäckman",firstName:"Adam",div:"Optics",cat:"",reg:"SWE"},
-  {num:"1556",lastName:"Laghi",firstName:"Lorenzo",div:"Optics",cat:"",reg:"ITA"},
-  {num:"1291",lastName:"Wojcieszek",firstName:"Marcin",div:"Optics",cat:"",reg:"POL"},
-  {num:"1479",lastName:"Teier",firstName:"Lukas",div:"Optics",cat:"",reg:"AUT"},
-  {num:"273",lastName:"Nestvold",firstName:"Ove",div:"Optics",cat:"",reg:"NOR"},
-  {num:"1203",lastName:"Samek",firstName:"Petr",div:"Optics",cat:"",reg:"CZE"},
-  {num:"237",lastName:"Hankaniemi",firstName:"Mikko",div:"Optics",cat:"",reg:"FIN"},
-  {num:"1379",lastName:"Ženčár",firstName:"Pavol",div:"Optics",cat:"",reg:"SVK"},
-  {num:"1292",lastName:"Szczesny",firstName:"Bartosz",div:"Optics",cat:"",reg:"POL"},
-  {num:"775",lastName:"Raykov",firstName:"Boris",div:"Optics",cat:"",reg:"BUL"},
-  {num:"274",lastName:"Natvik",firstName:"Vegard",div:"Optics",cat:"",reg:"NOR"},
-  {num:"1204",lastName:"Cimburek",firstName:"Lukas",div:"Optics",cat:"",reg:"CZE"},
-  {num:"238",lastName:"Tiihonen",firstName:"Samuli",div:"Optics",cat:"",reg:"FIN"},
-  {num:"1382",lastName:"Fedor",firstName:"Marian",div:"Optics",cat:"",reg:"SVK"},
-  {num:"1301",lastName:"Galazka",firstName:"Marcin",div:"Optics",cat:"",reg:"POL"},
-  {num:"776",lastName:"MERDZHANOV",firstName:"Nikola",div:"Optics",cat:"",reg:"BUL"},
-  {num:"275",lastName:"Fosse",firstName:"Daniel Skreros",div:"Optics",cat:"",reg:"NOR"},
-  {num:"1205",lastName:"Slavik",firstName:"Daniel",div:"Optics",cat:"",reg:"CZE"},
-  {num:"239",lastName:"Lehtikevari",firstName:"Timo",div:"Optics",cat:"S",reg:"FIN"},
-  {num:"1385",lastName:"Kubica",firstName:"Dusan",div:"Optics",cat:"",reg:"SVK"},
-  {num:"1306",lastName:"Górski",firstName:"Dominik",div:"Optics",cat:"",reg:"POL"},
-  {num:"778",lastName:"Koussev",firstName:"Alexander",div:"Optics",cat:"",reg:"BUL"},
-  {num:"276",lastName:"Mølmen",firstName:"Henrik",div:"Optics",cat:"",reg:"NOR"},
-  {num:"250",lastName:"Nurmi",firstName:"Iiro",div:"Optics",cat:"",reg:"FIN"},
-  {num:"1387",lastName:"Adamec",firstName:"Ľuboš",div:"Optics",cat:"",reg:"SVK"},
-  {num:"842",lastName:"Nikolov",firstName:"Manuil",div:"Optics",cat:"",reg:"BUL"},
-  {num:"462",lastName:"Camaño Morata",firstName:"Carlos",div:"Optics",cat:"",reg:"ESP"},
-  {num:"457",lastName:"JIMÉNEZ",firstName:"PABLO",div:"Optics",cat:"SS",reg:"ESP"},
-  {num:"469",lastName:"Botella Galiana",firstName:"Natalia",div:"Optics",cat:"L",reg:"ESP"},
-  {num:"744",lastName:"Musil",firstName:"Jacqueline",div:"Optics",cat:"L",reg:"AUT"},
-  {num:"465",lastName:"SANTAMARIA ARANDA",firstName:"JESUS ANGEL",div:"Optics",cat:"",reg:"ESP"},
-  {num:"460",lastName:"de la encarnacion mompel",firstName:"Gonzalo",div:"Optics",cat:"S",reg:"ESP"},
-  {num:"470",lastName:"Jiménez Blázquez",firstName:"María de los Ángeles",div:"Optics",cat:"LS",reg:"ESP"},
-  {num:"745",lastName:"Kastner",firstName:"Kerstin",div:"Optics",cat:"L",reg:"AUT"},
-  {num:"473",lastName:"Kryuchin",firstName:"Nikita",div:"Optics",cat:"",reg:"ESP"},
-  {num:"461",lastName:"Zanón",firstName:"Jose",div:"Optics",cat:"SS",reg:"ESP"},
-  {num:"471",lastName:"Díaz González",firstName:"Yuraima",div:"Optics",cat:"L",reg:"ESP"},
-  {num:"746",lastName:"Leitner",firstName:"Sandra",div:"Optics",cat:"L",reg:"AUT"},
-  {num:"474",lastName:"Sánchez Pardo",firstName:"Carlos Javier",div:"Optics",cat:"",reg:"ESP"},
-  {num:"513",lastName:"De Cobos Abreu",firstName:"Eduardo",div:"Optics",cat:"S",reg:"ESP"},
-  {num:"597",lastName:"Bokuchava",firstName:"Natalia",div:"Optics",cat:"LS",reg:"ESP"},
-  {num:"751",lastName:"Weber",firstName:"Günter",div:"Optics",cat:"SS",reg:"AUT"},
-  {num:"747",lastName:"Gebhardt",firstName:"Jürgen",div:"Optics",cat:"S",reg:"AUT"},
-  {num:"240",lastName:"Mustonen",firstName:"Anastasia",div:"Optics",cat:"L",reg:"FIN"},
-  {num:"752",lastName:"Breitler",firstName:"Christian",div:"Optics",cat:"SS",reg:"AUT"},
-  {num:"748",lastName:"RASOVIC",firstName:"Bosko",div:"Optics",cat:"S",reg:"AUT"},
-  {num:"241",lastName:"Viskari",firstName:"Laura",div:"Optics",cat:"L",reg:"FIN"},
-  {num:"753",lastName:"Willer",firstName:"Helmuth",div:"Optics",cat:"SS",reg:"AUT"},
-  {num:"749",lastName:"Kneringer",firstName:"Mario",div:"Optics",cat:"S",reg:"AUT"},
-  {num:"242",lastName:"Vapanen",firstName:"Annu",div:"Optics",cat:"LS",reg:"FIN"},
-  {num:"754",lastName:"Brugger",firstName:"Stephan",div:"Optics",cat:"SS",reg:"AUT"},
-  {num:"750",lastName:"Hampel",firstName:"Christof",div:"Optics",cat:"S",reg:"AUT"},
-  {num:"243",lastName:"Laakkonen",firstName:"Miia",div:"Optics",cat:"L",reg:"FIN"},
+// ─── ALL TEAMS data (all nations, all div+cat from EHG 2026 PDF) ─────────────
+const ALL_TEAMS = [
+  {key:"AUT_Open_L",name:"AUT Open L",reg:"AUT",div:"Open",cat:"L",members:[{num:"720",firstName:"Yvonne",lastName:"Ebner",cat:"L"}]},
+  {key:"AUT_Open_LS",name:"AUT Open LS",reg:"AUT",div:"Open",cat:"LS",members:[{num:"719",firstName:"Margit",lastName:"Steurer",cat:"LS"},{num:"721",firstName:"Edeltraut",lastName:"Aigner",cat:"LS"},{num:"722",firstName:"Doris",lastName:"Nestl-Treiber",cat:"LS"}]},
+  {key:"AUT_Optics_OVR",name:"AUT Optics",reg:"AUT",div:"Optics",cat:"",members:[{num:"740",firstName:"Rainer",lastName:"Ulreich",cat:""},{num:"741",firstName:"Fabio",lastName:"Eppensteiner",cat:""},{num:"742",firstName:"Philipp",lastName:"Dolezal",cat:""},{num:"1479",firstName:"Lukas",lastName:"Teier",cat:""}]},
+  {key:"AUT_Optics_L",name:"AUT Optics L",reg:"AUT",div:"Optics",cat:"L",members:[{num:"744",firstName:"Jacqueline",lastName:"Musil",cat:"L"},{num:"745",firstName:"Kerstin",lastName:"Kastner",cat:"L"},{num:"746",firstName:"Sandra",lastName:"Leitner",cat:"L"}]},
+  {key:"AUT_Optics_S",name:"AUT Optics S",reg:"AUT",div:"Optics",cat:"S",members:[{num:"747",firstName:"Jürgen",lastName:"Gebhardt",cat:"S"},{num:"748",firstName:"Bosko",lastName:"RASOVIC",cat:"S"},{num:"749",firstName:"Mario",lastName:"Kneringer",cat:"S"},{num:"750",firstName:"Christof",lastName:"Hampel",cat:"S"}]},
+  {key:"AUT_Optics_SS",name:"AUT Optics SS",reg:"AUT",div:"Optics",cat:"SS",members:[{num:"751",firstName:"Günter",lastName:"Weber",cat:"SS"},{num:"752",firstName:"Christian",lastName:"Breitler",cat:"SS"},{num:"753",firstName:"Helmuth",lastName:"Willer",cat:"SS"},{num:"754",firstName:"Stephan",lastName:"Brugger",cat:"SS"}]},
+  {key:"AUT_Production_OVR",name:"AUT Production",reg:"AUT",div:"Production",cat:"",members:[{num:"734",firstName:"Klaus",lastName:"Gasteiger",cat:""},{num:"735",firstName:"Simon",lastName:"Heiligenbrunner",cat:""},{num:"736",firstName:"Andreas",lastName:"Oriol",cat:""}]},
+  {key:"AUT_Production_Optics_S",name:"AUT Production Optics S",reg:"AUT",div:"Production Optics",cat:"S",members:[{num:"737",firstName:"Martin",lastName:"Hummer",cat:"S"},{num:"738",firstName:"Wolfgang",lastName:"Griessner",cat:"S"},{num:"739",firstName:"Manfred",lastName:"Fellner",cat:"S"}]},
+  {key:"AUT_Revolver_OVR",name:"AUT Revolver",reg:"AUT",div:"Revolver",cat:"",members:[{num:"756",firstName:"Nikolaus",lastName:"Stelzmueller",cat:""}]},
+  {key:"AUT_Revolver_S",name:"AUT Revolver S",reg:"AUT",div:"Revolver",cat:"S",members:[{num:"755",firstName:"Gerald",lastName:"Reiter",cat:"S"},{num:"757",firstName:"Robert",lastName:"Kroiss",cat:"S"},{num:"758",firstName:"Johann",lastName:"Lang",cat:"S"}]},
+  {key:"AUT_Standard_OVR",name:"AUT Standard",reg:"AUT",div:"Standard",cat:"",members:[{num:"723",firstName:"Markus",lastName:"Ebner",cat:""},{num:"724",firstName:"Hans Georg",lastName:"Koller",cat:""},{num:"725",firstName:"Alexander",lastName:"Kastner",cat:""}]},
+  {key:"AUT_Standard_L",name:"AUT Standard L",reg:"AUT",div:"Standard",cat:"L",members:[{num:"730",firstName:"Katharina",lastName:"Schneider",cat:"L"},{num:"731",firstName:"Christa",lastName:"Stundner",cat:"L"},{num:"733",firstName:"Elisabeth",lastName:"Strasser",cat:"L"}]},
+  {key:"AUT_Standard_S",name:"AUT Standard S",reg:"AUT",div:"Standard",cat:"S",members:[{num:"727",firstName:"Thomas",lastName:"Benesch",cat:"S"},{num:"728",firstName:"Jürgen",lastName:"Stranz",cat:"S"},{num:"729",firstName:"Reinhard",lastName:"Handl",cat:"S"}]},
+  {key:"AUT_Standard_SJ",name:"AUT Standard SJ",reg:"AUT",div:"Standard",cat:"SJ",members:[{num:"726",firstName:"Kilian",lastName:"Molitor",cat:"SJ"}]},
+  {key:"BEL_Production_OVR",name:"BEL Production",reg:"BEL",div:"Production",cat:"",members:[{num:"521",firstName:"David",lastName:"Deschepper",cat:""},{num:"522",firstName:"Marc",lastName:"Gillis",cat:""},{num:"523",firstName:"Mathieu",lastName:"Vereecke",cat:""},{num:"762",firstName:"Cédric",lastName:"Lambeir",cat:""}]},
+  {key:"BEL_Production_Optics_OVR",name:"BEL Production Optics",reg:"BEL",div:"Production Optics",cat:"",members:[{num:"524",firstName:"Nic",lastName:"Wuyts",cat:""},{num:"525",firstName:"Mike",lastName:"Desmedt",cat:""},{num:"526",firstName:"Maarten",lastName:"Proost",cat:""},{num:"534",firstName:"Sven",lastName:"Peeters",cat:""}]},
+  {key:"BIH_Standard_S",name:"BIH Standard S",reg:"BIH",div:"Standard",cat:"S",members:[{num:"889",firstName:"Dragan",lastName:"Misanovic",cat:"S"},{num:"891",firstName:"Boris",lastName:"Časar",cat:"S"},{num:"893",firstName:"Sasa",lastName:"Smajlovic",cat:"S"}]},
+  {key:"BUL_Optics_OVR",name:"BUL Optics",reg:"BUL",div:"Optics",cat:"",members:[{num:"775",firstName:"Boris",lastName:"Raykov",cat:""},{num:"776",firstName:"Nikola",lastName:"MERDZHANOV",cat:""},{num:"778",firstName:"Alexander",lastName:"Koussev",cat:""},{num:"842",firstName:"Manuil",lastName:"Nikolov",cat:""}]},
+  {key:"BUL_Production_OVR",name:"BUL Production",reg:"BUL",div:"Production",cat:"",members:[{num:"182",firstName:"Veselin",lastName:"Sazdov",cat:""},{num:"223",firstName:"Kostadin",lastName:"Krushkov",cat:""},{num:"779",firstName:"Svetlozar",lastName:"Kalchev",cat:""}]},
+  {key:"BUL_Production_J",name:"BUL Production J",reg:"BUL",div:"Production",cat:"J",members:[{num:"224",firstName:"Vasil",lastName:"Krushkov",cat:"J"}]},
+  {key:"BUL_Standard_S",name:"BUL Standard S",reg:"BUL",div:"Standard",cat:"S",members:[{num:"170",firstName:"Plamen",lastName:"Kostadinov",cat:"S"},{num:"173",firstName:"Artem",lastName:"Sakharov",cat:"S"},{num:"174",firstName:"Borislav",lastName:"Sariev",cat:"S"},{num:"769",firstName:"Zlatomir",lastName:"Milanov",cat:"S"}]},
+  {key:"CRO_Production_OVR",name:"CRO Production",reg:"CRO",div:"Production",cat:"",members:[{num:"1119",firstName:"Tomislav",lastName:"Tomljanovic",cat:""},{num:"1120",firstName:"Davor",lastName:"Majstorović",cat:""},{num:"1121",firstName:"Denis",lastName:"Hasanspahic",cat:""},{num:"1122",firstName:"Hrvoje",lastName:"Marić",cat:""}]},
+  {key:"CRO_Production_Optics_OVR",name:"CRO Production Optics",reg:"CRO",div:"Production Optics",cat:"",members:[{num:"1123",firstName:"Davor",lastName:"Lukenda",cat:""},{num:"1124",firstName:"Marin",lastName:"Marinović",cat:""}]},
+  {key:"CRO_Production_Optics_S",name:"CRO Production Optics S",reg:"CRO",div:"Production Optics",cat:"S",members:[{num:"1125",firstName:"Robert",lastName:"Međugorac",cat:"S"}]},
+  {key:"CZE_Classic_OVR",name:"CZE Classic",reg:"CZE",div:"Classic",cat:"",members:[{num:"821",firstName:"Jakub",lastName:"Marx",cat:""},{num:"878",firstName:"Zdeněk",lastName:"Novotný",cat:""},{num:"880",firstName:"David",lastName:"Zvěřina",cat:""}]},
+  {key:"CZE_Open_OVR",name:"CZE Open",reg:"CZE",div:"Open",cat:"",members:[{num:"803",firstName:"Robin",lastName:"Šebo",cat:""},{num:"804",firstName:"Miroslav",lastName:"Havlíček",cat:""}]},
+  {key:"CZE_Open_L",name:"CZE Open L",reg:"CZE",div:"Open",cat:"L",members:[{num:"805",firstName:"Martina",lastName:"Šerá",cat:"L"},{num:"806",firstName:"Lenka",lastName:"Horejsi",cat:"L"},{num:"807",firstName:"Kateřina",lastName:"Šustrová",cat:"L"},{num:"808",firstName:"Natálie",lastName:"Novotná",cat:"L"}]},
+  {key:"CZE_Optics_OVR",name:"CZE Optics",reg:"CZE",div:"Optics",cat:"",members:[{num:"1203",firstName:"Petr",lastName:"Samek",cat:""},{num:"1204",firstName:"Lukas",lastName:"Cimburek",cat:""},{num:"1205",firstName:"Daniel",lastName:"Slavik",cat:""}]},
+  {key:"CZE_Production_OVR",name:"CZE Production",reg:"CZE",div:"Production",cat:"",members:[{num:"809",firstName:"Michal",lastName:"Stepan",cat:""},{num:"810",firstName:"Štěpán",lastName:"Tomolya",cat:""}]},
+  {key:"CZE_Production_L",name:"CZE Production L",reg:"CZE",div:"Production",cat:"L",members:[{num:"811",firstName:"Petra",lastName:"Němcová",cat:"L"}]},
+  {key:"CZE_Production_S",name:"CZE Production S",reg:"CZE",div:"Production",cat:"S",members:[{num:"887",firstName:"Vaclav",lastName:"Vinduska",cat:"S"},{num:"888",firstName:"Ladislav",lastName:"Hanzlicek",cat:"S"}]},
+  {key:"CZE_Production_SJ",name:"CZE Production SJ",reg:"CZE",div:"Production",cat:"SJ",members:[{num:"812",firstName:"Daniel",lastName:"Mikolášek",cat:"SJ"}]},
+  {key:"CZE_Production_SS",name:"CZE Production SS",reg:"CZE",div:"Production",cat:"SS",members:[{num:"820",firstName:"Zdeněk",lastName:"Němeček",cat:"SS"}]},
+  {key:"CZE_Production_Optics_OVR",name:"CZE Production Optics",reg:"CZE",div:"Production Optics",cat:"",members:[{num:"813",firstName:"Martin",lastName:"Kamenicek",cat:""}]},
+  {key:"CZE_Production_Optics_J",name:"CZE Production Optics J",reg:"CZE",div:"Production Optics",cat:"J",members:[{num:"814",firstName:"Dan",lastName:"Koudelka",cat:"J"}]},
+  {key:"CZE_Production_Optics_LJ",name:"CZE Production Optics LJ",reg:"CZE",div:"Production Optics",cat:"LJ",members:[{num:"816",firstName:"Livia",lastName:"Gabriel",cat:"LJ"}]},
+  {key:"CZE_Production_Optics_SJ",name:"CZE Production Optics SJ",reg:"CZE",div:"Production Optics",cat:"SJ",members:[{num:"815",firstName:"Robert",lastName:"Novotný",cat:"SJ"}]},
+  {key:"CZE_Standard_OVR",name:"CZE Standard",reg:"CZE",div:"Standard",cat:"",members:[{num:"818",firstName:"Zdenek",lastName:"Liehne",cat:""}]},
+  {key:"CZE_Standard_S",name:"CZE Standard S",reg:"CZE",div:"Standard",cat:"S",members:[{num:"817",firstName:"Josef",lastName:"Rakusan",cat:"S"},{num:"819",firstName:"Petr",lastName:"Znamenacek",cat:"S"}]},
+  {key:"DEN_Classic_OVR",name:"DEN Classic",reg:"DEN",div:"Classic",cat:"",members:[{num:"135",firstName:"Kim",lastName:"Frandsen",cat:""}]},
+  {key:"DEN_Classic_S",name:"DEN Classic S",reg:"DEN",div:"Classic",cat:"S",members:[{num:"136",firstName:"Mads Peter",lastName:"Bach",cat:"S"}]},
+  {key:"DEN_Classic_SS",name:"DEN Classic SS",reg:"DEN",div:"Classic",cat:"SS",members:[{num:"134",firstName:"Gert Erling",lastName:"Hansen",cat:"SS"}]},
+  {key:"DEN_Open_OVR",name:"DEN Open",reg:"DEN",div:"Open",cat:"",members:[{num:"161",firstName:"Jens Martin",lastName:"Sørensen",cat:""},{num:"177",firstName:"Marc",lastName:"Johnson",cat:""}]},
+  {key:"DEN_Open_SS",name:"DEN Open SS",reg:"DEN",div:"Open",cat:"SS",members:[{num:"162",firstName:"Peter",lastName:"Davis",cat:"SS"}]},
+  {key:"DEN_Optics_OVR",name:"DEN Optics",reg:"DEN",div:"Optics",cat:"",members:[{num:"139",firstName:"Rasmus",lastName:"Milling Varmdag",cat:""},{num:"144",firstName:"Stefan",lastName:"Fischer",cat:""},{num:"179",firstName:"David K.",lastName:"Grainger",cat:""}]},
+  {key:"DEN_Production_OVR",name:"DEN Production",reg:"DEN",div:"Production",cat:"",members:[{num:"130",firstName:"Pavel",lastName:"Ibenforth",cat:""},{num:"133",firstName:"Mikkel Sloth",lastName:"Pedersen",cat:""},{num:"159",firstName:"Victor",lastName:"Næblerød Herstad",cat:""}]},
+  {key:"DEN_Production_L",name:"DEN Production L",reg:"DEN",div:"Production",cat:"L",members:[{num:"128",firstName:"Sissal",lastName:"Skaale",cat:"L"}]},
+  {key:"DEN_Standard_OVR",name:"DEN Standard",reg:"DEN",div:"Standard",cat:"",members:[{num:"141",firstName:"Bjørn",lastName:"Severin",cat:""},{num:"142",firstName:"Henrik",lastName:"Thomsen",cat:""},{num:"143",firstName:"Runi",lastName:"Skoubjerg",cat:""},{num:"178",firstName:"Stefan Kryger",lastName:"Starke",cat:""}]},
+  {key:"ESP_Classic_S",name:"ESP Classic S",reg:"ESP",div:"Classic",cat:"S",members:[{num:"448",firstName:"Francisco",lastName:"Manosalvas",cat:"S"},{num:"449",firstName:"Nicolas",lastName:"Arroyo Navidad",cat:"S"}]},
+  {key:"ESP_Classic_SS",name:"ESP Classic SS",reg:"ESP",div:"Classic",cat:"SS",members:[{num:"450",firstName:"ANTONIO",lastName:"CASES",cat:"SS"},{num:"550",firstName:"FEDERICO",lastName:"CONDE GALA",cat:"SS"}]},
+  {key:"ESP_Open_OVR",name:"ESP Open",reg:"ESP",div:"Open",cat:"",members:[{num:"452",firstName:"Ivan",lastName:"Espilez",cat:""},{num:"455",firstName:"DANIEL",lastName:"MEDINA MESTRES",cat:""},{num:"572",firstName:"Francisco Javier",lastName:"Honrubia ruiz",cat:""}]},
+  {key:"ESP_Open_S",name:"ESP Open S",reg:"ESP",div:"Open",cat:"S",members:[{num:"454",firstName:"Horaci",lastName:"Bernabé Pardo",cat:"S"}]},
+  {key:"ESP_Optics_OVR",name:"ESP Optics",reg:"ESP",div:"Optics",cat:"",members:[{num:"462",firstName:"Carlos",lastName:"Camaño Morata",cat:""},{num:"465",firstName:"JESUS ANGEL",lastName:"SANTAMARIA ARANDA",cat:""},{num:"473",firstName:"Nikita",lastName:"Kryuchin",cat:""},{num:"474",firstName:"Carlos Javier",lastName:"Sánchez Pardo",cat:""}]},
+  {key:"ESP_Optics_L",name:"ESP Optics L",reg:"ESP",div:"Optics",cat:"L",members:[{num:"469",firstName:"Natalia",lastName:"Botella Galiana",cat:"L"},{num:"471",firstName:"Yuraima",lastName:"Díaz González",cat:"L"}]},
+  {key:"ESP_Optics_LS",name:"ESP Optics LS",reg:"ESP",div:"Optics",cat:"LS",members:[{num:"470",firstName:"María de los Ángeles",lastName:"Jiménez Blázquez",cat:"LS"},{num:"597",firstName:"Natalia",lastName:"Bokuchava",cat:"LS"}]},
+  {key:"ESP_Optics_S",name:"ESP Optics S",reg:"ESP",div:"Optics",cat:"S",members:[{num:"460",firstName:"Gonzalo",lastName:"de la encarnacion mompel",cat:"S"},{num:"513",firstName:"Eduardo",lastName:"De Cobos Abreu",cat:"S"}]},
+  {key:"ESP_Optics_SS",name:"ESP Optics SS",reg:"ESP",div:"Optics",cat:"SS",members:[{num:"457",firstName:"PABLO",lastName:"JIMÉNEZ",cat:"SS"},{num:"461",firstName:"Jose",lastName:"Zanón",cat:"SS"}]},
+  {key:"ESP_Production_OVR",name:"ESP Production",reg:"ESP",div:"Production",cat:"",members:[{num:"478",firstName:"Miguel",lastName:"Diaz Alvarez",cat:""},{num:"481",firstName:"CESAR",lastName:"BLANCO PANES",cat:""},{num:"598",firstName:"Carlos",lastName:"Palacios Tercero",cat:""},{num:"672",firstName:"Juan",lastName:"GuerreroC",cat:""}]},
+  {key:"ESP_Production_L",name:"ESP Production L",reg:"ESP",div:"Production",cat:"L",members:[{num:"475",firstName:"Airi",lastName:"Rodríguez Domènech",cat:"L"},{num:"480",firstName:"Alexandra",lastName:"Darias",cat:"L"},{num:"920",firstName:"M Cristina",lastName:"Arnaiz Larson",cat:"L"}]},
+  {key:"ESP_Production_LS",name:"ESP Production LS",reg:"ESP",div:"Production",cat:"LS",members:[{num:"483",firstName:"Rosa Maria",lastName:"Domènech Mestres",cat:"LS"}]},
+  {key:"ESP_Production_S",name:"ESP Production S",reg:"ESP",div:"Production",cat:"S",members:[{num:"477",firstName:"BUENAVENTURA",lastName:"DARIAS MEDINA",cat:"S"},{num:"479",firstName:"Sergiy",lastName:"Oskoma",cat:"S"},{num:"599",firstName:"Peregrino",lastName:"Luaces leston",cat:"S"}]},
+  {key:"ESP_Production_Optics_OVR",name:"ESP Production Optics",reg:"ESP",div:"Production Optics",cat:"",members:[{num:"488",firstName:"Enrique",lastName:"Alcaraz",cat:""},{num:"489",firstName:"Miquel Angel",lastName:"Tomas Forne",cat:""},{num:"490",firstName:"Victor",lastName:"Alcaraz",cat:""},{num:"573",firstName:"Francisco",lastName:"Roldán Blázquez",cat:""}]},
+  {key:"ESP_Standard_S",name:"ESP Standard S",reg:"ESP",div:"Standard",cat:"S",members:[{num:"500",firstName:"Juan Pedro",lastName:"García",cat:"S"},{num:"503",firstName:"Luis",lastName:"Montero Bernardino",cat:"S"},{num:"510",firstName:"Jose Vicente",lastName:"TURIEGANO LACARTE",cat:"S"}]},
+  {key:"ESP_Standard_SS",name:"ESP Standard SS",reg:"ESP",div:"Standard",cat:"SS",members:[{num:"502",firstName:"Jesus",lastName:"Ferreiro Rodriguez",cat:"SS"}]},
+  {key:"EST_Open_OVR",name:"EST Open",reg:"EST",div:"Open",cat:"",members:[{num:"974",firstName:"Rene",lastName:"Papli",cat:""},{num:"971",firstName:"Marko",lastName:"Praakli",cat:""}]},
+  {key:"EST_Open_S",name:"EST Open S",reg:"EST",div:"Open",cat:"S",members:[{num:"953",firstName:"Rait",lastName:"Rutnik",cat:"S"}]},
+  {key:"EST_Production_S",name:"EST Production S",reg:"EST",div:"Production",cat:"S",members:[{num:"946",firstName:"Jaago",lastName:"Männiste",cat:"S"},{num:"947",firstName:"Dmitri",lastName:"Brodski",cat:"S"},{num:"948",firstName:"Aleksandr",lastName:"Serenok",cat:"S"},{num:"977",firstName:"Sergei",lastName:"Ivanotsev",cat:"S"}]},
+  {key:"EST_Production_Optics_OVR",name:"EST Production Optics",reg:"EST",div:"Production Optics",cat:"",members:[{num:"961",firstName:"Erkki",lastName:"Kivi",cat:""},{num:"962",firstName:"Jaanus",lastName:"Kond",cat:""}]},
+  {key:"EST_Production_Optics_S",name:"EST Production Optics S",reg:"EST",div:"Production Optics",cat:"S",members:[{num:"952",firstName:"Kaido",lastName:"Vilokas",cat:"S"},{num:"965",firstName:"Toomas",lastName:"Veskimäe",cat:"S"}]},
+  {key:"EST_Standard_OVR",name:"EST Standard",reg:"EST",div:"Standard",cat:"",members:[{num:"949",firstName:"Dagnis",lastName:"Maiberg",cat:""},{num:"951",firstName:"Kert",lastName:"Kuuskla",cat:""},{num:"975",firstName:"Rain",lastName:"Lepikmäe",cat:""}]},
+  {key:"EST_Standard_S",name:"EST Standard S",reg:"EST",div:"Standard",cat:"S",members:[{num:"950",firstName:"Juri",lastName:"Kidjajev",cat:"S"}]},
+  {key:"FIN_Classic_OVR",name:"FIN Classic",reg:"FIN",div:"Classic",cat:"",members:[{num:"338",firstName:"Antti",lastName:"Tukiainen",cat:""}]},
+  {key:"FIN_Classic_S",name:"FIN Classic S",reg:"FIN",div:"Classic",cat:"S",members:[{num:"336",firstName:"Esa",lastName:"Marjoniemi",cat:"S"},{num:"337",firstName:"Sampo",lastName:"Mattila",cat:"S"}]},
+  {key:"FIN_Open_OVR",name:"FIN Open",reg:"FIN",div:"Open",cat:"",members:[{num:"331",firstName:"Arttu",lastName:"Mäkelä",cat:""},{num:"332",firstName:"Jani",lastName:"Kössi",cat:""},{num:"334",firstName:"Sanyalak",lastName:"Phancharoen",cat:""}]},
+  {key:"FIN_Open_S",name:"FIN Open S",reg:"FIN",div:"Open",cat:"S",members:[{num:"333",firstName:"Hannu",lastName:"Uronen",cat:"S"}]},
+  {key:"FIN_Optics_OVR",name:"FIN Optics",reg:"FIN",div:"Optics",cat:"",members:[{num:"237",firstName:"Mikko",lastName:"Hankaniemi",cat:""},{num:"238",firstName:"Samuli",lastName:"Tiihonen",cat:""},{num:"250",firstName:"Iiro",lastName:"Nurmi",cat:""}]},
+  {key:"FIN_Optics_L",name:"FIN Optics L",reg:"FIN",div:"Optics",cat:"L",members:[{num:"240",firstName:"Anastasia",lastName:"Mustonen",cat:"L"},{num:"241",firstName:"Laura",lastName:"Viskari",cat:"L"},{num:"243",firstName:"Miia",lastName:"Laakkonen",cat:"L"}]},
+  {key:"FIN_Optics_LS",name:"FIN Optics LS",reg:"FIN",div:"Optics",cat:"LS",members:[{num:"242",firstName:"Annu",lastName:"Vapanen",cat:"LS"}]},
+  {key:"FIN_Optics_S",name:"FIN Optics S",reg:"FIN",div:"Optics",cat:"S",members:[{num:"239",firstName:"Timo",lastName:"Lehtikevari",cat:"S"}]},
+  {key:"FIN_Production_OVR",name:"FIN Production",reg:"FIN",div:"Production",cat:"",members:[{num:"327",firstName:"Jonas",lastName:"Åberg",cat:""},{num:"328",firstName:"Zhe",lastName:"Wang",cat:""}]},
+  {key:"FIN_Production_S",name:"FIN Production S",reg:"FIN",div:"Production",cat:"S",members:[{num:"231",firstName:"ESA JUKKA",lastName:"BLOM",cat:"S"},{num:"325",firstName:"Vesa",lastName:"Kaunisto",cat:"S"}]},
+  {key:"FIN_Production_Optics_OVR",name:"FIN Production Optics",reg:"FIN",div:"Production Optics",cat:"",members:[{num:"244",firstName:"Mikko",lastName:"Suoninen",cat:""},{num:"245",firstName:"Pasi",lastName:"Pennanen",cat:""},{num:"246",firstName:"Samuel",lastName:"Tiili",cat:""},{num:"310",firstName:"Timo",lastName:"Jetsonen",cat:""}]},
+  {key:"FIN_Production_Optics_S",name:"FIN Production Optics S",reg:"FIN",div:"Production Optics",cat:"S",members:[{num:"311",firstName:"Esa",lastName:"Laine",cat:"S"},{num:"316",firstName:"Mika",lastName:"Lento",cat:"S"},{num:"339",firstName:"Pasi",lastName:"Kumpulainen",cat:"S"}]},
+  {key:"FIN_Production_Optics_SS",name:"FIN Production Optics SS",reg:"FIN",div:"Production Optics",cat:"SS",members:[{num:"315",firstName:"Timo",lastName:"McKeown",cat:"SS"}]},
+  {key:"FIN_Standard_OVR",name:"FIN Standard",reg:"FIN",div:"Standard",cat:"",members:[{num:"227",firstName:"Aki",lastName:"Pakka",cat:""},{num:"236",firstName:"Petri",lastName:"Piili",cat:""},{num:"249",firstName:"Henri",lastName:"Heimonen",cat:""}]},
+  {key:"FIN_Standard_L",name:"FIN Standard L",reg:"FIN",div:"Standard",cat:"L",members:[{num:"233",firstName:"Kaisa",lastName:"Koski",cat:"L"},{num:"234",firstName:"Tiia",lastName:"Honkaselkä",cat:"L"},{num:"312",firstName:"Emily",lastName:"Blom",cat:"L"}]},
+  {key:"FIN_Standard_LSJ",name:"FIN Standard LSJ",reg:"FIN",div:"Standard",cat:"LSJ",members:[{num:"342",firstName:"Anitra",lastName:"Koski",cat:"LSJ"}]},
+  {key:"FIN_Standard_S",name:"FIN Standard S",reg:"FIN",div:"Standard",cat:"S",members:[{num:"228",firstName:"Mikko",lastName:"Koski",cat:"S"},{num:"229",firstName:"Jani",lastName:"Kinnala",cat:"S"},{num:"235",firstName:"Mikko",lastName:"Kuisma",cat:"S"},{num:"247",firstName:"Mika",lastName:"Kontulainen",cat:"S"},{num:"341",firstName:"Tony",lastName:"Ruohonen",cat:"S"}]},
+  {key:"FRA_Optics_OVR",name:"FRA Optics",reg:"FRA",div:"Optics",cat:"",members:[{num:"1683",firstName:"Eric",lastName:"Grauffel",cat:""},{num:"1686",firstName:"Pierre",lastName:"HARDY",cat:""},{num:"1692",firstName:"frederic",lastName:"karbich",cat:""},{num:"1694",firstName:"Julien",lastName:"JUHEL",cat:""}]},
+  {key:"FRA_Optics_S",name:"FRA Optics S",reg:"FRA",div:"Optics",cat:"S",members:[{num:"1700",firstName:"Jerome",lastName:"Poiret",cat:"S"},{num:"1724",firstName:"Jean Guy",lastName:"Becret",cat:"S"},{num:"1726",firstName:"Bertrand",lastName:"BOITTIAUX",cat:"S"},{num:"1727",firstName:"Laurent",lastName:"Piedade",cat:"S"}]},
+  {key:"FRA_Production_Optics_OVR",name:"FRA Production Optics",reg:"FRA",div:"Production Optics",cat:"",members:[{num:"1685",firstName:"Emile",lastName:"Obriot",cat:""},{num:"1693",firstName:"Sebastien",lastName:"Armendariz",cat:""},{num:"1695",firstName:"Morgan",lastName:"Denoyelles",cat:""}]},
+  {key:"FRA_Production_Optics_J",name:"FRA Production Optics J",reg:"FRA",div:"Production Optics",cat:"J",members:[{num:"1684",firstName:"Robin",lastName:"Grauffel",cat:"J"}]},
+  {key:"GBR_Production_Optics_OVR",name:"GBR Production Optics",reg:"GBR",div:"Production Optics",cat:"",members:[{num:"1270",firstName:"Hongji",lastName:"Yu",cat:""},{num:"1272",firstName:"James",lastName:"Titcumb",cat:""},{num:"1278",firstName:"Gareth",lastName:"Bland",cat:""},{num:"1280",firstName:"Peter",lastName:"Bland",cat:""}]},
+  {key:"GBR_Production_Optics_S",name:"GBR Production Optics S",reg:"GBR",div:"Production Optics",cat:"S",members:[{num:"1266",firstName:"Justin",lastName:"Cooper",cat:"S"},{num:"1275",firstName:"Sonny",lastName:"Bayly",cat:"S"},{num:"1283",firstName:"Richard",lastName:"Ingram",cat:"S"},{num:"1267",firstName:"Waldek",lastName:"Mickiewicz",cat:"S"}]},
+  {key:"GER_Classic_S",name:"GER Classic S",reg:"GER",div:"Classic",cat:"S",members:[{num:"5",firstName:"Arno",lastName:"Graner",cat:"S"},{num:"6",firstName:"Marcus",lastName:"Kaiser",cat:"S"}]},
+  {key:"GER_Open_OVR",name:"GER Open",reg:"GER",div:"Open",cat:"",members:[{num:"8",firstName:"Christian",lastName:"Dörr",cat:""},{num:"9",firstName:"Andreas",lastName:"Pfeiffer",cat:""},{num:"10",firstName:"Peter",lastName:"Siegle",cat:""},{num:"62",firstName:"Felix",lastName:"Seiffer",cat:""}]},
+  {key:"GER_Open_S",name:"GER Open S",reg:"GER",div:"Open",cat:"S",members:[{num:"11",firstName:"Sascha",lastName:"Back",cat:"S"},{num:"12",firstName:"Roland",lastName:"Von Borries",cat:"S"},{num:"13",firstName:"Thomas",lastName:"Winter",cat:"S"},{num:"14",firstName:"Gregor",lastName:"Reineck",cat:"S"}]},
+  {key:"GER_Optics_OVR",name:"GER Optics",reg:"GER",div:"Optics",cat:"",members:[{num:"15",firstName:"Patrick",lastName:"Kummer",cat:""},{num:"16",firstName:"Mikhail",lastName:"Radzivil",cat:""},{num:"165",firstName:"Nils",lastName:"Nothnagel",cat:""}]},
+  {key:"GER_Production_OVR",name:"GER Production",reg:"GER",div:"Production",cat:"",members:[{num:"17",firstName:"Nikolai",lastName:"Bost",cat:""},{num:"18",firstName:"Alexander",lastName:"Fleischer",cat:""},{num:"19",firstName:"Marcel",lastName:"Prüm",cat:""},{num:"20",firstName:"Stefan",lastName:"Rumpler",cat:""}]},
+  {key:"GER_Production_S",name:"GER Production S",reg:"GER",div:"Production",cat:"S",members:[{num:"32",firstName:"Michael",lastName:"Hofmann",cat:"S"},{num:"34",firstName:"Robert",lastName:"Koch",cat:"S"},{num:"35",firstName:"Holger",lastName:"Kunzmann",cat:"S"},{num:"36",firstName:"Markus",lastName:"Stobbe",cat:"S"}]},
+  {key:"GER_Production_SS",name:"GER Production SS",reg:"GER",div:"Production",cat:"SS",members:[{num:"37",firstName:"Ludwig",lastName:"Bowakow",cat:"SS"},{num:"38",firstName:"Jürgen",lastName:"Braun",cat:"SS"},{num:"39",firstName:"Reinhard",lastName:"Kelterbaum",cat:"SS"},{num:"40",firstName:"Olaf",lastName:"van Essen",cat:"SS"}]},
+  {key:"GER_Production_Optics_OVR",name:"GER Production Optics",reg:"GER",div:"Production Optics",cat:"",members:[{num:"21",firstName:"Luis",lastName:"Ehrhardt",cat:""},{num:"22",firstName:"Christopher",lastName:"Ross",cat:""},{num:"23",firstName:"Timm",lastName:"Eggert",cat:""},{num:"63",firstName:"David",lastName:"Udvary",cat:""}]},
+  {key:"GER_Production_Optics_S",name:"GER Production Optics S",reg:"GER",div:"Production Optics",cat:"S",members:[{num:"25",firstName:"Frank",lastName:"Albrecht",cat:"S"},{num:"26",firstName:"Arne",lastName:"Lentz",cat:"S"},{num:"27",firstName:"Michael",lastName:"Schuetz",cat:"S"}]},
+  {key:"GER_Production_Optics_SS",name:"GER Production Optics SS",reg:"GER",div:"Production Optics",cat:"SS",members:[{num:"28",firstName:"Heribert",lastName:"Bettermann",cat:"SS"},{num:"29",firstName:"Georg",lastName:"Fabricius",cat:"SS"},{num:"30",firstName:"Jörg",lastName:"Haben",cat:"SS"},{num:"31",firstName:"Andy",lastName:"Holden",cat:"SS"},{num:"90",firstName:"Stefan",lastName:"Möbs",cat:"SS"}]},
+  {key:"GER_Revolver_OVR",name:"GER Revolver",reg:"GER",div:"Revolver",cat:"",members:[{num:"59",firstName:"Christian",lastName:"Füger",cat:""},{num:"60",firstName:"Michael",lastName:"Schmid",cat:""},{num:"1678",firstName:"Benjamin",lastName:"Steinert",cat:""}]},
+  {key:"GER_Revolver_S",name:"GER Revolver S",reg:"GER",div:"Revolver",cat:"S",members:[{num:"56",firstName:"Günther",lastName:"Knaus",cat:"S"}]},
+  {key:"GER_Standard_OVR",name:"GER Standard",reg:"GER",div:"Standard",cat:"",members:[{num:"41",firstName:"Philipp",lastName:"Wessels",cat:""},{num:"42",firstName:"Bilal",lastName:"Daouk",cat:""},{num:"43",firstName:"Michael",lastName:"Kahl",cat:""},{num:"44",firstName:"Sergej",lastName:"Mueller",cat:""}]},
+  {key:"GER_Standard_S",name:"GER Standard S",reg:"GER",div:"Standard",cat:"S",members:[{num:"46",firstName:"Oliver",lastName:"Damm",cat:"S"},{num:"47",firstName:"Vitalij",lastName:"Melehov",cat:"S"},{num:"48",firstName:"Wladislaw",lastName:"Peschkow",cat:"S"}]},
+  {key:"GER_Standard_SS",name:"GER Standard SS",reg:"GER",div:"Standard",cat:"SS",members:[{num:"49",firstName:"Horst P.",lastName:"Beck",cat:"SS"},{num:"52",firstName:"Uwe",lastName:"Pankalla",cat:"SS"},{num:"53",firstName:"Uwe",lastName:"Mohr",cat:"SS"},{num:"58",firstName:"Friedrich",lastName:"Gepperth",cat:"SS"}]},
+  {key:"GIB_Open_OVR",name:"GIB Open",reg:"GIB",div:"Open",cat:"",members:[{num:"1206",firstName:"Stephen",lastName:"Borge",cat:""}]},
+  {key:"GIB_Open_L",name:"GIB Open L",reg:"GIB",div:"Open",cat:"L",members:[{num:"1212",firstName:"Rachael",lastName:"Viagas",cat:"L"}]},
+  {key:"GIB_Open_S",name:"GIB Open S",reg:"GIB",div:"Open",cat:"S",members:[{num:"1177",firstName:"John",lastName:"Holmes",cat:"S"}]},
+  {key:"GIB_Open_SS",name:"GIB Open SS",reg:"GIB",div:"Open",cat:"SS",members:[{num:"1176",firstName:"Shane",lastName:"Athey",cat:"SS"}]},
+  {key:"GRE_Classic_OVR",name:"GRE Classic",reg:"GRE",div:"Classic",cat:"",members:[{num:"626",firstName:"ATHANASIOS",lastName:"GKOGKAKIS",cat:""},{num:"627",firstName:"Kostas",lastName:"Vlachos",cat:""}]},
+  {key:"GRE_Classic_S",name:"GRE Classic S",reg:"GRE",div:"Classic",cat:"S",members:[{num:"586",firstName:"Konstantinos",lastName:"Iosifidis",cat:"S"},{num:"760",firstName:"Dimitris",lastName:"Fragos",cat:"S"}]},
+  {key:"GRE_Open_OVR",name:"GRE Open",reg:"GRE",div:"Open",cat:"",members:[{num:"616",firstName:"Nektarios",lastName:"Tastanidis",cat:""}]},
+  {key:"GRE_Open_J",name:"GRE Open J",reg:"GRE",div:"Open",cat:"J",members:[{num:"615",firstName:"NIKOLAOS",lastName:"SPATOULAS",cat:"J"}]},
+  {key:"GRE_Open_S",name:"GRE Open S",reg:"GRE",div:"Open",cat:"S",members:[{num:"829",firstName:"GEORGIOS",lastName:"KALOGERAKIS",cat:"S"}]},
+  {key:"GRE_Open_SS",name:"GRE Open SS",reg:"GRE",div:"Open",cat:"SS",members:[{num:"614",firstName:"IOANNIS",lastName:"TYRAKIS",cat:"SS"}]},
+  {key:"GRE_Production_OVR",name:"GRE Production",reg:"GRE",div:"Production",cat:"",members:[{num:"631",firstName:"Theologos",lastName:"Zounis",cat:""},{num:"632",firstName:"Athanasios",lastName:"Papadakos",cat:""}]},
+  {key:"GRE_Production_S",name:"GRE Production S",reg:"GRE",div:"Production",cat:"S",members:[{num:"634",firstName:"ANGELOS",lastName:"KOSTIDIS",cat:"S"}]},
+  {key:"GRE_Production_SS",name:"GRE Production SS",reg:"GRE",div:"Production",cat:"SS",members:[{num:"633",firstName:"IOSIF",lastName:"ROUSSOS",cat:"SS"}]},
+  {key:"GRE_Production_Optics_OVR",name:"GRE Production Optics",reg:"GRE",div:"Production Optics",cat:"",members:[{num:"622",firstName:"THEODOROS",lastName:"KOUIMTSIDIS",cat:""},{num:"623",firstName:"Nikolaos",lastName:"Tsantalis",cat:""}]},
+  {key:"GRE_Production_Optics_S",name:"GRE Production Optics S",reg:"GRE",div:"Production Optics",cat:"S",members:[{num:"625",firstName:"Athanasios",lastName:"Karavergos",cat:"S"}]},
+  {key:"GRE_Standard_OVR",name:"GRE Standard",reg:"GRE",div:"Standard",cat:"",members:[{num:"602",firstName:"HAYKAZ",lastName:"GALSTYAN",cat:""},{num:"628",firstName:"Alexandros",lastName:"Sklavis",cat:""},{num:"629",firstName:"DIMITRIS",lastName:"PAPAFLORATOS",cat:""}]},
+  {key:"GRE_Standard_L",name:"GRE Standard L",reg:"GRE",div:"Standard",cat:"L",members:[{num:"630",firstName:"ANTONIA",lastName:"KROKAROPOULOU",cat:"L"}]},
+  {key:"GRE_Standard_S",name:"GRE Standard S",reg:"GRE",div:"Standard",cat:"S",members:[{num:"590",firstName:"Dimitrios",lastName:"Krimnianiotis",cat:"S"},{num:"596",firstName:"Panagiotis",lastName:"Pappas",cat:"S"},{num:"618",firstName:"Georgios",lastName:"Michos",cat:"S"}]},
+  {key:"GRE_Standard_SS",name:"GRE Standard SS",reg:"GRE",div:"Standard",cat:"SS",members:[{num:"594",firstName:"IOANNIS",lastName:"STAMOS",cat:"SS"},{num:"620",firstName:"NIKOLAOS",lastName:"MAVROS",cat:"SS"}]},
+  {key:"HUN_Classic_S",name:"HUN Classic S",reg:"HUN",div:"Classic",cat:"S",members:[{num:"1066",firstName:"Imre",lastName:"Donka",cat:"S"},{num:"1067",firstName:"Mihaly",lastName:"Bobaly",cat:"S"},{num:"1068",firstName:"Gyula",lastName:"Miglecz",cat:"S"},{num:"1069",firstName:"György",lastName:"Batki",cat:"S"}]},
+  {key:"HUN_Open_S",name:"HUN Open S",reg:"HUN",div:"Open",cat:"S",members:[{num:"1062",firstName:"Laszlo",lastName:"Barkanyi",cat:"S"},{num:"1063",firstName:"Levente",lastName:"Kretai",cat:"S"},{num:"1064",firstName:"Oliver",lastName:"Ambrus",cat:"S"},{num:"1065",firstName:"Zoltan",lastName:"Maczeovics",cat:"S"}]},
+  {key:"HUN_Production_Optics_OVR",name:"HUN Production Optics",reg:"HUN",div:"Production Optics",cat:"",members:[{num:"1058",firstName:"Attila",lastName:"Obermajer",cat:""},{num:"1059",firstName:"Attila",lastName:"Kovacs",cat:""},{num:"1060",firstName:"András",lastName:"Bükkfejes",cat:""}]},
+  {key:"HUN_Production_Optics_S",name:"HUN Production Optics S",reg:"HUN",div:"Production Optics",cat:"S",members:[{num:"1061",firstName:"Zsolt",lastName:"Lázár",cat:"S"}]},
+  {key:"HUN_Revolver_OVR",name:"HUN Revolver",reg:"HUN",div:"Revolver",cat:"",members:[{num:"1054",firstName:"Peter",lastName:"Csucska",cat:""},{num:"1056",firstName:"Gabor Alex",lastName:"Wittinger",cat:""},{num:"1651",firstName:"Károly",lastName:"Sárközy",cat:""}]},
+  {key:"HUN_Revolver_S",name:"HUN Revolver S",reg:"HUN",div:"Revolver",cat:"S",members:[{num:"1055",firstName:"Peter",lastName:"Szarvas",cat:"S"}]},
+  {key:"HUN_Standard_OVR",name:"HUN Standard",reg:"HUN",div:"Standard",cat:"",members:[{num:"1",firstName:"Flavius",lastName:"Balogh",cat:""},{num:"2",firstName:"Zoltan",lastName:"Albrecht",cat:""},{num:"3",firstName:"Wei",lastName:"Hua",cat:""},{num:"4",firstName:"Arseniy",lastName:"Denisov",cat:""}]},
+  {key:"ITA_Classic_OVR",name:"ITA Classic",reg:"ITA",div:"Classic",cat:"",members:[{num:"1541",firstName:"Vittorio",lastName:"Anesa",cat:""},{num:"1542",firstName:"Francesco",lastName:"Losi",cat:""},{num:"1543",firstName:"Vincenzo",lastName:"Mundo",cat:""},{num:"1544",firstName:"Lorenzo",lastName:"Masieri",cat:""}]},
+  {key:"ITA_Classic_S",name:"ITA Classic S",reg:"ITA",div:"Classic",cat:"S",members:[{num:"1545",firstName:"Antonio",lastName:"Sciurpi",cat:"S"},{num:"1546",firstName:"Giovanni",lastName:"Di Giulio",cat:"S"},{num:"1547",firstName:"Marco",lastName:"Farnetani",cat:"S"}]},
+  {key:"ITA_Classic_SS",name:"ITA Classic SS",reg:"ITA",div:"Classic",cat:"SS",members:[{num:"1548",firstName:"Nicola",lastName:"Pedroli",cat:"SS"}]},
+  {key:"ITA_Open_L",name:"ITA Open L",reg:"ITA",div:"Open",cat:"L",members:[{num:"1550",firstName:"PATRIZIA",lastName:"PERRUCINO",cat:"L"},{num:"1551",firstName:"Denny",lastName:"Rossetto",cat:"L"},{num:"1552",firstName:"Giulia",lastName:"Villari",cat:"L"}]},
+  {key:"ITA_Open_LS",name:"ITA Open LS",reg:"ITA",div:"Open",cat:"LS",members:[{num:"1549",firstName:"Nicole",lastName:"Esposito",cat:"LS"}]},
+  {key:"ITA_Open_S",name:"ITA Open S",reg:"ITA",div:"Open",cat:"S",members:[{num:"1562",firstName:"Maurizio",lastName:"Ciocconi",cat:"S"},{num:"1658",firstName:"Federico",lastName:"Checcucci",cat:"S"}]},
+  {key:"ITA_Open_SS",name:"ITA Open SS",reg:"ITA",div:"Open",cat:"SS",members:[{num:"1563",firstName:"Daniele",lastName:"Barbizzi",cat:"SS"}]},
+  {key:"ITA_Optics_OVR",name:"ITA Optics",reg:"ITA",div:"Optics",cat:"",members:[{num:"1553",firstName:"Simone",lastName:"Miloro",cat:""},{num:"1554",firstName:"ANDREA",lastName:"GEMIGNANI",cat:""},{num:"1555",firstName:"Matteo",lastName:"Filippi",cat:""},{num:"1556",firstName:"Lorenzo",lastName:"Laghi",cat:""}]},
+  {key:"ITA_Production_OVR",name:"ITA Production",reg:"ITA",div:"Production",cat:"",members:[{num:"1523",firstName:"Francesco",lastName:"Perazzoli",cat:""},{num:"1524",firstName:"Silvio Maria",lastName:"Perongini",cat:""},{num:"1525",firstName:"Federico",lastName:"Trionfetti",cat:""},{num:"1526",firstName:"Alessandro",lastName:"Biagioli",cat:""}]},
+  {key:"ITA_Production_L",name:"ITA Production L",reg:"ITA",div:"Production",cat:"L",members:[{num:"1527",firstName:"Camilla",lastName:"Almici",cat:"L"},{num:"1528",firstName:"Lucrezia",lastName:"Di Prospero",cat:"L"},{num:"1529",firstName:"Monica",lastName:"Rasi Caldogno",cat:"L"},{num:"1530",firstName:"Marta",lastName:"Cattaneo",cat:"L"}]},
+  {key:"ITA_Production_S",name:"ITA Production S",reg:"ITA",div:"Production",cat:"S",members:[{num:"1531",firstName:"Andrea",lastName:"Iorfino",cat:"S"},{num:"1532",firstName:"Claudio",lastName:"Cozzella",cat:"S"},{num:"1533",firstName:"Gianluca",lastName:"Passalia",cat:"S"}]},
+  {key:"ITA_Production_SS",name:"ITA Production SS",reg:"ITA",div:"Production",cat:"SS",members:[{num:"1655",firstName:"GIOVANNI",lastName:"ZUCCOLO",cat:"SS"}]},
+  {key:"ITA_Production_Optics_OVR",name:"ITA Production Optics",reg:"ITA",div:"Production Optics",cat:"",members:[{num:"1534",firstName:"Davide",lastName:"Indizio",cat:""},{num:"1535",firstName:"Cristian",lastName:"Giacomini",cat:""},{num:"1536",firstName:"Manuel",lastName:"Masserdotti",cat:""},{num:"1537",firstName:"Michael",lastName:"Vicari",cat:""}]},
+  {key:"ITA_Production_Optics_S",name:"ITA Production Optics S",reg:"ITA",div:"Production Optics",cat:"S",members:[{num:"1538",firstName:"Roberto",lastName:"Vezzoli",cat:"S"},{num:"1539",firstName:"Francesco",lastName:"Cerniglia",cat:"S"},{num:"1540",firstName:"Gianluca",lastName:"Mulazzani",cat:"S"}]},
+  {key:"ITA_Standard_GS",name:"ITA Standard GS",reg:"ITA",div:"Standard",cat:"GS",members:[{num:"1639",firstName:"Esterino",lastName:"Magli",cat:"GS"}]},
+  {key:"ITA_Standard_S",name:"ITA Standard S",reg:"ITA",div:"Standard",cat:"S",members:[{num:"1558",firstName:"Giulio",lastName:"Del Rosario",cat:"S"},{num:"1559",firstName:"Leonardo",lastName:"Bettoni",cat:"S"}]},
+  {key:"ITA_Standard_SS",name:"ITA Standard SS",reg:"ITA",div:"Standard",cat:"SS",members:[{num:"1557",firstName:"Adriano Ciro",lastName:"Santarcangelo",cat:"SS"}]},
+  {key:"LTU_Production_OVR",name:"LTU Production",reg:"LTU",div:"Production",cat:"",members:[{num:"348",firstName:"Arvydas",lastName:"Vaitekūnas",cat:""},{num:"349",firstName:"Mindaugas",lastName:"Pakarnas",cat:""},{num:"356",firstName:"Donatas",lastName:"Cimoš",cat:""}]},
+  {key:"LTU_Production_S",name:"LTU Production S",reg:"LTU",div:"Production",cat:"S",members:[{num:"417",firstName:"Vitalijus",lastName:"Grinčenko",cat:"S"},{num:"351",firstName:"Audrius",lastName:"Goštautas",cat:"S"},{num:"884",firstName:"Žilvinas",lastName:"Čipkus",cat:"S"}]},
+  {key:"LTU_Production_SS",name:"LTU Production SS",reg:"LTU",div:"Production",cat:"SS",members:[{num:"357",firstName:"Ramūnas",lastName:"Sventickas",cat:"SS"}]},
+  {key:"LTU_Production_Optics_OVR",name:"LTU Production Optics",reg:"LTU",div:"Production Optics",cat:"",members:[{num:"347",firstName:"Giedrius",lastName:"Baksa",cat:""},{num:"355",firstName:"Donatas",lastName:"Ribokas",cat:""},{num:"358",firstName:"Tautvydas",lastName:"Šukys",cat:""}]},
+  {key:"LTU_Production_Optics_S",name:"LTU Production Optics S",reg:"LTU",div:"Production Optics",cat:"S",members:[{num:"345",firstName:"Linas",lastName:"Karosas",cat:"S"},{num:"346",firstName:"Ramunas",lastName:"Binkevicius",cat:"S"},{num:"359",firstName:"Egidijus",lastName:"Palaima",cat:"S"},{num:"360",firstName:"Lech",lastName:"Cimoš",cat:"S"}]},
+  {key:"MTO_Production_OVR",name:"MTO Production",reg:"MTO",div:"Production",cat:"",members:[{num:"1102",firstName:"Sasa",lastName:"Vujosevic",cat:""},{num:"1103",firstName:"Edin",lastName:"Ramovic",cat:""},{num:"1104",firstName:"Nikola",lastName:"Vujovic",cat:""}]},
+  {key:"MTO_Production_S",name:"MTO Production S",reg:"MTO",div:"Production",cat:"S",members:[{num:"1099",firstName:"Milorad",lastName:"Janjusevic",cat:"S"},{num:"1100",firstName:"Nenad",lastName:"Pavlicic",cat:"S"},{num:"1101",firstName:"Srdjan",lastName:"Krstic",cat:"S"},{num:"1164",firstName:"Boris",lastName:"Saveljic",cat:"S"}]},
+  {key:"NED_Classic_OVR",name:"NED Classic",reg:"NED",div:"Classic",cat:"",members:[{num:"156",firstName:"Jan-Wouter",lastName:"Thijssen",cat:""}]},
+  {key:"NED_Classic_S",name:"NED Classic S",reg:"NED",div:"Classic",cat:"S",members:[{num:"759",firstName:"Rene",lastName:"Warmerdam",cat:"S"}]},
+  {key:"NED_Classic_SS",name:"NED Classic SS",reg:"NED",div:"Classic",cat:"SS",members:[{num:"140",firstName:"Marcel",lastName:"Slim",cat:"SS"}]},
+  {key:"NED_Open_OVR",name:"NED Open",reg:"NED",div:"Open",cat:"",members:[{num:"104",firstName:"Peter",lastName:"van den Berg",cat:""},{num:"105",firstName:"tim",lastName:"tim gerritsen",cat:""},{num:"186",firstName:"Marc",lastName:"Woudstra",cat:""}]},
+  {key:"NED_Open_S",name:"NED Open S",reg:"NED",div:"Open",cat:"S",members:[{num:"106",firstName:"Richard",lastName:"Van der Wel",cat:"S"}]},
+  {key:"NED_Open_SS",name:"NED Open SS",reg:"NED",div:"Open",cat:"SS",members:[{num:"103",firstName:"Jacky",lastName:"van koolwijk",cat:"SS"},{num:"248",firstName:"Arno",lastName:"Smits",cat:"SS"},{num:"636",firstName:"Rien",lastName:"Faro",cat:"SS"}]},
+  {key:"NED_Production_Optics_OVR",name:"NED Production Optics",reg:"NED",div:"Production Optics",cat:"",members:[{num:"107",firstName:"Dylan",lastName:"Keppel",cat:""},{num:"132",firstName:"Marcel Timothy",lastName:"Souhuwat",cat:""}]},
+  {key:"NED_Production_Optics_L",name:"NED Production Optics L",reg:"NED",div:"Production Optics",cat:"L",members:[{num:"108",firstName:"Cheyenne",lastName:"Wauben",cat:"L"}]},
+  {key:"NED_Standard_OVR",name:"NED Standard",reg:"NED",div:"Standard",cat:"",members:[{num:"109",firstName:"Justin",lastName:"Verhoog",cat:""},{num:"111",firstName:"Maurits",lastName:"Roselaar",cat:""},{num:"113",firstName:"Nico",lastName:"Koek",cat:""}]},
+  {key:"NED_Standard_SS",name:"NED Standard SS",reg:"NED",div:"Standard",cat:"SS",members:[{num:"110",firstName:"John",lastName:"van Uitert",cat:"SS"}]},
+  {key:"NOR_Classic_OVR",name:"NOR Classic",reg:"NOR",div:"Classic",cat:"",members:[{num:"266",firstName:"Espen",lastName:"Fiskebeck",cat:""},{num:"268",firstName:"Henrik",lastName:"Johansen",cat:""},{num:"365",firstName:"Stig",lastName:"Aarmo",cat:""}]},
+  {key:"NOR_Classic_S",name:"NOR Classic S",reg:"NOR",div:"Classic",cat:"S",members:[{num:"381",firstName:"Jan Stian",lastName:"Fiskerstrand",cat:"S"}]},
+  {key:"NOR_Open_OVR",name:"NOR Open",reg:"NOR",div:"Open",cat:"",members:[{num:"269",firstName:"Anders",lastName:"Nerheim",cat:""},{num:"270",firstName:"Rune Wichmann",lastName:"Haldorsen",cat:""},{num:"366",firstName:"Nikolai",lastName:"Busk",cat:""},{num:"515",firstName:"Dariusz",lastName:"Kowalczyk",cat:""}]},
+  {key:"NOR_Optics_OVR",name:"NOR Optics",reg:"NOR",div:"Optics",cat:"",members:[{num:"273",firstName:"Ove",lastName:"Nestvold",cat:""},{num:"274",firstName:"Vegard",lastName:"Natvik",cat:""},{num:"275",firstName:"Daniel Skreros",lastName:"Fosse",cat:""},{num:"276",firstName:"Henrik",lastName:"Mølmen",cat:""}]},
+  {key:"NOR_Production_OVR",name:"NOR Production",reg:"NOR",div:"Production",cat:"",members:[{num:"281",firstName:"Bard",lastName:"Kristiansen",cat:""},{num:"282",firstName:"Frede",lastName:"Stenslie",cat:""},{num:"283",firstName:"Christian",lastName:"Følvik",cat:""},{num:"368",firstName:"Tor Martin",lastName:"Kandal",cat:""}]},
+  {key:"NOR_Production_L",name:"NOR Production L",reg:"NOR",div:"Production",cat:"L",members:[{num:"307",firstName:"Tanya Marlene",lastName:"Tysnes",cat:"L"},{num:"308",firstName:"Anne-Kristine",lastName:"Hardaway",cat:"L"},{num:"830",firstName:"Susann Lyngmyr",lastName:"Mikkelsen",cat:"L"}]},
+  {key:"NOR_Production_LS",name:"NOR Production LS",reg:"NOR",div:"Production",cat:"LS",members:[{num:"309",firstName:"Inger Skjold",lastName:"Bratli",cat:"LS"}]},
+  {key:"NOR_Production_SS",name:"NOR Production SS",reg:"NOR",div:"Production",cat:"SS",members:[{num:"291",firstName:"Folke",lastName:"Myrvang",cat:"SS"},{num:"292",firstName:"Geir",lastName:"Kvæl",cat:"SS"},{num:"293",firstName:"Eindride",lastName:"Stien",cat:"SS"}]},
+  {key:"NOR_Production_Optics_OVR",name:"NOR Production Optics",reg:"NOR",div:"Production Optics",cat:"",members:[{num:"277",firstName:"Steinar",lastName:"Granbo",cat:""},{num:"278",firstName:"Alexander",lastName:"Grimli",cat:""},{num:"279",firstName:"Aleksander",lastName:"Norr",cat:""},{num:"684",firstName:"Terje",lastName:"Andersen",cat:""}]},
+  {key:"NOR_Production_Optics_GJ",name:"NOR Production Optics GJ",reg:"NOR",div:"Production Optics",cat:"GJ",members:[{num:"303",firstName:"Noah Valentin",lastName:"Helland",cat:"GJ"},{num:"369",firstName:"Aljoneil",lastName:"Alforte",cat:"GJ"}]},
+  {key:"NOR_Production_Optics_J",name:"NOR Production Optics J",reg:"NOR",div:"Production Optics",cat:"J",members:[{num:"306",firstName:"Jakob",lastName:"Ryen",cat:"J"}]},
+  {key:"NOR_Production_Optics_LJ",name:"NOR Production Optics LJ",reg:"NOR",div:"Production Optics",cat:"LJ",members:[{num:"301",firstName:"Adelén",lastName:"Sollyst",cat:"LJ"}]},
+  {key:"NOR_Production_Optics_S",name:"NOR Production Optics S",reg:"NOR",div:"Production Optics",cat:"S",members:[{num:"294",firstName:"Thomas",lastName:"Nordvi",cat:"S"},{num:"295",firstName:"Kyrre",lastName:"Lee",cat:"S"},{num:"296",firstName:"Rune",lastName:"Toft",cat:"S"},{num:"516",firstName:"Stein Gustav",lastName:"Wulvik",cat:"S"}]},
+  {key:"NOR_Production_Optics_SJ",name:"NOR Production Optics SJ",reg:"NOR",div:"Production Optics",cat:"SJ",members:[{num:"304",firstName:"Sebastian",lastName:"Kåsin",cat:"SJ"},{num:"305",firstName:"Mathias Nordhagen",lastName:"Larsen",cat:"SJ"},{num:"370",firstName:"Per-Kristian",lastName:"Kjøren",cat:"SJ"},{num:"302",firstName:"Henrik B.",lastName:"Thorud",cat:"SJ"}]},
+  {key:"NOR_Production_Optics_SS",name:"NOR Production Optics SS",reg:"NOR",div:"Production Optics",cat:"SS",members:[{num:"297",firstName:"Rune",lastName:"Vikeby",cat:"SS"},{num:"298",firstName:"Karl",lastName:"Torkildsen",cat:"SS"},{num:"299",firstName:"Tony",lastName:"Østreng Tsigakis",cat:"SS"},{num:"300",firstName:"Lars",lastName:"Flugstad",cat:"SS"}]},
+  {key:"NOR_Standard_OVR",name:"NOR Standard",reg:"NOR",div:"Standard",cat:"",members:[{num:"287",firstName:"Pål",lastName:"Ripnes",cat:""},{num:"288",firstName:"Stefan",lastName:"Winsnes",cat:""},{num:"289",firstName:"Kim-ove",lastName:"Ellingsen",cat:""},{num:"683",firstName:"Glenn",lastName:"Lodden",cat:""}]},
+  {key:"POL_Optics_OVR",name:"POL Optics",reg:"POL",div:"Optics",cat:"",members:[{num:"1291",firstName:"Marcin",lastName:"Wojcieszek",cat:""},{num:"1292",firstName:"Bartosz",lastName:"Szczesny",cat:""},{num:"1301",firstName:"Marcin",lastName:"Galazka",cat:""},{num:"1306",firstName:"Dominik",lastName:"Górski",cat:""}]},
+  {key:"POL_Production_S",name:"POL Production S",reg:"POL",div:"Production",cat:"S",members:[{num:"1304",firstName:"Bogdan",lastName:"Skorupka",cat:"S"},{num:"1305",firstName:"Krzysztof",lastName:"Opechowski",cat:"S"}]},
+  {key:"POL_Production_Optics_OVR",name:"POL Production Optics",reg:"POL",div:"Production Optics",cat:"",members:[{num:"1213",firstName:"Marcin",lastName:"Tausiewicz",cat:""},{num:"1289",firstName:"Lukas",lastName:"Ratynski",cat:""},{num:"1293",firstName:"Nikodem",lastName:"Wysocki",cat:""},{num:"1307",firstName:"Denys",lastName:"Sviridov",cat:""}]},
+  {key:"POL_Standard_OVR",name:"POL Standard",reg:"POL",div:"Standard",cat:"",members:[{num:"1296",firstName:"Bartosz",lastName:"Staszczyk",cat:""},{num:"1455",firstName:"Kamil",lastName:"Mirzwa",cat:""}]},
+  {key:"POL_Standard_L",name:"POL Standard L",reg:"POL",div:"Standard",cat:"L",members:[{num:"1310",firstName:"Emilia",lastName:"Kabatek",cat:"L"},{num:"1311",firstName:"Małgorzata",lastName:"Murzydło",cat:"L"}]},
+  {key:"POR_Production_Optics_OVR",name:"POR Production Optics",reg:"POR",div:"Production Optics",cat:"",members:[{num:"924",firstName:"Rafael",lastName:"Peniche",cat:""},{num:"932",firstName:"Joao",lastName:"Mendes",cat:""}]},
+  {key:"POR_Production_Optics_S",name:"POR Production Optics S",reg:"POR",div:"Production Optics",cat:"S",members:[{num:"927",firstName:"Robert",lastName:"Mendes",cat:"S"},{num:"929",firstName:"Joao",lastName:"Bastos",cat:"S"}]},
+  {key:"POR_Standard_OVR",name:"POR Standard",reg:"POR",div:"Standard",cat:"",members:[{num:"925",firstName:"Mauricio",lastName:"Reis",cat:""}]},
+  {key:"POR_Standard_LS",name:"POR Standard LS",reg:"POR",div:"Standard",cat:"LS",members:[{num:"921",firstName:"Elsa",lastName:"Joaquim",cat:"LS"}]},
+  {key:"POR_Standard_S",name:"POR Standard S",reg:"POR",div:"Standard",cat:"S",members:[{num:"928",firstName:"Luis",lastName:"Bastos",cat:"S"}]},
+  {key:"POR_Standard_SS",name:"POR Standard SS",reg:"POR",div:"Standard",cat:"SS",members:[{num:"922",firstName:"Manuel",lastName:"Silva",cat:"SS"}]},
+  {key:"SER_Production_OVR",name:"SER Production",reg:"SER",div:"Production",cat:"",members:[{num:"150",firstName:"Saša",lastName:"Šunjevarić",cat:""},{num:"153",firstName:"Predrag",lastName:"Vasic",cat:""},{num:"187",firstName:"Aleksa",lastName:"Popović",cat:""}]},
+  {key:"SER_Production_L",name:"SER Production L",reg:"SER",div:"Production",cat:"L",members:[{num:"158",firstName:"Snežana",lastName:"Momčilović",cat:"L"},{num:"168",firstName:"Milica",lastName:"Vujčić",cat:"L"},{num:"169",firstName:"Ivana",lastName:"Djukic",cat:"L"},{num:"777",firstName:"Ana",lastName:"Visi Bujak",cat:"L"}]},
+  {key:"SER_Production_S",name:"SER Production S",reg:"SER",div:"Production",cat:"S",members:[{num:"155",firstName:"Ljubisa",lastName:"Momcilovic",cat:"S"}]},
+  {key:"SER_Production_Optics_OVR",name:"SER Production Optics",reg:"SER",div:"Production Optics",cat:"",members:[{num:"151",firstName:"Luka",lastName:"Bankovic",cat:""},{num:"669",firstName:"Branislav",lastName:"Bulatović",cat:""},{num:"670",firstName:"Dejan",lastName:"Stamenković",cat:""},{num:"1026",firstName:"Marjan",lastName:"Džonić",cat:""}]},
+  {key:"SER_Standard_S",name:"SER Standard S",reg:"SER",div:"Standard",cat:"S",members:[{num:"149",firstName:"Vukota",lastName:"Djukic",cat:"S"},{num:"152",firstName:"Vladimir",lastName:"Djukanovic",cat:"S"},{num:"166",firstName:"Slavko",lastName:"Obradović",cat:"S"},{num:"167",firstName:"Dragan",lastName:"Barasin",cat:"S"}]},
+  {key:"SLO_Production_S",name:"SLO Production S",reg:"SLO",div:"Production",cat:"S",members:[{num:"654",firstName:"Niko",lastName:"Legat",cat:"S"},{num:"655",firstName:"Viljem",lastName:"Dovžan",cat:"S"},{num:"656",firstName:"Savo",lastName:"Stjepanovic",cat:"S"},{num:"671",firstName:"Hubert",lastName:"Šlosar",cat:"S"}]},
+  {key:"SUI_Open_OVR",name:"SUI Open",reg:"SUI",div:"Open",cat:"",members:[{num:"424",firstName:"Dave",lastName:"Wäfler",cat:""},{num:"425",firstName:"Erol",lastName:"Ryant",cat:""},{num:"429",firstName:"Patrick",lastName:"Habegger",cat:""}]},
+  {key:"SUI_Open_S",name:"SUI Open S",reg:"SUI",div:"Open",cat:"S",members:[{num:"422",firstName:"Dominic",lastName:"Meier",cat:"S"}]},
+  {key:"SUI_Production_OVR",name:"SUI Production",reg:"SUI",div:"Production",cat:"",members:[{num:"517",firstName:"Christoph",lastName:"Bitterli",cat:""},{num:"574",firstName:"Manuel",lastName:"Schneider",cat:""}]},
+  {key:"SUI_Production_S",name:"SUI Production S",reg:"SUI",div:"Production",cat:"S",members:[{num:"427",firstName:"Karl",lastName:"Haeussler",cat:"S"},{num:"428",firstName:"Mathias",lastName:"Röthenmund",cat:"S"}]},
+  {key:"SVK_Optics_OVR",name:"SVK Optics",reg:"SVK",div:"Optics",cat:"",members:[{num:"1379",firstName:"Pavol",lastName:"Ženčár",cat:""},{num:"1382",firstName:"Marian",lastName:"Fedor",cat:""},{num:"1385",firstName:"Dusan",lastName:"Kubica",cat:""},{num:"1387",firstName:"Ľuboš",lastName:"Adamec",cat:""}]},
+  {key:"SVK_Production_J",name:"SVK Production J",reg:"SVK",div:"Production",cat:"J",members:[{num:"1375",firstName:"Tomáš",lastName:"Chmúra",cat:"J"}]},
+  {key:"SVK_Production_S",name:"SVK Production S",reg:"SVK",div:"Production",cat:"S",members:[{num:"1388",firstName:"Marian",lastName:"Vyšný",cat:"S"}]},
+  {key:"SVK_Production_SJ",name:"SVK Production SJ",reg:"SVK",div:"Production",cat:"SJ",members:[{num:"1377",firstName:"Peter",lastName:"Polák",cat:"SJ"}]},
+  {key:"SVK_Production_Optics_OVR",name:"SVK Production Optics",reg:"SVK",div:"Production Optics",cat:"",members:[{num:"1391",firstName:"Marian",lastName:"Bednarik",cat:""},{num:"1394",firstName:"Vojtech",lastName:"Drienik",cat:""}]},
+  {key:"SVK_Production_Optics_SS",name:"SVK Production Optics SS",reg:"SVK",div:"Production Optics",cat:"SS",members:[{num:"1378",firstName:"Jan",lastName:"Palka",cat:"SS"}]},
+  {key:"SVK_Standard_OVR",name:"SVK Standard",reg:"SVK",div:"Standard",cat:"",members:[{num:"1390",firstName:"Marek",lastName:"Zach",cat:""}]},
+  {key:"SVK_Standard_SJ",name:"SVK Standard SJ",reg:"SVK",div:"Standard",cat:"SJ",members:[{num:"1383",firstName:"Patrik",lastName:"Selucky",cat:"SJ"},{num:"1386",firstName:"Dušan",lastName:"Sčensný",cat:"SJ"},{num:"1392",firstName:"Ryan",lastName:"Hladik",cat:"SJ"}]},
+  {key:"SWE_Open_OVR",name:"SWE Open",reg:"SWE",div:"Open",cat:"",members:[{num:"1219",firstName:"Albin",lastName:"Hylander",cat:""},{num:"1222",firstName:"Peter",lastName:"Kastell",cat:""},{num:"1228",firstName:"Erik",lastName:"Stjernlöf",cat:""},{num:"1231",firstName:"Frans",lastName:"Vonasek",cat:""}]},
+  {key:"SWE_Open_S",name:"SWE Open S",reg:"SWE",div:"Open",cat:"S",members:[{num:"1223",firstName:"Jari",lastName:"Kurttio",cat:"S"},{num:"1350",firstName:"Per",lastName:"Forsling",cat:"S"},{num:"1451",firstName:"Daniel",lastName:"Holmberg",cat:"S"}]},
+  {key:"SWE_Open_SS",name:"SWE Open SS",reg:"SWE",div:"Open",cat:"SS",members:[{num:"1216",firstName:"JOHAN",lastName:"HANSEN",cat:"SS"}]},
+  {key:"SWE_Optics_OVR",name:"SWE Optics",reg:"SWE",div:"Optics",cat:"",members:[{num:"1217",firstName:"Fredric",lastName:"Hidesand",cat:""},{num:"1349",firstName:"Joacim",lastName:"Eriksson",cat:""},{num:"1355",firstName:"Jimmy",lastName:"With",cat:""},{num:"1467",firstName:"Adam",lastName:"Bäckman",cat:""}]},
+  {key:"SWE_Production_OVR",name:"SWE Production",reg:"SWE",div:"Production",cat:"",members:[{num:"996",firstName:"Ricardo",lastName:"Soler",cat:""},{num:"997",firstName:"Robert",lastName:"Becker",cat:""},{num:"999",firstName:"Carl",lastName:"Danielson",cat:""},{num:"1369",firstName:"Jim",lastName:"Andersson",cat:""}]},
+  {key:"SWE_Production_L",name:"SWE Production L",reg:"SWE",div:"Production",cat:"L",members:[{num:"1001",firstName:"Alexandra",lastName:"Shamloo",cat:"L"},{num:"1453",firstName:"Saga",lastName:"Yousefian Johansson",cat:"L"},{num:"1520",firstName:"Maria",lastName:"Assenhöj",cat:"L"}]},
+  {key:"SWE_Production_Optics_OVR",name:"SWE Production Optics",reg:"SWE",div:"Production Optics",cat:"",members:[{num:"981",firstName:"David",lastName:"Levin",cat:""},{num:"982",firstName:"Rasmus",lastName:"Gyllenberg",cat:""},{num:"983",firstName:"Daniel",lastName:"Johnson",cat:""},{num:"1357",firstName:"Tobias",lastName:"Åström",cat:""}]},
+  {key:"SWE_Production_Optics_S",name:"SWE Production Optics S",reg:"SWE",div:"Production Optics",cat:"S",members:[{num:"985",firstName:"Marcus",lastName:"Skogstrom",cat:"S"},{num:"986",firstName:"Jiro",lastName:"Nihei",cat:"S"},{num:"1215",firstName:"Patrik",lastName:"Gren",cat:"S"}]},
+  {key:"SWE_Production_Optics_SS",name:"SWE Production Optics SS",reg:"SWE",div:"Production Optics",cat:"SS",members:[{num:"987",firstName:"Niclas",lastName:"Dal",cat:"SS"},{num:"988",firstName:"Stefan",lastName:"Ekstedt",cat:"SS"},{num:"989",firstName:"Kent",lastName:"Stangvik",cat:"SS"},{num:"1220",firstName:"Stefan",lastName:"Johannesson",cat:"SS"}]},
+  {key:"SWE_Standard_OVR",name:"SWE Standard",reg:"SWE",div:"Standard",cat:"",members:[{num:"1214",firstName:"Simon",lastName:"Fant",cat:""},{num:"1224",firstName:"Nicola",lastName:"Lo Presti",cat:""},{num:"1225",firstName:"Anders",lastName:"Långberg",cat:""}]},
+  {key:"SWE_Standard_L",name:"SWE Standard L",reg:"SWE",div:"Standard",cat:"L",members:[{num:"1463",firstName:"Sandra",lastName:"Arbinger",cat:"L"}]},
+  {key:"SWE_Standard_S",name:"SWE Standard S",reg:"SWE",div:"Standard",cat:"S",members:[{num:"1221",firstName:"Mats",lastName:"Karlsson",cat:"S"},{num:"1452",firstName:"Kent",lastName:"Westerlund",cat:"S"},{num:"1466",firstName:"Ronny",lastName:"Andreassen",cat:"S"}]},
+  {key:"SWE_Standard_SS",name:"SWE Standard SS",reg:"SWE",div:"Standard",cat:"SS",members:[{num:"1354",firstName:"Per-Arne",lastName:"Svensson",cat:"SS"}]},
+  {key:"UKR_Production_Optics_OVR",name:"UKR Production Optics",reg:"UKR",div:"Production Optics",cat:"",members:[{num:"1011",firstName:"Oleksii",lastName:"Dudenko",cat:""},{num:"1012",firstName:"Pavlo",lastName:"Varhanov",cat:""},{num:"1036",firstName:"Oleksandr",lastName:"Fedorchuk",cat:""},{num:"1037",firstName:"Orest",lastName:"Senyshyn",cat:""}]},
 ];
 
-// ─── Import logic ────────────────────────────────────────────────────────────
+// NOR individual (non-team) shooters for import only
+const NOR_INDIVIDUALS = [
+  {num:"367",firstName:"Alvin",lastName:"Alforte",div:"Open",cat:""},
+  {num:"685",firstName:"Henning",lastName:"Wallgren",div:"Open",cat:""},
+  {num:"380",firstName:"Lars",lastName:"Mork",div:"Production",cat:""},
+  {num:"371",firstName:"Renate",lastName:"Sand",div:"Standard",cat:"L"},
+  {num:"372",firstName:"Anna Louise",lastName:"Axelsen",div:"Standard",cat:"L"},
+  {num:"373",firstName:"Lars-Einar",lastName:"Kjøren",div:"Optics",cat:""},
+  {num:"1374",firstName:"Kjeld Joakim",lastName:"Kjøren",div:"Optics",cat:"GJ"},
+];
+
+// NOR_TEAMS alias for import tab (NOR entries from ALL_TEAMS)
+const NOR_TEAMS = ALL_TEAMS.filter(t => t.reg === 'NOR');
+
+// Flat list of NOR shooters for display in import tab
+const NOR_ALL = (() => {
+  const all = [];
+  NOR_TEAMS.forEach(t => t.members.forEach(m => {
+    all.push({...m, div:t.div, reg:'NOR', teamKey:t.key, teamName:t.name, isTeam:true});
+  }));
+  NOR_INDIVIDUALS.forEach(s => all.push({...s, reg:'NOR', teamKey:null, teamName:null, isTeam:false}));
+  return all;
+})();
+
+
+// ─── Import logic (NOR only) ─────────────────────────────────────────────────
 let selectedNums = new Set();
 
-// Populate nation dropdown
-const nations = [...new Set(EHC_SHOOTERS.map(s=>s.reg))].sort();
-const regSel = document.getElementById('filter-reg');
-nations.forEach(n => {
-  const o = document.createElement('option');
-  o.value = n; o.textContent = `${countryFlag(n)} ${n}`;
-  regSel.appendChild(o);
-});
-
 window.renderImportList = () => {
-  const filterReg = document.getElementById('filter-reg').value;
   const filterDiv = document.getElementById('filter-div').value;
   const search = document.getElementById('import-search').value.toLowerCase();
 
-  let shooters = EHC_SHOOTERS.filter(s => {
-    if (filterReg && s.reg !== filterReg) return false;
+  let shooters = NOR_ALL.filter(s => {
     if (filterDiv && s.div !== filterDiv) return false;
     if (search && !(`${s.firstName} ${s.lastName}`).toLowerCase().includes(search)) return false;
     return true;
   });
 
-  // Group by nation then division
-  const byNation = {};
+  // Group: teams first (by teamName), then individuals
+  const teamGroups = {};
+  const individuals = [];
   shooters.forEach(s => {
-    if (!byNation[s.reg]) byNation[s.reg] = {};
-    if (!byNation[s.reg][s.div]) byNation[s.reg][s.div] = [];
-    byNation[s.reg][s.div].push(s);
+    if (s.isTeam) {
+      if (!teamGroups[s.teamKey]) teamGroups[s.teamKey] = {name: s.teamName, div: s.div, members: []};
+      teamGroups[s.teamKey].members.push(s);
+    } else {
+      individuals.push(s);
+    }
   });
 
   const container = document.getElementById('import-list');
-  container.innerHTML = Object.keys(byNation).sort().map(reg => {
-    const divs = byNation[reg];
-    const total = Object.values(divs).flat().length;
-    const divHtml = Object.keys(divs).sort().map(div => {
-      const list = divs[div].map(s => {
-        const checked = selectedNums.has(s.num) ? 'checked' : '';
-        return `<div class="import-shooter-row">
-          <input type="checkbox" class="import-checkbox" value="${s.num}" ${checked}
-            onchange="toggleShooter('${s.num}')">
-          <div class="import-shooter-name">${s.firstName} ${s.lastName}</div>
-          <div class="import-shooter-meta">#${s.num}${s.cat?' · '+s.cat:''}</div>
-        </div>`;
-      }).join('');
-      return `<div class="div-group-label">${div}</div>${list}`;
+  let html = '';
+
+  // Render team blocks
+  Object.entries(teamGroups).forEach(([key, grp]) => {
+    const memberHtml = grp.members.map(s => {
+      const checked = selectedNums.has(s.num) ? 'checked' : '';
+      return `<div class="import-shooter-row">
+        <input type="checkbox" class="import-checkbox" value="${s.num}" ${checked}
+          onchange="toggleShooter('${s.num}')">
+        <div class="import-shooter-name">${s.firstName} ${s.lastName}</div>
+        <div class="import-shooter-meta">#${s.num}${s.cat?' · '+s.cat:''}</div>
+      </div>`;
     }).join('');
-    return `
+
+    html += `
     <div class="nation-block">
       <div class="nation-header" onclick="toggleNation(this)">
-        <div class="nation-flag">${countryFlag(reg)}</div>
-        <div class="nation-name">${reg}</div>
-        <div class="nation-count">${total} shooters</div>
+        <div class="nation-flag">🇳🇴</div>
+        <div class="nation-name">${grp.name}</div>
+        <div class="nation-count">${grp.members.length} shooters · <span style="color:var(--accent)">LAG</span></div>
         <div class="nation-arrow">▶</div>
       </div>
-      <div class="nation-shooters">${divHtml}</div>
+      <div class="nation-shooters">${memberHtml}</div>
     </div>`;
-  }).join('');
+  });
 
+  // Render individuals block
+  if (individuals.length) {
+    const indHtml = individuals.map(s => {
+      const checked = selectedNums.has(s.num) ? 'checked' : '';
+      return `<div class="import-shooter-row">
+        <input type="checkbox" class="import-checkbox" value="${s.num}" ${checked}
+          onchange="toggleShooter('${s.num}')">
+        <div class="import-shooter-name">${s.firstName} ${s.lastName}</div>
+        <div class="import-shooter-meta">#${s.num} · ${s.div}${s.cat?' · '+s.cat:''}</div>
+      </div>`;
+    }).join('');
+    html += `
+    <div class="nation-block">
+      <div class="nation-header" onclick="toggleNation(this)">
+        <div class="nation-flag">🇳🇴</div>
+        <div class="nation-name">NOR Individuelle</div>
+        <div class="nation-count">${individuals.length} shooters · <span style="color:var(--muted)">ingen lag</span></div>
+        <div class="nation-arrow">▶</div>
+      </div>
+      <div class="nation-shooters">${indHtml}</div>
+    </div>`;
+  }
+
+  container.innerHTML = html || '<div class="empty-state" style="padding:24px;text-align:center;color:var(--muted)">Ingen treff</div>';
   updateSelCount();
 };
 
@@ -1162,73 +915,84 @@ function updateSelCount() {
 
 window.doImport = async () => {
   const matchId = document.getElementById('import-match-select').value;
-  if (!matchId) { showToast('Select a match first', 'error'); return; }
-  if (!selectedNums.size) { showToast('Select at least one shooter', 'error'); return; }
+  if (!matchId) { showToast('Velg en match først', 'error'); return; }
+  if (!selectedNums.size) { showToast('Velg minst én skytter', 'error'); return; }
 
   const match = allMatches.find(m => String(m.id) === String(matchId));
-  if (!match) { showToast('Match not found', 'error'); return; }
+  if (!match) { showToast('Match ikke funnet', 'error'); return; }
 
-  const toImport = EHC_SHOOTERS.filter(s => selectedNums.has(s.num));
   const existingShooters = [...(match.shooters || [])];
   const existingTeams = [...(match.teams || [])];
-
-  // Build shooter objects for new shooters only
   const existingNums = new Set(existingShooters.map(s => s.ehcNum).filter(Boolean));
-  const newShooters = toImport.filter(s => !existingNums.has(s.num)).map(s => ({
-    id: 'ehc_' + s.num,
-    isMe: false,
-    uid: null,
-    firstName: s.firstName,
-    lastName: s.lastName,
-    division: s.div,
-    pf: 'minor',
-    club: '',
-    ehcNum: s.num,
-    ehcReg: s.reg,
-    stages: []
-  }));
 
-  // Build/update teams: one team per (nation, division)
+  // Build new shooter objects (skip duplicates)
+  const toImport = NOR_ALL.filter(s => selectedNums.has(s.num));
+  // Also include non-NOR selected shooters via ALL_TEAMS
+  const allTeamMembers = [];
+  ALL_TEAMS.forEach(t => t.members.forEach(m => allTeamMembers.push({...m, div:t.div, reg:t.reg})));
+  const allSelectable = [...NOR_ALL, ...allTeamMembers.filter(m => !NOR_ALL.some(n => n.num === m.num))];
+
+  const newShooters = allSelectable
+    .filter(s => selectedNums.has(s.num) && !existingNums.has(s.num))
+    .map(s => ({
+      id: 'ehc_' + s.num,
+      isMe: false,
+      uid: null,
+      firstName: s.firstName,
+      lastName: s.lastName,
+      division: s.div,
+      pf: 'minor',
+      club: '',
+      ehcNum: s.num,
+      ehcReg: s.reg || 'NOR',
+      stages: []
+    }));
+
+  // Build teams from ALL_TEAMS — only for teams where at least one member is selected
   const teamMap = {};
   existingTeams.forEach(t => { if (t.ehcKey) teamMap[t.ehcKey] = t; });
 
-  toImport.forEach(s => {
-    const key = `${s.reg}_${s.div}`;
-    if (!teamMap[key]) {
-      teamMap[key] = {
-        id: 'ehcteam_' + key,
-        name: `${s.reg} ${s.div}`,
-        country: s.reg,
+  ALL_TEAMS.forEach(teamDef => {
+    const teamMemberIds = teamDef.members
+      .filter(m => selectedNums.has(m.num))
+      .map(m => 'ehc_' + m.num);
+    if (!teamMemberIds.length) return;
+
+    if (!teamMap[teamDef.key]) {
+      teamMap[teamDef.key] = {
+        id: 'ehcteam_' + teamDef.key,
+        name: teamDef.name,
+        country: teamDef.reg,
         shooterIds: [],
-        ehcKey: key
+        ehcKey: teamDef.key,
+        ehcDiv: teamDef.div,
+        ehcCat: teamDef.cat
       };
     }
-    const shooterId = 'ehc_' + s.num;
-    if (!teamMap[key].shooterIds.includes(shooterId)) {
-      teamMap[key].shooterIds.push(shooterId);
-    }
+    teamMemberIds.forEach(id => {
+      if (!teamMap[teamDef.key].shooterIds.includes(id)) {
+        teamMap[teamDef.key].shooterIds.push(id);
+      }
+    });
   });
-
-  // Enforce max 4 per team (keep first 4)
-  Object.values(teamMap).forEach(t => { if (t.shooterIds.length > 4) t.shooterIds = t.shooterIds.slice(0,4); });
 
   const updatedShooters = [...existingShooters, ...newShooters];
   const updatedTeams = Object.values(teamMap);
 
   const progEl = document.getElementById('import-progress');
-  progEl.textContent = 'Saving…';
+  progEl.textContent = 'Lagrer…';
 
   try {
     await updateDoc(doc(db, 'matches', matchId.toString()), {
       shooters: updatedShooters,
       teams: updatedTeams
     });
-    showToast(`✓ Imported ${newShooters.length} shooters, ${updatedTeams.length} teams`, 'success');
+    showToast(`✓ ${newShooters.length} skyttere, ${updatedTeams.length} lag importert`, 'success');
     progEl.textContent = '';
     selectedNums.clear();
     renderImportList();
   } catch(e) {
-    showToast('Error: ' + e.message, 'error');
+    showToast('Feil: ' + e.message, 'error');
     progEl.textContent = '';
   }
 };
@@ -1241,7 +1005,7 @@ function showToast(msg, type='success') {
   setTimeout(() => t.className = 'toast', 3000);
 }
 
-// ─── Init import list ─────────────────────────────────────────────────────────
+// ─── Init ─────────────────────────────────────────────────────────────────────
 renderImportList();
 
 </script>

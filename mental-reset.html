@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Mental Reset – Etter en Fuck Up</title>
+<style>
+:root { --red:#c91f2f; --dark:#151515; --ink:#f8f8f8; --muted:#d8d8d8; --line:#3b3b3b; --gold:#f2c14e; }
+* { box-sizing:border-box; }
+body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--ink); background:linear-gradient(135deg,#8f111d 0%,#d22535 42%,#151515 100%); }
+.bg { min-height:100vh; background-image: radial-gradient(circle at 18% 15%, rgba(255,255,255,.12), transparent 22%), repeating-linear-gradient(88deg, rgba(0,0,0,.16) 0 2px, transparent 2px 72px); }
+header { padding:28px 28px 18px; border-bottom:4px solid rgba(255,255,255,.18); background:rgba(0,0,0,.38); position:relative; overflow:hidden; }
+header:after { content:""; position:absolute; inset:auto -5% -60px 40%; height:140px; transform:rotate(-8deg); background:linear-gradient(90deg, transparent, rgba(255,255,255,.9), rgba(0,36,125,.9), rgba(255,255,255,.9), rgba(200,16,46,.95)); opacity:.35; }
+.hero { position:relative; z-index:1; display:grid; grid-template-columns:minmax(210px,260px) minmax(0,1fr); align-items:start; gap:30px; max-width:1400px; margin:0 auto; }
+.logo-stack { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+.hero-text { min-width:0; padding-top:2px; }
+.logo-placeholder { background:#fff; border-radius:50%; width:112px; height:112px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,.35); flex-shrink:0; }
+.logo-placeholder span { font-size:2rem; font-weight:900; color:var(--red); letter-spacing:-.04em; }
+h1 { margin:0; font-size:clamp(2rem,4vw,4.2rem); letter-spacing:.04em; text-transform:uppercase; line-height:1; }
+.lead { margin:.6rem 0 0; font-size:1.05rem; color:#fff; max-width:900px; }
+.badges { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+.pill { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border:1px solid rgba(255,255,255,.55); border-radius:999px; background:rgba(0,0,0,.35); color:#fff; font-weight:700; font-size:.82rem; letter-spacing:.04em; white-space:nowrap; }
+.pill.gold { border-color:rgba(242,193,78,.7); background:rgba(242,193,78,.15); color:var(--gold); }
+.pill.step { background:rgba(201,31,47,.45); border-color:rgba(201,31,47,.7); }
+main { max-width:1400px; margin:0 auto; padding:24px 18px 60px; }
+
+/* Kollapsbare kort */
+details.card { display:block; background:rgba(10,10,10,.82); border:1px solid rgba(255,255,255,.18); border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.30); margin-bottom:20px; overflow:hidden; }
+details.card > summary.card-head { list-style:none; cursor:pointer; user-select:none; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 20px; background:linear-gradient(90deg, rgba(0,0,0,.94), rgba(201,31,47,.55)); border-bottom:1px solid rgba(255,255,255,.16); }
+details.card > summary.card-head::-webkit-details-marker { display:none; }
+details.card > summary.card-head::after { content:"Åpne"; display:inline-flex; align-items:center; justify-content:center; min-width:68px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.35); background:rgba(0,0,0,.28); font-size:.78rem; font-weight:800; letter-spacing:.04em; flex-shrink:0; }
+details.card[open] > summary.card-head::after { content:"Lukk"; }
+details.card:not([open]) { margin-bottom:12px; }
+details.card:not([open]) > summary.card-head { border-bottom:none; }
+details.card h2 { margin:0; font-size:1.4rem; letter-spacing:.02em; text-transform:uppercase; }
+.sub { margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
+
+/* Kortinnhold */
+.card-body { padding:20px 24px 24px; }
+.card-body p { margin:.6rem 0; line-height:1.7; color:var(--ink); }
+.card-body p.ingress { font-size:1.08rem; font-weight:600; color:#fff; margin-bottom:14px; }
+
+/* Teoriboks */
+.theory-box { margin-top:18px; padding:14px 16px; border-radius:14px; background:rgba(242,193,78,.10); border:1px solid rgba(242,193,78,.38); border-left:5px solid var(--gold); }
+.theory-box .theory-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--gold); font-weight:800; margin-bottom:6px; }
+.theory-box p { margin:.4rem 0; font-size:.9rem; color:var(--muted); line-height:1.55; }
+
+/* Steg-grid */
+.step-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; margin-top:16px; }
+.step-item { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px 16px; }
+.step-item .step-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--gold); font-weight:800; margin-bottom:6px; }
+.step-item p { margin:0; font-size:.92rem; line-height:1.55; }
+
+/* Kommando-boks */
+.command-box { margin-top:18px; display:flex; flex-wrap:wrap; gap:10px; }
+.cmd-pill { display:inline-flex; align-items:center; padding:10px 18px; border-radius:999px; background:rgba(201,31,47,.35); border:2px solid rgba(201,31,47,.7); color:#fff; font-size:1.1rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+
+/* Anker-eksempler */
+.anker-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.anker-item { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); border-radius:10px; padding:7px 14px; font-size:.88rem; color:var(--ink); }
+
+/* Referanser */
+.ref-list { margin:12px 0 0; padding-left:0; list-style:none; }
+.ref-list li { font-size:.82rem; color:var(--muted); line-height:1.6; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+.ref-list li:last-child { border-bottom:none; }
+
+footer { max-width:1400px; margin:0 auto; padding:0 18px 30px; color:#f3f3f3; opacity:.88; font-size:.85rem; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns:1fr; gap:14px; }
+  .logo-placeholder { width:72px; height:72px; }
+  .logo-placeholder span { font-size:1.3rem; }
+  h1 { font-size:clamp(1.8rem,8vw,3rem); }
+  .lead { font-size:.98rem; }
+  .step-grid { grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .step-grid { grid-template-columns:1fr; }
+}
+@media print {
+  body { background:#fff; color:#111; }
+  .bg, header, main, footer { background:#fff; color:#111; }
+  header { border-bottom:2px solid #111; }
+  details.card { box-shadow:none; border:1px solid #999; background:#fff; color:#111; break-inside:avoid; }
+  details.card > summary.card-head { background:#eee; color:#111; }
+  details.card > summary.card-head::after { display:none; }
+  .pill { color:#111; border-color:#555; background:#fff; }
+  .theory-box { background:#fff8dc; border-color:#999; }
+  .step-item { background:#f5f5f5; border-color:#ccc; }
+  .cmd-pill { background:#eee; border-color:#aaa; color:#111; }
+  .anker-item { background:#f5f5f5; border-color:#ccc; }
+}
+</style>
+</head>
+<body>
+<div class="bg">
+
+<header>
+<div class="hero">
+  <div class="logo-stack">
+    <div class="logo-placeholder"><span>IPSC</span></div>
+  </div>
+  <div class="hero-text">
+    <h1>Mental Reset</h1>
+    <p class="lead">Etter en Fuck Up — en praktisk protokoll for å nullstille hodet og komme tilbake i fokus</p>
+    <div class="badges">
+      <span class="pill">IPSC</span>
+      <span class="pill">Prestasjonpsykologi</span>
+      <span class="pill gold">4 steg</span>
+      <span class="pill">Kognitiv defusjon</span>
+    </div>
+  </div>
+</div>
+</header>
+
+<main>
+
+<!-- STEG 1 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 1 — Fuck ups skjer</h2>
+    <div class="sub">
+      <span class="pill step">AKSEPT</span>
+      <span class="pill">Normalisering</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Fuck ups skjer. Det er en del av sporten.</p>
+  <p>Alle skytere gjør feil — enten det er en teknisk bommert, en dårlig transisjon eller et mentalt sammenbrudd midt i en stage. Feil er ikke unntaket, de er en del av konkurransen.</p>
+  <p>Det som skiller eliteskyttere fra resten er ikke at de aldri feiler — det er <strong>hastigheten og kvaliteten på resetten etterpå</strong>.</p>
+  <div class="theory-box">
+    <div class="theory-label">Teoretisk forankring</div>
+    <p>Det som skiller eliteutøvere fra andre er ikke fraværet av feil, men hastigheten og kvaliteten på den mentale resetten etterpå <em>(Zaro, 2026)</em>.</p>
+    <p>Selvmedfølelse — ikke hard selvkritikk — fører til raskere prestasjonsrecovery <em>(Zaro, 2026)</em>.</p>
+  </div>
+</div>
+</details>
+
+<!-- STEG 2 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 2 — Faktuelt</h2>
+    <div class="sub">
+      <span class="pill step">ANALYSE</span>
+      <span class="pill">Evaluering</span>
+      <span class="pill">Ikke overanalyse</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Ta kun det fakta du trenger — raskt og presist. Tre spørsmål, ikke flere.</p>
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">HVA?</div>
+      <p>Hva skjedde konkret? Beskriv hendelsen nøytralt — ikke tolkninger, ikke følelser. Bare fakta.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">HVORFOR?</div>
+      <p>Hva var årsaken? Teknikk, timing, fokus, spenning? Én enkel årsak.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">JUSTERES?</div>
+      <p>Hva justerer du konkret nå — på neste stage? Én konkret handling.</p>
+    </div>
+  </div>
+  <div class="theory-box">
+    <div class="theory-label">Teoretisk forankring — Evaluering vs. overanalyse</div>
+    <p>Evaluering er å gjennomgå hva som skjedde og spørre: «hvordan kan jeg justere?» — og deretter <em>velge</em> å ikke spole tilbake mer. Overanalyse er å tolke hva feilen betyr om deg som skytter. Det tjener aldri prestasjonen <em>(Maximize the Mind, 2025)</em>.</p>
+  </div>
+</div>
+</details>
+
+<!-- STEG 3 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 3 — Akseptere + fysisk reset</h2>
+    <div class="sub">
+      <span class="pill step">ACT</span>
+      <span class="pill">Kognitiv defusjon</span>
+      <span class="pill">Fysisk anker</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Aksepter det som skjedde. Bruk en fysisk handling for å markere at du legger det bak deg.</p>
+  <p>Aksept betyr ikke at du er likegyldig — det betyr at du velger å ikke la hendelsen styre resten av skyting. Du <strong>observerer</strong> tanken, men lar den ikke bestemme.</p>
+
+  <div class="theory-box">
+    <div class="theory-label">ACT — Acceptance and Commitment Therapy</div>
+    <p>Aksept innebærer å innta en åpen holdning til enhver tanke eller følelse som oppstår — uten å dømme dem som positive eller negative, og <strong>uten å la dem styre atferden</strong> <em>(Hayes et al., 2012)</em>.</p>
+    <p>Kognitiv defusjon: lær å observere tanker og følelser på avstand, fremfor å identifisere deg med dem. La tankene komme og gå — de er hendelser i sinnet, ikke sannheter <em>(Assaz et al., 2018)</em>.</p>
+  </div>
+
+  <p style="margin-top:18px; font-weight:600; color:#fff;">Fysisk anker — eksempler:</p>
+  <div class="anker-list">
+    <div class="anker-item">🤜 Knytt nevene</div>
+    <div class="anker-item">👏 Klapp i hender</div>
+    <div class="anker-item">🔵 Ta på ankerpunktet</div>
+    <div class="anker-item">✊ Tap på holster</div>
+    <div class="anker-item">💨 Kontrollert pust</div>
+    <div class="anker-item">🔄 Snu deg vekk fra banen</div>
+  </div>
+
+  <div class="theory-box" style="margin-top:16px;">
+    <div class="theory-label">Ankerpunktet — fysisk signal</div>
+    <p>Et konkret objekt eller bevegelse — som å ta på noe, knytte nevene eller bruke et armbånd — kan fungere som et «anker» som hjelper utøveren å låse inn et commitment til neste utførelse <em>(Alive Counselling, 2025)</em>.</p>
+    <p>Disse lille, intensjonelle bevegelsene tar fokuset bort fra det som nettopp skjedde i et øyeblikk, og signaliserer til kroppen at det er tid for å gå videre <em>(CoachUp Nation, 2025)</em>.</p>
+  </div>
+</div>
+</details>
+
+<!-- STEG 4 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 4 — Fuck it. Reload. Execute.</h2>
+    <div class="sub">
+      <span class="pill step">KOMMANDO</span>
+      <span class="pill">Cue-ord</span>
+      <span class="pill">Kroppslig fokus</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Enkle ord som fungerer som kommandoer — trent inn, automatisert, presist.</p>
+  <div class="command-box">
+    <span class="cmd-pill">Fuck it</span>
+    <span class="cmd-pill">Reload</span>
+    <span class="cmd-pill">Rest</span>
+    <span class="cmd-pill">Execute</span>
+  </div>
+  <p style="margin-top:16px;">Ordene er ikke tilfeldige. De er <strong>cue-ord</strong> — bundet til en spesifikk mental tilstand gjennom trening. Hvert ord er en kommando til nervesystemet om å skifte modus.</p>
+
+  <div class="theory-box">
+    <div class="theory-label">Cue-ord — idrettspsykologisk forankring</div>
+    <p>Cue-ord kobles til en handling, atferd eller emosjonell tilstand — og fungerer som en påminner. <strong>For at dette skal virke under konkurranse, må koblingen trenes inn systematisk</strong> <em>(NFLPA / Nideffer &amp; Sagal, 2006)</em>.</p>
+    <p>En mental reset rydder hodet, eliminerer destruktive tanker og bidrar til raskere beslutningstaking under konkurranse <em>(Peak Performance Sports, 2025)</em>.</p>
+  </div>
+
+  <p style="margin-top:16px; font-weight:600; color:#fff;">Etter reset — kroppslig fokus:</p>
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">Grip</div>
+      <p>Kjenner du pistolen riktig? Aktiver gripen bevisst.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Pust</div>
+      <p>En kontrollert utpust. Slipp spenningen i skuldrene.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Trigger</div>
+      <p>Vis-sikt-trykk. Tilbake til teknikken, ikke til feilen.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Bevegelse</div>
+      <p>Fokus på neste transisjon, neste mål — ikke det forrige.</p>
+    </div>
+  </div>
+</div>
+</details>
+
+<!-- FØLELSER ER INFORMASJON -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Følelser er informasjon — ikke instruksjon</h2>
+    <div class="sub">
+      <span class="pill step">NØKKELPRINSIPP</span>
+      <span class="pill">ACT</span>
+      <span class="pill">Kognitiv defusjon</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Følelser er bare informasjon. De er ikke instruksjon.</p>
+
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">Informasjon ✓</div>
+      <p>«Jeg er frustrert» forteller deg at noe gikk galt. Bruk det som signal — ikke som ordre.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Instruksjon ✗</div>
+      <p>«Jeg er frustrert, derfor må jeg skyte saktere / gi opp / endre alt» — dette er å la følelsen ta kommando.</p>
+    </div>
+  </div>
+
+  <p style="margin-top:14px;">Følelsen <em>registreres</em> — og <em>legges bort</em>. Du velger selv hva du fokuserer på videre.</p>
+
+  <div class="theory-box">
+    <div class="theory-label">ACT — kognitiv defusjon i idrettspsykologi</div>
+    <p>I ACT lærer utøveren å oppleve tanker og følelser som mentale hendelser, fremfor å se dem som sannheter eller refleksjoner av virkeligheten. Dette kalles <strong>kognitiv defusjon</strong> <em>(Hayes et al., 2012; PST-ACT integrasjon, 2025)</em>.</p>
+    <p>Defusjon innebærer å <em>observere</em> sine tanker og følelser på avstand, fremfor å identifisere seg med dem og bli fanget i dem. Man lærer å la tanker komme og gå <em>(Frontiers in Psychology, NCBi, 2022)</em>.</p>
+  </div>
+
+  <div style="margin-top:18px; padding:14px 16px; border-radius:12px; background:rgba(201,31,47,.15); border:1px solid rgba(201,31,47,.4);">
+    <p style="margin:0; font-size:1.05rem; font-weight:700; color:#fff; text-align:center;">
+      Mindre følelse &nbsp;·&nbsp; Mer fokus &nbsp;·&nbsp; Kroppslig fokus
+    </p>
+  </div>
+</div>
+</details>
+
+<!-- BESTEMME FOKUS -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Bestemme fokus</h2>
+    <div class="sub">
+      <span class="pill step">ATTENSJON</span>
+      <span class="pill">Nideffer-modellen</span>
+      <span class="pill">God følelse</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Vi må bestemme oss for hva vi skal fokusere på. Fokus er en aktiv beslutning — ikke noe som bare skjer.</p>
+
+  <p><strong>God følelse — definer den:</strong> Hva kjenner du i kroppen når du skyter bra? Grip, stillstand, øyekontakt på siktet, trigger-trykk. Gjenfinn den følelsen bevisst.</p>
+
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">Smal intern</div>
+      <p>Fokus på ett element i teknikken: grip, pust, trigger. Brukes ved presisjonskrevende utførelse.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Smal ekstern</div>
+      <p>Fokus på ett konkret punkt utenfor kroppen: målet, siktet, neste bevegelse.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Bred intern</div>
+      <p>Oversikt over egen kropp og tilstand — brukes i planlegging mellom stages.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Bred ekstern</div>
+      <p>Lese banen, forstå stage-designet, planlegge løp. Brukes i stage-walk.</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <div class="theory-label">Nideffer-modellen (1976) — oppmerksomhetskontroll</div>
+    <p>Nidefffers modell foreslår at utøvere til enhver tid befinner seg i én av fire oppmerksomhetsdimensjoner. <strong>Evnen til å skifte oppmerksomhet til det som er nødvendig i kritiske øyeblikk er veldokumentert</strong> <em>(Nideffer &amp; Sagal, 2006; Medicine LibreTexts, 2025)</em>.</p>
+    <p>Cue-ord paret med spesifikke fokustyper — for eksempel «sikt» som trigger for smal-ekstern fokus — kan trenes inn slik at skiftet skjer automatisk <em>(NFLPA / Nideffer, 2006)</em>.</p>
+  </div>
+</div>
+</details>
+
+<!-- REFERANSER -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Referanser (APA 7)</h2>
+    <div class="sub">
+      <span class="pill">Idrettspsykologi</span>
+      <span class="pill">ACT</span>
+      <span class="pill">Oppmerksomhet</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <ul class="ref-list">
+    <li>Assaz, D. A., Roche, B., Kanter, J. W., &amp; Oshiro, C. K. B. (2018). Cognitive defusion in acceptance and commitment therapy: What are the basic processes? <em>The Psychological Record, 68</em>(2), 405–418. https://doi.org/10.1007/s40732-017-0254-z</li>
+    <li>Gardner, F. L., &amp; Moore, Z. E. (2012). Mindfulness and acceptance models in sport psychology: A decade of basic and applied scientific advancements. <em>Canadian Psychology / Psychologie canadienne, 53</em>(4), 309–318. https://doi.org/10.1037/a0030220</li>
+    <li>Hayes, S. C., Strosahl, K. D., &amp; Wilson, K. G. (2012). <em>Acceptance and commitment therapy: The process and practice of mindful change</em> (2nd ed.). Guilford Press.</li>
+    <li>Nideffer, R. M. (1976). <em>The inner athlete: Mind plus muscle for winning</em>. Thomas Crowell.</li>
+    <li>Nideffer, R. M., &amp; Sagal, M. (2006). Concentration and attention control training. In J. M. Williams (Ed.), <em>Applied sport psychology: Personal growth to peak performance</em> (5th ed., pp. 382–403). McGraw-Hill.</li>
+    <li>Ruiz, M. C., Haapanen, S., Tolvanen, A., Robazza, C., &amp; Duda, J. L. (2017). Predicting athletes' functional and dysfunctional emotions: The role of the motivational climate and basic psychological needs. <em>Journal of Sports Sciences, 35</em>(16), 1598–1606. https://doi.org/10.1080/02640414.2016.1225971</li>
+    <li>Zaro, S. (2026, mars). How athletes mentally reset after a loss or setback. https://www.susanzaro.com/site/2026/03/05/setbacks-the-art-of-athletic-recovery/</li>
+    <li>Alive Counselling. (2025). <em>Reset routine for athletes</em>. https://alivecounselling.com/sports-psychology/reset-routine-for-athletes/</li>
+    <li>CoachUp Nation. (2025). <em>Mental reset techniques to keep focus through adversity</em>. https://www.coachup.com/nation/articles/mental-reset-techniques</li>
+    <li>Peak Performance Sports. (2025). <em>How a mental reset can improve your game</em>. https://www.peaksports.com/sports-psychology-blog/how-a-mental-reset-can-improve-your-game/</li>
+    <li>Maximize the Mind. (2025). <em>How to reset after a mistake if you're an athlete</em>. https://maximizethemind.com/how-to-reset-after-a-mistake/</li>
+  </ul>
+</div>
+</details>
+
+</main>
+
+<footer>
+  <p>Mental Reset-protokoll · Basert på idrettspsykologisk forskning · IPSC Classic Division</p>
+</footer>
+
+</div>
+<script>
+(function(){
+  let openedByPrint = [];
+  window.addEventListener('beforeprint', function(){
+    openedByPrint = [];
+    document.querySelectorAll('details.card:not([open])').forEach(function(d){ d.setAttribute('open',''); openedByPrint.push(d); });
+  });
+  window.addEventListener('afterprint', function(){ openedByPrint.forEach(function(d){ d.removeAttribute('open'); }); openedByPrint = []; });
+})();
+</script>
+</body>
+</html>

@@ -207,7 +207,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
     <div class="header-icon">🏆</div>
     <div>
       <div class="header-title">EHC 2026 — Team Standings</div>
-      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v7 RESULTS RESTORED</div>
+      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v9 ESS EXTRACTOR</div>
     </div>
     <div class="header-right">
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
@@ -289,8 +289,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   <!-- RESULTS IMPORT TAB -->
   <div class="tab-content" id="tab-results">
     <div class="import-header" style="border-color:var(--accent);box-shadow:0 0 0 1px rgba(201,162,39,.25)">
-      <h3>📥 Import Results from ESS Portal · AKTIV v7</h3>
-      <p>Automatisk import bruker to separate felt: <strong>ESS result URL</strong> er resultatsiden fra IPSC ESS, og <strong>Proxy/API URL</strong> er Cloudflare Worker-adressen. Importen oppdaterer bare <strong>shooter.stages</strong> og endrer aldri lagtilhørighet.</p>
+      <h3>📥 Import Results from ESS Portal · AKTIV v9</h3>
+      <p>Automatisk import kan forsøke proxy, men ESS returnerer ofte portal-/login-side. Mest stabil metode er nå <strong>ESS Extractor Bookmarklet</strong>: åpne resultatsiden mens du er innlogget, kjør extractor, lim resultatet inn her. Importen oppdaterer bare <strong>shooter.stages</strong> og endrer aldri lagtilhørighet.</p>
     </div>
     <div class="match-selector">
       <label>Target match</label>
@@ -309,6 +309,12 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
         <button class="btn btn-primary" onclick="fetchESSResults()">Fetch results</button>
         <button class="btn btn-secondary" onclick="parsePastedESSResults()">Parse pasted text</button>
       </div>
+    </div>
+    <div class="import-header" style="border-left:4px solid var(--accent)">
+      <h3>ESS Extractor Bookmarklet</h3>
+      <p>Bruk denne når Cloudflare/automatisk henting bare får <strong>ECM Members Portal</strong>. Åpne ESS-resultatsiden i nettleseren der du er innlogget, kjør bookmarklet, og lim JSON/tekst inn i feltet under.</p>
+      <textarea class="field-input" style="min-height:94px;font-family:'Share Tech Mono',monospace;white-space:pre-wrap" readonly onclick="this.select()" id="ess-bookmarklet-code">javascript:(()=&gt;{const clean=s=&gt;String(s||'').replace(/\u00a0/g,' ').replace(/[ \t]+/g,' ').trim();const tables=[...document.querySelectorAll('table')].map((t,i)=&gt;({index:i,rows:[...t.querySelectorAll('tr')].map(tr=&gt;[...tr.children].map(td=&gt;clean(td.innerText)))}));const payload={essExtractor:true,version:1,url:location.href,title:document.title,text:document.body?document.body.innerText:'',tables:tables,at:new Date().toISOString()};const out=JSON.stringify(payload,null,2);navigator.clipboard.writeText(out).then(()=&gt;alert('ESS Extractor: data kopiert. Lim inn i team.html → Import Results → Manual fallback.')).catch(()=&gt;{prompt('Kopier teksten:',out);});})();</textarea>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">Tips: Lag et nytt bokmerke i nettleseren, kall det “ESS Extractor”, og lim hele koden over inn som URL/adresse.</div>
     </div>
     <div class="import-header">
       <h3>Manual fallback</h3>
@@ -1198,14 +1204,125 @@ function essExtractVisibleText(raw) {
   return str;
 }
 
+function essNormalizeExtractorPayload(text) {
+  const raw = String(text || '').trim();
+  if (!raw) return '';
+  try {
+    const obj = JSON.parse(raw);
+    if (obj && obj.essExtractor) {
+      const tableText = Array.isArray(obj.tables) ? obj.tables.map(t => (t.rows||[]).map(r => (r||[]).join('\t')).join('\n')).join('\n\n') : '';
+      return [obj.title || '', obj.url || '', tableText, obj.text || ''].filter(Boolean).join('\n\n');
+    }
+  } catch(e) {}
+  return raw;
+}
+
 function parseESSResultsText(text) {
+  text = essNormalizeExtractorPayload(text);
   const match = resultMatch();
   if (!match) { showToast('Velg target match først', 'error'); return; }
+  if (essLooksLikePortalPage(text)) {
+    essParsedResults = [];
+    renderESSPreview(match);
+    setESSStatus('Dette er portalside/eventliste, ikke ESS-resultater. Automatisk henting får ikke selve resultatsiden fra ESS. Prøv full result-compare-lenke eller kopier resultat-/verify-tekst fra skyttersiden.', 'error');
+    return;
+  }
   const parsed = essParseManyCompetitors(text);
   essParsedResults = parsed.map(p => ({...p, matchInfo: matchESSResultToShooter(p, match)}));
   renderESSPreview(match);
   const matched = essParsedResults.filter(r => r.matchInfo && r.matchInfo.confidence === 'exact').length;
   setESSStatus(`Fant ${essParsedResults.length} resultatblokker. ${matched} matcher sikkert på skytternummer.`, matched ? 'success' : 'error');
+}
+
+
+function essLooksLikePortalPage(text) {
+  const t = String(text || '');
+  return /ECM Members Portal|Search Matches|Events Open For Registration|Login to Register|Match Results/i.test(t)
+    && !/\bStage\s+\d+\b/i.test(t)
+    && !/#\s*\d+\s+[^\n]+/m.test(t);
+}
+
+function essDetectSSI(text){
+  if(!text)return false;
+  const lines=String(text).trim().split(/\n/).filter(l=>l.trim());
+  const dataLines=lines.filter(l=>{
+    const t=l.trim();
+    return t && !t.toLowerCase().startsWith('total') && /^[\d\.,]/.test(t);
+  });
+  if(!dataLines.length)return false;
+  const firstCols=dataLines[0].trim().split(/\t+/);
+  return firstCols.length>=5 && !isNaN(parseFloat(firstCols[0].replace(',','.'))) && parseFloat(firstCols[0].replace(',','.'))>0;
+}
+
+function essParseSSIAll(text){
+  if(!text)return[];
+  const lines=String(text).trim().split(/\n/);
+  const rows=[];
+  const pn=s=>parseFloat(String(s||'').replace(/,/g,'.').trim())||0;
+  const pi=s=>parseInt(String(s||'').replace(/,/g,'.').trim())||0;
+  for(const line of lines){
+    const t=line.trim();
+    if(!t || t.toLowerCase().startsWith('total'))continue;
+    const cols=t.split(/\t+/);
+    if(cols.length<8 || isNaN(pn(cols[0])))continue;
+    const hf=pn(cols[0]), time=pn(cols[1]), pts=pi(cols[2]);
+    const a=pi(cols[3]), c=pi(cols[4]), d=pi(cols[5]), miss=pi(cols[6]), proc=pi(cols[7]), ns=cols.length>8?pi(cols[8]):0;
+    if(time>0) rows.push({hf,time,pts,a,c,d,miss,ns,proc});
+  }
+  return rows;
+}
+
+function portalParseAllStages(text){
+  if(!text || !String(text).trim())return null;
+  const raw=String(text).replace(/\r/g,'\n').replace(/\u00a0/g,' ');
+  if(essLooksLikePortalPage(raw))return null;
+
+  if(essDetectSSI(raw)){
+    const ssiRows=essParseSSIAll(raw);
+    if(!ssiRows.length)return null;
+    return {shooterName:'SSI import',firstName:'',lastName:'SSI',division:'',pf:'minor',stages:ssiRows.map((r,i)=>({...r,num:i+1}))};
+  }
+
+  const numMatch = raw.match(/^\s*#?\s*(\d{2,5})\s+([^\n]+)/m) || raw.match(/Competitor\s*(?:No\.?|#|Number)?\s*[:#]?\s*(\d{2,5})/i);
+  let shooterName='Ukjent';
+  if(numMatch && numMatch[2]) shooterName = numMatch[2].trim();
+  const nameHash = raw.match(/#\s*\d+\s+([^\n]+)/);
+  if(nameHash) shooterName = nameHash[1].trim();
+  const divMatch=raw.match(/Division[\s:]+([A-Za-z ]+?)(?:\s+Class|\s+Factor|\s+Category|$)/im);
+  const pfMatch=raw.match(/Factor[\s:]+(Minor|Major)/i);
+  const division=divMatch?divMatch[1].trim():'';
+  const pf=pfMatch?pfMatch[1].toLowerCase():'minor';
+  let firstName='', lastName='';
+  if(shooterName.includes(',')){
+    const parts=shooterName.split(',');
+    lastName=(parts[0]||'').trim(); firstName=(parts.slice(1).join(',')||'').trim();
+  } else {
+    const parts=shooterName.trim().split(/\s+/);
+    firstName=parts.slice(0,-1).join(' '); lastName=parts.slice(-1).join(' ');
+  }
+
+  const stages=[];
+  const lines=raw.split(/\n/);
+  for(const line0 of lines){
+    const line=line0.trim().replace(/,/g,'.');
+    // ESS verify/portal copied line: Stage 01 4.3210 95 10 3 0 0 0 0 21.99
+    let m=line.match(/^Stage\s+(\d+)\s+([\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d.]+)$/i);
+    if(m){
+      stages.push({num:parseInt(m[1]),hf:parseFloat(m[2]),pts:parseInt(m[3]),a:parseInt(m[4]),c:parseInt(m[5]),d:parseInt(m[6]),miss:parseInt(m[7]),ns:parseInt(m[8]),proc:parseInt(m[9]),time:parseFloat(m[10])});
+      continue;
+    }
+    // Looser table fallback: stage number followed by hf/time/points-like columns
+    m=line.match(/^(?:Stage\s*)?(\d+)\s+([\d.]+)\s+([\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+([\d.]+))?$/i);
+    if(m){
+      const hf=parseFloat(m[2]);
+      const maybeTime=parseFloat(m[3]);
+      const pts=parseInt(m[4]);
+      const time=m[10]?parseFloat(m[10]):maybeTime;
+      stages.push({num:parseInt(m[1]),hf,pts,a:parseInt(m[5]),c:parseInt(m[6]),d:parseInt(m[7]),miss:parseInt(m[8]),ns:parseInt(m[9]),proc:0,time});
+    }
+  }
+  if(!stages.length)return null;
+  return {num:numMatch?String(numMatch[1]):'',shooterName,firstName,lastName,division,pf,stages};
 }
 
 function essParseManyCompetitors(text) {

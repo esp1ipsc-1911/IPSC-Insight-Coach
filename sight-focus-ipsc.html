@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Siktfokus under press – IPSC Classic</title>
+<style>
+:root { --red:#c91f2f; --dark:#151515; --ink:#f8f8f8; --muted:#d8d8d8; --line:#3b3b3b; --gold:#f2c14e; }
+* { box-sizing:border-box; }
+body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--ink); background:linear-gradient(135deg,#8f111d 0%,#d22535 42%,#151515 100%); }
+.bg { min-height:100vh; background-image: radial-gradient(circle at 18% 15%, rgba(255,255,255,.12), transparent 22%), repeating-linear-gradient(88deg, rgba(0,0,0,.16) 0 2px, transparent 2px 72px); }
+header { padding:28px 28px 18px; border-bottom:4px solid rgba(255,255,255,.18); background:rgba(0,0,0,.38); position:relative; overflow:hidden; }
+header:after { content:""; position:absolute; inset:auto -5% -60px 40%; height:140px; transform:rotate(-8deg); background:linear-gradient(90deg, transparent, rgba(255,255,255,.9), rgba(0,36,125,.9), rgba(255,255,255,.9), rgba(200,16,46,.95)); opacity:.35; }
+.hero { position:relative; z-index:1; display:grid; grid-template-columns:minmax(210px,260px) minmax(0,1fr); align-items:start; gap:30px; max-width:1400px; margin:0 auto; }
+.logo-stack { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+.hero-text { min-width:0; padding-top:2px; }
+.logo-placeholder { background:#fff; border-radius:50%; width:112px; height:112px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,.35); flex-shrink:0; }
+.logo-placeholder span { font-size:2rem; font-weight:900; color:var(--red); letter-spacing:-.04em; }
+h1 { margin:0; font-size:clamp(2rem,4vw,4.2rem); letter-spacing:.04em; text-transform:uppercase; line-height:1; }
+.lead { margin:.6rem 0 0; font-size:1.05rem; color:#fff; max-width:900px; }
+.badges { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+.pill { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border:1px solid rgba(255,255,255,.55); border-radius:999px; background:rgba(0,0,0,.35); color:#fff; font-weight:700; font-size:.82rem; letter-spacing:.04em; white-space:nowrap; }
+.pill.gold { border-color:rgba(242,193,78,.7); background:rgba(242,193,78,.15); color:var(--gold); }
+.pill.step { background:rgba(201,31,47,.45); border-color:rgba(201,31,47,.7); }
+main { max-width:1400px; margin:0 auto; padding:24px 18px 60px; }
+
+details.card { display:block; background:rgba(10,10,10,.82); border:1px solid rgba(255,255,255,.18); border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.30); margin-bottom:20px; overflow:hidden; }
+details.card > summary.card-head { list-style:none; cursor:pointer; user-select:none; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:18px 20px; background:linear-gradient(90deg, rgba(0,0,0,.94), rgba(201,31,47,.55)); border-bottom:1px solid rgba(255,255,255,.16); }
+details.card > summary.card-head::-webkit-details-marker { display:none; }
+details.card > summary.card-head::after { content:"Åpne"; display:inline-flex; align-items:center; justify-content:center; min-width:68px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.35); background:rgba(0,0,0,.28); font-size:.78rem; font-weight:800; letter-spacing:.04em; flex-shrink:0; margin-top:2px; }
+details.card[open] > summary.card-head::after { content:"Lukk"; }
+details.card:not([open]) { margin-bottom:12px; }
+details.card:not([open]) > summary.card-head { border-bottom:none; }
+details.card h2 { margin:0; font-size:1.4rem; letter-spacing:.02em; text-transform:uppercase; }
+.sub { margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
+.card-body { padding:20px 24px 24px; }
+.card-body p { margin:.6rem 0; line-height:1.7; color:var(--ink); }
+.card-body p.ingress { font-size:1.08rem; font-weight:600; color:#fff; margin-bottom:14px; }
+
+.theory-box { margin-top:18px; padding:14px 16px; border-radius:14px; background:rgba(242,193,78,.10); border:1px solid rgba(242,193,78,.38); border-left:5px solid var(--gold); }
+.theory-box .theory-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--gold); font-weight:800; margin-bottom:6px; }
+.theory-box p { margin:.4rem 0; font-size:.9rem; color:var(--muted); line-height:1.55; }
+
+.step-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; margin-top:16px; }
+.step-item { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px 16px; }
+.step-item .step-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--gold); font-weight:800; margin-bottom:6px; }
+.step-item p { margin:0; font-size:.92rem; line-height:1.55; }
+
+.command-box { margin-top:18px; display:flex; flex-wrap:wrap; gap:10px; }
+.cmd-pill { display:inline-flex; align-items:center; padding:10px 18px; border-radius:999px; background:rgba(201,31,47,.35); border:2px solid rgba(201,31,47,.7); color:#fff; font-size:1.1rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+
+.symptom-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.symptom-item { background:rgba(201,31,47,.18); border:1px solid rgba(201,31,47,.4); border-radius:10px; padding:7px 14px; font-size:.88rem; color:var(--ink); }
+
+.contrast-box { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+.contrast-item { border-radius:12px; padding:14px 16px; }
+.contrast-item.bad { background:rgba(201,31,47,.18); border:1px solid rgba(201,31,47,.4); }
+.contrast-item.good { background:rgba(50,180,80,.15); border:1px solid rgba(50,180,80,.4); }
+.contrast-item .contrast-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; font-weight:800; margin-bottom:6px; }
+.contrast-item.bad .contrast-label { color:#ff8888; }
+.contrast-item.good .contrast-label { color:#88ee99; }
+.contrast-item p { margin:0; font-size:.9rem; line-height:1.5; }
+
+.breath-box { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+.breath-step { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:12px 16px; flex:1; min-width:100px; text-align:center; }
+.breath-step .bs-num { font-size:1.8rem; font-weight:900; color:var(--gold); line-height:1; }
+.breath-step .bs-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-top:4px; }
+.breath-step .bs-desc { font-size:.8rem; margin-top:6px; color:var(--ink); }
+
+/* HF cost table */
+.hf-table { width:100%; border-collapse:collapse; margin-top:14px; font-size:.88rem; }
+.hf-table th { background:rgba(201,31,47,.45); color:#fff; padding:8px 12px; text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; }
+.hf-table td { padding:8px 12px; border-bottom:1px solid rgba(255,255,255,.08); color:var(--ink); }
+.hf-table tr:last-child td { border-bottom:none; }
+.hf-table .bad { color:#ff8888; font-weight:700; }
+.hf-table .good { color:#88ee99; font-weight:700; }
+
+/* Siktbilde-tidstabell */
+.dist-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:10px; margin-top:14px; }
+.dist-item { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px 16px; text-align:center; }
+.dist-item .dist-m { font-size:1.6rem; font-weight:900; color:var(--gold); line-height:1; }
+.dist-item .dist-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-top:2px; }
+.dist-item .dist-time { font-size:1rem; font-weight:700; color:#fff; margin-top:6px; }
+.dist-item .dist-note { font-size:.78rem; color:var(--muted); margin-top:4px; }
+
+.highlight-box { margin-top:18px; padding:14px 16px; border-radius:12px; background:rgba(201,31,47,.15); border:1px solid rgba(201,31,47,.4); }
+.highlight-box p { margin:0; font-size:1.05rem; font-weight:700; color:#fff; text-align:center; }
+
+.ref-list { margin:12px 0 0; padding-left:0; list-style:none; }
+.ref-list li { font-size:.82rem; color:var(--muted); line-height:1.6; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+.ref-list li:last-child { border-bottom:none; }
+
+footer { max-width:1400px; margin:0 auto; padding:0 18px 30px; color:#f3f3f3; opacity:.88; font-size:.85rem; }
+
+@media (max-width:900px) {
+  .hero { grid-template-columns:1fr; gap:14px; }
+  .logo-placeholder { width:72px; height:72px; }
+  .logo-placeholder span { font-size:1.3rem; }
+  h1 { font-size:clamp(1.8rem,8vw,3rem); }
+  .step-grid { grid-template-columns:1fr 1fr; }
+  .contrast-box { grid-template-columns:1fr; }
+  .dist-grid { grid-template-columns:1fr 1fr; }
+}
+@media (max-width:560px) {
+  .step-grid { grid-template-columns:1fr; }
+  .breath-box { flex-direction:column; }
+  .dist-grid { grid-template-columns:1fr 1fr; }
+}
+@media print {
+  body, .bg, header, main, footer { background:#fff; color:#111; }
+  header { border-bottom:2px solid #111; }
+  details.card { box-shadow:none; border:1px solid #999; background:#fff; color:#111; break-inside:avoid; }
+  details.card > summary.card-head { background:#eee; color:#111; }
+  details.card > summary.card-head::after { display:none; }
+  .pill { color:#111; border-color:#555; background:#fff; }
+  .theory-box { background:#fff8dc; border-color:#999; }
+  .step-item, .breath-step, .dist-item { background:#f5f5f5; border-color:#ccc; }
+  .contrast-item.bad { background:#ffeaea; border-color:#ccc; }
+  .contrast-item.good { background:#eaffea; border-color:#ccc; }
+  .highlight-box { background:#f5f5f5; border-color:#ccc; }
+  .hf-table th { background:#ddd; color:#111; }
+  .hf-table td { color:#111; }
+}
+</style>
+</head>
+<body>
+<div class="bg">
+
+<header>
+<div class="hero">
+  <div class="logo-stack">
+    <div class="logo-placeholder"><span>IPSC</span></div>
+  </div>
+  <div class="hero-text">
+    <h1>Siktfokus under press</h1>
+    <p class="lead">Fra target focus til sight focus — IPSC Classic Division. Hva taper du i hit factor, og hva gjør du med det.</p>
+    <div class="badges">
+      <span class="pill">IPSC Classic</span>
+      <span class="pill">Quiet Eye</span>
+      <span class="pill gold">5 steg</span>
+      <span class="pill">Hit Factor</span>
+      <span class="pill">0,10–0,20 sek</span>
+    </div>
+  </div>
+</div>
+</header>
+
+<main>
+
+<!-- IPSC KONTEKST -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>IPSC-konteksten — hva target focus faktisk koster</h2>
+    <div class="sub">
+      <span class="pill step">HIT FACTOR</span>
+      <span class="pill">Speed-accuracy</span>
+      <span class="pill">Minor power factor</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">I IPSC er scoring poeng per sekund. Target focus gir deg C/D-treff og misser. Det er ikke bare dårlige treff — det er direkte hit factor-tap som overstiger tidsgevinsten.</p>
+
+  <p>IPSC-scoring (hit factor = poeng ÷ tid) betyr at hvert treff og hver tidel sekund teller. Under Minor power factor er en A-zone verdt 5 poeng, C-zone 3 poeng — en differanse på 2 poeng per skudd. En miss koster 10 poeng i straff. Target focus fører systematisk til treff i ytre soner og misser — fordi du slapp skuddet på platens signal, ikke siktets.</p>
+
+  <table class="hf-table">
+    <thead>
+      <tr><th>Situasjon</th><th>Poeng</th><th>Tidsverdi ved HF 5</th><th>Resultat</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>A-zone treff</td><td class="good">5 p</td><td>1,0 sek</td><td class="good">Optimalt</td></tr>
+      <tr><td>C-zone treff (target focus)</td><td>3 p</td><td>0,6 sek</td><td class="bad">−2 p = −0,4 sek</td></tr>
+      <tr><td>Miss (target focus)</td><td class="bad">−10 p</td><td>−2,0 sek</td><td class="bad">Kostbart</td></tr>
+      <tr><td>0,05 sek ekstra siktbilde → A-zone</td><td class="good">5 p</td><td>1,0 sek</td><td class="good">Netto gevinst</td></tr>
+    </tbody>
+  </table>
+
+  <p style="margin-top:14px;"><strong>Konklusjonen er matematisk:</strong> Å bruke 0,05–0,10 sekunder ekstra på å etablere siktbildet og sikre A-zone er alltid lønnsomt sammenlignet med et C-zone-treff eller en miss. Target focus sparer ikke tid — det koster tid.</p>
+
+  <div class="theory-box">
+    <div class="theory-label">Speed-accuracy tradeoff — Fitts (1954) / Spancken et al. (2025)</div>
+    <p>Fitts' lov beskriver en fundamental avveining mellom hastighet og presisjon i målrettet motorisk bevegelse: økt hastighet reduserer presisjonen dersom den visuelle og proprioseptive tilbakemeldingssløyfen ikke rekker å fullføres (Fitts, 1954, via Spancken et al., 2025). I skytekontekst: å slippe skuddet før siktbildet er etablert er ekvivalent med å skyte raskere enn din visuelle prosesseringstid tillater.</p>
+    <p>Under Minor power factor i IPSC Classic er tapet ved C-zone i stedet for A-zone 2 poeng per skudd. På en stage med 12 skudd kan systematisk target focus koste 10–24 poeng — tilsvarende 2–5 sekunder på et HF 5-nivå <em>(IPSC hit factor-logikk; Tomasie, u.å.)</em>.</p>
+  </div>
+</div>
+</details>
+
+<!-- PROBLEMET -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Hva skjer — mekanismen bak target focus</h2>
+    <div class="sub">
+      <span class="pill step">MEKANISME</span>
+      <span class="pill">Attentional Control</span>
+      <span class="pill">Quiet Eye</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Under press trekkes blikket automatisk mot det mest fremtredende stimuliet: stålplaten. Det er ikke en vane — det er fysiologi. Og det kan trenes bort.</p>
+
+  <div class="contrast-box">
+    <div class="contrast-item bad">
+      <div class="contrast-label">❌ Target focus — under press</div>
+      <p>Blikket låser seg på stålplaten eller A-sonen. Siktet forsvinner fra fokus. Skuddet slippes når <em>platen ser riktig ut</em> — ikke når siktbildet er etablert. Resultat: C/D-treff eller miss.</p>
+    </div>
+    <div class="contrast-item good">
+      <div class="contrast-label">✓ Sight focus — under kontroll</div>
+      <p>Blikket hviler på frontsiktet / korntoppen. Platen er synlig men uskarp. Skuddet slippes når <em>siktbildet er etablert</em>. Resultat: konsekvent A-zone.</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <div class="theory-label">Attentional Control Theory — Eysenck et al. (2007)</div>
+    <p>Under angst og press svekkes det <strong>målstyrte oppmerksomhetssystemet</strong> (top-down: «se på kornet») og det <strong>stimulus-drevne systemet</strong> tar over (bottom-up: «se på trusselen/målet»). Blikket trekkes automatisk mot det mest fremtredende visuelle stimuliet — i IPSC er det stålplaten eller papirmålets senter (Eysenck et al., 2007).</p>
+    <p>Angst svekker spesifikt to funksjoner: <em>inhibering</em> (evne til å ignorere platens visuelle tiltrekningskraft) og <em>shifting</em> (evne til å flytte blikket tilbake til siktet). Begge er direkte relevante for sight focus-problemet.</p>
+  </div>
+
+  <div class="theory-box" style="margin-top:12px;">
+    <div class="theory-label">Quiet Eye og visuell prosesseringstid — Vickers (2007) / Goonetilleke et al. (2009)</div>
+    <p>Quiet Eye (QE) er den siste stabile fikseringen på siktepunktet — minimum 100 ms — før triggertrekket. Angst forkorter QE-varigheten og øker antallet kortvarige fiksasjoner på multiple punkter (Wilson et al., 2009). Eliteskyttere opprettholder lengre QE under press enn nybegynnere (Vickers & Williams, 2007; de Amorim et al., 2024).</p>
+    <p>Goonetilleke et al. (2009) viser at visuell prosesseringstid kan være så lav som 100 ms, men at redusert tilgjengelig siktbildetid direkte reduserer presisjonen — og at eksperter håndterer dette bedre enn nybegynnere. I IPSC Classic er tilgjengelig siktbildetid 100–200 ms på nære mål: du er allerede i minimumsvinduet.</p>
+  </div>
+</div>
+</details>
+
+<!-- STEG 1 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 1 — Gjenkjenn varselsignalet</h2>
+    <div class="sub">
+      <span class="pill step">BEVISSTHET</span>
+      <span class="pill">IZOF</span>
+      <span class="pill">Pre-stage</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">«Jeg ser bare platen» er et varselsignal. Lær å gjenkjenne det <em>før</em> du skyter — ikke etter at treffene er feil.</p>
+
+  <p>I IPSC viser target focus seg oftest på bestemte måltyper og avstander: stålmål på 12–18 m, trange papirmål med delvis sperring, eller første mål i en stage etter draw. Kartlegg <em>dine</em> høyrisiko-situasjoner.</p>
+
+  <p style="font-weight:600; color:#fff; margin-top:14px;">Typiske varselsignaler i IPSC-kontekst:</p>
+  <div class="symptom-list">
+    <div class="symptom-item">👁 Ser platen/A-sonen skarpt under stage-walk</div>
+    <div class="symptom-item">⚡ Triggerfingeren «vil» skyte ved presentasjon</div>
+    <div class="symptom-item">💪 Grip strammes hardt ved draw</div>
+    <div class="symptom-item">🧠 Tanker: «hit den», «den er stor nok»</div>
+    <div class="symptom-item">💨 Pusten stopper ved «standby»</div>
+    <div class="symptom-item">👀 Blikket søker platen, ikke siktet, under sikte</div>
+  </div>
+
+  <div class="theory-box">
+    <div class="theory-label">IZOF — Hanin (1997) — din personlige terskel</div>
+    <p>Terskelen for når angst forstyrrer visuell attensjonskontroll er individuell (Hanin, 1997). Noen skyttere mister siktfokus allerede på lette nær-mål under konkurranse; andre holder seg lenger. Systematisk treningslogg — notér hvilke stage-elementer og betingelser som utløser target focus — bygger opp en personlig IZOF-profil over tid.</p>
+  </div>
+</div>
+</details>
+
+<!-- STEG 2 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 2 — Pust ned før «Make ready»</h2>
+    <div class="sub">
+      <span class="pill step">FYSIOLOGI</span>
+      <span class="pill">4–4–6</span>
+      <span class="pill">HRV / Vagus</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Pre-stage-rutinen starter med én kontrollert pustesekvens. Ikke reaktivt etter en feil — proaktivt, som fast prosedyre.</p>
+
+  <p>Kontrollert diafragmapust med forlenget utpust aktiverer vagusnerven og parasympathicus — noe som direkte demper den stimulus-drevne attensjonsdriften mot platen og øker evnen til målstyrt visuell kontroll (Laborde et al., 2022). 14 sekunder. Passer i tidsrommet mellom «next competitor» og «make ready».</p>
+
+  <div class="breath-box">
+    <div class="breath-step">
+      <div class="bs-num">4</div>
+      <div class="bs-label">Inn (sek)</div>
+      <div class="bs-desc">Diafragma ned, skuldrene ned</div>
+    </div>
+    <div class="breath-step">
+      <div class="bs-num">4</div>
+      <div class="bs-label">Hold (sek)</div>
+      <div class="bs-desc">Slipp grep og underarmer</div>
+    </div>
+    <div class="breath-step">
+      <div class="bs-num">6</div>
+      <div class="bs-label">Ut (sek)</div>
+      <div class="bs-desc">Lang, rolig — vagusaktivering</div>
+    </div>
+  </div>
+
+  <p style="margin-top:14px;">Den forlengede utpusten er det kritiske elementet: det er utpusten — lengre enn innpusten — som aktiverer parasympathicus og øker HRV (Laborde et al., 2022). En enkelt 5–14-sekunders pustepause er tilstrekkelig til å dempe akutt over-arousal.</p>
+
+  <div class="theory-box">
+    <div class="theory-label">HRV og selvregulering — Laborde et al. (2022)</div>
+    <p>Frivillig saktegående pust øker vagalt mediert HRV, som er direkte assosiert med selvregulering og attensjonskontroll. Effekten inntreffer allerede etter én pustesyklus. Proaktiv bruk — som fast pre-stage-rutine — er mer effektiv enn reaktiv bruk etter en feil (Laborde et al., 2022).</p>
+  </div>
+</div>
+</details>
+
+<!-- STEG 3 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 3 — Kommando: «Korn»</h2>
+    <div class="sub">
+      <span class="pill step">KOMMANDO</span>
+      <span class="pill">Cue-ord</span>
+      <span class="pill">Shifting</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Ett ord. Trent inn. Aktiverer blikket mot frontsiktet — ikke mot platen.</p>
+
+  <p>«Shifting»-funksjonen — evnen til å flytte oppmerksomheten bevisst — er svekket under press (Eysenck et al., 2007). Siden automatikken svikter, må skiftet initieres eksplisitt. Et cue-ord gjør dette: det er ikke motivasjon, det er en nevralt innøvd kommando.</p>
+
+  <div class="command-box">
+    <span class="cmd-pill">Korn</span>
+    <span class="cmd-pill">Front</span>
+    <span class="cmd-pill">Sikt</span>
+  </div>
+
+  <p style="margin-top:16px;">Velg ett ord. Hold det konsistent. Tren det inn i <em>hver eneste</em> dry-fire-økt og hvert treningsskudd — ikke bare i konkurranse. Koblingen ord → blikk finner korntoppen etableres gjennom repetisjon og overføres til konkurranse (Nideffer & Sagal, 2006).</p>
+
+  <p>I IPSC: bruk cue-ordet ved <em>presentasjon av pistolen</em> mot hvert mål — ikke bare ved draw. Gjøres det til en del av skyterytmen, aktiveres det automatisk under press.</p>
+
+  <div class="theory-box">
+    <div class="theory-label">Cue-ord som attensjonskifte — Nideffer & Sagal (2006)</div>
+    <p>Cue-ord fungerer som eksplisitt trigger for oppmerksomhetsskifte til smal-ekstern fokus: ett konkret punkt i ytre rom (korntoppen). For at koblingen skal aktiveres under konkurranse-stress, må den være innøvd i trening — ikke bare forsøkt i kamp (Nideffer & Sagal, 2006).</p>
+  </div>
+</div>
+</details>
+
+<!-- STEG 4 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 4 — Riktig siktbildetid per avstand</h2>
+    <div class="sub">
+      <span class="pill step">QUIET EYE</span>
+      <span class="pill">0,10–0,20 sek</span>
+      <span class="pill">Avstandskalibrering</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Siktbildet er ikke statisk. 0,10 sek på 5 m — 0,20 sek på 20 m. Kalibrér til avstand og målstørrelse, ikke til følelsen av at platen ser riktig ut.</p>
+
+  <p>Minimum visuell prosesseringstid er ~100 ms (Zelaznik et al., 1983, via Goonetilleke et al., 2009). I IPSC betyr dette at du allerede på nære mål er i absolutt minimumsvindu. Enhver forkortelse — drevet av press eller target focus — sender deg under grensen for pålitelig visuell kontroll.</p>
+
+  <div class="dist-grid">
+    <div class="dist-item">
+      <div class="dist-m">5 m</div>
+      <div class="dist-label">Nær / stål</div>
+      <div class="dist-time">~0,10 sek</div>
+      <div class="dist-note">Kornet i hakket, flash sight picture</div>
+    </div>
+    <div class="dist-item">
+      <div class="dist-m">10 m</div>
+      <div class="dist-label">Middels</div>
+      <div class="dist-time">~0,12–0,15 sek</div>
+      <div class="dist-note">Korn tydelig, plate uskarp</div>
+    </div>
+    <div class="dist-item">
+      <div class="dist-m">15 m</div>
+      <div class="dist-label">Langt / papir</div>
+      <div class="dist-time">~0,15–0,20 sek</div>
+      <div class="dist-note">Korn presist i hakket, tydelig QE</div>
+    </div>
+    <div class="dist-item">
+      <div class="dist-m">20+ m</div>
+      <div class="dist-label">Langt / presisjon</div>
+      <div class="dist-time">0,20–0,30 sek</div>
+      <div class="dist-note">Lengre QE, bevisst avvente klarsignal</div>
+    </div>
+  </div>
+
+  <p style="margin-top:16px;"><strong>Klarsignalet</strong> er ikke en bevisst tanke — det er en trent, automatisert persepsjon: «kornet er på plass». Når dette er internalisert, erstatter det platens visuelle tiltrekningskraft som avfyringssignal.</p>
+
+  <p>Under press er den vanligste feilen for kort QE på nære mål — skuddet slippes fordi «stål er nær nok». Den nest vanligste er for lang QE på fjerne mål — «henger» på siktet til muskelspenningen tar over. Begge er symptomer på at platen, ikke siktet, styrer beslutningen.</p>
+
+  <div class="theory-box">
+    <div class="theory-label">Quiet Eye og pistolskyting — Vickers & Williams (2007) / de Amorim et al. (2024)</div>
+    <p>Vickers & Williams (2007) dokumenterte at QE-varighet var direkte positivt korrelert med skytepresisjonen hos biatlon-eliteskyttere under press. de Amorim et al. (2024) bekrefter i en longitudinell pistolskyting-studie: forbedring over tid var assosiert med <strong>tidligere QE-onset</strong> og <strong>lengre QE-varighet</strong> — begge kjennetegn ved innøvd visuell attensjonskontroll, ikke instinktiv reaksjon.</p>
+    <p>Angst forkorter QE og øker antallet kortvarige fiksasjoner på multiple punkter (Wilson et al., 2009) — det nøyaktige mønsteret som oppstår ved target focus under press.</p>
+  </div>
+</div>
+</details>
+
+<!-- STEG 5 -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Steg 5 — Commit: Siktet er beslutningsgrunnlaget</h2>
+    <div class="sub">
+      <span class="pill step">COMMIT</span>
+      <span class="pill">Pre-performance</span>
+      <span class="pill">Hit Factor</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Skuddet slippes når <em>siktet</em> sier klart. Ikke når platen sier klart. Dette er ikke et teknisk valg — det er et mentalt commit du gjør før «standby».</p>
+
+  <p>I stage-walk: visualiser frontsiktet — korntoppen — på hvert mål. Ikke platen. Ikke A-sonen. Korntoppen i hakket. Etabler dette som det eneste visuelle referansepunktet for avfyring.</p>
+
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">Feil commit</div>
+      <p>«Platen er stor og nær, det går fint.» → Avfyringssignalet er platens utseende. Target focus er allerede aktiv.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Riktig commit</div>
+      <p>«Korn i hakket → avfyr.» → Avfyringssignalet er siktbildet. Hit factor optimeres.</p>
+    </div>
+  </div>
+
+  <p style="margin-top:14px;"><strong>Pre-stage-sekvens:</strong> Pust ned (steg 2) → «Korn» (steg 3) → Visualiser siktbilde på første mål → Commit: «Jeg skyter på siktets signal». Deretter: «Make ready».</p>
+
+  <div class="theory-box">
+    <div class="theory-label">Pre-performance rutiner — Moran (2012)</div>
+    <p>Strukturerte pre-performance rutiner som eksplisitt inkluderer et visuelt attensjonsfokuselement er dokumentert å redusere sannsynligheten for stress-indusert oppmerksomhetsdrift. En rutine som forankrer avfyringssignalet i siktbildet — ikke i platens utseende — er en kognitiv forankring mot target focus (Moran, 2012).</p>
+  </div>
+
+  <div class="highlight-box" style="margin-top:18px;">
+    <p>Pust · Korn · Visualiser siktbilde · Commit · Execute på siktets signal</p>
+  </div>
+</div>
+</details>
+
+<!-- TRENING -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Praktisk trening — slik bygger du inn sight focus</h2>
+    <div class="sub">
+      <span class="pill step">TRENING</span>
+      <span class="pill">Dry fire</span>
+      <span class="pill">Gradert press</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Sight focus under press trenes inn — det skjer ikke automatisk. Start langsomt. Øk presset gradvis. Hold cue-ordet konsistent.</p>
+
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">Dry fire — grunnlag</div>
+      <p>Presentér pistolen mot mål. Si «korn» høyt eller stille. Finn korntoppen bevisst. Trekk ab. Gjenta 20–30 ganger per økt. Bygg koblingen ord → blikk.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Slow fire — forankring</div>
+      <p>Livfyre på nært mål. Hold siktbildet bevisst i 2–3 sekunder. Avfyr på «klarsignal» fra siktet. Fokus på konsistens, ikke hastighet.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Gradert tempo</div>
+      <p>Øk hastigheten gradvis. Bruk timer. Akseptér kun A-zone. Sikt-tid kalibreres til avstand — aldri kortere enn QE-minimumet for den aktuelle distansen.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Press-simulering</div>
+      <p>Videopptak, tilskuere, konkurranse-simulering. Bruk pre-stage-rutinen bevisst. Loggfør: når og hvor inntreffer target focus?</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <div class="theory-label">Trening under press — Oudejans & Pijpers (2010)</div>
+    <p>Trening med gradvis økt angst-eksponering fører til at de visuelle attensjonsmønstrene som fungerer under press internaliseres mer robust enn trening kun under lav press. Eksperter viser stabilt blikkadferd under stress — dette er en lært, ikke medfødt, egenskap (Oudejans & Pijpers, 2010, via Oudejans et al., 2011).</p>
+  </div>
+</div>
+</details>
+
+<!-- REFERANSER -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Referanser (APA 7)</h2>
+    <div class="sub">
+      <span class="pill">Quiet Eye</span>
+      <span class="pill">Attentional Control</span>
+      <span class="pill">IPSC</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <ul class="ref-list">
+    <li>de Amorim, V. P., Meira, C. M., Jr., & Vickers, J. N. (2024). Pistol shooting performance under pressure: Longitudinal changes in gaze behavior of male and female Army cadets. <em>Human Movement Science, 94</em>, 103194. https://doi.org/10.1016/j.humov.2024.103194</li>
+    <li>Eysenck, M. W., Derakshan, N., Santos, R., & Calvo, M. G. (2007). Anxiety and cognitive performance: Attentional control theory. <em>Emotion, 7</em>(2), 336–353. https://doi.org/10.1037/1528-3542.7.2.336</li>
+    <li>Fitts, P. M. (1954). The information capacity of the human motor system in controlling the amplitude of movement. <em>Journal of Experimental Psychology, 47</em>(6), 381–391. https://doi.org/10.1037/h0055392</li>
+    <li>Goonetilleke, R. S., Hoffmann, E. R., & Luximon, A. (2009). Pistol shooting accuracy as dependent on experience, eyes being opened and available viewing time. <em>Applied Ergonomics, 40</em>(3), 500–508. https://doi.org/10.1016/j.apergo.2008.09.004</li>
+    <li>Hanin, Y. L. (1997). Emotions and athletic performance: Individual zones of optimal functioning model. <em>European Yearbook of Sport Psychology, 1</em>, 29–72.</li>
+    <li>Laborde, S., Allen, M. S., Borges, U., Dosseville, F., Hosang, T. J., Iskra, M., Mosley, E., Salvotti, C., Spolverato, L., Zammit, N., & Javelle, F. (2022). Effects of voluntary slow breathing on heart rate and heart rate variability: A systematic review and meta-analysis. <em>Neuroscience & Biobehavioral Reviews, 138</em>, 104711. https://doi.org/10.1016/j.neubiorev.2022.104711</li>
+    <li>Moran, A. (2012). <em>Sport and exercise psychology: A critical introduction</em> (2. utg.). Routledge.</li>
+    <li>Nideffer, R. M., & Sagal, M. (2006). Concentration and attention control training. I J. M. Williams (Red.), <em>Applied sport psychology: Personal growth to peak performance</em> (5. utg., s. 382–403). McGraw-Hill.</li>
+    <li>Oudejans, R. R. D., Kuijpers, W., Kooijman, C. C., & Bakker, F. C. (2011). Thoughts and attention of athletes under pressure: skill-focus or performance worries? <em>Anxiety, Stress, & Coping, 24</em>(1), 59–73. https://doi.org/10.1080/10615801003601894</li>
+    <li>Spancken, S., Stoll, O., & Kreiter, C. (2025). Target size, self-efficacy, and stress as determinants of precision in a marksmanship task. <em>Frontiers in Psychology, 16</em>, 1710147. https://doi.org/10.3389/fpsyg.2025.1710147</li>
+    <li>Tomasie, T. (u.å.). <em>Hit factors and USPSA/IPSC scoring</em>. https://www.travistomasie.com/hit-factors-and-uspsa-ipsc-scoring.html</li>
+    <li>Vickers, J. N. (2007). <em>Perception, cognition and decision training: The quiet eye in action</em>. Human Kinetics.</li>
+    <li>Vickers, J. N., & Williams, A. M. (2007). Performing under pressure: The interactive effects of physiological arousal, cognitive anxiety and gaze control in elite biathlon shooters. <em>Journal of Motor Behavior, 39</em>(5), 381–394. https://doi.org/10.3200/JMBR.39.5.381-394</li>
+    <li>Wilson, M. R., Vine, S. J., & Wood, G. (2009). The influence of anxiety on visual attentional control in basketball free throw shooting. <em>Journal of Sport and Exercise Psychology, 31</em>(2), 152–168. https://doi.org/10.1123/jsep.31.2.152</li>
+  </ul>
+</div>
+</details>
+
+</main>
+
+<footer>
+  <p>Siktfokus under press · IPSC Classic Division · Basert på idrettspsykologisk forskning</p>
+</footer>
+
+</div>
+<script>
+(function(){
+  let op=[];
+  window.addEventListener('beforeprint',function(){
+    op=[];
+    document.querySelectorAll('details.card:not([open])').forEach(function(d){d.setAttribute('open','');op.push(d);});
+  });
+  window.addEventListener('afterprint',function(){op.forEach(function(d){d.removeAttribute('open');});op=[];});
+})();
+</script>
+</body>
+</html>

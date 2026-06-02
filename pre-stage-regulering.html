@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Pre-stage regulering – IPSC Classic</title>
+<style>
+:root { --red:#c91f2f; --dark:#151515; --ink:#f8f8f8; --muted:#d8d8d8; --line:#3b3b3b; --gold:#f2c14e; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--ink); background:linear-gradient(135deg,#8f111d 0%,#d22535 42%,#151515 100%); }
+.bg { min-height:100vh; background-image:radial-gradient(circle at 18% 15%,rgba(255,255,255,.12),transparent 22%),repeating-linear-gradient(88deg,rgba(0,0,0,.16) 0 2px,transparent 2px 72px); }
+header { padding:28px 28px 18px; border-bottom:4px solid rgba(255,255,255,.18); background:rgba(0,0,0,.38); position:relative; overflow:hidden; }
+header:after { content:""; position:absolute; inset:auto -5% -60px 40%; height:140px; transform:rotate(-8deg); background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),rgba(0,36,125,.9),rgba(255,255,255,.9),rgba(200,16,46,.95)); opacity:.35; }
+.hero { position:relative; z-index:1; display:grid; grid-template-columns:minmax(210px,260px) minmax(0,1fr); align-items:start; gap:30px; max-width:1400px; margin:0 auto; }
+.logo-stack { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+.logo-placeholder { background:#fff; border-radius:50%; width:112px; height:112px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,.35); flex-shrink:0; }
+.logo-placeholder span { font-size:2rem; font-weight:900; color:var(--red); letter-spacing:-.04em; }
+.hero-text { min-width:0; padding-top:2px; }
+h1 { margin:0; font-size:clamp(2rem,4vw,4.2rem); letter-spacing:.04em; text-transform:uppercase; line-height:1; }
+.lead { margin:.6rem 0 0; font-size:1.05rem; color:#fff; max-width:900px; }
+.badges { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+.pill { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border:1px solid rgba(255,255,255,.55); border-radius:999px; background:rgba(0,0,0,.35); color:#fff; font-weight:700; font-size:.82rem; letter-spacing:.04em; white-space:nowrap; }
+.pill.gold { border-color:rgba(242,193,78,.7); background:rgba(242,193,78,.15); color:var(--gold); }
+.pill.step { background:rgba(201,31,47,.45); border-color:rgba(201,31,47,.7); }
+main { max-width:1400px; margin:0 auto; padding:24px 18px 60px; }
+
+details.card { display:block; background:rgba(10,10,10,.82); border:1px solid rgba(255,255,255,.18); border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.30); margin-bottom:20px; overflow:hidden; }
+details.card > summary.card-head { list-style:none; cursor:pointer; user-select:none; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:18px 20px; background:linear-gradient(90deg,rgba(0,0,0,.94),rgba(201,31,47,.55)); border-bottom:1px solid rgba(255,255,255,.16); }
+details.card > summary.card-head::-webkit-details-marker { display:none; }
+details.card > summary.card-head::after { content:"Åpne"; display:inline-flex; align-items:center; justify-content:center; min-width:68px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.35); background:rgba(0,0,0,.28); font-size:.78rem; font-weight:800; letter-spacing:.04em; flex-shrink:0; margin-top:2px; }
+details.card[open] > summary.card-head::after { content:"Lukk"; }
+details.card:not([open]) { margin-bottom:12px; }
+details.card:not([open]) > summary.card-head { border-bottom:none; }
+details.card h2 { margin:0; font-size:1.4rem; letter-spacing:.02em; text-transform:uppercase; }
+.sub { margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
+.card-body { padding:20px 24px 24px; }
+.card-body p { margin:.6rem 0; line-height:1.7; color:var(--ink); }
+.card-body p.ingress { font-size:1.08rem; font-weight:600; color:#fff; margin-bottom:14px; }
+
+.theory-box { margin-top:18px; padding:14px 16px; border-radius:14px; background:rgba(242,193,78,.10); border:1px solid rgba(242,193,78,.38); border-left:5px solid var(--gold); }
+.theory-box .theory-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--gold); font-weight:800; margin-bottom:6px; }
+.theory-box p { margin:.4rem 0; font-size:.9rem; color:var(--muted); line-height:1.55; }
+
+.step-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-top:16px; }
+.step-item { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px 16px; }
+.step-item .step-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--gold); font-weight:800; margin-bottom:6px; }
+.step-item p { margin:0; font-size:.92rem; line-height:1.55; }
+
+/* Protokoll-tidslinje */
+.timeline { display:flex; flex-direction:column; gap:0; margin-top:16px; }
+.tl-item { display:grid; grid-template-columns:90px 1fr; gap:0; }
+.tl-time { display:flex; flex-direction:column; align-items:center; padding-top:4px; }
+.tl-dot { width:18px; height:18px; border-radius:50%; background:var(--red); border:2px solid rgba(255,255,255,.6); flex-shrink:0; }
+.tl-line { width:2px; flex:1; background:rgba(255,255,255,.18); margin:4px 0; min-height:24px; }
+.tl-label { font-size:.72rem; font-weight:800; color:var(--gold); text-align:center; line-height:1.2; margin-top:4px; letter-spacing:.04em; }
+.tl-body { padding:4px 0 20px 12px; }
+.tl-body h3 { margin:0 0 4px; font-size:1rem; font-weight:800; color:#fff; letter-spacing:.02em; text-transform:uppercase; }
+.tl-body p { margin:0; font-size:.9rem; line-height:1.55; color:var(--muted); }
+.tl-body .cmd { display:inline-flex; align-items:center; padding:5px 14px; border-radius:999px; background:rgba(201,31,47,.35); border:2px solid rgba(201,31,47,.7); color:#fff; font-size:.95rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; margin-top:8px; }
+
+.breath-box { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+.breath-step { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:12px 16px; flex:1; min-width:90px; text-align:center; }
+.breath-step .bs-num { font-size:1.8rem; font-weight:900; color:var(--gold); line-height:1; }
+.breath-step .bs-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-top:4px; }
+.breath-step .bs-desc { font-size:.78rem; margin-top:5px; color:var(--ink); }
+
+.contrast-box { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+.contrast-item { border-radius:12px; padding:14px 16px; }
+.contrast-item.bad { background:rgba(201,31,47,.18); border:1px solid rgba(201,31,47,.4); }
+.contrast-item.good { background:rgba(50,180,80,.15); border:1px solid rgba(50,180,80,.4); }
+.contrast-item .contrast-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; font-weight:800; margin-bottom:6px; }
+.contrast-item.bad .contrast-label { color:#ff8888; }
+.contrast-item.good .contrast-label { color:#88ee99; }
+.contrast-item p { margin:0; font-size:.9rem; line-height:1.5; }
+
+.highlight-box { margin-top:18px; padding:16px 20px; border-radius:14px; background:rgba(201,31,47,.15); border:2px solid rgba(201,31,47,.5); }
+.highlight-box p { margin:0; font-size:1.1rem; font-weight:800; color:#fff; text-align:center; letter-spacing:.04em; }
+
+.overview-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-top:14px; }
+.ov-item { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 16px; text-align:center; }
+.ov-num { font-size:2rem; font-weight:900; color:var(--gold); line-height:1; }
+.ov-title { font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:#fff; font-weight:800; margin-top:4px; }
+.ov-cmd { font-size:.92rem; color:var(--muted); margin-top:6px; font-style:italic; }
+
+.ref-list { margin:12px 0 0; padding-left:0; list-style:none; }
+.ref-list li { font-size:.82rem; color:var(--muted); line-height:1.6; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+.ref-list li:last-child { border-bottom:none; }
+footer { max-width:1400px; margin:0 auto; padding:0 18px 30px; color:#f3f3f3; opacity:.88; font-size:.85rem; }
+
+@media (max-width:900px) {
+  .hero { grid-template-columns:1fr; gap:14px; }
+  .logo-placeholder { width:72px; height:72px; }
+  .logo-placeholder span { font-size:1.3rem; }
+  h1 { font-size:clamp(1.8rem,8vw,3rem); }
+  .step-grid { grid-template-columns:1fr 1fr; }
+  .contrast-box { grid-template-columns:1fr; }
+  .overview-grid { grid-template-columns:1fr 1fr; }
+}
+@media (max-width:560px) {
+  .step-grid { grid-template-columns:1fr; }
+  .breath-box { flex-direction:column; }
+  .tl-item { grid-template-columns:70px 1fr; }
+  .overview-grid { grid-template-columns:1fr 1fr; }
+}
+@media print {
+  body,.bg,header,main,footer { background:#fff; color:#111; }
+  header { border-bottom:2px solid #111; }
+  details.card { box-shadow:none; border:1px solid #999; background:#fff; color:#111; break-inside:avoid; }
+  details.card > summary.card-head { background:#eee; color:#111; }
+  details.card > summary.card-head::after { display:none; }
+  .pill { color:#111; border-color:#555; background:#fff; }
+  .theory-box { background:#fff8dc; border-color:#999; }
+  .step-item,.breath-step,.ov-item { background:#f5f5f5; border-color:#ccc; }
+  .contrast-item.bad { background:#ffeaea; } .contrast-item.good { background:#eaffea; }
+  .highlight-box { background:#f5f5f5; border-color:#ccc; }
+  .tl-dot { background:#333; }
+  .tl-line { background:#ccc; }
+  .cmd { background:#eee; border-color:#aaa; color:#111; }
+}
+</style>
+</head>
+<body>
+<div class="bg">
+
+<header>
+<div class="hero">
+  <div class="logo-stack">
+    <div class="logo-placeholder"><span>IPSC</span></div>
+  </div>
+  <div class="hero-text">
+    <h1>Pre-stage regulering</h1>
+    <p class="lead">Komplett protokoll for spenningsregulering og siktfokus — IPSC Classic Division. Pust · Skulder · Armer · «Se på siktet».</p>
+    <div class="badges">
+      <span class="pill">IPSC Classic</span>
+      <span class="pill gold">4 elementer</span>
+      <span class="pill">~14 sekunder</span>
+      <span class="pill">Eksternt fokus</span>
+      <span class="pill">HRV</span>
+    </div>
+  </div>
+</div>
+</header>
+
+<main>
+
+<!-- OVERSIKT -->
+<details class="card" open>
+<summary class="card-head">
+  <div>
+    <h2>Protokolloversikt — fire elementer, én sekvens</h2>
+    <div class="sub">
+      <span class="pill step">KOMPLETT RUTINE</span>
+      <span class="pill">«Next competitor» → «Make ready»</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Alle fire elementene gjennomføres i rekkefølge mellom «next competitor» og «make ready». Totalt ~14–20 sekunder. Ikke reaktivt etter feil — proaktivt, som fast prosedyre.</p>
+
+  <div class="overview-grid">
+    <div class="ov-item">
+      <div class="ov-num">1</div>
+      <div class="ov-title">Pust 4–4–6</div>
+      <div class="ov-cmd">Fysiologisk reset</div>
+    </div>
+    <div class="ov-item">
+      <div class="ov-num">2</div>
+      <div class="ov-title">Slapp av i skuldrene</div>
+      <div class="ov-cmd">Bryt spenningssyklusen</div>
+    </div>
+    <div class="ov-item">
+      <div class="ov-num">3</div>
+      <div class="ov-title">Strekk ut armene</div>
+      <div class="ov-cmd">Benstøtte, ikke muskelkraft</div>
+    </div>
+    <div class="ov-item">
+      <div class="ov-num">4</div>
+      <div class="ov-title">«Se på siktet»</div>
+      <div class="ov-cmd">Ekstern fokus-kommando</div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p>Pust · Skulder · Armer · «Se på siktet» · Commit · Execute</p>
+  </div>
+</div>
+</details>
+
+<!-- ELEMENT 1: PUST -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Element 1 — Pust 4–4–6</h2>
+    <div class="sub">
+      <span class="pill step">FYSIOLOGI</span>
+      <span class="pill">Vagusaktivering</span>
+      <span class="pill">HRV</span>
+      <span class="pill">~14 sek</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Den forlengede utpusten aktiverer vagusnerven og demper sympatikusresponsen. Dette er ikke avslapping — det er regulering til optimal aktiviseringssone.</p>
+
+  <p>Kontrollert diafragmapust med forlenget utpust er det eneste bevisste verktøyet du har for direkte, øyeblikkelig påvirkning på det autonome nervesystemet. Effekten inntreffer allerede etter én syklus (Laborde et al., 2022).</p>
+
+  <div class="breath-box">
+    <div class="breath-step">
+      <div class="bs-num">4</div>
+      <div class="bs-label">Inn (sek)</div>
+      <div class="bs-desc">Diafragma ned. Magen ut. Skuldrene ned.</div>
+    </div>
+    <div class="breath-step">
+      <div class="bs-num">4</div>
+      <div class="bs-label">Hold (sek)</div>
+      <div class="bs-desc">Kjenn spenningen. La den sitte.</div>
+    </div>
+    <div class="breath-step">
+      <div class="bs-num">6</div>
+      <div class="bs-label">Ut (sek)</div>
+      <div class="bs-desc">Lang, rolig. Vagus-trigger.</div>
+    </div>
+  </div>
+
+  <p style="margin-top:14px;"><strong>Kritisk:</strong> Utpusten er 6 sekunder — lengre enn innpusten. Det er denne asymmetrien som aktiverer parasympathicus og øker vagalt mediert HRV. En kortere, jevn pust gir ikke samme effekt (Laborde et al., 2022).</p>
+
+  <div class="theory-box">
+    <div class="theory-label">HRV og attensjonskontroll — Laborde et al. (2022)</div>
+    <p>Frivillig saktegående pust med forlenget utpust øker vagalt mediert HRV i 223 studier (metaanalyse). Høy HRV er positivt assosiert med selvregulering, oppgaveytelse og attensjonskontroll — inkludert evnen til å motstå stimulus-drevet blikk-drift mot platen (Eysenck et al., 2007).</p>
+    <p>Proaktiv bruk — fast rutine for hvert stage — gir mer robust effekt enn reaktiv bruk etter feil (Laborde et al., 2022; Blumenstein & Orbach, 2022).</p>
+  </div>
+</div>
+</details>
+
+<!-- ELEMENT 2: SKULDER -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Element 2 — Slapp av i skuldrene</h2>
+    <div class="sub">
+      <span class="pill step">SOMATISK</span>
+      <span class="pill">Muskelspenning</span>
+      <span class="pill">Ko-aktivering</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Angst øker muskelspenning — særlig i trapezius og skuldrene. Skuldrene er det første stedet du kjenner spenning, og det første stedet du slipper den.</p>
+
+  <p>Under angst og press øker baseline muskeltonus og ko-aktivering av agonist/antagonist-muskler i arm og skulder. Resultatet er at armen blir stivere, siktelinjen mer utsatt for mikrooscillasjoner, og triggertrekket forstyrres (Loh et al., 2021). Et bevisst skulderslipp bryter denne syklusen direkte.</p>
+
+  <div class="contrast-box">
+    <div class="contrast-item bad">
+      <div class="contrast-label">❌ For høy spenning</div>
+      <p>Skuldrene kryper opp. Ko-aktivering øker. Armen stivner. Pistolen vibrerer mer. Triggertrekket blir aktivt og forstyrrende.</p>
+    </div>
+    <div class="contrast-item good">
+      <div class="contrast-label">✓ Optimal spenning</div>
+      <p>Skuldrene er nede og løse. Benstøtte holder våpenet stabilt — ikke muskelkraft. Ko-aktivering er minimal og konsistent.</p>
+    </div>
+  </div>
+
+  <p style="margin-top:14px;"><strong>Viktig nyanse:</strong> Målet er <em>optimal</em> spenning — ikke total avspenning. Totalt avslappede armer gir ustabilitet og økt tremor. Skulderslippet er en regulering mot over-spenning, ikke et signal om å bli løs i hele systemet (Loh et al., 2021; Rodd, 2008, via Loh et al.).</p>
+
+  <div class="theory-box">
+    <div class="theory-label">Muskelspenning og pistolskyting — Loh et al. (2021) / Jacobson (1928)</div>
+    <p>Loh et al. (2021) dokumenterte via EMG at stress under simulert konkurranse øker aktivering av deltoid og skuldermuskulatur hos luftpistolskyttere, med moderate til store effektstørrelser. Stivning av lemmer og upassende ko-aktivering er direkte assosiert med redusert presisjon.</p>
+    <p>Jacobson (1928) viste at mental aktivitet alltid ledsages av økt muskeltonus — og at reduksjon av muskeltonus umiddelbart reduserer mental aktivitetsintensitet. Skulderslippet er altså både motorisk og kognitivt regulerende.</p>
+  </div>
+</div>
+</details>
+
+<!-- ELEMENT 3: ARMER -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Element 3 — Strekk ut armene</h2>
+    <div class="sub">
+      <span class="pill step">MOTORIKK</span>
+      <span class="pill">Natural Point of Aim</span>
+      <span class="pill">Benstøtte</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Full armstrekk etablerer benstøtte som fundament — ikke muskelkraft. Det er den mest stabile og repetable presentasjonsposisjonen i IPSC isosceles-stansen.</p>
+
+  <p>Natural Point of Aim (NPOA) er prinsippet om at kroppen i en riktig stilling peker naturlig mot målet uten å bruke aktiv muskelkraft til korreksjon. Når armene er fullt utstrakt i isosceles-stansen, er skjelettstøtten optimal og muskulær variabilitet minimert. Forstyrrende muskelspenning — som under angst øker ujevnt — påvirker en stilling basert på benstøtte langt mindre enn en stilling basert på muskelkraft (ISSF; Sajnog; Wikipedia NPOA).</p>
+
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">Benstøtte</div>
+      <p>Fullt utstrakte armer overfører vekten til skjelettet. Skjelettet er stabilt uavhengig av arousal-nivå. Muskelkraft er variabel under press.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Konsistens</div>
+      <p>Full armstrekk er den mest repetable presentasjonsposisjonen — den samme hver gang. Redusert variabilitet i utgangspunktet gir lavere variabilitet i treffbilde.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">NPOA-etablering</div>
+      <p>Strekk ut til naturlig siktlinje mot første mål. Juster heler — ikke armer. Armer forblir i naturlig stilling.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Kobling til skulder</div>
+      <p>Skulderslipp (element 2) + armstrekk (element 3) er en sekvens: slipp skuldrene, <em>strekk deretter</em>. Rekkefølgen er viktig.</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <div class="theory-label">NPOA og benstøtte — ISSF / Loh et al. (2021)</div>
+    <p>ISSF beskriver aiming stability som en kritisk faktor for skyteresultat. Stabilitet oppnås gjennom skeletal support fremfor muskulær kraft — fordi muskelkraft er mer variabel og mer påvirket av angst og arousal enn skjelett-geometri.</p>
+    <p>Loh et al. (2021) fant at anterior og posterior deltoid-aktivering er direkte assosiert med skyteresultat i luftpistol. Optimal, konsistent deltoid-aktivering — ikke minimal — er målet. Full armstrekk gir det mest konsistente deltoid-belastningsbildet.</p>
+  </div>
+</div>
+</details>
+
+<!-- ELEMENT 4: SE PÅ SIKTET -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Element 4 — «Se på siktet»</h2>
+    <div class="sub">
+      <span class="pill step">EKSTERN FOKUS</span>
+      <span class="pill">Wulf (2013)</span>
+      <span class="pill">Raisbeck & Diekfuss (2017)</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">«Se på siktet» er ikke bare et ønske — det er et eksternt fokus-cue med dokumentert prestasjonseffekt. Ett ord. Eksternt objekt. Aktiverer automatisert motorikk.</p>
+
+  <p>Forskning på attensjonsfokus er entydig: ett enkelt eksternt fokus-cue gir signifikant bedre motorisk prestasjon og lavere kognitiv belastning enn intern fokus (kroppen, armen, hånden) eller multiple cues. «Se på siktet» peker oppmerksomheten mot et objekt <em>utenfor</em> kroppen — korntoppen / frontsiktet — og aktiverer dermed den constrained action hypothesis-mekanismen: motorikken selvorganiserer uten bevisst interferens (Wulf et al., 2001; Raisbeck & Diekfuss, 2017).</p>
+
+  <div class="contrast-box">
+    <div class="contrast-item bad">
+      <div class="contrast-label">❌ Intern fokus (unngå)</div>
+      <p>«Husk å holde armen stabil» · «Grip riktig» · «Ikke trekk av for fort» — disse retter oppmerksomheten mot kroppen og forstyrrer automatisert motorikk.</p>
+    </div>
+    <div class="contrast-item good">
+      <div class="contrast-label">✓ Eksternt fokus (bruk)</div>
+      <p>«Se på siktet» — ett ord, ett eksternt punkt. Kroppen selvorganiserer. Motorikken kjøres automatisert. Kognitiv belastning reduseres.</p>
+    </div>
+  </div>
+
+  <p style="margin-top:14px;"><strong>Kobling til Quiet Eye:</strong> «Se på siktet» aktiverer ikke bare riktig attensjonsfokus — det etablerer også startpunktet for Quiet Eye-fikseringen på frontsiktet, som er direkte assosiert med skytepresisjonen (Vickers, 2007; Vickers & Williams, 2007).</p>
+
+  <p><strong>Timing i IPSC:</strong> Cue-ordet aktiveres <em>ved presentasjon av pistolen mot hvert mål</em> — ikke bare ved draw. Gjøres det til en del av skyterytmen, aktiveres det automatisk under press.</p>
+
+  <div class="theory-box">
+    <div class="theory-label">Eksternt fokus i håndvåpenskyting — Raisbeck & Diekfuss (2017) / Wulf (2013)</div>
+    <p>Raisbeck & Diekfuss (2017) testet direkte effekten av eksternt versus internt fokus-cue i simulert håndvåpenskyting. Ett eksternt fokus-cue ga signifikant bedre prestasjon under immediat og delayed retention enn intern fokus eller multiple cues. Kognitiv belastning (NASA-TLX) var signifikant lavere med eksternt enkelt-cue.</p>
+    <p>Metaanalyse (Nicklas et al., 2022) bekrefter at eksternt fokus gir overlegen motorisk prestasjon (SMD = 0.24 vs intern fokus) på tvers av motoriske oppgaver — konsistent med constrained action hypothesis (Wulf et al., 2001): eksternt fokus fremmer automatisert bevegelse, intern fokus hindrer det.</p>
+  </div>
+</div>
+</details>
+
+<!-- KOMPLETT SEKVENS -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Den komplette sekvensen — steg for steg</h2>
+    <div class="sub">
+      <span class="pill step">FULL PROTOKOLL</span>
+      <span class="pill">Fra «next competitor» til «beep»</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Slik ser den komplette pre-stage-rutinen ut i praksis. Hvert element har sin funksjon. Rekkefølgen er ikke tilfeldig.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-time">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-label">~60 sek</div>
+      </div>
+      <div class="tl-body">
+        <h3>Stage-walk — visualiser siktet, ikke platen</h3>
+        <p>Gå stage-en mentalt. Visualiser korntoppen i hakket på hvert mål — ikke A-sonen, ikke platen. Etabler dette som ditt visuelle referansepunkt.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-label">~30 sek</div>
+      </div>
+      <div class="tl-body">
+        <h3>Pust 4–4–6</h3>
+        <p>Én pustesekvens. Inn 4 sek → hold 4 sek → ut 6 sek. Vagusaktivering. Demper sympatikusrespons og stimulus-drevet blikk-drift.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-label">«Make ready»</div>
+      </div>
+      <div class="tl-body">
+        <h3>Slapp av i skuldrene</h3>
+        <p>Bevisst skulderslipp. Kjenn spenningen slippe fra trapezius og ned. Armer henger løst. <em>Deretter</em> strekk ut til stilling.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-label">Stilling</div>
+      </div>
+      <div class="tl-body">
+        <h3>Strekk ut armene — NPOA</h3>
+        <p>Full armstrekk. Benstøtte, ikke muskelkraft. Juster heler til naturlig siktlinje mot første mål. Armer forblir i naturlig stilling.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-label">«Standby»</div>
+      </div>
+      <div class="tl-body">
+        <h3>«Se på siktet» — commit</h3>
+        <p>Aktivér cue-ordet. Blikket finner korntoppen. Commit: «Jeg skyter når siktet sier klart — ikke når platen sier klart.»</p>
+        <div class="cmd">Se på siktet</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">
+        <div class="tl-dot"></div>
+        <div class="tl-line" style="opacity:0"></div>
+        <div class="tl-label">«Beep»</div>
+      </div>
+      <div class="tl-body">
+        <h3>Execute</h3>
+        <p>Draw. Presentasjon. «Se på siktet» aktiveres på nytt ved hvert mål. Kroppen selvorganiserer.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</details>
+
+<!-- TRENING -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Trening av protokollen</h2>
+    <div class="sub">
+      <span class="pill step">TRENING</span>
+      <span class="pill">Dry fire</span>
+      <span class="pill">Automatisering</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <p class="ingress">Protokollen virker bare hvis den er automatisert. Den må trenes inn — ikke bare brukes i konkurranse.</p>
+
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">Dry fire — daglig</div>
+      <p>Gjennomfør hele sekvensen (pust → skulder → armer → «se på siktet») før hvert dry-fire-sett. Gjøres etter hvert sett: 50–100 repetisjoner per uke.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Live fire — konsistens</div>
+      <p>Bruk sekvensen før hvert sett i trening, ikke bare i match. Jo mer automatisert den er i trening, desto sikrere aktiveres den under konkurranse-press.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">«Se på siktet» — ved hvert mål</div>
+      <p>Cue-ordet trenes inn som del av skyterytmen: presentasjon → «se på siktet» → QE → avfyr. Ikke bare ved draw-starten.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-label">Press-simulering</div>
+      <p>Videopptak, rangerte treningsstages, tilskuere. Observer: aktiveres protokollen automatisk? Loggfør når target focus likevel inntreffer.</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <div class="theory-label">Automatisering og press — Nideffer & Sagal (2006) / Oudejans et al. (2011)</div>
+    <p>Cue-ord og pre-performance rutiner virker under press kun hvis de er innøvd nok til at aktiveringsterskelen er lav (Nideffer & Sagal, 2006). Trening under gradvis økt press overfører protokollen til konkurranse-konteksten mer robust enn trening kun under lav press (Oudejans et al., 2011).</p>
+  </div>
+</div>
+</details>
+
+<!-- REFERANSER -->
+<details class="card">
+<summary class="card-head">
+  <div>
+    <h2>Referanser (APA 7)</h2>
+    <div class="sub">
+      <span class="pill">Eksternt fokus</span>
+      <span class="pill">HRV</span>
+      <span class="pill">Pistolskyting</span>
+    </div>
+  </div>
+</summary>
+<div class="card-body">
+  <ul class="ref-list">
+    <li>Blumenstein, B., & Orbach, I. (2022). Preparatory routines for emotional regulation in performance enhancement. <em>Frontiers in Psychology, 13</em>, 948512. https://doi.org/10.3389/fpsyg.2022.948512</li>
+    <li>Eysenck, M. W., Derakshan, N., Santos, R., & Calvo, M. G. (2007). Anxiety and cognitive performance: Attentional control theory. <em>Emotion, 7</em>(2), 336–353. https://doi.org/10.1037/1528-3542.7.2.336</li>
+    <li>Jacobson, E. (1928). <em>Progressive relaxation</em>. University of Chicago Press.</li>
+    <li>Laborde, S., Allen, M. S., Borges, U., Dosseville, F., Hosang, T. J., Iskra, M., Mosley, E., Salvotti, C., Spolverato, L., Zammit, N., & Javelle, F. (2022). Effects of voluntary slow breathing on heart rate and heart rate variability: A systematic review and meta-analysis. <em>Neuroscience & Biobehavioral Reviews, 138</em>, 104711. https://doi.org/10.1016/j.neubiorev.2022.104711</li>
+    <li>Loh, S. K., Lim, J. Z., Pan, J. W., Aziz, L., Lee, M. J. C., & Kong, P. W. (2021). Air pistol shooting: Differences in upper limb muscle activation between training and simulated competition. <em>Sports Biomechanics, 23</em>(10), 1726–1737. https://doi.org/10.1080/14763141.2021.1975812</li>
+    <li>Moran, A. (2012). <em>Sport and exercise psychology: A critical introduction</em> (2. utg.). Routledge.</li>
+    <li>Nicklas, A., Bröcker, J., & Baumeister, J. (2022). A meta-analysis on immediate effects of attentional focus on motor tasks performance. <em>International Review of Sport and Exercise Psychology, 17</em>(2), 1–31. https://doi.org/10.1080/1750984X.2022.2062678</li>
+    <li>Nideffer, R. M., & Sagal, M. (2006). Concentration and attention control training. I J. M. Williams (Red.), <em>Applied sport psychology: Personal growth to peak performance</em> (5. utg., s. 382–403). McGraw-Hill.</li>
+    <li>Oudejans, R. R. D., Kuijpers, W., Kooijman, C. C., & Bakker, F. C. (2011). Thoughts and attention of athletes under pressure: skill-focus or performance worries? <em>Anxiety, Stress, & Coping, 24</em>(1), 59–73. https://doi.org/10.1080/10615801003601894</li>
+    <li>Raisbeck, L. D., & Diekfuss, J. A. (2017). Verbal cues and attentional focus: A simulated target-shooting experiment. <em>Journal of Motor Learning and Development, 5</em>(1), 148–163. https://doi.org/10.1123/jmld.2016-0005</li>
+    <li>Vickers, J. N. (2007). <em>Perception, cognition and decision training: The quiet eye in action</em>. Human Kinetics.</li>
+    <li>Vickers, J. N., & Williams, A. M. (2007). Performing under pressure: The interactive effects of physiological arousal, cognitive anxiety and gaze control in elite biathlon shooters. <em>Journal of Motor Behavior, 39</em>(5), 381–394. https://doi.org/10.3200/JMBR.39.5.381-394</li>
+    <li>Wilson, M. R., Vine, S. J., & Wood, G. (2009). The influence of anxiety on visual attentional control in basketball free throw shooting. <em>Journal of Sport and Exercise Psychology, 31</em>(2), 152–168. https://doi.org/10.1123/jsep.31.2.152</li>
+    <li>Wulf, G. (2013). Attentional focus and motor learning: A review of 15 years. <em>International Review of Sport and Exercise Psychology, 6</em>(1), 77–104. https://doi.org/10.1080/1750984X.2012.723728</li>
+    <li>Wulf, G., McNevin, N., & Shea, C. H. (2001). The automaticity of complex motor skill learning as a function of attentional focus. <em>The Quarterly Journal of Experimental Psychology, 54A</em>(4), 1143–1154. https://doi.org/10.1080/713756012</li>
+  </ul>
+</div>
+</details>
+
+</main>
+
+<footer>
+  <p>Pre-stage regulering · IPSC Classic Division · Basert på idrettspsykologisk forskning</p>
+</footer>
+
+</div>
+<script>
+(function(){
+  let op=[];
+  window.addEventListener('beforeprint',function(){
+    op=[];
+    document.querySelectorAll('details.card:not([open])').forEach(function(d){d.setAttribute('open','');op.push(d);});
+  });
+  window.addEventListener('afterprint',function(){op.forEach(function(d){d.removeAttribute('open');});op=[];});
+})();
+</script>
+</body>
+</html>

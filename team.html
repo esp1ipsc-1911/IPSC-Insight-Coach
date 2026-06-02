@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#0a0b0d">
 <title>EHC 2026 — Team Standings</title>
-<!-- Build: v7 results-tab-restored two-url-fields + tomanek-test 2026-06-02 -->
+<!-- Build: v11 single-shooter-result-extractor 2026-06-02 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -207,7 +207,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
     <div class="header-icon">🏆</div>
     <div>
       <div class="header-title">EHC 2026 — Team Standings</div>
-      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v9 ESS EXTRACTOR</div>
+      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v11 SINGLE SHOOTER EXTRACTOR</div>
     </div>
     <div class="header-right">
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
@@ -289,8 +289,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   <!-- RESULTS IMPORT TAB -->
   <div class="tab-content" id="tab-results">
     <div class="import-header" style="border-color:var(--accent);box-shadow:0 0 0 1px rgba(201,162,39,.25)">
-      <h3>📥 Import Results from ESS Portal · AKTIV v9</h3>
-      <p>Automatisk import kan forsøke proxy, men ESS returnerer ofte portal-/login-side. Mest stabil metode er nå <strong>ESS Extractor Bookmarklet</strong>: åpne resultatsiden mens du er innlogget, kjør extractor, lim resultatet inn her. Importen oppdaterer bare <strong>shooter.stages</strong> og endrer aldri lagtilhørighet.</p>
+      <h3>📥 Import Results from ESS Portal · AKTIV v10</h3>
+      <p>Automatisk import kan forsøke proxy, men ESS returnerer ofte portal-/login-side. Mest stabil metode er nå <strong>ESS Single Shooter Extractor</strong>: søk opp skytter på ESS, åpne skytterens resultatside, kjør extractor, lim resultatet inn her. Importen oppdaterer bare <strong>shooter.stages</strong> og endrer aldri lagtilhørighet.</p>
     </div>
     <div class="match-selector">
       <label>Target match</label>
@@ -1204,27 +1204,168 @@ function essExtractVisibleText(raw) {
   return str;
 }
 
-function essNormalizeExtractorPayload(text) {
+function essTryParseExtractorPayload(text) {
   const raw = String(text || '').trim();
-  if (!raw) return '';
+  if (!raw) return null;
   try {
     const obj = JSON.parse(raw);
-    if (obj && obj.essExtractor) {
-      const tableText = Array.isArray(obj.tables) ? obj.tables.map(t => (t.rows||[]).map(r => (r||[]).join('\t')).join('\n')).join('\n\n') : '';
-      return [obj.title || '', obj.url || '', tableText, obj.text || ''].filter(Boolean).join('\n\n');
-    }
+    if (obj && obj.essExtractor) return obj;
   } catch(e) {}
+  return null;
+}
+
+
+function essParseExtractorSingleShooter(obj) {
+  if (!obj || !obj.essExtractor) return null;
+  const src = obj.shooter || obj.singleShooter || obj.result || null;
+  if (!src || !Array.isArray(src.stages)) return null;
+  const clean = v => String(v ?? '').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
+  const pn = v => parseFloat(String(v ?? '').replace(',', '.').replace('%','').trim()) || 0;
+  const pi = v => parseInt(String(v ?? '').replace(',', '.').trim(), 10) || 0;
+  const splitName = name => {
+    name = clean(name).replace(/^#\s*\d+\s*/, '').trim();
+    if (name.includes(',')) {
+      const parts = name.split(',');
+      return {lastName: clean(parts[0]), firstName: clean(parts.slice(1).join(','))};
+    }
+    const parts = name.split(/\s+/).filter(Boolean);
+    return {firstName: parts.slice(0,-1).join(' '), lastName: parts.slice(-1).join(' ')};
+  };
+  const shooterName = clean(src.shooterName || src.name || src.competitorName || '');
+  const nm = splitName(shooterName);
+  const stages = src.stages.map(st => ({
+    num: pi(st.num ?? st.stage ?? st.stageNumber ?? String(st.stg || '').replace(/[^0-9]/g,'')),
+    hf: pn(st.hf ?? st.hitFactor ?? st.factor),
+    pts: pi(st.pts ?? st.points),
+    a: pi(st.a),
+    c: pi(st.c),
+    d: pi(st.d),
+    miss: pi(st.miss ?? st.mi ?? st.m),
+    ns: pi(st.ns),
+    proc: pi(st.proc ?? st.pe),
+    time: pn(st.time),
+    totalScore: pn(st.totalScore),
+    scorePct: pn(st.scorePct)
+  })).filter(st => st.num && (st.hf || st.time || st.pts || st.a || st.c || st.d || st.miss || st.ns || st.proc))
+     .sort((a,b)=>a.num-b.num);
+  if (!stages.length) return null;
+  return {
+    num: clean(src.num || src.number || src.competitorNo || obj.competitorNo || ''),
+    shooterName,
+    firstName: clean(src.firstName || nm.firstName),
+    lastName: clean(src.lastName || nm.lastName),
+    division: clean(src.division || obj.division || ''),
+    category: clean(src.category || obj.category || ''),
+    class: clean(src.class || src.shooterClass || obj.class || ''),
+    region: clean(src.region || src.reg || obj.region || ''),
+    pf: clean(src.pf || src.powerFactor || src.factor || obj.pf || 'minor').toLowerCase(),
+    stages
+  };
+}
+
+function essParseExtractorStageTables(obj) {
+  if (!obj || !obj.essExtractor) return [];
+  const tables = Array.isArray(obj.stageTables) ? obj.stageTables : [];
+  const byNum = new Map();
+  const pn = v => parseFloat(String(v ?? '').replace(',', '.').replace('%','').trim()) || 0;
+  const pi = v => parseInt(String(v ?? '').replace(',', '.').trim(), 10) || 0;
+  const clean = v => String(v ?? '').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
+  const splitName = name => {
+    name = clean(name).replace(/\s*\(\d+\)\s*$/, '').trim();
+    if (name.includes(',')) {
+      const parts = name.split(',');
+      return {lastName: clean(parts[0]), firstName: clean(parts.slice(1).join(','))};
+    }
+    const parts = name.split(/\s+/).filter(Boolean);
+    return {firstName: parts.slice(0,-1).join(' '), lastName: parts.slice(-1).join(' ')};
+  };
+  tables.forEach(t => {
+    const stageNum = Number(t.stage || t.stageNumber || 0);
+    if (!stageNum) return;
+    const division = clean(t.division || '');
+    (t.results || []).forEach(r => {
+      const num = clean(r.num || r.number || r.competitorNo || '');
+      const shooterName = clean(r.shooterName || r.shooter || r.name || '');
+      if (!num || !shooterName) return;
+      const key = num;
+      if (!byNum.has(key)) {
+        const nm = splitName(shooterName);
+        byNum.set(key, {
+          num,
+          shooterName: shooterName.replace(/\s*\(\d+\)\s*$/, '').trim(),
+          firstName: nm.firstName,
+          lastName: nm.lastName,
+          division,
+          category: clean(r.category || ''),
+          region: clean(r.region || ''),
+          pf: clean(r.factor || r.pf || 'minor').toLowerCase(),
+          stages: []
+        });
+      }
+      const objRes = byNum.get(key);
+      if (!objRes.division && division) objRes.division = division;
+      if (!objRes.region && r.region) objRes.region = clean(r.region);
+      if (!objRes.category && r.category) objRes.category = clean(r.category);
+      const existing = objRes.stages.findIndex(s => Number(s.num) === stageNum);
+      const st = {
+        num: stageNum,
+        hf: pn(r.hitFactor ?? r.hf),
+        pts: pi(r.points),
+        time: pn(r.time),
+        totalScore: pn(r.totalScore),
+        scorePct: pn(r.scorePct),
+        place: pi(r.place),
+        pom: pn(r.pom),
+        a: 0, c: 0, d: 0, miss: 0, ns: 0, proc: 0
+      };
+      if (existing >= 0) objRes.stages[existing] = {...objRes.stages[existing], ...st};
+      else objRes.stages.push(st);
+    });
+  });
+  return Array.from(byNum.values()).map(r => ({...r, stages: r.stages.sort((a,b)=>a.num-b.num)}));
+}
+
+function essNormalizeExtractorPayload(text) {
+  const raw = String(text || '').trim();
+  const obj = essTryParseExtractorPayload(raw);
+  if (obj && obj.essExtractor) {
+    const tableText = Array.isArray(obj.stageTables)
+      ? obj.stageTables.map(t => [t.title || '', ...(t.results || []).map(r => [r.place,r.num,r.shooterName,r.category,r.class,r.factor,r.region,r.points,r.time,r.hitFactor,r.totalScore,r.scorePct].join('\t'))].join('\n')).join('\n\n')
+      : (Array.isArray(obj.tables) ? obj.tables.map(t => (t.rows||[]).map(r => (r||[]).join('\t')).join('\n')).join('\n\n') : '');
+    return [obj.title || '', obj.url || '', tableText, obj.text || ''].filter(Boolean).join('\n\n');
+  }
   return raw;
 }
 
 function parseESSResultsText(text) {
-  text = essNormalizeExtractorPayload(text);
   const match = resultMatch();
   if (!match) { showToast('Velg target match først', 'error'); return; }
+
+  const extractorObj = essTryParseExtractorPayload(text);
+  if (extractorObj) {
+    const single = essParseExtractorSingleShooter(extractorObj);
+    if (single) {
+      essParsedResults = [{...single, matchInfo: matchESSResultToShooter(single, match)}];
+      renderESSPreview(match);
+      const matched = essParsedResults.filter(r => r.matchInfo && r.matchInfo.confidence === 'exact').length;
+      setESSStatus(`Leste single-shooter ESS-resultat for #${single.num || '?'} ${single.shooterName || ''}. ${matched ? 'Matchet sikkert på skytternummer.' : 'Ingen sikker match – sjekk at skytteren finnes i target match.'}`, matched ? 'success' : 'error');
+      return;
+    }
+  }
+  if (extractorObj && Array.isArray(extractorObj.stageTables) && extractorObj.stageTables.length) {
+    const parsedFromTables = essParseExtractorStageTables(extractorObj);
+    essParsedResults = parsedFromTables.map(p => ({...p, matchInfo: matchESSResultToShooter(p, match)}));
+    renderESSPreview(match);
+    const matched = essParsedResults.filter(r => r.matchInfo && r.matchInfo.confidence === 'exact').length;
+    setESSStatus(`Leste ${extractorObj.stageTables.length} stage-tabeller fra ESS. Fant ${essParsedResults.length} skyttere. ${matched} matcher sikkert på skytternummer.`, matched ? 'success' : 'error');
+    return;
+  }
+
+  text = essNormalizeExtractorPayload(text);
   if (essLooksLikePortalPage(text)) {
     essParsedResults = [];
     renderESSPreview(match);
-    setESSStatus('Dette er portalside/eventliste, ikke ESS-resultater. Automatisk henting får ikke selve resultatsiden fra ESS. Prøv full result-compare-lenke eller kopier resultat-/verify-tekst fra skyttersiden.', 'error');
+    setESSStatus('Dette er portalside/eventliste, ikke ESS-resultater. Åpne selve resultatsiden der stage-tabellene vises, og kjør ESS Extractor der.', 'error');
     return;
   }
   const parsed = essParseManyCompetitors(text);
@@ -1233,7 +1374,6 @@ function parseESSResultsText(text) {
   const matched = essParsedResults.filter(r => r.matchInfo && r.matchInfo.confidence === 'exact').length;
   setESSStatus(`Fant ${essParsedResults.length} resultatblokker. ${matched} matcher sikkert på skytternummer.`, matched ? 'success' : 'error');
 }
-
 
 function essLooksLikePortalPage(text) {
   const t = String(text || '');
@@ -1459,6 +1599,8 @@ window.confirmESSResultsImport = async () => {
         ns: Number(sr.ns) || 0,
         proc: Number(sr.proc) || 0,
         pf: shooter.pf || res.pf || 'minor',
+        totalScore: Number(sr.totalScore) || 0,
+        scorePct: Number(sr.scorePct) || 0,
         source: 'ESS'
       };
       if (existingIdx >= 0) shooter.stages[existingIdx] = {...shooter.stages[existingIdx], ...stageObj};

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#0a0b0d">
 <title>EHC 2026 — Team Standings</title>
+<!-- Build: v7 results-tab-restored two-url-fields + tomanek-test 2026-06-02 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -122,6 +123,24 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .import-search:focus{border-color:var(--accent)}
 
 .nation-block{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+
+.category-block{background:rgba(10,10,10,.42);border:2px solid rgba(201,162,39,.45);border-radius:16px;margin:0 0 18px;overflow:hidden}
+.category-header{padding:16px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;background:linear-gradient(90deg,rgba(201,162,39,.24),rgba(255,255,255,.035));border-bottom:1px solid rgba(201,162,39,.32)}
+.category-title{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);flex:1}
+.category-count{font-size:12px;color:var(--text);font-family:'Share Tech Mono',monospace}
+.category-arrow{font-size:12px;color:var(--muted);transition:transform .2s}
+.category-arrow.open{transform:rotate(90deg)}
+.category-content{display:none;padding:10px}
+.category-content.open{display:block}
+.category-content .nation-block{margin-bottom:8px}
+.team-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.team-card-head{padding:12px 16px;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.035);border-bottom:1px solid var(--border)}
+.team-card-flag{font-size:20px;flex-shrink:0}
+.team-card-title{font-size:14px;font-weight:800;flex:1}
+.team-card-meta{font-size:12px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+.team-card-body{padding:8px 16px 10px}
+.competition-note{font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.team-mini-label{font-size:11px;color:var(--accent);font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:.5px;padding:8px 0 4px;border-bottom:1px solid var(--border);margin:4px 0}
 .nation-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
 .nation-header:hover{background:rgba(255,255,255,.03)}
 .nation-flag{font-size:20px}
@@ -154,6 +173,17 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   .tab-content{max-width:700px;margin:0 auto}
   .import-footer{max-width:700px;margin:0 auto;border-radius:12px;margin-bottom:12px;border:1px solid var(--border)}
 }
+
+/* ESS result import */
+.result-summary{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.result-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.result-metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px}
+.result-metric strong{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.result-metric span{font-size:18px;font-weight:800;color:var(--accent);font-family:'Share Tech Mono',monospace}
+.result-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.result-table th,.result-table td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;text-align:left}
+.result-ok{color:var(--success);font-weight:700}.result-warn{color:var(--danger);font-weight:700}
+@media(max-width:700px){.result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-table{font-size:11px}}
 </style>
 </head>
 <body>
@@ -177,7 +207,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
     <div class="header-icon">🏆</div>
     <div>
       <div class="header-title">EHC 2026 — Team Standings</div>
-      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE</div>
+      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v7 RESULTS RESTORED</div>
     </div>
     <div class="header-right">
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
@@ -187,6 +217,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   <div class="tabs">
     <div class="tab active" onclick="switchTab('standings')">Standings</div>
     <div class="tab" onclick="switchTab('import')">Import Shooters</div>
+    <div class="tab" onclick="switchTab('results')">Import Results</div>
   </div>
 
   <!-- STANDINGS TAB -->
@@ -206,8 +237,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   <!-- IMPORT TAB -->
   <div class="tab-content" id="tab-import">
     <div class="import-header">
-      <h3>🌍 Import EHC Teams & Shooters</h3>
-      <p>Alle landslag fra EHG 2026. T-merkede skyttere legges automatisk i riktig lag basert på squad-/teamoverskriften. Personlig kategori (S, SS, J osv.) brukes ikke til å splitte et lag når overskriften sier én lagklasse. Norske ikke-lagskyttere kan også importeres som individuelle skyttere.</p>
+      <h3>🌍 Import EHC Teams & Shooters · kategoriinndelt</h3>
+      <p><strong>SEPARATE KONKURRANSER:</strong> Lagene vises først etter divisjon og deretter etter lagkategori. Overall, Senior, Super Senior, Lady, Junior osv. har hver sin egen seksjon. Nasjoner vises først inni riktig kategori.</p>
     </div>
     <div class="match-selector">
       <label>Target match</label>
@@ -226,6 +257,20 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
         <option>Revolver</option>
         <option>Standard</option>
       </select>
+      <select class="import-select" id="filter-cat" onchange="renderImportList()">
+        <option value="__ALL__">All Categories</option>
+        <option value="">Overall</option>
+        <option value="S">Senior</option>
+        <option value="SS">Super Senior</option>
+        <option value="L">Lady</option>
+        <option value="LS">Lady Senior</option>
+        <option value="J">Junior</option>
+        <option value="SJ">Senior Junior</option>
+        <option value="LJ">Lady Junior</option>
+        <option value="LSJ">Lady Senior Junior</option>
+        <option value="GJ">Grand Junior</option>
+        <option value="GS">Grand Senior</option>
+      </select>
       <select class="import-select" id="filter-reg" onchange="renderImportList()">
         <option value="">All Nations</option>
       </select>
@@ -238,6 +283,43 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
       <div class="import-selected-count">Selected: <span id="sel-count">0</span> shooters</div>
       <div class="import-progress" id="import-progress"></div>
       <button class="btn btn-primary" onclick="doImport()">Import to match</button>
+    </div>
+  </div>
+
+  <!-- RESULTS IMPORT TAB -->
+  <div class="tab-content" id="tab-results">
+    <div class="import-header" style="border-color:var(--accent);box-shadow:0 0 0 1px rgba(201,162,39,.25)">
+      <h3>📥 Import Results from ESS Portal · AKTIV v7</h3>
+      <p>Automatisk import bruker to separate felt: <strong>ESS result URL</strong> er resultatsiden fra IPSC ESS, og <strong>Proxy/API URL</strong> er Cloudflare Worker-adressen. Importen oppdaterer bare <strong>shooter.stages</strong> og endrer aldri lagtilhørighet.</p>
+    </div>
+    <div class="match-selector">
+      <label>Target match</label>
+      <select class="field-select" id="results-match-select">
+        <option value="">Loading matches…</option>
+      </select>
+    </div>
+    <div class="match-selector">
+      <label>ESS result URL</label>
+      <input class="field-input" id="ess-url" value="https://portal.ipscess.org/portal/match/7375de86-2332-4402-a763-7e4b07d11bf9/result-compare/689774b4-7648-4bb6-94bf-1ec699b851ce?group=class" placeholder="https://portal.ipscess.org/portal/match/.../result-compare/...?group=class">
+      <div style="font-size:12px;color:var(--muted);margin-top:-4px;margin-bottom:10px">Dette skal være selve ESS-resultatsiden/result-compare-lenken.</div>
+      <label>Proxy/API URL</label>
+      <input class="field-input" id="ess-proxy-url" value="https://ess-results-proxy.esp1-ipsc.workers.dev/" placeholder="https://ess-results-proxy.<navn>.workers.dev/">
+      <div style="font-size:12px;color:var(--muted);margin-top:-4px;margin-bottom:10px">Dette skal være Cloudflare Worker-adressen, ikke ESS-lenken.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <button class="btn btn-primary" onclick="fetchESSResults()">Fetch results</button>
+        <button class="btn btn-secondary" onclick="parsePastedESSResults()">Parse pasted text</button>
+      </div>
+    </div>
+    <div class="import-header">
+      <h3>Manual fallback</h3>
+      <p>Bruk dette hvis automatisk henting feiler. Kopier tekst fra ESS/verify/results-siden og lim inn under.</p>
+      <textarea id="ess-paste-text" class="field-input" style="min-height:170px;font-family:'Share Tech Mono',monospace;white-space:pre-wrap" placeholder="Paste ESS/SSI/portal result text here…"></textarea>
+    </div>
+    <div id="ess-import-status" class="import-progress" style="margin:10px 0 16px"></div>
+    <div id="ess-preview"></div>
+    <div class="import-footer">
+      <div class="import-selected-count">Ready to import: <span id="ess-ready-count">0</span> matched shooters</div>
+      <button class="btn btn-primary" onclick="confirmESSResultsImport()">Import confirmed results</button>
     </div>
   </div>
 </div>
@@ -320,15 +402,22 @@ function populateMatchDropdowns() {
   const empty = '<option value="">— Select match —</option>';
   document.getElementById('match-select').innerHTML = empty + opts;
   document.getElementById('import-match-select').innerHTML = empty + opts;
-  if (selectedMatchId) document.getElementById('match-select').value = selectedMatchId;
+  const resultsSel = document.getElementById('results-match-select');
+  if (resultsSel) resultsSel.innerHTML = empty + opts;
+  if (selectedMatchId) {
+    document.getElementById('match-select').value = selectedMatchId;
+    if (resultsSel) resultsSel.value = selectedMatchId;
+  }
   if (selectedImportMatchId) document.getElementById('import-match-select').value = selectedImportMatchId;
 }
 
 // ─── Standings ────────────────────────────────────────────────────────────────
 window.switchTab = (tab) => {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['standings','import'][i]===tab));
+  const tabNames = ['standings','import','results'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabNames[i]===tab));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
+  const target = document.getElementById('tab-'+tab);
+  if (target) target.classList.add('active');
 };
 
 window.onMatchSelect = () => {
@@ -713,6 +802,8 @@ const NOR_INDIVIDUALS = [
   {num:"372",firstName:"Anna Louise",lastName:"Axelsen",div:"Standard",cat:"L"},
   {num:"373",firstName:"Lars-Einar",lastName:"Kjøren",div:"Optics",cat:""},
   {num:"1374",firstName:"Kjeld Joakim",lastName:"Kjøren",div:"Optics",cat:"GJ"},
+  // Test shooter for ESS result import only — not part of any team
+  {num:"1633",firstName:"Rafał",lastName:"Tomanek",div:"Classic",cat:"",reg:"POL"},
 ];
 
 // Flat import list for ALL nations. Team category comes from ALL_TEAMS/team heading.
@@ -736,7 +827,7 @@ const ALL_IMPORT_SHOOTERS = (() => {
 
   NOR_INDIVIDUALS.forEach(s => {
     if (!byNum.has(s.num)) {
-      byNum.set(s.num, {...s, reg:'NOR', teams: [], isTeam:false});
+      byNum.set(s.num, {...s, reg:(s.reg || 'NOR'), teams: [], isTeam:false});
     }
   });
   return Array.from(byNum.values());
@@ -753,99 +844,143 @@ function populateNationFilter() {
   if (regs.includes(current)) el.value = current;
 }
 
-// ─── Import logic (NOR only) ─────────────────────────────────────────────────
+// ─── Import logic (all EHC teams, grouped by division + team category) ───────
 let selectedNums = new Set();
 
 window.renderImportList = () => {
   populateNationFilter();
   const filterDiv = document.getElementById('filter-div').value;
   const filterReg = document.getElementById('filter-reg')?.value || '';
-  const search = document.getElementById('import-search').value.toLowerCase();
+  const filterCatRaw = document.getElementById('filter-cat')?.value ?? '__ALL__';
+  const filterCat = filterCatRaw === '__ALL__' ? null : filterCatRaw;
+  const search = document.getElementById('import-search').value.toLowerCase().trim();
 
-  let shooters = ALL_IMPORT_SHOOTERS.filter(s => {
-    const teamNames = (s.teams || []).map(t => t.name).join(' ');
-    const haystack = `${s.firstName} ${s.lastName} ${s.reg || ''} ${s.div || ''} ${teamNames}`.toLowerCase();
-    const divMatch = !filterDiv || s.div === filterDiv || (s.teams || []).some(t => t.div === filterDiv);
-    const regMatch = !filterReg || s.reg === filterReg;
+  const catLabel = (cat) => ({
+    '':'Overall', S:'Senior', SS:'Super Senior', J:'Junior', SJ:'Senior Junior',
+    L:'Lady', LS:'Lady Senior', LJ:'Lady Junior', LSJ:'Lady Senior Junior',
+    GJ:'Grand Junior', GS:'Grand Senior'
+  }[cat] || cat || 'Overall');
+
+  const divOrder = ['Classic','Open','Optics','Production','Production Optics','Revolver','Standard'];
+  const catOrder = ['','S','SS','J','SJ','L','LS','LJ','LSJ','GJ','GS'];
+  const divSort = (a,b) => {
+    const ai = divOrder.includes(a) ? divOrder.indexOf(a) : 999;
+    const bi = divOrder.includes(b) ? divOrder.indexOf(b) : 999;
+    return ai !== bi ? ai - bi : String(a).localeCompare(String(b));
+  };
+  const catSort = (a,b) => {
+    const ai = catOrder.includes(a) ? catOrder.indexOf(a) : 999;
+    const bi = catOrder.includes(b) ? catOrder.indexOf(b) : 999;
+    return ai !== bi ? ai - bi : String(a).localeCompare(String(b));
+  };
+
+  const visibleTeams = ALL_TEAMS.filter(t => {
+    const divMatch = !filterDiv || t.div === filterDiv;
+    const regMatch = !filterReg || t.reg === filterReg;
+    const catMatch = filterCat === null || (t.cat || '') === filterCat;
+    const memberText = t.members.map(m => `${m.num} ${m.firstName} ${m.lastName} ${m.cat || ''}`).join(' ');
+    const haystack = `${t.name} ${t.reg} ${t.div} ${catLabel(t.cat)} ${t.cat || ''} ${memberText}`.toLowerCase();
     const searchMatch = !search || haystack.includes(search);
-    return divMatch && regMatch && searchMatch;
+    return divMatch && regMatch && catMatch && searchMatch;
   });
 
-  // Group by nation, then by team. Individual shooters get their own group.
-  const nations = {};
-  shooters.forEach(s => {
-    const reg = s.reg || 'UNK';
-    if (!nations[reg]) nations[reg] = {reg, teamGroups: {}, individuals: []};
-
-    const visibleTeams = (s.teams || []).filter(t => !filterDiv || t.div === filterDiv);
-    if (visibleTeams.length) {
-      visibleTeams.forEach(t => {
-        if (!nations[reg].teamGroups[t.key]) {
-          nations[reg].teamGroups[t.key] = {name:t.name, div:t.div, cat:t.cat, members: []};
-        }
-        nations[reg].teamGroups[t.key].members.push(s);
-      });
-    } else {
-      nations[reg].individuals.push(s);
-    }
+  // Group by division + TEAM category. This is the competition class.
+  // Personal shooter category is displayed only as metadata and must not split teams.
+  const groups = {};
+  visibleTeams.forEach(t => {
+    const key = `${t.div}||${t.cat || ''}`;
+    if (!groups[key]) groups[key] = {div:t.div, cat:t.cat || '', teams: []};
+    groups[key].teams.push(t);
   });
 
   const container = document.getElementById('import-list');
   let html = '';
 
-  Object.values(nations).sort((a,b) => a.reg.localeCompare(b.reg)).forEach(nation => {
-    const teamEntries = Object.entries(nation.teamGroups).sort((a,b) => a[1].name.localeCompare(b[1].name));
-    const teamCount = teamEntries.length;
-    const shooterCount = new Set([
-      ...teamEntries.flatMap(([_, grp]) => grp.members.map(m => m.num)),
-      ...nation.individuals.map(m => m.num)
-    ]).size;
+  Object.values(groups)
+    .sort((a,b) => divSort(a.div,b.div) || catSort(a.cat,b.cat))
+    .forEach(group => {
+      const teamsHtml = group.teams
+        .sort((a,b) => a.reg.localeCompare(b.reg) || a.name.localeCompare(b.name))
+        .map(team => {
+          const memberHtml = team.members.map(shooter => {
+            const checked = selectedNums.has(shooter.num) ? 'checked' : '';
+            return `<div class="import-shooter-row">
+              <input type="checkbox" class="import-checkbox" value="${shooter.num}" ${checked}
+                onchange="toggleShooter('${shooter.num}')">
+              <div class="import-shooter-name">${shooter.firstName} ${shooter.lastName}</div>
+              <div class="import-shooter-meta">#${shooter.num}${shooter.cat?' · personlig '+shooter.cat:''}</div>
+            </div>`;
+          }).join('');
 
-    let innerHtml = '';
-    teamEntries.forEach(([key, grp]) => {
-      const catLabel = grp.cat === '' ? 'Overall' : grp.cat;
-      const memberHtml = grp.members.map(s => {
-        const checked = selectedNums.has(s.num) ? 'checked' : '';
-        return `<div class="import-shooter-row">
-          <input type="checkbox" class="import-checkbox" value="${s.num}" ${checked}
-            onchange="toggleShooter('${s.num}')">
-          <div class="import-shooter-name">${s.firstName} ${s.lastName}</div>
-          <div class="import-shooter-meta">#${s.num}${s.cat?' · personlig '+s.cat:''}</div>
-        </div>`;
-      }).join('');
+          return `
+          <div class="team-card">
+            <div class="team-card-head">
+              <div class="team-card-flag">${countryFlag(team.reg)}</div>
+              <div class="team-card-title">${team.name}</div>
+              <div class="team-card-meta">${team.reg} · ${team.members.length} skyttere</div>
+            </div>
+            <div class="team-card-body">${memberHtml}</div>
+          </div>`;
+        }).join('');
 
-      innerHtml += `
-        <div class="div-group-label">${grp.name} · ${grp.div} · ${catLabel}</div>
-        ${memberHtml}`;
+      const teamCount = group.teams.length;
+      const shooterCount = new Set(group.teams.flatMap(t => t.members.map(m => m.num))).size;
+
+      html += `
+      <div class="category-block" data-competition-class="${group.div}||${group.cat}">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div>
+            <div class="category-title">${group.div} · ${catLabel(group.cat)}</div>
+            <div class="competition-note">Egen konkurranseklasse: bare disse lagene skyter mot hverandre</div>
+          </div>
+          <div class="category-count">${teamCount} lag · ${shooterCount} skyttere</div>
+          <div class="category-arrow open">▶</div>
+        </div>
+        <div class="category-content open">${teamsHtml}</div>
+      </div>`;
     });
 
-    if (nation.individuals.length) {
-      const indHtml = nation.individuals.map(s => {
-        const checked = selectedNums.has(s.num) ? 'checked' : '';
-        return `<div class="import-shooter-row">
-          <input type="checkbox" class="import-checkbox" value="${s.num}" ${checked}
-            onchange="toggleShooter('${s.num}')">
-          <div class="import-shooter-name">${s.firstName} ${s.lastName}</div>
-          <div class="import-shooter-meta">#${s.num} · ${s.div}${s.cat?' · '+s.cat:''}</div>
-        </div>`;
-      }).join('');
-      innerHtml += `<div class="div-group-label">Individuelle skyttere</div>${indHtml}`;
-    }
-
-    html += `
-    <div class="nation-block">
-      <div class="nation-header" onclick="toggleNation(this)">
-        <div class="nation-flag">${countryFlag(nation.reg)}</div>
-        <div class="nation-name">${nation.reg}</div>
-        <div class="nation-count">${teamCount} lag · ${shooterCount} skyttere</div>
-        <div class="nation-arrow">▶</div>
-      </div>
-      <div class="nation-shooters">${innerHtml}</div>
-    </div>`;
+  // NOR individual shooters are not team competitors; show them separately when relevant.
+  const individuals = ALL_IMPORT_SHOOTERS.filter(s => !s.isTeam).filter(s => {
+    const haystack = `${s.firstName} ${s.lastName} ${s.reg || ''} ${s.div || ''} ${s.cat || ''} ${s.num}`.toLowerCase();
+    const divMatch = !filterDiv || s.div === filterDiv;
+    const regMatch = !filterReg || s.reg === filterReg;
+    const searchMatch = !search || haystack.includes(search);
+    const catMatch = filterCat === null || (s.cat || '') === filterCat;
+    return divMatch && regMatch && catMatch && searchMatch;
   });
+
+  if (individuals.length) {
+    const indHtml = individuals.sort((a,b) => `${a.lastName} ${a.firstName}`.localeCompare(`${b.lastName} ${b.firstName}`)).map(s => {
+      const checked = selectedNums.has(s.num) ? 'checked' : '';
+      return `<div class="import-shooter-row">
+        <input type="checkbox" class="import-checkbox" value="${s.num}" ${checked}
+          onchange="toggleShooter('${s.num}')">
+        <div class="import-shooter-name">${s.firstName} ${s.lastName}</div>
+        <div class="import-shooter-meta">#${s.num} · ${s.reg} · ${s.div}${s.cat?' · '+s.cat:''}</div>
+      </div>`;
+    }).join('');
+    html += `
+      <div class="category-block">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="category-title">Individuelle skyttere</div>
+          <div class="category-count">${individuals.length} skyttere</div>
+          <div class="category-arrow">▶</div>
+        </div>
+        <div class="category-content open">${indHtml}</div>
+      </div>`;
+  }
 
   container.innerHTML = html || '<div class="empty-state" style="padding:24px;text-align:center;color:var(--muted)">Ingen treff</div>';
   updateSelCount();
+};
+
+
+window.toggleCategory = (header) => {
+  const content = header.nextElementSibling;
+  const arrow = header.querySelector('.category-arrow');
+  const open = content.classList.toggle('open');
+  arrow.classList.toggle('open', open);
 };
 
 window.toggleNation = (header) => {
@@ -954,6 +1089,273 @@ window.doImport = async () => {
   } catch(e) {
     showToast('Feil: ' + e.message, 'error');
     progEl.textContent = '';
+  }
+};
+
+
+// ─── ESS / IPSC portal result import ──────────────────────────────────────────
+let essParsedResults = [];
+let essLastRawText = '';
+
+function normTextName(v) {
+  return String(v || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,' ')
+    .trim();
+}
+
+function resultMatch() {
+  const matchId = document.getElementById('results-match-select')?.value || selectedMatchId;
+  return allMatches.find(m => String(m.id) === String(matchId));
+}
+
+function setESSStatus(msg, type='') {
+  const el = document.getElementById('ess-import-status');
+  if (!el) return;
+  el.innerHTML = msg || '';
+  el.style.color = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--muted)');
+}
+
+
+setTimeout(() => {
+  try {
+    const savedEss = localStorage.getItem('ehcEssUrl');
+    const savedProxy = localStorage.getItem('ehcEssProxyUrl');
+    if (savedEss && document.getElementById('ess-url')) document.getElementById('ess-url').value = savedEss;
+    if (savedProxy && document.getElementById('ess-proxy-url')) document.getElementById('ess-proxy-url').value = savedProxy;
+  } catch(e) {}
+}, 0);
+
+window.fetchESSResults = async () => {
+  const essUrl = (document.getElementById('ess-url')?.value || '').trim();
+  const proxyUrl = (document.getElementById('ess-proxy-url')?.value || '').trim();
+
+  if (!essUrl) { showToast('Legg inn ESS result URL først', 'error'); return; }
+  if (!proxyUrl) { showToast('Legg inn Proxy/API URL først', 'error'); return; }
+  if (!essUrl.includes('portal.ipscess.org')) { showToast('ESS result URL må være portal.ipscess.org-lenken', 'error'); return; }
+  if (proxyUrl.includes('portal.ipscess.org')) { showToast('Proxy/API URL må være Cloudflare Worker, ikke ESS-lenken', 'error'); return; }
+
+  try {
+    localStorage.setItem('ehcEssUrl', essUrl);
+    localStorage.setItem('ehcEssProxyUrl', proxyUrl);
+  } catch(e) {}
+
+  setESSStatus('Henter ESS-resultater via Cloudflare Worker…');
+  try {
+    const r = await fetch(proxyUrl, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({url: essUrl})
+    });
+    if (!r.ok) {
+      let errText = '';
+      try { errText = await r.text(); } catch(e) {}
+      throw new Error('Proxy HTTP '+r.status+(errText ? ': '+errText.slice(0,180) : ''));
+    }
+
+    const ct = r.headers.get('content-type') || '';
+    let text = '';
+    if (ct.includes('application/json')) {
+      const data = await r.json();
+      if (data.ok === false) throw new Error(data.error || 'Proxy returnerte ok=false');
+      text = data.rawText || data.text || data.html || '';
+    } else {
+      text = await r.text();
+    }
+
+    essLastRawText = essExtractVisibleText(text);
+    document.getElementById('ess-paste-text').value = essLastRawText.slice(0, 200000);
+
+    if (/ECM Members Portal|Search Matches|Events Open For Registration|\bLogin\b/i.test(essLastRawText) && !/#\s*\d+/.test(essLastRawText)) {
+      setESSStatus('Proxyen hentet portalside/login/eventliste, ikke resultatdata. Sjekk at ESS result URL er full result-compare-lenke, eller at siden er offentlig tilgjengelig.', 'error');
+      renderESSPreview();
+      return;
+    }
+
+    parseESSResultsText(essLastRawText);
+  } catch(e) {
+    setESSStatus('Automatisk henting feilet. Sjekk at ESS result URL og Proxy/API URL ligger i hvert sitt felt. Feil: '+e.message, 'error');
+    showToast('ESS fetch feilet – sjekk URL-feltene', 'error');
+  }
+};
+
+window.parsePastedESSResults = () => {
+  const text = document.getElementById('ess-paste-text')?.value || '';
+  if (!text.trim()) { showToast('Lim inn resultattekst først', 'error'); return; }
+  parseESSResultsText(text);
+};
+
+function essExtractVisibleText(raw) {
+  const str = String(raw || '');
+  if (/<html|<body|<div|<table|<!doctype/i.test(str)) {
+    try {
+      const doc = new DOMParser().parseFromString(str, 'text/html');
+      doc.querySelectorAll('script,style,noscript,svg').forEach(n => n.remove());
+      return (doc.body?.innerText || doc.documentElement?.innerText || str).replace(/\u00a0/g,' ');
+    } catch(e) { return str.replace(/<[^>]+>/g,' '); }
+  }
+  return str;
+}
+
+function parseESSResultsText(text) {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match først', 'error'); return; }
+  const parsed = essParseManyCompetitors(text);
+  essParsedResults = parsed.map(p => ({...p, matchInfo: matchESSResultToShooter(p, match)}));
+  renderESSPreview(match);
+  const matched = essParsedResults.filter(r => r.matchInfo && r.matchInfo.confidence === 'exact').length;
+  setESSStatus(`Fant ${essParsedResults.length} resultatblokker. ${matched} matcher sikkert på skytternummer.`, matched ? 'success' : 'error');
+}
+
+function essParseManyCompetitors(text) {
+  const clean = String(text || '').replace(/\r/g,'\n').replace(/\u00a0/g,' ');
+  const blocks = [];
+  // Primary: blocks beginning with #123 Name. This matches the existing ESS verify parser.
+  const chunks = clean.split(/(?=^\s*#\s*\d+\s+[^\n]+)/m).map(x => x.trim()).filter(Boolean);
+  chunks.forEach(ch => {
+    const parsed = portalParseAllStages(ch);
+    if (parsed && parsed.stages && parsed.stages.length) {
+      const numMatch = ch.match(/^\s*#\s*(\d+)/m) || ch.match(/Competitor\s*(?:No\.?|#|Number)?\s*[:#]?\s*(\d+)/i);
+      parsed.num = numMatch ? String(numMatch[1]) : '';
+      blocks.push(parsed);
+    }
+  });
+  if (blocks.length) return dedupeESSBlocks(blocks);
+
+  // Fallback: the pasted text may be one single verify block.
+  const single = portalParseAllStages(clean);
+  if (single && single.stages && single.stages.length) {
+    const numMatch = clean.match(/#\s*(\d+)/) || clean.match(/Competitor\s*(?:No\.?|#|Number)?\s*[:#]?\s*(\d+)/i);
+    single.num = numMatch ? String(numMatch[1]) : '';
+    return [single];
+  }
+
+  // Fallback for SSI table: no shooter identity, cannot auto-match safely.
+  if (essDetectSSI(clean)) {
+    const ssi = portalParseAllStages(clean);
+    if (ssi) return [ssi];
+  }
+  return [];
+}
+
+function dedupeESSBlocks(blocks) {
+  const seen = new Set();
+  return blocks.filter(b => {
+    const key = `${b.num||''}|${normTextName(b.shooterName)}|${b.stages.map(s=>s.num+':'+s.hf+':'+s.time).join(',')}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function matchESSResultToShooter(result, match) {
+  const shooters = match.shooters || [];
+  if (result.num) {
+    const exact = shooters.find(s => String(s.ehcNum || s.num || '').trim() === String(result.num).trim());
+    if (exact) return {confidence:'exact', shooter:exact, reason:'#'+result.num};
+  }
+  const rn = normTextName(result.shooterName || `${result.firstName||''} ${result.lastName||''}`);
+  if (rn) {
+    const possible = shooters.filter(s => {
+      const full1 = normTextName(`${s.lastName||''} ${s.firstName||''}`);
+      const full2 = normTextName(`${s.firstName||''} ${s.lastName||''}`);
+      return rn === full1 || rn === full2 || rn.includes(full1) || rn.includes(full2);
+    });
+    if (possible.length === 1) return {confidence:'name', shooter:possible[0], reason:'navn'};
+    if (possible.length > 1) return {confidence:'ambiguous', options:possible, reason:'flere navnetreff'};
+  }
+  return {confidence:'none', shooter:null, reason:'ingen sikker match'};
+}
+
+function renderESSPreview(match) {
+  const cont = document.getElementById('ess-preview');
+  const readyEl = document.getElementById('ess-ready-count');
+  if (!cont) return;
+  const exact = essParsedResults.filter(r => r.matchInfo?.confidence === 'exact').length;
+  const name = essParsedResults.filter(r => r.matchInfo?.confidence === 'name').length;
+  const unmatched = essParsedResults.length - exact - name;
+  if (readyEl) readyEl.textContent = exact + name;
+  if (!essParsedResults.length) {
+    cont.innerHTML = '<div class="empty-state"><h3>Ingen resultater funnet</h3><p>Kontroller at teksten inneholder ESS/verify stage-linjer.</p></div>';
+    return;
+  }
+  const rows = essParsedResults.map((r, i) => {
+    const mi = r.matchInfo || {};
+    const s = mi.shooter;
+    const status = mi.confidence === 'exact'
+      ? '<span class="result-ok">OK #</span>'
+      : (mi.confidence === 'name' ? '<span class="result-ok">OK navn</span>' : '<span class="result-warn">Ikke sikker</span>');
+    const shooterName = s ? `${s.firstName||''} ${s.lastName||''}`.trim() : '—';
+    const stages = (r.stages||[]).map(st => st.num).sort((a,b)=>a-b).join(', ');
+    return `<tr>
+      <td>${status}</td>
+      <td>${r.num ? '#'+r.num : '—'}</td>
+      <td>${r.shooterName || `${r.firstName||''} ${r.lastName||''}`}</td>
+      <td>${shooterName}</td>
+      <td>${r.division || ''}</td>
+      <td>${(r.stages||[]).length}</td>
+      <td>${stages}</td>
+    </tr>`;
+  }).join('');
+  cont.innerHTML = `
+    <div class="result-summary">
+      <strong>Import preview</strong>
+      <div class="result-grid">
+        <div class="result-metric"><strong>Resultatblokker</strong><span>${essParsedResults.length}</span></div>
+        <div class="result-metric"><strong>Sikker #match</strong><span>${exact}</span></div>
+        <div class="result-metric"><strong>Navnematch</strong><span>${name}</span></div>
+        <div class="result-metric"><strong>Må sjekkes</strong><span>${unmatched}</span></div>
+      </div>
+    </div>
+    <table class="result-table">
+      <thead><tr><th>Status</th><th>ESS #</th><th>ESS navn</th><th>Match-skytter</th><th>Div</th><th>Stages</th><th>Nr</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+window.confirmESSResultsImport = async () => {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match først', 'error'); return; }
+  const importable = essParsedResults.filter(r => r.matchInfo && (r.matchInfo.confidence === 'exact' || r.matchInfo.confidence === 'name') && r.matchInfo.shooter);
+  if (!importable.length) { showToast('Ingen sikre skyttermatcher å importere', 'error'); return; }
+  const updatedShooters = (match.shooters || []).map(s => ({...s, stages:[...(s.stages || [])]}));
+  let stageWriteCount = 0;
+  importable.forEach(res => {
+    const targetId = String(res.matchInfo.shooter.id);
+    const shooter = updatedShooters.find(s => String(s.id) === targetId);
+    if (!shooter) return;
+    shooter.stages = shooter.stages || [];
+    (res.stages || []).forEach(sr => {
+      const existingIdx = shooter.stages.findIndex(st => Number(st.num || st.number) === Number(sr.num));
+      const stageObj = {
+        num: Number(sr.num),
+        number: Number(sr.num),
+        name: 'Stage ' + Number(sr.num),
+        hf: Number(sr.hf) || 0,
+        pts: Number(sr.pts) || 0,
+        time: Number(sr.time) || 0,
+        a: Number(sr.a) || 0,
+        c: Number(sr.c) || 0,
+        d: Number(sr.d) || 0,
+        miss: Number(sr.miss) || 0,
+        ns: Number(sr.ns) || 0,
+        proc: Number(sr.proc) || 0,
+        pf: shooter.pf || res.pf || 'minor',
+        source: 'ESS'
+      };
+      if (existingIdx >= 0) shooter.stages[existingIdx] = {...shooter.stages[existingIdx], ...stageObj};
+      else shooter.stages.push(stageObj);
+      stageWriteCount++;
+    });
+    if (res.pf && !shooter.pf) shooter.pf = res.pf;
+  });
+  try {
+    await updateDoc(doc(db, 'matches', String(match.id)), {shooters: updatedShooters});
+    showToast(`✓ Importerte ${stageWriteCount} stage-resultater på ${importable.length} skyttere`, 'success');
+    setESSStatus(`Import fullført: ${stageWriteCount} stage-resultater på ${importable.length} skyttere.`, 'success');
+  } catch(e) {
+    showToast('Feil ved lagring: '+e.message, 'error');
   }
 };
 

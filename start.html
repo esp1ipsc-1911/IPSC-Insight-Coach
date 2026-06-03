@@ -341,6 +341,7 @@
       grid-template-columns: repeat(3, minmax(0,1fr));
       gap: 10px;
     }
+    .grid.mental  { grid-template-columns: repeat(3, minmax(0,1fr)); }
     .grid.team    { grid-template-columns: repeat(4, minmax(0,1fr)); }
     .grid.support { grid-template-columns: minmax(0, 360px); }
 
@@ -558,6 +559,7 @@
     /* ── RESPONSIVE ────────────────────────────────────────────── */
     @media (max-width: 980px) {
       .grid,
+      .grid.mental,
       .grid.team    { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .grid.support { grid-template-columns: repeat(2, minmax(0,1fr)); }
     }
@@ -576,6 +578,7 @@
       .section-head { margin: 22px 0 10px; }
       .section-title h2 { font-size: 20px; }
       .grid,
+      .grid.mental,
       .grid.team,
       .grid.support { grid-template-columns: 1fr; gap: 8px; }
       .module { min-height: 0; padding: 14px 13px 12px; gap: 9px; clip-path: none; }
@@ -612,9 +615,9 @@
       <div class="section-head">
         <div class="section-title">
           <h2 id="personal-title">Personal Tools</h2>
-          <p>Core tools for training, competition flow and mental preparation.</p>
+          <p>Core tools for training and competition flow.</p>
         </div>
-        <div class="section-count">08 Modules</div>
+        <div class="section-count">02 Modules</div>
       </div>
       <div class="grid personal">
         <a class="module" href="index.html" target="_blank" rel="noopener" aria-label="Open Coaching">
@@ -635,6 +638,19 @@
           <p>Match flow, stages and performance overview.</p>
           <div class="module-foot"><span class="status">Ready</span><span class="tag">Competition</span></div>
         </a>
+      </div>
+    </section>
+
+    <!-- MENTAL PERFORMANCE -->
+    <section id="mental-performance" aria-labelledby="mental-title">
+      <div class="section-head">
+        <div class="section-title">
+          <h2 id="mental-title">Mental Performance</h2>
+          <p>Focus, activation and mental preparation for training and competition.</p>
+        </div>
+        <div class="section-count">05 Modules</div>
+      </div>
+      <div class="grid mental">
         <a class="module" href="mental.html" target="_blank" rel="noopener" aria-label="Open Mental Card Deck">
           <div class="module-head">
             <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.5 14.5A6 6 0 1 1 15.5 14.5c-.9.8-1.5 1.7-1.5 3.5h-4c0-1.8-.6-2.7-1.5-3.5Z"/><path d="M12 6v3"/></svg></div>
@@ -643,24 +659,6 @@
           </div>
           <p>Focus cards and mental preparation.</p>
           <div class="module-foot"><span class="status">Ready</span><span class="tag">Mindset</span></div>
-        </a>
-        <a class="module" href="coach.html" target="_blank" rel="noopener" aria-label="Open IPSC Coach">
-          <div class="module-head">
-            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/><path d="M18 8h2M4 8h2"/><path d="M18 12l2 2M4 12l-2 2"/></svg></div>
-            <h3>IPSC Coach</h3>
-            <div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div>
-          </div>
-          <p>Coaching-verktøy for instruktører og lag.</p>
-          <div class="module-foot"><span class="status">Ready</span><span class="tag">Coaching</span></div>
-        </a>
-        <a class="module" href="sight-focus-ipsc.html" target="_blank" rel="noopener" aria-label="Open Sight Focus">
-          <div class="module-head">
-            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
-            <h3>Sight Focus</h3>
-            <div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div>
-          </div>
-          <p>Siktfokus under press – Classic.</p>
-          <div class="module-foot"><span class="status">Ready</span><span class="tag">Technique</span></div>
         </a>
         <a class="module" href="mental-reset.html" target="_blank" rel="noopener" aria-label="Open Mental Reset">
           <div class="module-head">
@@ -679,6 +677,15 @@
           </div>
           <p>Mental kortdekk for EM-forberedelse.</p>
           <div class="module-foot"><span class="status">Ready</span><span class="tag">Mindset</span></div>
+        </a>
+        <a class="module" href="sight-focus-ipsc.html" target="_blank" rel="noopener" aria-label="Open Sight Focus">
+          <div class="module-head">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
+            <h3>Sight Focus</h3>
+            <div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div>
+          </div>
+          <p>Siktfokus under press – Classic.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Technique</span></div>
         </a>
         <a class="module" href="pre-stage-regulering.html" target="_blank" rel="noopener" aria-label="Open Pre-Stage Regulering">
           <div class="module-head">
@@ -699,7 +706,7 @@
           <h2 id="team-title">Team Tools</h2>
           <p>Team-specific resources for Classic Team Norway, rules, EHC schedule and stage analysis.</p>
         </div>
-        <div class="section-count">06 Modules</div>
+        <div class="section-count">07 Modules</div>
       </div>
       <div class="grid team">
         <a class="module" href="classic.html" target="_blank" rel="noopener" aria-label="Open Classic Team Norway">
@@ -731,6 +738,11 @@
           <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11"/><path d="M8 18v-3M12 18V9M17 18v-5"/><path d="M3 18h18"/><path d="M9 6h6"/></svg></div><h3>Team Standings</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
           <p>Lagresultater og import fra ESS.</p>
           <div class="module-foot"><span class="status">Ready</span><span class="tag">Results</span></div>
+        </a>
+        <a class="module" href="coach.html" target="_blank" rel="noopener" aria-label="Open IPSC Coach">
+          <div class="module-head"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/><path d="M18 8h2M4 8h2"/><path d="M18 12l2 2M4 12l-2 2"/></svg></div><h3>IPSC Coach</h3><div class="open-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></div></div>
+          <p>Coaching-verktøy for instruktører og lag.</p>
+          <div class="module-foot"><span class="status">Ready</span><span class="tag">Coaching</span></div>
         </a>
       </div>
     </section>

@@ -207,7 +207,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
     <div class="header-icon">🏆</div>
     <div>
       <div class="header-title">EHC 2026 — Team Standings</div>
-      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v12 REDCELL API IMPORT</div>
+      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v13 REDCELL PROXY READY</div>
     </div>
     <div class="header-right">
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
@@ -289,7 +289,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   <!-- RESULTS IMPORT TAB -->
   <div class="tab-content" id="tab-results">
     <div class="import-header" style="border-color:var(--accent);box-shadow:0 0 0 1px rgba(201,162,39,.25)">
-      <h3>📥 Import Results · Redcell API + ESS fallback · AKTIV v12</h3>
+      <h3>📥 Import Results · Redcell API + Proxy · AKTIV v13</h3>
       <p>Primær løsning er nå <strong>Redcell API</strong>. Den kan hente én skytter på nummer, eller hente resultater for alle skyttere som finnes i valgt target match. ESS/bookmarklet beholdes som fallback. Importen oppdaterer bare <strong>shooter.stages</strong> og endrer aldri lagtilhørighet.</p>
     </div>
     <div class="match-selector">
@@ -305,9 +305,9 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
       <input class="field-input" id="redcell-base-url" value="https://ipsc.redcell.se" placeholder="https://ipsc.redcell.se">
       <label>Redcell slug</label>
       <input class="field-input" id="redcell-slug" value="ehc" placeholder="ehc">
-      <label>Redcell proxy URL (valgfritt)</label>
-      <input class="field-input" id="redcell-proxy-url" value="" placeholder="https://redcell-results-proxy.<navn>.workers.dev/">
-      <div style="font-size:12px;color:var(--muted);margin-top:-4px;margin-bottom:10px">La stå tomt først. Bruk Cloudflare Worker-proxy bare hvis nettleseren blokkerer direkte henting/CORS.</div>
+      <label>Redcell proxy URL</label>
+      <input class="field-input" id="redcell-proxy-url" value="https://ess-results-proxy.esp1-ipsc.workers.dev/" placeholder="https://ess-results-proxy.esp1-ipsc.workers.dev/">
+      <div style="font-size:12px;color:var(--muted);margin-top:-4px;margin-bottom:10px">CORS blokkerer direkte henting fra ipsc.redcell.se. Bruk Cloudflare Worker-proxy her. Worker-koden må være oppdatert til v13 kombinert ESS/Redcell-proxy.</div>
       <label>Skytternummer for enkelttest</label>
       <input class="field-input" id="redcell-shooter-no" value="1633" placeholder="1633">
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
@@ -1182,7 +1182,7 @@ async function redcellFetchJson(path) {
     const json = await res.json();
     return redcellUnwrapJson(json);
   } catch(e) { lastErr = e; }
-  if (!cfg.proxy) throw lastErr || new Error('Redcell fetch failed');
+  if (!cfg.proxy) throw lastErr || new Error('Redcell fetch failed. CORS blokkerer trolig direkte henting. Legg inn Cloudflare Worker i Redcell proxy URL.');
   const res = await fetch(cfg.proxy, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -1269,7 +1269,7 @@ window.fetchRedcellShooterResult = async () => {
     const matched = essParsedResults.filter(r => r.matchInfo && (r.matchInfo.confidence === 'exact' || r.matchInfo.confidence === 'name')).length;
     setESSStatus(`Redcell: fant ${essParsedResults.length} resultatblokk(er) for #${nr}. ${matched} matcher mot target match.`, matched ? 'success' : 'error');
   } catch(e) {
-    setESSStatus('Redcell-henting feilet: '+e.message, 'error');
+    setESSStatus('Redcell-henting feilet: '+e.message+' — kontroller at Redcell proxy URL er satt og at Worker-koden er oppdatert til v13.', 'error');
     showToast('Redcell-henting feilet', 'error');
   }
 };
@@ -1280,7 +1280,7 @@ window.fetchRedcellShooterListOnly = async () => {
     const data = await redcellFetchJson(`/api/public/p/${encodeURIComponent(cfg.slug)}/shooters`);
     const shooters = Array.isArray(data?.shooters) ? data.shooters : (Array.isArray(data) ? data : []);
     setESSStatus(`Redcell skytterliste OK: ${shooters.length} skyttere funnet.`, 'success');
-  } catch(e) { setESSStatus('Redcell skytterliste feilet: '+e.message, 'error'); }
+  } catch(e) { setESSStatus('Redcell skytterliste feilet: '+e.message+' — kontroller Redcell proxy URL / Worker v13.', 'error'); }
 };
 window.fetchRedcellAllTargetShooters = async () => {
   const match = resultMatch();

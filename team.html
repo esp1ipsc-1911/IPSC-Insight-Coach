@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#0a0b0d">
 <title>EHC 2026 — Team Standings</title>
-<!-- Build: v11 single-shooter-result-extractor 2026-06-02 -->
+<!-- Build: v12 redcell-api-import 2026-06-02 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -207,7 +207,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
     <div class="header-icon">🏆</div>
     <div>
       <div class="header-title">EHC 2026 — Team Standings</div>
-      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v11 SINGLE SHOOTER EXTRACTOR</div>
+      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v12 REDCELL API IMPORT</div>
     </div>
     <div class="header-right">
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
@@ -289,14 +289,33 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   <!-- RESULTS IMPORT TAB -->
   <div class="tab-content" id="tab-results">
     <div class="import-header" style="border-color:var(--accent);box-shadow:0 0 0 1px rgba(201,162,39,.25)">
-      <h3>📥 Import Results from ESS Portal · AKTIV v10</h3>
-      <p>Automatisk import kan forsøke proxy, men ESS returnerer ofte portal-/login-side. Mest stabil metode er nå <strong>ESS Single Shooter Extractor</strong>: søk opp skytter på ESS, åpne skytterens resultatside, kjør extractor, lim resultatet inn her. Importen oppdaterer bare <strong>shooter.stages</strong> og endrer aldri lagtilhørighet.</p>
+      <h3>📥 Import Results · Redcell API + ESS fallback · AKTIV v12</h3>
+      <p>Primær løsning er nå <strong>Redcell API</strong>. Den kan hente én skytter på nummer, eller hente resultater for alle skyttere som finnes i valgt target match. ESS/bookmarklet beholdes som fallback. Importen oppdaterer bare <strong>shooter.stages</strong> og endrer aldri lagtilhørighet.</p>
     </div>
     <div class="match-selector">
       <label>Target match</label>
       <select class="field-select" id="results-match-select">
         <option value="">Loading matches…</option>
       </select>
+    </div>
+    <div class="import-header" style="border-left:4px solid var(--success)">
+      <h3>Redcell API-import</h3>
+      <p>Bruk denne for EHC-resultater fra <strong>ipsc.redcell.se</strong>. Den henter strukturert JSON direkte fra Redcell og matcher mot skyttere i valgt match på skytternummer/ehcNum.</p>
+      <label>Redcell base URL</label>
+      <input class="field-input" id="redcell-base-url" value="https://ipsc.redcell.se" placeholder="https://ipsc.redcell.se">
+      <label>Redcell slug</label>
+      <input class="field-input" id="redcell-slug" value="ehc" placeholder="ehc">
+      <label>Redcell proxy URL (valgfritt)</label>
+      <input class="field-input" id="redcell-proxy-url" value="" placeholder="https://redcell-results-proxy.<navn>.workers.dev/">
+      <div style="font-size:12px;color:var(--muted);margin-top:-4px;margin-bottom:10px">La stå tomt først. Bruk Cloudflare Worker-proxy bare hvis nettleseren blokkerer direkte henting/CORS.</div>
+      <label>Skytternummer for enkelttest</label>
+      <input class="field-input" id="redcell-shooter-no" value="1633" placeholder="1633">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <button class="btn btn-primary" onclick="fetchRedcellShooterResult()">Fetch Redcell shooter</button>
+        <button class="btn btn-secondary" onclick="fetchRedcellAllTargetShooters()">Fetch all target shooters</button>
+        <button class="btn btn-secondary" onclick="fetchRedcellShooterListOnly()">Test shooter list</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">API som brukes: <code>/api/public/p/{slug}/shooter/{nr}</code> og <code>/api/public/p/{slug}/shooters</code>.</div>
     </div>
     <div class="match-selector">
       <label>ESS result URL</label>
@@ -1132,6 +1151,164 @@ setTimeout(() => {
   } catch(e) {}
 }, 0);
 
+
+function redcellNum(v) {
+  if (v === null || v === undefined || v === '') return 0;
+  const n = Number(String(v).replace(',', '.').replace('%','').trim());
+  return Number.isFinite(n) ? n : 0;
+}
+function redcellInt(v) {
+  if (v === null || v === undefined || v === '') return 0;
+  const n = parseInt(String(v).replace(',', '.').trim(), 10);
+  return Number.isFinite(n) ? n : 0;
+}
+function redcellApiConfig() {
+  const base = (document.getElementById('redcell-base-url')?.value || 'https://ipsc.redcell.se').trim().replace(/\/$/, '');
+  const slug = (document.getElementById('redcell-slug')?.value || 'ehc').trim().replace(/^\/+|\/+$/g, '');
+  const proxy = (document.getElementById('redcell-proxy-url')?.value || '').trim();
+  return {base, slug, proxy};
+}
+function redcellUnwrapJson(json) {
+  if (json && json.data !== undefined) return json.data;
+  return json;
+}
+async function redcellFetchJson(path) {
+  const cfg = redcellApiConfig();
+  const url = cfg.base + path;
+  let lastErr = null;
+  try {
+    const res = await fetch(url, {headers:{'Accept':'application/json'}});
+    if (!res.ok) throw new Error('HTTP '+res.status+' '+res.statusText);
+    const json = await res.json();
+    return redcellUnwrapJson(json);
+  } catch(e) { lastErr = e; }
+  if (!cfg.proxy) throw lastErr || new Error('Redcell fetch failed');
+  const res = await fetch(cfg.proxy, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({url})
+  });
+  const json = await res.json().catch(()=>null);
+  if (!res.ok || !json) throw new Error((json && json.error) || ('Proxy HTTP '+res.status));
+  if (json.json !== undefined) return redcellUnwrapJson(json.json);
+  if (json.data !== undefined) return redcellUnwrapJson(json.data);
+  return redcellUnwrapJson(json);
+}
+function redcellSplitName(name) {
+  name = String(name || '').replace(/^#\s*\d+\s*/, '').replace(/\u00a0/g,' ').trim();
+  if (name.includes(',')) {
+    const parts = name.split(',');
+    return {lastName: parts[0].trim(), firstName: parts.slice(1).join(',').trim()};
+  }
+  const parts = name.split(/\s+/).filter(Boolean);
+  return {firstName: parts.slice(0,-1).join(' '), lastName: parts.slice(-1).join(' ')};
+}
+function redcellDivisionToResult(shooter, division) {
+  const nm = redcellSplitName(shooter.shooterName || shooter.name || '');
+  const stages = (division.stages || []).map(st => ({
+    num: redcellInt(st.stageNumber ?? st.stage ?? st.num ?? st.number),
+    hf: redcellNum(st.hitFactor ?? st.hf ?? st.factor),
+    pts: redcellNum(st.points ?? st.pts),
+    a: redcellInt(st.a),
+    c: redcellInt(st.c),
+    d: redcellInt(st.d),
+    miss: redcellInt(st.miss ?? st.mi),
+    ns: redcellInt(st.ns),
+    proc: redcellInt(st.proc ?? st.pe),
+    time: redcellNum(st.time),
+    totalScore: redcellNum(st.pom ?? st.totalScore ?? st.score),
+    scorePct: redcellNum(st.stagePercent ?? st.scorePct ?? st.percent),
+    place: st.place ?? null,
+    stageName: st.stageName || st.name || ('Stage ' + redcellInt(st.stageNumber ?? st.stage ?? st.num ?? st.number))
+  })).filter(st => st.num && (st.hf || st.time || st.pts || st.totalScore || st.scorePct || st.a || st.c || st.d || st.miss || st.ns || st.proc))
+     .sort((a,b)=>a.num-b.num);
+  return {
+    num: String(shooter.memberNumber ?? shooter.num ?? shooter.number ?? ''),
+    shooterName: shooter.shooterName || shooter.name || '',
+    firstName: shooter.firstName || nm.firstName,
+    lastName: shooter.lastName || nm.lastName,
+    division: division.divisionName || division.name || shooter.division || '',
+    category: shooter.category || '',
+    class: shooter.class || shooter.shooterClass || '',
+    region: shooter.region || shooter.country || '',
+    pf: String(shooter.factor || shooter.powerFactor || 'minor').toLowerCase(),
+    stages,
+    redcellRaw: shooter,
+    source: 'Redcell'
+  };
+}
+function redcellShooterToResults(data) {
+  const shooter = data && data.shooter ? {...data.shooter, ...data} : data;
+  if (!shooter) return [];
+  const divisions = Array.isArray(shooter.divisions) ? shooter.divisions : [];
+  if (divisions.length) return divisions.map(div => redcellDivisionToResult(shooter, div)).filter(r => r.stages.length);
+  return [redcellDivisionToResult(shooter, {divisionName: shooter.division || '', stages: shooter.stages || []})].filter(r => r.stages.length);
+}
+function normDivName(v) { return String(v || '').toLowerCase().replace(/[^a-z0-9]/g,''); }
+function redcellResultMatchesTargetDivision(result, match) {
+  const div = normDivName(result.division || '');
+  if (!div) return true;
+  const mi = matchESSResultToShooter(result, match);
+  const sh = mi && mi.shooter;
+  if (!sh) return true;
+  const sdiv = normDivName(sh.div || sh.division || '');
+  return !sdiv || sdiv === div;
+}
+window.fetchRedcellShooterResult = async () => {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match først', 'error'); return; }
+  const cfg = redcellApiConfig();
+  const nr = (document.getElementById('redcell-shooter-no')?.value || '').trim();
+  if (!nr) { showToast('Skriv inn skytternummer først', 'error'); return; }
+  try {
+    setESSStatus(`Henter Redcell-resultat for skytter #${nr}…`, 'success');
+    const data = await redcellFetchJson(`/api/public/p/${encodeURIComponent(cfg.slug)}/shooter/${encodeURIComponent(nr)}`);
+    let parsed = redcellShooterToResults(data).filter(r => redcellResultMatchesTargetDivision(r, match));
+    essParsedResults = parsed.map(p => ({...p, matchInfo: matchESSResultToShooter(p, match)}));
+    renderESSPreview(match);
+    const matched = essParsedResults.filter(r => r.matchInfo && (r.matchInfo.confidence === 'exact' || r.matchInfo.confidence === 'name')).length;
+    setESSStatus(`Redcell: fant ${essParsedResults.length} resultatblokk(er) for #${nr}. ${matched} matcher mot target match.`, matched ? 'success' : 'error');
+  } catch(e) {
+    setESSStatus('Redcell-henting feilet: '+e.message, 'error');
+    showToast('Redcell-henting feilet', 'error');
+  }
+};
+window.fetchRedcellShooterListOnly = async () => {
+  const cfg = redcellApiConfig();
+  try {
+    setESSStatus('Tester Redcell skytterliste…', 'success');
+    const data = await redcellFetchJson(`/api/public/p/${encodeURIComponent(cfg.slug)}/shooters`);
+    const shooters = Array.isArray(data?.shooters) ? data.shooters : (Array.isArray(data) ? data : []);
+    setESSStatus(`Redcell skytterliste OK: ${shooters.length} skyttere funnet.`, 'success');
+  } catch(e) { setESSStatus('Redcell skytterliste feilet: '+e.message, 'error'); }
+};
+window.fetchRedcellAllTargetShooters = async () => {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match først', 'error'); return; }
+  const cfg = redcellApiConfig();
+  const nums = [...new Set((match.shooters || []).map(s => String(s.ehcNum || s.num || '').trim()).filter(Boolean))];
+  if (!nums.length) { showToast('Ingen skytternummer i target match', 'error'); return; }
+  essParsedResults = [];
+  renderESSPreview(match);
+  setESSStatus(`Henter Redcell-resultater for ${nums.length} skyttere i target match…`, 'success');
+  const parsedAll = [];
+  const errors = [];
+  for (let i=0; i<nums.length; i++) {
+    const nr = nums[i];
+    try {
+      if (i % 5 === 0) setESSStatus(`Henter Redcell-resultater… ${i+1}/${nums.length} (#${nr})`, 'success');
+      const data = await redcellFetchJson(`/api/public/p/${encodeURIComponent(cfg.slug)}/shooter/${encodeURIComponent(nr)}`);
+      const parsed = redcellShooterToResults(data).filter(r => redcellResultMatchesTargetDivision(r, match));
+      parsedAll.push(...parsed);
+    } catch(e) { errors.push(`#${nr}: ${e.message}`); }
+  }
+  essParsedResults = parsedAll.map(p => ({...p, matchInfo: matchESSResultToShooter(p, match)}));
+  renderESSPreview(match);
+  const matched = essParsedResults.filter(r => r.matchInfo && (r.matchInfo.confidence === 'exact' || r.matchInfo.confidence === 'name')).length;
+  setESSStatus(`Redcell: hentet ${essParsedResults.length} resultatblokker for ${nums.length} target-skyttere. ${matched} matcher. ${errors.length ? errors.length+' feilet.' : ''}`, matched ? 'success' : 'error');
+  if (errors.length) console.warn('Redcell errors', errors);
+};
+
 window.fetchESSResults = async () => {
   const essUrl = (document.getElementById('ess-url')?.value || '').trim();
   const proxyUrl = (document.getElementById('ess-proxy-url')?.value || '').trim();
@@ -1601,7 +1778,7 @@ window.confirmESSResultsImport = async () => {
         pf: shooter.pf || res.pf || 'minor',
         totalScore: Number(sr.totalScore) || 0,
         scorePct: Number(sr.scorePct) || 0,
-        source: 'ESS'
+        source: res.source || 'ESS'
       };
       if (existingIdx >= 0) shooter.stages[existingIdx] = {...shooter.stages[existingIdx], ...stageObj};
       else shooter.stages.push(stageObj);

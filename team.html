@@ -265,7 +265,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
         <option value="L">Lady</option>
         <option value="LS">Lady Senior</option>
         <option value="J">Junior</option>
-        <option value="SJ">Senior Junior</option>
+        <option value="SJ">Super Junior</option>
         <option value="LJ">Lady Junior</option>
         <option value="LSJ">Lady Senior Junior</option>
         <option value="GJ">Grand Junior</option>
@@ -831,9 +831,87 @@ const NOR_INDIVIDUALS = [
   {num:"1633",firstName:"Rafał",lastName:"Tomanek",div:"Classic",cat:"",reg:"POL"},
 ];
 
+
+// Junior shooters from MAIN + PRE squadding PDFs.
+// These are imported as individual shooters only, not as teams.
+const JUNIOR_CATS = new Set(['J','SJ','GJ','LJ','LSJ']);
+const isJuniorCat = (cat) => JUNIOR_CATS.has(String(cat || '').trim());
+
+const PDF_JUNIOR_INDIVIDUALS = [
+  // MAIN MATCH
+  {sourceMatch:'MAIN',squad:'SQ 33',num:'561',firstName:'Lehan',lastName:'Poljeter',div:'Classic',cat:'J',reg:'RSA'},
+  {sourceMatch:'MAIN',squad:'SQ 65',num:'405',firstName:'Jaanvi',lastName:'Kanani',div:'Open',cat:'J',reg:'USA'},
+  {sourceMatch:'MAIN',squad:'SQ 65',num:'407',firstName:'Joseph',lastName:'Scuccca',div:'Open',cat:'J',reg:'USA'},
+  {sourceMatch:'MAIN',squad:'SQ 66',num:'1470',firstName:'Patrik',lastName:'Nivalainen',div:'Production',cat:'J',reg:'FIN'},
+  {sourceMatch:'MAIN',squad:'SQ 66',num:'54',firstName:'Nicolas',lastName:'Kahl',div:'Production',cat:'J',reg:'GER'},
+  {sourceMatch:'MAIN',squad:'SQ 66',num:'1175',firstName:'Luke',lastName:'Hermida',div:'Production',cat:'J',reg:'GIB'},
+  {sourceMatch:'MAIN',squad:'SQ 66',num:'1602',firstName:'Angelo',lastName:'Gennuso',div:'Production',cat:'J',reg:'ITA'},
+  {sourceMatch:'MAIN',squad:'SQ 66',num:'1297',firstName:'Szymon',lastName:'Chomicki',div:'Production',cat:'SJ',reg:'POL'},
+  {sourceMatch:'MAIN',squad:'SQ 66',num:'563',firstName:'Leibrandt',lastName:'Swart',div:'Production',cat:'J',reg:'RSA'},
+  {sourceMatch:'MAIN',squad:'SQ 66',num:'1376',firstName:'Frantisek',lastName:'Blaha',div:'Production',cat:'SJ',reg:'SVK'},
+  {sourceMatch:'MAIN',squad:'SQ 66',num:'1605',firstName:'Paola',lastName:'Del Rosario',div:'Production',cat:'LJ',reg:'ITA'},
+  {sourceMatch:'MAIN',squad:'SQ 07',num:'814',firstName:'Dan',lastName:'Koudelka',div:'Production Optics',cat:'J',reg:'CZE'},
+  {sourceMatch:'MAIN',squad:'SQ 07',num:'815',firstName:'Robert',lastName:'Novotny',div:'Production Optics',cat:'SJ',reg:'CZE'},
+  {sourceMatch:'MAIN',squad:'SQ 07',num:'816',firstName:'Livia',lastName:'Gabriel',div:'Production Optics',cat:'LJ',reg:'CZE'},
+  {sourceMatch:'MAIN',squad:'SQ 08',num:'1684',firstName:'Robin',lastName:'Grauffel',div:'Production Optics',cat:'J',reg:'FRA'},
+  {sourceMatch:'MAIN',squad:'SQ 12',num:'278',firstName:'Alexander',lastName:'Grim',div:'Production Optics',cat:'J',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 12',num:'279',firstName:'Aleksander',lastName:'Norr',div:'Production Optics',cat:'J',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 72',num:'304',firstName:'Sebastian',lastName:'Kasin',div:'Production Optics',cat:'SJ',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 72',num:'305',firstName:'Mathias Nordhagen',lastName:'Larsen',div:'Production Optics',cat:'SJ',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 72',num:'306',firstName:'Jakob',lastName:'Ryen',div:'Production Optics',cat:'J',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 72',num:'370',firstName:'Per-Kristian',lastName:'Kjoren',div:'Production Optics',cat:'SJ',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 97',num:'301',firstName:'Adelen',lastName:'Sollyst',div:'Production Optics',cat:'LJ',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 97',num:'302',firstName:'Henrik B.',lastName:'Thorud',div:'Production Optics',cat:'SJ',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 97',num:'303',firstName:'Noah Valentin',lastName:'Helland',div:'Production Optics',cat:'GJ',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 97',num:'369',firstName:'Aljoneil',lastName:'Alforte',div:'Production Optics',cat:'GJ',reg:'NOR'},
+  {sourceMatch:'MAIN',squad:'SQ 97',num:'1499',firstName:'Tim',lastName:'Yang',div:'Production Optics',cat:'SJ',reg:'CHN'},
+  {sourceMatch:'MAIN',squad:'SQ 97',num:'1698',firstName:'Alim Hugo',lastName:'Sequeira',div:'Production Optics',cat:'J',reg:'FRA'},
+  {sourceMatch:'MAIN',squad:'SQ 97',num:'55',firstName:'Alexander',lastName:'Zwilling',div:'Production Optics',cat:'J',reg:'GER'},
+  {sourceMatch:'MAIN',squad:'SQ 97',num:'1680',firstName:'Alyssa',lastName:'Duba',div:'Production Optics',cat:'J',reg:'FRA'},
+  {sourceMatch:'MAIN',squad:'SQ 101',num:'450',firstName:'Kelvin',lastName:'Ng',div:'Open',cat:'J',reg:'HKG'},
+  {sourceMatch:'MAIN',squad:'SQ 16',num:'228',firstName:'Vasil',lastName:'Krushkov',div:'Production',cat:'J',reg:'BUL'},
+  {sourceMatch:'MAIN',squad:'SQ 45',num:'1375',firstName:'Tomas',lastName:'Chmura',div:'Production',cat:'J',reg:'SVK'},
+  {sourceMatch:'MAIN',squad:'SQ 76',num:'256',firstName:'Gabriel',lastName:'Castro',div:'Production',cat:'J',reg:'BRA'},
+  {sourceMatch:'MAIN',squad:'SQ 19',num:'629',firstName:'Dimitris',lastName:'Papaflouratos',div:'Standard',cat:'J',reg:'GRE'},
+  {sourceMatch:'MAIN',squad:'SQ 24',num:'1392',firstName:'Ryan',lastName:'Hladik',div:'Standard',cat:'SJ',reg:'SVK'},
+  {sourceMatch:'MAIN',squad:'SQ 49',num:'726',firstName:'Kilian',lastName:'Molitor',div:'Standard',cat:'SJ',reg:'AUT'},
+  {sourceMatch:'MAIN',squad:'SQ 52',num:'840',firstName:'Nadin',lastName:'Hordic',div:'Standard',cat:'J',reg:'BIH'},
+  {sourceMatch:'MAIN',squad:'SQ 80',num:'342',firstName:'Anitra',lastName:'Koski',div:'Standard',cat:'LSJ',reg:'FIN'},
+  {sourceMatch:'MAIN',squad:'SQ 111',num:'587',firstName:'Ioannis',lastName:'Kelavidis',div:'Standard',cat:'J',reg:'GRE'},
+  {sourceMatch:'MAIN',squad:'SQ 111',num:'1255',firstName:'Janna',lastName:'Szczerba',div:'Standard',cat:'LJ',reg:'POL'},
+  {sourceMatch:'MAIN',squad:'SQ 113',num:'1374',firstName:'Kjeld Joakim',lastName:'Kjoren',div:'Production Optics',cat:'GJ',reg:'NOR'},
+
+  // PRE MATCH
+  {sourceMatch:'PRE',squad:'SQ 297',num:'1673',firstName:'Vitezslav',lastName:'Bures',div:'Optics',cat:'J',reg:'CZE'},
+  {sourceMatch:'PRE',squad:'SQ 297',num:'1746',firstName:'Vitezslav',lastName:'Bures Jr.',div:'Production Optics',cat:'GJ',reg:'CZE'},
+  {sourceMatch:'PRE',squad:'SQ 297',num:'766',firstName:'Mari Vestnes',lastName:'Hundevad',div:'Production Optics',cat:'LJ',reg:'NOR'},
+  {sourceMatch:'PRE',squad:'SQ 297',num:'745',firstName:'Kristian Kjoller',lastName:'Hundevad',div:'Open',cat:'J',reg:'NOR'},
+  {sourceMatch:'PRE',squad:'SQ 297',num:'1748',firstName:'Jan',lastName:'Slavik',div:'Open',cat:'J',reg:'CZE'},
+  {sourceMatch:'PRE',squad:'SQ 297',num:'1747',firstName:'Eduard',lastName:'Slavik',div:'Production Optics',cat:'SJ',reg:'CZE'},
+  {sourceMatch:'PRE',squad:'SQ 276',num:'1047',firstName:'Lilly',lastName:'Niederquell',div:'Production',cat:'J',reg:'GER'},
+  {sourceMatch:'PRE',squad:'SQ 303',num:'1201',firstName:'Martin',lastName:'Lukes Jr.',div:'Production',cat:'GJ',reg:'CZE'},
+  {sourceMatch:'PRE',squad:'SQ 303',num:'1337',firstName:'Piotr',lastName:'Paluszynski',div:'Production',cat:'J',reg:'POL'},
+  {sourceMatch:'PRE',squad:'SQ 303',num:'1345',firstName:'Pawel',lastName:'Paluszynski',div:'Production',cat:'J',reg:'POL'},
+  {sourceMatch:'PRE',squad:'SQ 305',num:'1245',firstName:'Victor',lastName:'Svensson',div:'Optics',cat:'SJ',reg:'SWE'},
+  {sourceMatch:'PRE',squad:'SQ 254',num:'1160',firstName:'Anselni',lastName:'Baranovskyi',div:'Optics',cat:'J',reg:'UKR'},
+  {sourceMatch:'PRE',squad:'SQ 254',num:'1262',firstName:'Emir',lastName:'Bukva',div:'Standard',cat:'J',reg:'BIH'},
+  {sourceMatch:'PRE',squad:'SQ 254',num:'1252',firstName:'Pavle',lastName:'Ignato',div:'Standard',cat:'J',reg:'BIH'},
+  {sourceMatch:'PRE',squad:'SQ 254',num:'772',firstName:'Daniela',lastName:'Kuneva',div:'Standard',cat:'LJ',reg:'BUL'},
+  {sourceMatch:'PRE',squad:'SQ 254',num:'1028',firstName:'Askold',lastName:'Shchokin',div:'Standard',cat:'J',reg:'UKR'},
+  {sourceMatch:'PRE',squad:'SQ 254',num:'1031',firstName:'Vsevolod',lastName:'Shchokin',div:'Standard',cat:'J',reg:'UKR'},
+  {sourceMatch:'PRE',squad:'SQ 254',num:'1178',firstName:'Kelvin',lastName:'Torres Jaramillo',div:'Standard',cat:'GJ',reg:'UKR'},
+];
+
 // Flat import list for ALL nations. Team category comes from ALL_TEAMS/team heading.
 const ALL_IMPORT_SHOOTERS = (() => {
   const byNum = new Map();
+  const addSource = (base, source, squad) => {
+    if (!base.sourceMatches) base.sourceMatches = [];
+    if (source && !base.sourceMatches.includes(source)) base.sourceMatches.push(source);
+    if (!base.squads) base.squads = [];
+    if (squad && !base.squads.includes(squad)) base.squads.push(squad);
+  };
+
   ALL_TEAMS.forEach(t => t.members.forEach(m => {
     const existing = byNum.get(m.num);
     const base = existing || {
@@ -844,15 +922,41 @@ const ALL_IMPORT_SHOOTERS = (() => {
       div: t.div,
       reg: t.reg,
       teams: [],
-      isTeam: true
+      isTeam: true,
+      sourceMatches: [],
+      squads: []
     };
     base.teams.push({key:t.key, name:t.name, div:t.div, cat:t.cat, reg:t.reg});
+    addSource(base, 'MAIN', 'TEAM');
     byNum.set(m.num, base);
   }));
 
   NOR_INDIVIDUALS.forEach(s => {
-    if (!byNum.has(s.num)) {
-      byNum.set(s.num, {...s, reg:(s.reg || 'NOR'), teams: [], isTeam:false});
+    const existing = byNum.get(s.num);
+    if (existing) {
+      existing.cat = existing.cat || s.cat || '';
+      addSource(existing, 'MAIN', s.squad || 'IND');
+    } else {
+      const base = {...s, reg:(s.reg || 'NOR'), teams: [], isTeam:false, sourceMatches: [], squads: []};
+      addSource(base, 'MAIN', s.squad || 'IND');
+      byNum.set(s.num, base);
+    }
+  });
+
+  PDF_JUNIOR_INDIVIDUALS.forEach(s => {
+    const existing = byNum.get(s.num);
+    if (existing) {
+      existing.cat = s.cat || existing.cat || '';
+      existing.div = existing.div || s.div;
+      existing.reg = existing.reg || s.reg;
+      existing.firstName = existing.firstName || s.firstName;
+      existing.lastName = existing.lastName || s.lastName;
+      addSource(existing, s.sourceMatch, s.squad);
+      existing.hasJuniorIndividualEntry = true;
+    } else {
+      const base = {...s, teams: [], isTeam:false, sourceMatches: [], squads: [], hasJuniorIndividualEntry:true};
+      addSource(base, s.sourceMatch, s.squad);
+      byNum.set(s.num, base);
     }
   });
   return Array.from(byNum.values());
@@ -871,6 +975,7 @@ function populateNationFilter() {
 
 // ─── Import logic (all EHC teams, grouped by division + team category) ───────
 let selectedNums = new Set();
+let selectedIndividualNums = new Set();
 
 window.renderImportList = () => {
   populateNationFilter();
@@ -881,8 +986,8 @@ window.renderImportList = () => {
   const search = document.getElementById('import-search').value.toLowerCase().trim();
 
   const catLabel = (cat) => ({
-    '':'Overall', S:'Senior', SS:'Super Senior', J:'Junior', SJ:'Senior Junior',
-    L:'Lady', LS:'Lady Senior', LJ:'Lady Junior', LSJ:'Lady Senior Junior',
+    '':'Overall', S:'Senior', SS:'Super Senior', J:'Junior', SJ:'Super Junior',
+    L:'Lady', LS:'Lady Senior', LJ:'Lady Junior', LSJ:'Lady Super Junior',
     GJ:'Grand Junior', GS:'Grand Senior'
   }[cat] || cat || 'Overall');
 
@@ -899,7 +1004,8 @@ window.renderImportList = () => {
     return ai !== bi ? ai - bi : String(a).localeCompare(String(b));
   };
 
-  const visibleTeams = ALL_TEAMS.filter(t => {
+  const showingJuniorIndividuals = filterCat !== null && isJuniorCat(filterCat);
+  const visibleTeams = showingJuniorIndividuals ? [] : ALL_TEAMS.filter(t => {
     const divMatch = !filterDiv || t.div === filterDiv;
     const regMatch = !filterReg || t.reg === filterReg;
     const catMatch = filterCat === null || (t.cat || '') === filterCat;
@@ -930,8 +1036,8 @@ window.renderImportList = () => {
           const memberHtml = team.members.map(shooter => {
             const checked = selectedNums.has(shooter.num) ? 'checked' : '';
             return `<div class="import-shooter-row">
-              <input type="checkbox" class="import-checkbox" value="${shooter.num}" ${checked}
-                onchange="toggleShooter('${shooter.num}')">
+              <input type="checkbox" class="import-checkbox" value="${shooter.num}" data-mode="team" ${checked}
+                onchange="toggleShooter('${shooter.num}','team')">
               <div class="import-shooter-name">${shooter.firstName} ${shooter.lastName}</div>
               <div class="import-shooter-meta">#${shooter.num}${shooter.cat?' · personlig '+shooter.cat:''}</div>
             </div>`;
@@ -965,9 +1071,11 @@ window.renderImportList = () => {
       </div>`;
     });
 
-  // NOR individual shooters are not team competitors; show them separately when relevant.
-  const individuals = ALL_IMPORT_SHOOTERS.filter(s => !s.isTeam).filter(s => {
-    const haystack = `${s.firstName} ${s.lastName} ${s.reg || ''} ${s.div || ''} ${s.cat || ''} ${s.num}`.toLowerCase();
+  // Individual shooters: normal non-team shooters, plus all junior categories when a junior category is selected.
+  const individuals = ALL_IMPORT_SHOOTERS.filter(s => !s.isTeam || (showingJuniorIndividuals && isJuniorCat(s.cat))).filter(s => {
+    const sourceText = (s.sourceMatches || []).join(' ');
+    const squadText = (s.squads || []).join(' ');
+    const haystack = `${s.firstName} ${s.lastName} ${s.reg || ''} ${s.div || ''} ${s.cat || ''} ${s.num} ${sourceText} ${squadText}`.toLowerCase();
     const divMatch = !filterDiv || s.div === filterDiv;
     const regMatch = !filterReg || s.reg === filterReg;
     const searchMatch = !search || haystack.includes(search);
@@ -979,10 +1087,10 @@ window.renderImportList = () => {
     const indHtml = individuals.sort((a,b) => `${a.lastName} ${a.firstName}`.localeCompare(`${b.lastName} ${b.firstName}`)).map(s => {
       const checked = selectedNums.has(s.num) ? 'checked' : '';
       return `<div class="import-shooter-row">
-        <input type="checkbox" class="import-checkbox" value="${s.num}" ${checked}
-          onchange="toggleShooter('${s.num}')">
+        <input type="checkbox" class="import-checkbox" value="${s.num}" data-mode="individual" ${checked}
+          onchange="toggleShooter('${s.num}','individual')">
         <div class="import-shooter-name">${s.firstName} ${s.lastName}</div>
-        <div class="import-shooter-meta">#${s.num} · ${s.reg} · ${s.div}${s.cat?' · '+s.cat:''}</div>
+        <div class="import-shooter-meta">#${s.num} · ${s.reg} · ${s.div}${s.cat?' · '+catLabel(s.cat):''}${(s.sourceMatches||[]).length?' · '+(s.sourceMatches||[]).join('/'):''}${(s.squads||[]).filter(x=>x!=='TEAM'&&x!=='IND').length?' · '+(s.squads||[]).filter(x=>x!=='TEAM'&&x!=='IND').join('/'):''}</div>
       </div>`;
     }).join('');
     html += `
@@ -1015,15 +1123,21 @@ window.toggleNation = (header) => {
   arrow.classList.toggle('open', open);
 };
 
-window.toggleShooter = (num) => {
-  if (selectedNums.has(num)) selectedNums.delete(num);
-  else selectedNums.add(num);
+window.toggleShooter = (num, mode='team') => {
+  if (selectedNums.has(num)) {
+    selectedNums.delete(num);
+    selectedIndividualNums.delete(num);
+  } else {
+    selectedNums.add(num);
+    if (mode === 'individual') selectedIndividualNums.add(num);
+  }
   updateSelCount();
 };
 
 window.selectAllVisible = () => {
   document.querySelectorAll('#import-list .import-checkbox').forEach(cb => {
     selectedNums.add(cb.value);
+    if (cb.dataset.mode === 'individual') selectedIndividualNums.add(cb.value);
     cb.checked = true;
   });
   updateSelCount();
@@ -1031,6 +1145,7 @@ window.selectAllVisible = () => {
 
 window.deselectAll = () => {
   selectedNums.clear();
+  selectedIndividualNums.clear();
   document.querySelectorAll('#import-list .import-checkbox').forEach(cb => cb.checked = false);
   updateSelCount();
 };
@@ -1065,8 +1180,15 @@ window.doImport = async () => {
       club: '',
       ehcNum: s.num,
       ehcReg: s.reg || 'NOR',
+      ehcCat: s.cat || '',
+      ehcSourceMatch: (s.sourceMatches || []).join('/'),
+      ehcSquads: s.squads || [],
       stages: []
     }));
+
+  // Build teams only for shooters selected through team rows.
+  // Junior rows selected through the individual view are imported as shooters only.
+  const selectedTeamNums = new Set([...selectedNums].filter(n => !selectedIndividualNums.has(n)));
 
   // Build teams from ALL_TEAMS — category is taken from the PDF squad/team heading, not from individual CAT codes
   const teamMap = {};
@@ -1074,7 +1196,7 @@ window.doImport = async () => {
 
   ALL_TEAMS.forEach(teamDef => {
     const teamMemberIds = teamDef.members
-      .filter(m => selectedNums.has(m.num))
+      .filter(m => selectedTeamNums.has(m.num))
       .map(m => 'ehc_' + m.num);
     if (!teamMemberIds.length) return;
 
@@ -1110,6 +1232,7 @@ window.doImport = async () => {
     showToast(`✓ ${newShooters.length} skyttere, ${updatedTeams.length} lag importert`, 'success');
     progEl.textContent = '';
     selectedNums.clear();
+    selectedIndividualNums.clear();
     renderImportList();
   } catch(e) {
     showToast('Feil: ' + e.message, 'error');

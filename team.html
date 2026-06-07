@@ -356,7 +356,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, onSnapshot, query, where }
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, onSnapshot, query, where }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -380,6 +380,52 @@ let selectedImportMatchId = null;
 let activeDiv = 'All';
 let unsubMatches = null;
 
+// ─── Team admin access ───────────────────────────────────────────────────────
+// Gives selected admins access to all matches in team.html, including EHC result import.
+const TEAM_ADMIN_EMAILS = new Set([
+  'esp1.ipsc@gmail.com'
+]);
+
+async function isTeamAdmin(user) {
+  if (!user) return false;
+
+  const email = String(user.email || '').toLowerCase();
+
+  // Explicit team admin access for Espen.
+  if (TEAM_ADMIN_EMAILS.has(email)) return true;
+
+  // Same admin model as admin.html: adminUsers/{email}.
+  try {
+    const adminDoc = await getDoc(doc(db, 'adminUsers', email));
+    if (adminDoc.exists()) {
+      const data = adminDoc.data();
+      const roles = Array.isArray(data.roles) ? data.roles : [];
+      return (
+        data.role === 'admin' ||
+        data.role === 'superadmin' ||
+        roles.includes('admin') ||
+        roles.includes('superadmin')
+      );
+    }
+  } catch (e) {
+    console.warn('Admin check via adminUsers failed:', e);
+  }
+
+  // Fallback: users/{uid}.roles or users/{uid}.role.
+  try {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      const roles = Array.isArray(data.roles) ? data.roles : (data.role ? [data.role] : []);
+      return roles.includes('admin') || roles.includes('superadmin');
+    }
+  } catch (e) {
+    console.warn('Admin check via users failed:', e);
+  }
+
+  return false;
+}
+
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 window.doLogin = async () => {
   const email = document.getElementById('auth-email').value.trim();
@@ -400,7 +446,7 @@ onAuthStateChanged(auth, user => {
   if (user) {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main').style.display = 'flex';
-    loadMatches(user.uid);
+    loadMatches(user);
   } else {
     document.getElementById('auth-screen').style.display = 'flex';
     document.getElementById('main').style.display = 'none';
@@ -409,14 +455,27 @@ onAuthStateChanged(auth, user => {
 });
 
 // ─── Load matches ─────────────────────────────────────────────────────────────
-function loadMatches(uid) {
-  const q = query(collection(db, 'matches'), where('participants', 'array-contains', uid));
+async function loadMatches(user) {
+  if (unsubMatches) {
+    unsubMatches();
+    unsubMatches = null;
+  }
+
+  const admin = await isTeamAdmin(user);
+
+  const q = admin
+    ? collection(db, 'matches')
+    : query(collection(db, 'matches'), where('participants', 'array-contains', user.uid));
+
   unsubMatches = onSnapshot(q, snap => {
     allMatches = [];
-    snap.forEach(d => allMatches.push({id: d.id, ...d.data()}));
-    allMatches.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    snap.forEach(d => allMatches.push({ id: d.id, ...d.data() }));
+    allMatches.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     populateMatchDropdowns();
     if (selectedMatchId) renderStandings();
+  }, err => {
+    console.error('Feil ved lasting av matcher:', err);
+    showToast('Feil ved lasting av matcher: ' + err.message, 'error');
   });
 }
 

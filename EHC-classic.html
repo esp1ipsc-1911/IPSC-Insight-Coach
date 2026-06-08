@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0b0d">
+<title>EHC 2026 — Classic Individual Standings</title>
+<!-- Build: v1 2026-06-08 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0b0d; --surface:#13151a; --card:#1a1d24; --border:#252830;
+  --accent:#c9a227; --accent2:#e8b84b; --text:#e8eaf0; --muted:#6b7280;
+  --success:#22c55e; --danger:#ef4444; --gold:#c9a227; --silver:#94a3b8; --bronze:#cd7f32;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh}
+.header{background:linear-gradient(135deg,#0d0f14 0%,#13151a 100%);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
+.header-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.header-title{font-size:17px;font-weight:700;letter-spacing:.3px}
+.header-sub{font-size:12px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+.header-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 10px;font-size:12px}
+
+/* Auth */
+#auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;gap:20px}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:380px;text-align:center}
+.auth-card h2{font-size:20px;font-weight:700;margin-bottom:8px}
+.auth-card p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.field-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;margin-bottom:12px}
+.field-input:focus{border-color:var(--accent)}
+.auth-error{color:var(--danger);font-size:13px;margin-top:8px}
+
+/* Main */
+#main{display:none;flex-direction:column}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px}
+.tab{padding:14px 16px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none;padding:16px}
+.tab-content.active{display:block}
+
+.match-selector{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.match-selector label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:.5px}
+.field-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;cursor:pointer}
+.field-select:focus{border-color:var(--accent)}
+
+/* Stage filter toggle */
+.stage-toggle{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.stage-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:var(--card);transition:all .15s}
+.stage-chip.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.stage-info{font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+
+/* Cat filter */
+.cat-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.cat-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:var(--card);transition:all .15s}
+.cat-chip.active{background:var(--accent);color:#000;border-color:var(--accent)}
+
+/* Shooter row */
+.shooter-card{background:var(--card);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;padding:11px 16px;gap:12px;margin-bottom:8px;transition:border-color .15s}
+.shooter-card.nor-highlight{border-color:var(--accent);box-shadow:0 0 0 1px rgba(201,162,39,.25)}
+.rank-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.rank-1{background:linear-gradient(135deg,#b8860b,var(--gold));color:#000}
+.rank-2{background:linear-gradient(135deg,#708090,var(--silver));color:#000}
+.rank-3{background:linear-gradient(135deg,#8b4513,var(--bronze));color:#fff}
+.rank-n{background:var(--surface);color:var(--muted)}
+.s-flag{font-size:18px;flex-shrink:0}
+.s-info{flex:1;min-width:0}
+.s-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-meta{font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+.s-bar-wrap{width:60px;flex-shrink:0}
+.s-bar{height:5px;background:var(--surface);border-radius:3px;overflow:hidden}
+.s-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s}
+.s-pts{text-align:right;flex-shrink:0;min-width:64px}
+.s-pts-val{font-size:15px;font-weight:800;color:var(--accent);font-family:'Share Tech Mono',monospace}
+.s-pts-label{font-size:10px;color:var(--muted)}
+.no-result{opacity:.5}
+
+/* Cat section label */
+.cat-section{font-size:11px;font-family:'Share Tech Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.cat-section span.muted{color:var(--muted)}
+
+/* Empty / loading */
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state h3{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Results import tab - reuse from team.html */
+.import-header{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.import-header h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.import-header p{font-size:13px;color:var(--muted);line-height:1.5}
+.result-summary{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.result-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.result-metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px}
+.result-metric strong{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.result-metric span{font-size:18px;font-weight:800;color:var(--accent);font-family:'Share Tech Mono',monospace}
+.result-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.result-table th,.result-table td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;text-align:left}
+.result-ok{color:var(--success);font-weight:700}.result-warn{color:var(--danger);font-weight:700}
+.import-footer{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.import-selected-count{font-size:13px;color:var(--muted);flex:1}
+.import-selected-count span{color:var(--accent);font-weight:700}
+.import-progress{font-size:12px;color:var(--muted)}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:14px;font-weight:600;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+.toast.show{opacity:1;pointer-events:auto}
+.toast.success{border-color:var(--success);color:var(--success)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+
+@media(min-width:600px){.tab-content{max-width:700px;margin:0 auto}.import-footer{max-width:700px;margin:0 auto;border-radius:12px;margin-bottom:12px;border:1px solid var(--border)}}
+@media(max-width:700px){.result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-table{font-size:11px}}
+</style>
+</head>
+<body>
+
+<div id="auth-screen">
+  <div class="auth-card">
+    <div style="font-size:36px;margin-bottom:12px">🎯</div>
+    <h2>EHC 2026 Classic</h2>
+    <p>Sign in with your Insight Dynamics account</p>
+    <input class="field-input" type="email" id="auth-email" placeholder="Email" autocomplete="username">
+    <input class="field-input" type="password" id="auth-pass" placeholder="Password" autocomplete="current-password">
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In</button>
+    <div class="auth-error" id="auth-err"></div>
+  </div>
+</div>
+
+<div id="main">
+  <div class="header">
+    <div class="header-icon">🏆</div>
+    <div>
+      <div class="header-title">EHC 2026 — Classic Individual</div>
+      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · 78 SHOOTERS</div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('standings')">Standings</div>
+    <div class="tab" onclick="switchTab('results')">Import Results</div>
+  </div>
+
+  <!-- STANDINGS TAB -->
+  <div class="tab-content active" id="tab-standings">
+    <div class="match-selector">
+      <label>Select match</label>
+      <select class="field-select" id="match-select" onchange="onMatchSelect()">
+        <option value="">Loading matches…</option>
+      </select>
+    </div>
+
+    <!-- Stage filter -->
+    <div class="stage-toggle">
+      <div class="stage-chip active" id="chip-all" onclick="setStageMode('all')">All Stages</div>
+      <div class="stage-chip" id="chip-common" onclick="setStageMode('common')">Common Stages</div>
+      <div class="stage-info" id="stage-info"></div>
+    </div>
+
+    <!-- Category filter -->
+    <div class="cat-filter" id="cat-filter"></div>
+
+    <div id="standings-content">
+      <div class="empty-state"><h3>Select a match</h3><p>Choose a match above to view standings.</p></div>
+    </div>
+  </div>
+
+  <!-- RESULTS IMPORT TAB -->
+  <div class="tab-content" id="tab-results">
+    <div class="import-header" style="border-color:var(--accent);box-shadow:0 0 0 1px rgba(201,162,39,.25)">
+      <h3>📥 Import Results · Redcell API + Proxy</h3>
+      <p>Henter resultater fra <strong>ipsc.redcell.se</strong> via Cloudflare Worker-proxy og lagrer til valgt match i Firebase.</p>
+    </div>
+    <div class="match-selector">
+      <label>Target match</label>
+      <select class="field-select" id="results-match-select">
+        <option value="">Loading matches…</option>
+      </select>
+    </div>
+    <div class="import-header" style="border-left:4px solid var(--success)">
+      <h3>Redcell API-import</h3>
+      <label>Redcell base URL</label>
+      <input class="field-input" id="redcell-base-url" value="https://ipsc.redcell.se" placeholder="https://ipsc.redcell.se">
+      <label>Redcell slug</label>
+      <input class="field-input" id="redcell-slug" value="ehc" placeholder="ehc">
+      <label>Redcell proxy URL</label>
+      <input class="field-input" id="redcell-proxy-url" value="https://ess-results-proxy.esp1-ipsc.workers.dev/" placeholder="https://ess-results-proxy.esp1-ipsc.workers.dev/">
+      <div style="font-size:12px;color:var(--muted);margin-top:-4px;margin-bottom:10px">CORS blokkerer direkte henting. Bruk Cloudflare Worker-proxy (v13).</div>
+      <label>Skytternummer for enkelttest</label>
+      <input class="field-input" id="redcell-shooter-no" value="266" placeholder="266">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <button class="btn btn-primary" onclick="fetchRedcellShooterResult()">Fetch skytter</button>
+        <button class="btn btn-secondary" onclick="fetchRedcellAllClassicShooters()">Fetch alle Classic (78)</button>
+        <button class="btn btn-secondary" onclick="fetchRedcellShooterListOnly()">Test shooter list</button>
+      </div>
+    </div>
+    <div class="import-header" style="border-left:4px solid var(--accent)">
+      <h3>ESS / Manual fallback</h3>
+      <label>ESS result URL</label>
+      <input class="field-input" id="ess-url" placeholder="https://portal.ipscess.org/portal/match/.../result-compare/...">
+      <label>Proxy URL</label>
+      <input class="field-input" id="ess-proxy-url" value="https://ess-results-proxy.esp1-ipsc.workers.dev/" placeholder="https://ess-results-proxy.esp1-ipsc.workers.dev/">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <button class="btn btn-primary" onclick="fetchESSResults()">Fetch ESS</button>
+        <button class="btn btn-secondary" onclick="parsePastedESSResults()">Parse pasted text</button>
+      </div>
+      <textarea id="ess-paste-text" class="field-input" style="min-height:120px;font-family:'Share Tech Mono',monospace;margin-top:10px" placeholder="Paste ESS/verify tekst her…"></textarea>
+    </div>
+    <div id="ess-import-status" class="import-progress" style="margin:10px 0 16px"></div>
+    <div id="ess-preview"></div>
+    <div class="import-footer">
+      <div class="import-selected-count">Ready: <span id="ess-ready-count">0</span> matched</div>
+      <button class="btn btn-primary" onclick="confirmESSResultsImport()">Import confirmed</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, onSnapshot, query, where }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA11OPapSOfwLQzs-oEoF7papT9S3T5p7Q",
+  authDomain: "ipsc-insight-coach.firebaseapp.com",
+  projectId: "ipsc-insight-coach",
+  storageBucket: "ipsc-insight-coach.firebasestorage.app",
+  messagingSenderId: "864793320312",
+  appId: "1:864793320312:web:c586e384bbe365444bc68d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ─── All 78 Classic shooters ──────────────────────────────────────────────────
+const CLASSIC_SHOOTERS = [
+  // Main 03
+  {num:'336',first:'Esa',last:'Marjoniemi',cat:'S',reg:'FIN',squad:'Main 03'},
+  {num:'337',first:'Sampo',last:'Mattila',cat:'S',reg:'FIN',squad:'Main 03'},
+  {num:'386',first:'Antti',last:'Tukiainen',cat:'',reg:'FIN',squad:'Main 03'},
+  {num:'1227',first:'Jerry',last:'Pettersson',cat:'',reg:'SWE',squad:'Main 03'},
+  // Main 04
+  {num:'1541',first:'Vittorio',last:'Anesa',cat:'',reg:'ITA',squad:'Main 04'},
+  {num:'1542',first:'Francesco',last:'Losi',cat:'',reg:'ITA',squad:'Main 04'},
+  {num:'1543',first:'Vincenzo',last:'Mundo',cat:'',reg:'ITA',squad:'Main 04'},
+  {num:'1544',first:'Lorenzo',last:'Masieri',cat:'',reg:'ITA',squad:'Main 04'},
+  {num:'821',first:'Jakub',last:'Marx',cat:'',reg:'CZE',squad:'Main 04'},
+  {num:'878',first:'Zdeněk',last:'Novotný',cat:'',reg:'CZE',squad:'Main 04'},
+  {num:'880',first:'David',last:'Zvěřina',cat:'',reg:'CZE',squad:'Main 04'},
+  {num:'1393',first:'Egon',last:'Mongel',cat:'',reg:'SVK',squad:'Main 04'},
+  // Main 05
+  {num:'266',first:'Espen',last:'Fiskebeck',cat:'',reg:'NOR',squad:'Main 05'},
+  {num:'381',first:'Jan Stian',last:'Fiskerstrand',cat:'S',reg:'NOR',squad:'Main 05'},
+  {num:'268',first:'Henrik',last:'Johansen',cat:'',reg:'NOR',squad:'Main 05'},
+  {num:'365',first:'Stig',last:'Aarmo',cat:'',reg:'NOR',squad:'Main 05'},
+  {num:'134',first:'Gert Erling',last:'Hansen',cat:'SS',reg:'DEN',squad:'Main 05'},
+  {num:'135',first:'Kim',last:'Frandsen',cat:'',reg:'DEN',squad:'Main 05'},
+  {num:'136',first:'Mads Peter',last:'Bach',cat:'S',reg:'DEN',squad:'Main 05'},
+  {num:'677',first:'Antonio',last:'Evangelista',cat:'',reg:'AUS',squad:'Main 05'},
+  // Main 06
+  {num:'586',first:'Konstantinos',last:'Iosifidis',cat:'S',reg:'GRE',squad:'Main 06'},
+  {num:'626',first:'Athanasios',last:'GKOGKAKIS',cat:'',reg:'GRE',squad:'Main 06'},
+  {num:'627',first:'Kostas',last:'Vlachos',cat:'',reg:'GRE',squad:'Main 06'},
+  {num:'760',first:'Dimitris',last:'Fragos',cat:'S',reg:'GRE',squad:'Main 06'},
+  {num:'140',first:'Marcel',last:'Slim',cat:'SS',reg:'NED',squad:'Main 06'},
+  {num:'156',first:'Jan-Wouter',last:'Thijssen',cat:'',reg:'NED',squad:'Main 06'},
+  {num:'759',first:'Rene',last:'Warmerdam',cat:'S',reg:'NED',squad:'Main 06'},
+  {num:'1218',first:'Pär',last:'Hylander',cat:'S',reg:'SWE',squad:'Main 06'},
+  // Main 31
+  {num:'1545',first:'Antonio',last:'Sciurpi',cat:'S',reg:'ITA',squad:'Main 31'},
+  {num:'1546',first:'Giovanni',last:'Di Giulio',cat:'S',reg:'ITA',squad:'Main 31'},
+  {num:'1547',first:'Marco',last:'Farnetani',cat:'S',reg:'ITA',squad:'Main 31'},
+  {num:'1548',first:'Nicola',last:'Pedroli',cat:'SS',reg:'ITA',squad:'Main 31'},
+  {num:'1066',first:'Imre',last:'Donka',cat:'S',reg:'HUN',squad:'Main 31'},
+  {num:'1067',first:'Mihaly',last:'Bobaly',cat:'S',reg:'HUN',squad:'Main 31'},
+  {num:'1068',first:'Gyula',last:'Miglecz',cat:'S',reg:'HUN',squad:'Main 31'},
+  {num:'1069',first:'György',last:'Batki',cat:'S',reg:'HUN',squad:'Main 31'},
+  // Main 32
+  {num:'448',first:'Francisco',last:'Manosalvas',cat:'S',reg:'ESP',squad:'Main 32'},
+  {num:'449',first:'Nicolas',last:'Arroyo Navidad',cat:'S',reg:'ESP',squad:'Main 32'},
+  {num:'450',first:'Antonio',last:'CASES',cat:'SS',reg:'ESP',squad:'Main 32'},
+  {num:'550',first:'Federico',last:'CONDE GALA',cat:'SS',reg:'ESP',squad:'Main 32'},
+  {num:'5',first:'Arno',last:'Graner',cat:'S',reg:'GER',squad:'Main 32'},
+  {num:'6',first:'Marcus',last:'Kaiser',cat:'S',reg:'GER',squad:'Main 32'},
+  {num:'7',first:'Stefan Ferdinand',last:'Prestel',cat:'S',reg:'GER',squad:'Main 32'},
+  {num:'447',first:'José Vicente',last:'Pérez Baz',cat:'',reg:'ESP',squad:'Main 32'},
+  // Main 33
+  {num:'562',first:'Jurgens',last:'Schuerman',cat:'',reg:'RSA',squad:'Main 33'},
+  {num:'56',first:'Lehan',last:'Potgieter',cat:'J',reg:'RSA',squad:'Main 33'},
+  {num:'451',first:'Javi',last:'Quiros',cat:'',reg:'ESP',squad:'Main 33'},
+  {num:'1710',first:'Bertrand',last:'GUILLAUME',cat:'S',reg:'FRA',squad:'Main 33'},
+  {num:'1281',first:'Cameron',last:'Hopkins',cat:'SS',reg:'GBR',squad:'Main 33'},
+  {num:'192',first:'Andrey',last:'Aventov',cat:'',reg:'ISR',squad:'Main 33'},
+  {num:'193',first:'Avi',last:'Hangshing',cat:'',reg:'ISR',squad:'Main 33'},
+  {num:'1303',first:'Michal',last:'KORONKIEWICZ',cat:'',reg:'POL',squad:'Main 33'},
+  // Pre 247
+  {num:'1507',first:'Andrea',last:'FABIANI',cat:'SS',reg:'ITA',squad:'Pre 247'},
+  {num:'1506',first:'Marco',last:'Tibéri',cat:'SS',reg:'ITA',squad:'Pre 247'},
+  // Pre 251
+  {num:'1114',first:'Willard',last:'Carrera',cat:'',reg:'PHI',squad:'Pre 251'},
+  // Pre 260
+  {num:'1495',first:'Renato',last:'Masieri',cat:'SS',reg:'ITA',squad:'Pre 260'},
+  // Pre 267
+  {num:'453',first:'Rafael',last:'Garcia Mateos',cat:'S',reg:'ESP',squad:'Pre 267'},
+  // Pre 285
+  {num:'1153',first:'Edrick Eliseo',last:'Chan',cat:'',reg:'PHI',squad:'Pre 285'},
+  // Pre 287
+  {num:'918',first:'Leonora',last:'Darte',cat:'L',reg:'PHI',squad:'Pre 287'},
+  {num:'919',first:'Jeufro',last:'Lejano',cat:'',reg:'PHI',squad:'Pre 287'},
+  {num:'915',first:'Lester',last:'POCDALEN',cat:'S',reg:'PHI',squad:'Pre 287'},
+  // Pre 299
+  {num:'716',first:'Christoph',last:'Fischer',cat:'',reg:'AUT',squad:'Pre 299'},
+  {num:'1411',first:'Jing',last:'Chen',cat:'L',reg:'CHN',squad:'Pre 299'},
+  {num:'844',first:'Pavel',last:'Mendelev',cat:'S',reg:'HUN',squad:'Pre 299'},
+  {num:'667',first:'Ole',last:'Eilertsen',cat:'S',reg:'NOR',squad:'Pre 299'},
+  {num:'663',first:'Jonas',last:'Schadewaldt',cat:'',reg:'NOR',squad:'Pre 299'},
+  {num:'1431',first:'Szymon',last:'Mikeska',cat:'',reg:'POL',squad:'Pre 299'},
+  {num:'1346',first:'Jędrzej',last:'Sztandera',cat:'',reg:'POL',squad:'Pre 299'},
+  // Pre 300
+  {num:'717',first:'Reinhard',last:'Prazsky-Eichinger',cat:'S',reg:'AUT',squad:'Pre 300'},
+  {num:'65',first:'Jens',last:'Dirlewanger',cat:'',reg:'GER',squad:'Pre 300'},
+  {num:'1653',first:'Ernő Zoltán',last:'Haiszky',cat:'S',reg:'HUN',squad:'Pre 300'},
+  {num:'1315',first:'Zbigniew',last:'Kaletka',cat:'S',reg:'POL',squad:'Pre 300'},
+  // Pre 301
+  {num:'1159',first:'Chiara',last:'Merviani',cat:'L',reg:'ITA',squad:'Pre 301'},
+  {num:'1152',first:'Chandra Cal',last:'FLORENDO',cat:'L',reg:'PHI',squad:'Pre 301'},
+  {num:'1608',first:'Goran',last:'Nešić',cat:'SS',reg:'SER',squad:'Pre 301'},
+  {num:'1667',first:'Filip',last:'Vasić',cat:'',reg:'SER',squad:'Pre 301'},
+  // Pre 306
+  {num:'125',first:'Adrie',last:'de Bot',cat:'SS',reg:'NED',squad:'Pre 306'},
+  // Pre 319
+  {num:'658',first:'Robert',last:'Petrač',cat:'S',reg:'SLO',squad:'Pre 319'},
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let currentUser = null;
+let allMatches = [];
+let selectedMatchId = null;
+let stageMode = 'all'; // 'all' | 'common'
+let activeCat = '__ALL__';
+let unsubMatches = null;
+let essParsedResults = [];
+let essLastRawText = '';
+
+// ─── Flags ────────────────────────────────────────────────────────────────────
+const flagMap = {
+  AUT:'🇦🇹',AUS:'🇦🇺',BEL:'🇧🇪',CHN:'🇨🇳',CZE:'🇨🇿',DEN:'🇩🇰',ESP:'🇪🇸',FIN:'🇫🇮',
+  FRA:'🇫🇷',GBR:'🇬🇧',GER:'🇩🇪',GRE:'🇬🇷',HUN:'🇭🇺',ISR:'🇮🇱',ITA:'🇮🇹',NED:'🇳🇱',
+  NOR:'🇳🇴',PHI:'🇵🇭',POL:'🇵🇱',RSA:'🇿🇦',SER:'🇷🇸',SLO:'🇸🇮',SVK:'🇸🇰',SWE:'🇸🇪',
+};
+const flag = r => flagMap[(r||'').toUpperCase()] || '🏳️';
+
+const catLabel = c => ({
+  '':'Overall','S':'Senior','SS':'Super Senior','L':'Lady','LS':'Lady Senior',
+  'J':'Junior','SJ':'Super Junior','LJ':'Lady Junior','GS':'Grand Senior'
+}[c] || c || 'Overall');
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+const TEAM_ADMIN_EMAILS = new Set(['esp1.ipsc@gmail.com']);
+
+async function isTeamAdmin(user) {
+  if (!user) return false;
+  if (TEAM_ADMIN_EMAILS.has(String(user.email||'').toLowerCase())) return true;
+  try {
+    const d = await getDoc(doc(db,'adminUsers',String(user.email||'').toLowerCase()));
+    if (d.exists()) { const data=d.data(); return data.role==='admin'||data.role==='superadmin'||(data.roles||[]).includes('admin'); }
+  } catch(e) {}
+  try {
+    const d = await getDoc(doc(db,'users',user.uid));
+    if (d.exists()) { const data=d.data(); return (data.roles||[data.role]).includes('admin')||(data.roles||[data.role]).includes('superadmin'); }
+  } catch(e) {}
+  return false;
+}
+
+window.doLogin = async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-err');
+  errEl.textContent = '';
+  try { await signInWithEmailAndPassword(auth, email, pass); }
+  catch(e) { errEl.textContent = e.message.replace('Firebase:','').replace(/\(auth\/[^)]+\)/,''); }
+};
+window.doLogout = () => signOut(auth);
+document.getElementById('auth-pass').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  if (user) {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main').style.display = 'flex';
+    loadMatches(user);
+  } else {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('main').style.display = 'none';
+    if (unsubMatches) { unsubMatches(); unsubMatches = null; }
+  }
+});
+
+// ─── Load matches ─────────────────────────────────────────────────────────────
+async function loadMatches(user) {
+  if (unsubMatches) { unsubMatches(); unsubMatches = null; }
+  const admin = await isTeamAdmin(user);
+  const q = admin
+    ? collection(db,'matches')
+    : query(collection(db,'matches'), where('participants','array-contains',user.uid));
+  unsubMatches = onSnapshot(q, snap => {
+    allMatches = [];
+    snap.forEach(d => allMatches.push({id:d.id,...d.data()}));
+    allMatches.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    populateMatchDropdowns();
+    if (selectedMatchId) renderStandings();
+  }, err => showToast('Feil ved lasting: '+err.message,'error'));
+}
+
+function populateMatchDropdowns() {
+  const opts = allMatches.map(m =>
+    `<option value="${m.id}">${m.name||'Match #'+m.id} (${(m.shooters||[]).length} shooters)</option>`
+  ).join('');
+  const empty = '<option value="">— Select match —</option>';
+  ['match-select','results-match-select'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = empty + opts;
+  });
+  if (selectedMatchId) document.getElementById('match-select').value = selectedMatchId;
+}
+
+// ─── Tab / filter controls ────────────────────────────────────────────────────
+window.switchTab = tab => {
+  ['standings','results'].forEach(t => {
+    document.querySelectorAll('.tab')[t==='standings'?0:1].classList.toggle('active',t===tab);
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+};
+
+window.onMatchSelect = () => {
+  selectedMatchId = document.getElementById('match-select').value;
+  renderStandings();
+};
+
+window.setStageMode = mode => {
+  stageMode = mode;
+  document.getElementById('chip-all').classList.toggle('active', mode==='all');
+  document.getElementById('chip-common').classList.toggle('active', mode==='common');
+  renderStandings();
+};
+
+window.setCat = cat => {
+  activeCat = cat;
+  document.querySelectorAll('.cat-chip').forEach(el => {
+    el.classList.toggle('active', el.dataset.cat === cat);
+  });
+  renderStandings();
+};
+
+// ─── Core standings logic ─────────────────────────────────────────────────────
+function getShooterStages(match, shooterNum) {
+  const s = (match.shooters||[]).find(sh => String(sh.ehcNum||sh.num||'') === String(shooterNum));
+  return s ? (s.stages||[]) : [];
+}
+
+function getCommonStageNums(match) {
+  // Stages where ALL classic shooters with any results have a result
+  // "Common" = stages where everyone in Overall who has shot at all has shot this stage
+  const shootersWithResults = CLASSIC_SHOOTERS.filter(cs => {
+    const stages = getShooterStages(match, cs.num);
+    return stages.length > 0;
+  });
+  if (!shootersWithResults.length) return [];
+
+  // Find intersection of stage numbers across all shooters with results
+  const stageSets = shootersWithResults.map(cs => {
+    const stages = getShooterStages(match, cs.num);
+    return new Set(stages.map(st => Number(st.num||st.number)));
+  });
+  const first = stageSets[0];
+  const common = [...first].filter(n => stageSets.every(s => s.has(n)));
+  return common.sort((a,b)=>a-b);
+}
+
+function getAllStageNums(match) {
+  const seen = new Set();
+  CLASSIC_SHOOTERS.forEach(cs => {
+    getShooterStages(match, cs.num).forEach(st => seen.add(Number(st.num||st.number)));
+  });
+  return [...seen].sort((a,b)=>a-b);
+}
+
+function calcShooterTotal(match, shooterNum, stageNums) {
+  const stages = getShooterStages(match, shooterNum);
+  if (!stages.length) return null;
+  // stage points as % of top HF per stage (same as team.html)
+  let total = 0;
+  let hasAny = false;
+  stageNums.forEach(n => {
+    const st = stages.find(s => Number(s.num||s.number) === n);
+    if (!st) return;
+    const topHF = getTopHFForStage(match, n);
+    if (topHF > 0 && st.hf > 0) {
+      total += (st.hf / topHF) * 100;
+      hasAny = true;
+    }
+  });
+  return hasAny ? total : null;
+}
+
+function getTopHFForStage(match, stageNum) {
+  let top = 0;
+  (match.shooters||[]).forEach(sh => {
+    const st = (sh.stages||[]).find(s => Number(s.num||s.number) === stageNum);
+    if (st && st.hf > top) top = st.hf;
+  });
+  return top;
+}
+
+// ─── Render standings ─────────────────────────────────────────────────────────
+function renderStandings() {
+  const match = allMatches.find(m => String(m.id) === String(selectedMatchId));
+  const cont = document.getElementById('standings-content');
+  const catFilterEl = document.getElementById('cat-filter');
+  const stageInfoEl = document.getElementById('stage-info');
+
+  if (!match) {
+    cont.innerHTML = '<div class="empty-state"><h3>Select a match</h3><p>Choose a match above.</p></div>';
+    catFilterEl.innerHTML = '';
+    stageInfoEl.textContent = '';
+    return;
+  }
+
+  // Determine active stages
+  const stageNums = stageMode === 'common' ? getCommonStageNums(match) : getAllStageNums(match);
+  const allNums = getAllStageNums(match);
+
+  if (stageMode === 'common') {
+    stageInfoEl.textContent = stageNums.length
+      ? `${stageNums.length} common stages (${stageNums.join(', ')})`
+      : 'No common stages yet';
+  } else {
+    stageInfoEl.textContent = allNums.length ? `${allNums.length} stages` : 'No results yet';
+  }
+
+  // Build category filter
+  const cats = ['__ALL__', '', 'S', 'SS', 'L', 'J'];
+  const catNames = {'__ALL__':'All','':'Overall','S':'Senior','SS':'Super Senior','L':'Lady','J':'Junior'};
+  catFilterEl.innerHTML = cats.map(c =>
+    `<div class="cat-chip ${activeCat===c?'active':''}" data-cat="${c}" onclick="setCat('${c}')">${catNames[c]}</div>`
+  ).join('');
+
+  // Score all shooters
+  let shooters = CLASSIC_SHOOTERS
+    .filter(cs => activeCat === '__ALL__' || cs.cat === activeCat)
+    .map(cs => ({
+      ...cs,
+      total: calcShooterTotal(match, cs.num, stageNums),
+      stagesShot: getShooterStages(match, cs.num).filter(st => stageNums.includes(Number(st.num||st.number))).length,
+    }));
+
+  // Sort: scored first (desc), then unscored alphabetically
+  const scored = shooters.filter(s => s.total !== null).sort((a,b) => b.total - a.total);
+  const unscored = shooters.filter(s => s.total === null).sort((a,b) => a.last.localeCompare(b.last));
+  const sorted = [...scored, ...unscored];
+
+  if (!sorted.length) {
+    cont.innerHTML = '<div class="empty-state"><h3>No shooters</h3></div>';
+    return;
+  }
+
+  const topPts = scored[0]?.total || 0;
+
+  // Group by category if showing all cats
+  if (activeCat === '__ALL__') {
+    const catOrder = ['', 'S', 'SS', 'L', 'LS', 'J', 'SJ', 'LJ'];
+    const groups = {};
+    sorted.forEach(s => {
+      const c = s.cat || '';
+      if (!groups[c]) groups[c] = [];
+      groups[c].push(s);
+    });
+
+    cont.innerHTML = catOrder
+      .filter(c => groups[c]?.length)
+      .map(c => {
+        const grp = groups[c];
+        const grpTop = grp.filter(s => s.total !== null)[0]?.total || 0;
+        // Re-rank within group
+        let rank = 0;
+        const rows = grp.map(s => {
+          if (s.total !== null) rank++;
+          return shooterRow(s, s.total !== null ? rank : null, grpTop);
+        }).join('');
+        return `
+          <div class="cat-section">
+            <span>${catLabel(c)}</span>
+            <span class="muted">· ${grp.filter(s=>s.total!==null).length} scored / ${grp.length} total</span>
+          </div>
+          ${rows}`;
+      }).join('');
+  } else {
+    let rank = 0;
+    cont.innerHTML = sorted.map(s => {
+      if (s.total !== null) rank++;
+      return shooterRow(s, s.total !== null ? rank : null, topPts);
+    }).join('');
+  }
+}
+
+function shooterRow(s, rank, topPts) {
+  const isNOR = s.reg === 'NOR';
+  const pct = topPts > 0 && s.total !== null ? Math.round(s.total / topPts * 100) : 0;
+  const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-n';
+  const rankLabel = rank ? rank : '—';
+  const cat = s.cat ? ` · ${catLabel(s.cat)}` : '';
+  return `
+    <div class="shooter-card ${isNOR?'nor-highlight':''} ${s.total===null?'no-result':''}">
+      <div class="rank-badge ${rankClass}">${rankLabel}</div>
+      <div class="s-flag">${flag(s.reg)}</div>
+      <div class="s-info">
+        <div class="s-name">${s.first} ${s.last}</div>
+        <div class="s-meta">#${s.num} · ${s.reg}${cat} · ${s.squad}</div>
+      </div>
+      <div class="s-bar-wrap">
+        <div class="s-bar"><div class="s-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="s-pts">
+        ${s.total !== null
+          ? `<div class="s-pts-val">${s.total.toFixed(2)}</div><div class="s-pts-label">${s.stagesShot} stages</div>`
+          : `<div class="s-pts-val" style="color:var(--muted)">—</div><div class="s-pts-label">no results</div>`}
+      </div>
+    </div>`;
+}
+
+// ─── Redcell API ──────────────────────────────────────────────────────────────
+function redcellApiConfig() {
+  const base = (document.getElementById('redcell-base-url')?.value||'https://ipsc.redcell.se').trim().replace(/\/$/,'');
+  const slug = (document.getElementById('redcell-slug')?.value||'ehc').trim().replace(/^\/+|\/+$/g,'');
+  const proxy = (document.getElementById('redcell-proxy-url')?.value||'').trim();
+  return {base,slug,proxy};
+}
+function redcellNum(v){return parseFloat(String(v??'').replace(',','.'))||0;}
+function redcellInt(v){return parseInt(String(v??''),10)||0;}
+
+async function redcellFetchJson(path) {
+  const cfg = redcellApiConfig();
+  const url = cfg.proxy ? cfg.proxy+'?url='+encodeURIComponent(cfg.base+path) : cfg.base+path;
+  const r = await fetch(url,{cache:'no-store'});
+  if (!r.ok) throw new Error('HTTP '+r.status);
+  let json = await r.json();
+  if (json.json !== undefined) return json.json;
+  if (json.data !== undefined) return json.data;
+  return json;
+}
+
+function redcellSplitName(name) {
+  const s = String(name||'').trim();
+  const parts = s.split(/\s+/).filter(Boolean);
+  if (!parts.length) return {firstName:'',lastName:''};
+  return {firstName:parts.slice(0,-1).join(' '),lastName:parts.slice(-1)[0]};
+}
+
+function redcellShooterToResults(data) {
+  if (!data) return [];
+  const shooters = Array.isArray(data?.shooters) ? data.shooters
+    : Array.isArray(data) ? data : [data];
+  return shooters.map(shooter => {
+    const divisions = Array.isArray(shooter.divisions) ? shooter.divisions
+      : (shooter.division ? [shooter] : []);
+    return divisions.map(div => {
+      const nm = redcellSplitName(shooter.shooterName||shooter.name||'');
+      const stages = (div.stages||div.stageResults||[]).map(st => ({
+        num: redcellInt(st.stageNumber??st.stage??st.num??st.number),
+        hf: redcellNum(st.hitFactor??st.hf??st.factor),
+        pts: redcellNum(st.points??st.pts),
+        a: redcellInt(st.a), c: redcellInt(st.c), d: redcellInt(st.d),
+        miss: redcellInt(st.miss??st.mi), ns: redcellInt(st.ns??st.noShoot),
+        proc: redcellInt(st.proc??st.procedural), time: redcellNum(st.time),
+      })).filter(st => st.num > 0);
+      return {
+        num: String(shooter.shooterNumber??shooter.num??shooter.number??''),
+        shooterName: shooter.shooterName||shooter.name||`${nm.firstName} ${nm.lastName}`.trim(),
+        firstName: nm.firstName, lastName: nm.lastName,
+        division: div.divisionName||div.division||'',
+        pf: String(div.powerFactor||div.pf||'minor').toLowerCase(),
+        stages,
+      };
+    });
+  }).flat().filter(r => r.stages.length);
+}
+
+function resultMatch() {
+  const id = document.getElementById('results-match-select')?.value;
+  return allMatches.find(m => String(m.id) === String(id)) || null;
+}
+
+function matchResultToShooter(result, match) {
+  const shooters = match.shooters||[];
+  if (result.num) {
+    const exact = shooters.find(s => String(s.ehcNum||s.num||'').trim() === String(result.num).trim());
+    if (exact) return {confidence:'exact',shooter:exact,reason:'#'+result.num};
+  }
+  const rn = normTextName(result.shooterName||`${result.firstName||''} ${result.lastName||''}`);
+  if (rn) {
+    const possible = shooters.filter(s => {
+      const f1 = normTextName(`${s.lastName||''} ${s.firstName||''}`);
+      const f2 = normTextName(`${s.firstName||''} ${s.lastName||''}`);
+      return rn===f1||rn===f2||rn.includes(f1)||rn.includes(f2);
+    });
+    if (possible.length===1) return {confidence:'name',shooter:possible[0],reason:'navn'};
+    if (possible.length>1) return {confidence:'ambiguous',options:possible,reason:'flere treff'};
+  }
+  return {confidence:'none',shooter:null,reason:'ingen match'};
+}
+
+function normTextName(s) {
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,' ').replace(/\s+/g,' ').trim();
+}
+
+function setESSStatus(msg, type='success') {
+  const el = document.getElementById('ess-import-status');
+  if (el) { el.textContent = msg; el.style.color = type==='error'?'var(--danger)':'var(--success)'; }
+}
+
+window.fetchRedcellShooterResult = async () => {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match først','error'); return; }
+  const cfg = redcellApiConfig();
+  const nr = (document.getElementById('redcell-shooter-no')?.value||'').trim();
+  if (!nr) { showToast('Skriv inn skytternummer','error'); return; }
+  try {
+    setESSStatus(`Henter Redcell #${nr}…`,'success');
+    const data = await redcellFetchJson(`/api/public/p/${encodeURIComponent(cfg.slug)}/shooter/${encodeURIComponent(nr)}`);
+    const parsed = redcellShooterToResults(data);
+    essParsedResults = parsed.map(p => ({...p, matchInfo: matchResultToShooter(p, match)}));
+    renderESSPreview(match);
+    const matched = essParsedResults.filter(r=>r.matchInfo?.confidence==='exact'||r.matchInfo?.confidence==='name').length;
+    setESSStatus(`Redcell: ${essParsedResults.length} blokk(er) for #${nr}. ${matched} matcher.`, matched?'success':'error');
+  } catch(e) {
+    setESSStatus('Feil: '+e.message,'error');
+    showToast('Redcell feilet','error');
+  }
+};
+
+window.fetchRedcellAllClassicShooters = async () => {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match først','error'); return; }
+  const cfg = redcellApiConfig();
+  const nums = CLASSIC_SHOOTERS.map(s => s.num);
+  essParsedResults = [];
+  renderESSPreview(match);
+  setESSStatus(`Henter Redcell for ${nums.length} Classic-skyttere…`,'success');
+  const parsedAll = [];
+  const errors = [];
+  for (let i=0; i<nums.length; i++) {
+    const nr = nums[i];
+    try {
+      if (i%10===0) setESSStatus(`Henter… ${i+1}/${nums.length} (#${nr})`,'success');
+      const data = await redcellFetchJson(`/api/public/p/${encodeURIComponent(cfg.slug)}/shooter/${encodeURIComponent(nr)}`);
+      parsedAll.push(...redcellShooterToResults(data));
+    } catch(e) { errors.push(`#${nr}: ${e.message}`); }
+  }
+  essParsedResults = parsedAll.map(p => ({...p, matchInfo: matchResultToShooter(p, match)}));
+  renderESSPreview(match);
+  const matched = essParsedResults.filter(r=>r.matchInfo?.confidence==='exact'||r.matchInfo?.confidence==='name').length;
+  setESSStatus(`Redcell: ${essParsedResults.length} blokker, ${matched} matcher. ${errors.length?errors.length+' feil.':''}`, matched?'success':'error');
+  if (errors.length) console.warn('Errors:', errors);
+};
+
+window.fetchRedcellShooterListOnly = async () => {
+  const cfg = redcellApiConfig();
+  try {
+    setESSStatus('Tester Redcell skytterliste…','success');
+    const data = await redcellFetchJson(`/api/public/p/${encodeURIComponent(cfg.slug)}/shooters`);
+    const shooters = Array.isArray(data?.shooters)?data.shooters:(Array.isArray(data)?data:[]);
+    setESSStatus(`OK: ${shooters.length} skyttere.`,'success');
+  } catch(e) { setESSStatus('Feil: '+e.message,'error'); }
+};
+
+// ─── ESS import ───────────────────────────────────────────────────────────────
+window.fetchESSResults = async () => {
+  const essUrl = (document.getElementById('ess-url')?.value||'').trim();
+  const proxyUrl = (document.getElementById('ess-proxy-url')?.value||'').trim();
+  if (!essUrl||!proxyUrl) { showToast('Fyll inn ESS URL og Proxy URL','error'); return; }
+  setESSStatus('Henter ESS-resultater…');
+  try {
+    const r = await fetch(proxyUrl,{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:essUrl})});
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    const text = data.rawText||data.text||data.html||'';
+    essLastRawText = text;
+    document.getElementById('ess-paste-text').value = text.slice(0,200000);
+    parseESSResultsText(text);
+  } catch(e) { setESSStatus('Feil: '+e.message,'error'); showToast('ESS fetch feilet','error'); }
+};
+
+window.parsePastedESSResults = () => {
+  const text = document.getElementById('ess-paste-text')?.value||'';
+  if (!text.trim()) { showToast('Lim inn tekst først','error'); return; }
+  parseESSResultsText(text);
+};
+
+function parseESSResultsText(text) {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match','error'); return; }
+  const blocks = essParseManyCompetitors(text);
+  essParsedResults = blocks.map(p => ({...p, matchInfo: matchResultToShooter(p, match)}));
+  renderESSPreview(match);
+  const matched = essParsedResults.filter(r=>r.matchInfo?.confidence==='exact'||r.matchInfo?.confidence==='name').length;
+  setESSStatus(`Fant ${essParsedResults.length} blokker, ${matched} matcher.`, matched?'success':'error');
+}
+
+function essParseManyCompetitors(text) {
+  const clean = String(text||'').replace(/\r/g,'\n').replace(/\u00a0/g,' ');
+  const blocks = [];
+  const chunks = clean.split(/(?=^\s*#\s*\d+\s+[^\n]+)/m).map(x=>x.trim()).filter(Boolean);
+  chunks.forEach(ch => {
+    const parsed = portalParseAllStages(ch);
+    if (parsed?.stages?.length) {
+      const nm = ch.match(/^\s*#\s*(\d+)/m);
+      parsed.num = nm?String(nm[1]):'';
+      blocks.push(parsed);
+    }
+  });
+  if (blocks.length) return blocks;
+  const single = portalParseAllStages(clean);
+  if (single?.stages?.length) {
+    const nm = clean.match(/#\s*(\d+)/);
+    single.num = nm?String(nm[1]):'';
+    return [single];
+  }
+  return [];
+}
+
+function portalParseAllStages(raw) {
+  if (!raw) return null;
+  const clean = s => String(s||'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
+  const pn = v => parseFloat(String(v??'').replace(',','.').replace('%','').trim())||0;
+  const pi = v => parseInt(String(v??'').replace(',','.').trim(),10)||0;
+  let shooterName='',firstName='',lastName='',division='',pf='minor';
+  const nameM = raw.match(/^#\s*\d+\s+(.+)/m);
+  if (nameM) {
+    shooterName = clean(nameM[1]);
+    const parts = shooterName.split(/\s+/).filter(Boolean);
+    firstName=parts.slice(0,-1).join(' '); lastName=parts.slice(-1)[0]||'';
+  }
+  const divM = raw.match(/(?:Classic|Open|Standard|Production|Revolver|Optics)/i);
+  if (divM) division = divM[0];
+  const pfM = raw.match(/(?:Minor|Major)/i);
+  if (pfM) pf = pfM[0].toLowerCase();
+  const stages = [];
+  raw.split(/\n/).forEach(line0 => {
+    const line = line0.trim().replace(/,/g,'.');
+    let m = line.match(/^Stage\s+(\d+)\s+([\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d.]+)$/i);
+    if (m) { stages.push({num:parseInt(m[1]),hf:parseFloat(m[2]),pts:parseInt(m[3]),a:parseInt(m[4]),c:parseInt(m[5]),d:parseInt(m[6]),miss:parseInt(m[7]),ns:parseInt(m[8]),proc:parseInt(m[9]),time:parseFloat(m[10])}); return; }
+    m = line.match(/^(?:Stage\s*)?(\d+)\s+([\d.]+)\s+([\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+([\d.]+))?$/i);
+    if (m) {
+      const hf=parseFloat(m[2]),maybeTime=parseFloat(m[3]),pts=parseInt(m[4]),time=m[10]?parseFloat(m[10]):maybeTime;
+      stages.push({num:parseInt(m[1]),hf,pts,a:parseInt(m[5]),c:parseInt(m[6]),d:parseInt(m[7]),miss:parseInt(m[8]),ns:parseInt(m[9]),proc:0,time});
+    }
+  });
+  if (!stages.length) return null;
+  return {shooterName,firstName,lastName,division,pf,stages};
+}
+
+function renderESSPreview(match) {
+  const cont = document.getElementById('ess-preview');
+  const readyEl = document.getElementById('ess-ready-count');
+  if (!cont) return;
+  const exact = essParsedResults.filter(r=>r.matchInfo?.confidence==='exact').length;
+  const name = essParsedResults.filter(r=>r.matchInfo?.confidence==='name').length;
+  const unmatched = essParsedResults.length - exact - name;
+  if (readyEl) readyEl.textContent = exact+name;
+  if (!essParsedResults.length) {
+    cont.innerHTML = '<div class="empty-state"><h3>Ingen resultater</h3></div>';
+    return;
+  }
+  const rows = essParsedResults.map(r => {
+    const mi = r.matchInfo||{};
+    const s = mi.shooter;
+    const status = mi.confidence==='exact'?'<span class="result-ok">OK #</span>'
+      :mi.confidence==='name'?'<span class="result-ok">OK navn</span>'
+      :'<span class="result-warn">Ikke sikker</span>';
+    return `<tr><td>${status}</td><td>${r.num?'#'+r.num:'—'}</td><td>${r.shooterName||`${r.firstName||''} ${r.lastName||''}`}</td><td>${s?`${s.firstName||''} ${s.lastName||''}`.trim():'—'}</td><td>${r.division||''}</td><td>${(r.stages||[]).length}</td></tr>`;
+  }).join('');
+  cont.innerHTML = `
+    <div class="result-summary"><strong>Preview</strong>
+      <div class="result-grid">
+        <div class="result-metric"><strong>Blokker</strong><span>${essParsedResults.length}</span></div>
+        <div class="result-metric"><strong>OK #</strong><span>${exact}</span></div>
+        <div class="result-metric"><strong>Navn</strong><span>${name}</span></div>
+        <div class="result-metric"><strong>Sjekk</strong><span>${unmatched}</span></div>
+      </div>
+    </div>
+    <table class="result-table">
+      <thead><tr><th>Status</th><th>ESS #</th><th>ESS navn</th><th>Match-skytter</th><th>Div</th><th>Stages</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+window.confirmESSResultsImport = async () => {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match','error'); return; }
+  const importable = essParsedResults.filter(r=>r.matchInfo&&(r.matchInfo.confidence==='exact'||r.matchInfo.confidence==='name')&&r.matchInfo.shooter);
+  if (!importable.length) { showToast('Ingen sikre matcher','error'); return; }
+  const updatedShooters = (match.shooters||[]).map(s=>({...s,stages:[...(s.stages||[])]}));
+  let count = 0;
+  importable.forEach(res => {
+    const sh = updatedShooters.find(s=>String(s.id)===String(res.matchInfo.shooter.id));
+    if (!sh) return;
+    sh.stages = sh.stages||[];
+    (res.stages||[]).forEach(sr => {
+      const idx = sh.stages.findIndex(st=>Number(st.num||st.number)===Number(sr.num));
+      const obj = {num:Number(sr.num),number:Number(sr.num),name:'Stage '+Number(sr.num),hf:Number(sr.hf)||0,pts:Number(sr.pts)||0,time:Number(sr.time)||0,a:Number(sr.a)||0,c:Number(sr.c)||0,d:Number(sr.d)||0,miss:Number(sr.miss)||0,ns:Number(sr.ns)||0,proc:Number(sr.proc)||0,pf:sh.pf||res.pf||'minor',source:res.source||'ESS'};
+      if (idx>=0) sh.stages[idx]={...sh.stages[idx],...obj};
+      else sh.stages.push(obj);
+      count++;
+    });
+  });
+  try {
+    await updateDoc(doc(db,'matches',String(match.id)),{shooters:updatedShooters});
+    showToast(`✓ Importerte ${count} stage-resultater på ${importable.length} skyttere`,'success');
+    setESSStatus(`Import fullført: ${count} resultater.`,'success');
+  } catch(e) { showToast('Feil: '+e.message,'error'); }
+};
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast show ${type}`;
+  setTimeout(()=>t.className='toast', 3000);
+}
+
+</script>
+</body>
+</html>

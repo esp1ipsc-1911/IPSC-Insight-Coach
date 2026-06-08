@@ -653,10 +653,24 @@ function redcellInt(v){return parseInt(String(v??''),10)||0;}
 
 async function redcellFetchJson(path) {
   const cfg = redcellApiConfig();
-  const url = cfg.proxy ? cfg.proxy+'?url='+encodeURIComponent(cfg.base+path) : cfg.base+path;
-  const r = await fetch(url,{cache:'no-store'});
-  if (!r.ok) throw new Error('HTTP '+r.status);
-  let json = await r.json();
+  const url = cfg.base + path;
+  let lastErr = null;
+  try {
+    const res = await fetch(url, {headers:{'Accept':'application/json'}});
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const json = await res.json();
+    if (json.json !== undefined) return json.json;
+    if (json.data !== undefined) return json.data;
+    return json;
+  } catch(e) { lastErr = e; }
+  if (!cfg.proxy) throw lastErr || new Error('Redcell fetch feilet. Legg inn Cloudflare Worker proxy.');
+  const res = await fetch(cfg.proxy, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({url})
+  });
+  const json = await res.json().catch(()=>null);
+  if (!res.ok || !json) throw new Error((json&&json.error)||('Proxy HTTP '+res.status));
   if (json.json !== undefined) return json.json;
   if (json.data !== undefined) return json.data;
   return json;

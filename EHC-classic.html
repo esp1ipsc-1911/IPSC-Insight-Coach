@@ -654,23 +654,14 @@ function redcellInt(v){return parseInt(String(v??''),10)||0;}
 async function redcellFetchJson(path) {
   const cfg = redcellApiConfig();
   const url = cfg.base + path;
-  let lastErr = null;
-  try {
-    const res = await fetch(url, {headers:{'Accept':'application/json'}});
-    if (!res.ok) throw new Error('HTTP '+res.status);
-    const json = await res.json();
-    if (json.json !== undefined) return json.json;
-    if (json.data !== undefined) return json.data;
-    return json;
-  } catch(e) { lastErr = e; }
-  if (!cfg.proxy) throw lastErr || new Error('Redcell fetch feilet. Legg inn Cloudflare Worker proxy.');
+  if (!cfg.proxy) throw new Error('Redcell proxy URL mangler. Fyll inn Cloudflare Worker URL.');
   const res = await fetch(cfg.proxy, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({url})
   });
-  const json = await res.json().catch(()=>null);
-  if (!res.ok || !json) throw new Error((json&&json.error)||('Proxy HTTP '+res.status));
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json) throw new Error((json && json.error) || ('Proxy HTTP ' + res.status));
   if (json.json !== undefined) return json.json;
   if (json.data !== undefined) return json.data;
   return json;
@@ -790,6 +781,8 @@ window.fetchRedcellAllClassicShooters = async () => {
       const data = await redcellFetchJson(`/api/public/p/${encodeURIComponent(cfg.slug)}/shooter/${encodeURIComponent(nr)}`);
       parsedAll.push(...redcellShooterToResults(data));
     } catch(e) { errors.push(`#${nr}: ${e.message}`); }
+    // Liten pause for å unngå rate limiting på proxyen
+    if (i % 5 === 4) await new Promise(r => setTimeout(r, 200));
   }
   essParsedResults = parsedAll.map(p => ({...p, matchInfo: matchResultToShooter(p, match)}));
   renderESSPreview(match);

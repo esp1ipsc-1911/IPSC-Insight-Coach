@@ -677,39 +677,47 @@ async function redcellFetchJson(path) {
 }
 
 function redcellSplitName(name) {
-  const s = String(name||'').trim();
-  const parts = s.split(/\s+/).filter(Boolean);
+  name = String(name||'').replace(/^#\s*\d+\s*/,'').replace(/\u00a0/g,' ').trim();
+  const parts = name.split(/\s+/).filter(Boolean);
   if (!parts.length) return {firstName:'',lastName:''};
+  if (parts.length === 1) return {firstName:'',lastName:parts[0]};
   return {firstName:parts.slice(0,-1).join(' '),lastName:parts.slice(-1)[0]};
 }
 
+function redcellDivisionToResult(shooter, division) {
+  const nm = redcellSplitName(shooter.shooterName||shooter.name||'');
+  const stages = (division.stages||[]).map(st => ({
+    num: redcellInt(st.stageNumber??st.stage??st.num??st.number),
+    hf: redcellNum(st.hitFactor??st.hf??st.factor),
+    pts: redcellNum(st.points??st.pts),
+    a: redcellInt(st.a), c: redcellInt(st.c), d: redcellInt(st.d),
+    miss: redcellInt(st.miss??st.mi), ns: redcellInt(st.ns),
+    proc: redcellInt(st.proc??st.pe), time: redcellNum(st.time),
+    totalScore: redcellNum(st.pom??st.totalScore??st.score),
+    scorePct: redcellNum(st.stagePercent??st.scorePct??st.percent),
+    place: st.place??null,
+    stageName: st.stageName||st.name||('Stage '+redcellInt(st.stageNumber??st.stage??st.num??st.number))
+  })).filter(st => st.num && (st.hf||st.time||st.pts||st.totalScore||st.scorePct||st.a||st.c||st.d||st.miss||st.ns||st.proc))
+     .sort((a,b)=>a.num-b.num);
+  return {
+    num: String(shooter.memberNumber??shooter.num??shooter.number??''),
+    shooterName: shooter.shooterName||shooter.name||'',
+    firstName: shooter.firstName||nm.firstName,
+    lastName: shooter.lastName||nm.lastName,
+    division: division.divisionName||division.name||shooter.division||'',
+    category: shooter.category||'',
+    pf: String(shooter.factor||shooter.powerFactor||'minor').toLowerCase(),
+    stages,
+    source: 'Redcell'
+  };
+}
+
 function redcellShooterToResults(data) {
-  if (!data) return [];
-  const shooters = Array.isArray(data?.shooters) ? data.shooters
-    : Array.isArray(data) ? data : [data];
-  return shooters.map(shooter => {
-    const divisions = Array.isArray(shooter.divisions) ? shooter.divisions
-      : (shooter.division ? [shooter] : []);
-    return divisions.map(div => {
-      const nm = redcellSplitName(shooter.shooterName||shooter.name||'');
-      const stages = (div.stages||div.stageResults||[]).map(st => ({
-        num: redcellInt(st.stageNumber??st.stage??st.num??st.number),
-        hf: redcellNum(st.hitFactor??st.hf??st.factor),
-        pts: redcellNum(st.points??st.pts),
-        a: redcellInt(st.a), c: redcellInt(st.c), d: redcellInt(st.d),
-        miss: redcellInt(st.miss??st.mi), ns: redcellInt(st.ns??st.noShoot),
-        proc: redcellInt(st.proc??st.procedural), time: redcellNum(st.time),
-      })).filter(st => st.num > 0);
-      return {
-        num: String(shooter.shooterNumber??shooter.num??shooter.number??''),
-        shooterName: shooter.shooterName||shooter.name||`${nm.firstName} ${nm.lastName}`.trim(),
-        firstName: nm.firstName, lastName: nm.lastName,
-        division: div.divisionName||div.division||'',
-        pf: String(div.powerFactor||div.pf||'minor').toLowerCase(),
-        stages,
-      };
-    });
-  }).flat().filter(r => r.stages.length);
+  const shooter = data && data.shooter ? {...data.shooter,...data} : data;
+  if (!shooter) return [];
+  const divisions = Array.isArray(shooter.divisions) ? shooter.divisions : [];
+  if (divisions.length) return divisions.map(div => redcellDivisionToResult(shooter,div)).filter(r=>r.stages.length);
+  return [redcellDivisionToResult(shooter,{divisionName:shooter.division||'',stages:shooter.stages||[]})].filter(r=>r.stages.length);
 }
 
 function resultMatch() {

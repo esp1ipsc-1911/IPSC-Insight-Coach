@@ -2700,7 +2700,7 @@
       const poppers = parseInt(stage.poppers ?? 0, 10) || 0;
       const plates = parseInt(stage.plates ?? 0, 10) || 0;
       const minRounds = (paper * shotsPerPaper) + poppers + plates;
-      const maxPoints = (paper * 10) + (poppers * 5) + (plates * 5);
+      const maxPoints = (paper * shotsPerPaper * 5) + (poppers * 5) + (plates * 5);
       return { minRounds, maxPoints };
     }
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#0a0b0d">
 <title>EHC 2026 — Team Standings</title>
-<!-- Build: v12 redcell-api-import 2026-06-02 -->
+<!-- Build: v13.1 proxy-first redcell-api-import 2026-06-08 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -207,7 +207,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
     <div class="header-icon">🏆</div>
     <div>
       <div class="header-title">EHC 2026 — Team Standings</div>
-      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v13 REDCELL PROXY READY</div>
+      <div class="header-sub">BUZSÁK, HUNGARY · 8–12 JUNE · BUILD v13.1 REDCELL PROXY FIRST</div>
     </div>
     <div class="header-right">
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign out</button>
@@ -1357,23 +1357,40 @@ function redcellUnwrapJson(json) {
 async function redcellFetchJson(path) {
   const cfg = redcellApiConfig();
   const url = cfg.base + path;
-  let lastErr = null;
-  try {
-    const res = await fetch(url, {headers:{'Accept':'application/json'}});
-    if (!res.ok) throw new Error('HTTP '+res.status+' '+res.statusText);
-    const json = await res.json();
+
+  // Browser-fetch direkte mot Redcell blir blokkert av CORS.
+  // Bruk derfor Cloudflare Worker-proxy først når proxy-URL er satt.
+  if (cfg.proxy) {
+    const res = await fetch(cfg.proxy, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url})
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (!res.ok || !json) {
+      throw new Error((json && (json.error || json.message)) || ('Proxy HTTP ' + res.status));
+    }
+
+    if (json.json !== undefined) return redcellUnwrapJson(json.json);
+    if (json.data !== undefined) return redcellUnwrapJson(json.data);
+    if (json.rawText) {
+      try {
+        return redcellUnwrapJson(JSON.parse(json.rawText));
+      } catch (e) {
+        throw new Error('Proxy returnerte rawText, men ikke gyldig JSON');
+      }
+    }
+
     return redcellUnwrapJson(json);
-  } catch(e) { lastErr = e; }
-  if (!cfg.proxy) throw lastErr || new Error('Redcell fetch failed. CORS blokkerer trolig direkte henting. Legg inn Cloudflare Worker i Redcell proxy URL.');
-  const res = await fetch(cfg.proxy, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({url})
-  });
-  const json = await res.json().catch(()=>null);
-  if (!res.ok || !json) throw new Error((json && json.error) || ('Proxy HTTP '+res.status));
-  if (json.json !== undefined) return redcellUnwrapJson(json.json);
-  if (json.data !== undefined) return redcellUnwrapJson(json.data);
+  }
+
+  // Fallback for miljøer der Redcell tillater direkte fetch.
+  const res = await fetch(url, {cache: 'no-store', headers: {'Accept': 'application/json'}});
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.statusText);
+  const json = await res.json();
   return redcellUnwrapJson(json);
 }
 function redcellSplitName(name) {

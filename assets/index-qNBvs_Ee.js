@@ -1124,7 +1124,7 @@ document.head.appendChild(_st);
  <div class="field-label">Last opp bilde (png, jpg, pdf)</div>
  <input class="field-input" type="file" id="upload-result-file" accept="image/png,image/jpeg,image/jpg,application/pdf">
  </div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button class="btn-secondary" id="upload-manual-btn" onclick="icOpenManualResult()">Enter Manually</button><button class="btn-primary" id="upload-ess-btn" onclick="importESSVerify(event)">ESS/SSI</button></div>
+ <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px;"><button class="btn-primary" id="upload-scan-btn" onclick="uploadAndScanResult(event)">Upload and Scan</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button class="btn-secondary" id="upload-manual-btn" onclick="icOpenManualResult()">Enter Manually</button><button class="btn-primary" id="upload-ess-btn" onclick="importESSVerify(event)">ESS/SSI</button></div>
  </div>
  </div>
 </div>

@@ -160,8 +160,10 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 
     <!-- Stage filter -->
     <div class="stage-toggle">
-      <div class="stage-chip active" id="chip-all" onclick="setStageMode('all')">All Stages</div>
-      <div class="stage-chip" id="chip-common" onclick="setStageMode('common')">Common Stages</div>
+      <div class="stage-chip active" id="chip-6" onclick="setStageRange(6)">Stage 1–6</div>
+      <div class="stage-chip" id="chip-12" onclick="setStageRange(12)">Stage 1–12</div>
+      <div class="stage-chip" id="chip-18" onclick="setStageRange(18)">Stage 1–18</div>
+      <div class="stage-chip" id="chip-24" onclick="setStageRange(24)">Stage 1–24</div>
       <div class="stage-info" id="stage-info"></div>
     </div>
 
@@ -358,7 +360,7 @@ const CLASSIC_SHOOTERS = [
 let currentUser = null;
 let allMatches = [];
 let selectedMatchId = null;
-let stageMode = 'all'; // 'all' | 'common'
+let stageRange = 6; // 6 | 12 | 18 | 24
 let activeCat = '__ALL__';
 let unsubMatches = null;
 let essParsedResults = [];
@@ -459,10 +461,12 @@ window.onMatchSelect = () => {
   renderStandings();
 };
 
-window.setStageMode = mode => {
-  stageMode = mode;
-  document.getElementById('chip-all').classList.toggle('active', mode==='all');
-  document.getElementById('chip-common').classList.toggle('active', mode==='common');
+window.setStageRange = range => {
+  stageRange = range;
+  [6,12,18,24].forEach(r => {
+    const el = document.getElementById('chip-'+r);
+    if (el) el.classList.toggle('active', r === range);
+  });
   renderStandings();
 };
 
@@ -481,23 +485,27 @@ function getShooterStages(match, shooterNum) {
 }
 
 function getCommonStageNums(match) {
-  // "Common" = stages shot by all shooters with results, excluding outliers below median
+  // "Common" = stages shot by majority (>=50%) of shooters with results
   const shootersWithResults = CLASSIC_SHOOTERS.filter(cs => getShooterStages(match, cs.num).length > 0);
   if (!shootersWithResults.length) return [];
 
-  // Find median number of stages to exclude outliers
-  const stageCounts = shootersWithResults.map(cs => getShooterStages(match, cs.num).length).sort((a,b)=>a-b);
-  const median = stageCounts[Math.floor(stageCounts.length / 2)];
+  // Count how many shooters have each stage
+  const stageCount = {};
+  shootersWithResults.forEach(cs => {
+    getShooterStages(match, cs.num).forEach(st => {
+      const n = Number(st.num||st.number);
+      stageCount[n] = (stageCount[n]||0) + 1;
+    });
+  });
 
-  // Only use shooters at or above median stage count
-  const normalShooters = shootersWithResults.filter(cs => getShooterStages(match, cs.num).length >= median);
-  if (!normalShooters.length) return [];
+  // Keep stages shot by at least 50% of shooters with results
+  const threshold = Math.ceil(shootersWithResults.length * 0.5);
+  const common = Object.entries(stageCount)
+    .filter(([n, count]) => count >= threshold)
+    .map(([n]) => Number(n))
+    .sort((a,b) => a-b);
 
-  // Intersection of stages across all normal shooters
-  const stageSets = normalShooters.map(cs => new Set(getShooterStages(match, cs.num).map(st => Number(st.num||st.number))));
-  const first = stageSets[0];
-  const common = [...first].filter(n => stageSets.every(s => s.has(n)));
-  return common.sort((a,b)=>a-b);
+  return common;
 }
 
 function getAllStageNums(match) {
@@ -549,17 +557,9 @@ function renderStandings() {
     return;
   }
 
-  // Determine active stages
-  const stageNums = stageMode === 'common' ? getCommonStageNums(match) : getAllStageNums(match);
-  const allNums = getAllStageNums(match);
-
-  if (stageMode === 'common') {
-    stageInfoEl.textContent = stageNums.length
-      ? `${stageNums.length} common stages (${stageNums.join(', ')})`
-      : 'No common stages yet';
-  } else {
-    stageInfoEl.textContent = allNums.length ? `${allNums.length} stages` : 'No results yet';
-  }
+  // Determine active stages: 1..stageRange
+  const stageNums = Array.from({length: stageRange}, (_, i) => i + 1);
+  stageInfoEl.textContent = `Stage 1–${stageRange}`;
 
   // Build category filter
   const cats = ['__ALL__', '', 'S', 'SS', 'L', 'J'];
@@ -571,16 +571,23 @@ function renderStandings() {
   // Score all shooters
   let shooters = CLASSIC_SHOOTERS
     .filter(cs => activeCat === '__ALL__' || cs.cat === activeCat)
-    .map(cs => ({
-      ...cs,
-      total: calcShooterTotal(match, cs.num, stageNums),
-      stagesShot: getShooterStages(match, cs.num).filter(st => stageNums.includes(Number(st.num||st.number))).length,
-    }));
+    .map(cs => {
+      const stagesShot = getShooterStages(match, cs.num)
+        .filter(st => stageNums.includes(Number(st.num||st.number))).length;
+      const complete = stagesShot >= stageNums.length;
+      const total = complete ? calcShooterTotal(match, cs.num, stageNums) : null;
+      const partialTotal = stagesShot > 0 && !complete ? calcShooterTotal(match, cs.num, stageNums.filter(n => {
+        return getShooterStages(match, cs.num).some(st => Number(st.num||st.number) === n);
+      })) : null;
+      return {...cs, total, stagesShot, complete, partialTotal};
+    })
+    .filter(cs => cs.stagesShot > 0); // hide shooters with no results in range
 
-  // Sort: scored first (desc), then unscored alphabetically
-  const scored = shooters.filter(s => s.total !== null).sort((a,b) => b.total - a.total);
-  const unscored = shooters.filter(s => s.total === null).sort((a,b) => a.last.localeCompare(b.last));
-  const sorted = [...scored, ...unscored];
+  // Sort: complete first (desc), then partial (desc by partial score), then unscored
+  const complete = shooters.filter(s => s.complete).sort((a,b) => b.total - a.total);
+  const partial = shooters.filter(s => !s.complete && s.stagesShot > 0).sort((a,b) => (b.partialTotal||0) - (a.partialTotal||0));
+  const sorted = [...complete, ...partial];
+  const scored = complete; // for topPts
 
   if (!sorted.length) {
     cont.innerHTML = '<div class="empty-state"><h3>No shooters</h3></div>';
@@ -644,12 +651,14 @@ function renderStandings() {
 
 function shooterRow(s, rank, topPts) {
   const isNOR = s.reg === 'NOR';
-  const pct = topPts > 0 && s.total !== null ? Math.round(s.total / topPts * 100) : 0;
+  const displayPts = s.total !== null ? s.total : (s.partialTotal || null);
+  const pct = topPts > 0 && displayPts !== null ? Math.round(displayPts / topPts * 100) : 0;
   const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-n';
-  const rankLabel = rank ? rank : '—';
+  const rankLabel = rank || '—';
   const cat = s.cat ? ` · ${catLabel(s.cat)}` : '';
+  const isPartial = !s.complete && s.stagesShot > 0;
   return `
-    <div class="shooter-card ${isNOR?'nor-highlight':''} ${s.total===null?'no-result':''}">
+    <div class="shooter-card ${isNOR?'nor-highlight':''} ${isPartial?'no-result':''}">
       <div class="rank-badge ${rankClass}">${rankLabel}</div>
       <div class="s-flag">${flag(s.reg)}</div>
       <div class="s-info">
@@ -660,9 +669,9 @@ function shooterRow(s, rank, topPts) {
         <div class="s-bar"><div class="s-bar-fill" style="width:${pct}%"></div></div>
       </div>
       <div class="s-pts">
-        ${s.total !== null
+        ${s.complete
           ? `<div class="s-pts-val">${s.total.toFixed(2)}</div><div class="s-pts-label">${s.stagesShot} stages</div>`
-          : `<div class="s-pts-val" style="color:var(--muted)">—</div><div class="s-pts-label">no results</div>`}
+          : `<div class="s-pts-val" style="color:var(--muted);font-size:12px">${displayPts!==null?displayPts.toFixed(2):'—'}</div><div class="s-pts-label">${s.stagesShot}/${stageRange} stages</div>`}
       </div>
     </div>`;
 }

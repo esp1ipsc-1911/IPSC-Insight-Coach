@@ -481,19 +481,22 @@ function getShooterStages(match, shooterNum) {
 }
 
 function getCommonStageNums(match) {
-  // Stages where ALL classic shooters with any results have a result
-  // "Common" = stages where everyone in Overall who has shot at all has shot this stage
-  const shootersWithResults = CLASSIC_SHOOTERS.filter(cs => {
-    const stages = getShooterStages(match, cs.num);
-    return stages.length > 0;
-  });
+  // "Common" = stages shot by ALL shooters who have completed the most stages
+  // Find max stages any shooter has
+  const shootersWithResults = CLASSIC_SHOOTERS.filter(cs => getShooterStages(match, cs.num).length > 0);
   if (!shootersWithResults.length) return [];
 
-  // Find intersection of stage numbers across all shooters with results
-  const stageSets = shootersWithResults.map(cs => {
-    const stages = getShooterStages(match, cs.num);
-    return new Set(stages.map(st => Number(st.num||st.number)));
-  });
+  // Find the maximum number of stages any shooter has completed
+  const maxStages = Math.max(...shootersWithResults.map(cs => getShooterStages(match, cs.num).length));
+  if (!maxStages) return [];
+
+  // Only consider shooters who have completed at least maxStages stages (i.e. "finished" shooters)
+  const finishedShooters = shootersWithResults.filter(cs => getShooterStages(match, cs.num).length >= maxStages);
+
+  if (!finishedShooters.length) return [];
+
+  // Intersection of stages across all finished shooters
+  const stageSets = finishedShooters.map(cs => new Set(getShooterStages(match, cs.num).map(st => Number(st.num||st.number))));
   const first = stageSets[0];
   const common = [...first].filter(n => stageSets.every(s => s.has(n)));
   return common.sort((a,b)=>a-b);

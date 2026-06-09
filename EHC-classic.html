@@ -728,8 +728,25 @@ function resultMatch() {
 function matchResultToShooter(result, match) {
   const shooters = match.shooters||[];
   if (result.num) {
+    // First try match.shooters with ehcNum
     const exact = shooters.find(s => String(s.ehcNum||s.num||'').trim() === String(result.num).trim());
     if (exact) return {confidence:'exact',shooter:exact,reason:'#'+result.num};
+    // Fallback: build a synthetic shooter from CLASSIC_SHOOTERS list
+    const cs = CLASSIC_SHOOTERS.find(s => String(s.num) === String(result.num));
+    if (cs) {
+      // Check if shooter exists in match under a different id format
+      const byId = shooters.find(s => String(s.id||'') === 'ehc_'+cs.num);
+      if (byId) return {confidence:'exact',shooter:byId,reason:'#'+result.num+' (id)'};
+      // Create synthetic shooter entry for import
+      const synthetic = {
+        id: 'ehc_'+cs.num, isMe:false, uid:null,
+        firstName:cs.first, lastName:cs.last,
+        division:'Classic', pf:'minor', club:cs.reg||'',
+        ehcNum:String(cs.num), ehcReg:cs.reg||'', ehcCat:cs.cat||'', ehcSquad:cs.squad||'',
+        stages:[]
+      };
+      return {confidence:'exact',shooter:synthetic,reason:'#'+result.num+' (classic list)',synthetic:true};
+    }
   }
   const rn = normTextName(result.shooterName||`${result.firstName||''} ${result.lastName||''}`);
   if (rn) {
@@ -936,7 +953,16 @@ window.confirmESSResultsImport = async () => {
   if (!match) { showToast('Velg target match','error'); return; }
   const importable = essParsedResults.filter(r=>r.matchInfo&&(r.matchInfo.confidence==='exact'||r.matchInfo.confidence==='name')&&r.matchInfo.shooter);
   if (!importable.length) { showToast('Ingen sikre matcher','error'); return; }
+
+  // Start with existing shooters, add synthetic ones that don't exist yet
   const updatedShooters = (match.shooters||[]).map(s=>({...s,stages:[...(s.stages||[])]}));
+  importable.forEach(res => {
+    if (res.matchInfo.synthetic) {
+      const exists = updatedShooters.find(s=>String(s.id)===String(res.matchInfo.shooter.id));
+      if (!exists) updatedShooters.push({...res.matchInfo.shooter, stages:[]});
+    }
+  });
+
   let count = 0;
   importable.forEach(res => {
     const sh = updatedShooters.find(s=>String(s.id)===String(res.matchInfo.shooter.id));
@@ -944,7 +970,7 @@ window.confirmESSResultsImport = async () => {
     sh.stages = sh.stages||[];
     (res.stages||[]).forEach(sr => {
       const idx = sh.stages.findIndex(st=>Number(st.num||st.number)===Number(sr.num));
-      const obj = {num:Number(sr.num),number:Number(sr.num),name:'Stage '+Number(sr.num),hf:Number(sr.hf)||0,pts:Number(sr.pts)||0,time:Number(sr.time)||0,a:Number(sr.a)||0,c:Number(sr.c)||0,d:Number(sr.d)||0,miss:Number(sr.miss)||0,ns:Number(sr.ns)||0,proc:Number(sr.proc)||0,pf:sh.pf||res.pf||'minor',source:res.source||'ESS'};
+      const obj = {num:Number(sr.num),number:Number(sr.num),name:'Stage '+Number(sr.num),hf:Number(sr.hf)||0,pts:Number(sr.pts)||0,time:Number(sr.time)||0,a:Number(sr.a)||0,c:Number(sr.c)||0,d:Number(sr.d)||0,miss:Number(sr.miss)||0,ns:Number(sr.ns)||0,proc:Number(sr.proc)||0,pf:sh.pf||res.pf||'minor',source:res.source||'Redcell'};
       if (idx>=0) sh.stages[idx]={...sh.stages[idx],...obj};
       else sh.stages.push(obj);
       count++;

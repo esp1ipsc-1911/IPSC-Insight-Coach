@@ -179,6 +179,15 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
       <h3>📥 Import Results · Redcell API + Proxy</h3>
       <p>Henter resultater fra <strong>ipsc.redcell.se</strong> via Cloudflare Worker-proxy og lagrer til valgt match i Firebase.</p>
     </div>
+
+    <div class="import-header" style="border-left:4px solid var(--accent);margin-bottom:16px">
+      <h3>👥 Import Shooters</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Legg til alle 78 Classic-skyttere i valgt match. Skyttere som allerede finnes hoppes over.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-primary" onclick="importAllClassicShooters()">Import alle 78 Classic-skyttere</button>
+        <div id="shooter-import-status" style="font-size:13px;color:var(--muted)"></div>
+      </div>
+    </div>
     <div class="match-selector">
       <label>Target match</label>
       <select class="field-select" id="results-match-select">
@@ -946,6 +955,52 @@ window.confirmESSResultsImport = async () => {
     showToast(`✓ Importerte ${count} stage-resultater på ${importable.length} skyttere`,'success');
     setESSStatus(`Import fullført: ${count} resultater.`,'success');
   } catch(e) { showToast('Feil: '+e.message,'error'); }
+};
+
+// ─── Import all Classic shooters to match ────────────────────────────────────
+window.importAllClassicShooters = async () => {
+  const match = resultMatch();
+  if (!match) { showToast('Velg target match først', 'error'); return; }
+  const statusEl = document.getElementById('shooter-import-status');
+  statusEl.textContent = 'Sjekker eksisterende skyttere…';
+
+  const existing = match.shooters || [];
+  const existingNums = new Set(existing.map(s => String(s.ehcNum || s.num || '')).filter(Boolean));
+
+  const newShooters = CLASSIC_SHOOTERS
+    .filter(s => !existingNums.has(String(s.num)))
+    .map(s => ({
+      id: 'ehc_' + s.num,
+      isMe: false,
+      uid: null,
+      firstName: s.first,
+      lastName: s.last,
+      division: 'Classic',
+      pf: 'minor',
+      club: s.reg || '',
+      ehcNum: String(s.num),
+      ehcReg: s.reg || '',
+      ehcCat: s.cat || '',
+      ehcSquad: s.squad || '',
+      stages: []
+    }));
+
+  if (!newShooters.length) {
+    statusEl.textContent = `Alle ${CLASSIC_SHOOTERS.length} skyttere finnes allerede i matchen.`;
+    showToast('Ingen nye skyttere å importere', 'success');
+    return;
+  }
+
+  statusEl.textContent = `Importerer ${newShooters.length} nye skyttere…`;
+  try {
+    const updatedShooters = [...existing, ...newShooters];
+    await updateDoc(doc(db, 'matches', String(match.id)), { shooters: updatedShooters });
+    statusEl.textContent = `✓ ${newShooters.length} skyttere importert (${existingNums.size} fantes fra før).`;
+    showToast(`✓ ${newShooters.length} Classic-skyttere importert`, 'success');
+  } catch(e) {
+    statusEl.textContent = 'Feil: ' + e.message;
+    showToast('Import feilet: ' + e.message, 'error');
+  }
 };
 
 // ─── Toast ────────────────────────────────────────────────────────────────────

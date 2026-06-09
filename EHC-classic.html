@@ -481,22 +481,20 @@ function getShooterStages(match, shooterNum) {
 }
 
 function getCommonStageNums(match) {
-  // "Common" = stages shot by ALL shooters who have completed the most stages
-  // Find max stages any shooter has
+  // "Common" = stages shot by all shooters with results, excluding outliers below median
   const shootersWithResults = CLASSIC_SHOOTERS.filter(cs => getShooterStages(match, cs.num).length > 0);
   if (!shootersWithResults.length) return [];
 
-  // Find the maximum number of stages any shooter has completed
-  const maxStages = Math.max(...shootersWithResults.map(cs => getShooterStages(match, cs.num).length));
-  if (!maxStages) return [];
+  // Find median number of stages to exclude outliers
+  const stageCounts = shootersWithResults.map(cs => getShooterStages(match, cs.num).length).sort((a,b)=>a-b);
+  const median = stageCounts[Math.floor(stageCounts.length / 2)];
 
-  // Only consider shooters who have completed at least maxStages stages (i.e. "finished" shooters)
-  const finishedShooters = shootersWithResults.filter(cs => getShooterStages(match, cs.num).length >= maxStages);
+  // Only use shooters at or above median stage count
+  const normalShooters = shootersWithResults.filter(cs => getShooterStages(match, cs.num).length >= median);
+  if (!normalShooters.length) return [];
 
-  if (!finishedShooters.length) return [];
-
-  // Intersection of stages across all finished shooters
-  const stageSets = finishedShooters.map(cs => new Set(getShooterStages(match, cs.num).map(st => Number(st.num||st.number))));
+  // Intersection of stages across all normal shooters
+  const stageSets = normalShooters.map(cs => new Set(getShooterStages(match, cs.num).map(st => Number(st.num||st.number))));
   const first = stageSets[0];
   const common = [...first].filter(n => stageSets.every(s => s.has(n)));
   return common.sort((a,b)=>a-b);
@@ -593,7 +591,10 @@ function renderStandings() {
 
   // Group by category if showing all cats
   if (activeCat === '__ALL__') {
-    const catOrder = ['', 'S', 'SS', 'L', 'LS', 'J', 'SJ', 'LJ'];
+    const catOrder = ['__OVERALL__', 'S', 'SS', 'L', 'LS', 'J', 'SJ', 'LJ'];
+    const catNames2 = {'__OVERALL__':'Overall','S':'Senior','SS':'Super Senior','L':'Lady','LS':'Lady Senior','J':'Junior','SJ':'Super Junior','LJ':'Lady Junior'};
+
+    // Build category groups (non-Overall cats)
     const groups = {};
     sorted.forEach(s => {
       const c = s.cat || '';
@@ -602,11 +603,24 @@ function renderStandings() {
     });
 
     cont.innerHTML = catOrder
-      .filter(c => groups[c]?.length)
+      .filter(c => c === '__OVERALL__' || groups[c]?.length)
       .map(c => {
+        if (c === '__OVERALL__') {
+          // Overall = all shooters ranked together
+          let rank = 0;
+          const rows = sorted.map(s => {
+            if (s.total !== null) rank++;
+            return shooterRow(s, s.total !== null ? rank : null, topPts);
+          }).join('');
+          return `
+            <div class="cat-section">
+              <span>Overall</span>
+              <span class="muted">· ${scored.length} scored / ${sorted.length} total</span>
+            </div>
+            ${rows}`;
+        }
         const grp = groups[c];
         const grpTop = grp.filter(s => s.total !== null)[0]?.total || 0;
-        // Re-rank within group
         let rank = 0;
         const rows = grp.map(s => {
           if (s.total !== null) rank++;
@@ -614,7 +628,7 @@ function renderStandings() {
         }).join('');
         return `
           <div class="cat-section">
-            <span>${catLabel(c)}</span>
+            <span>${catNames2[c]||catLabel(c)}</span>
             <span class="muted">· ${grp.filter(s=>s.total!==null).length} scored / ${grp.length} total</span>
           </div>
           ${rows}`;

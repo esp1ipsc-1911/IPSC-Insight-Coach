@@ -660,10 +660,21 @@ function redcellApiConfig() {
 function redcellNum(v){return parseFloat(String(v??'').replace(',','.'))||0;}
 function redcellInt(v){return parseInt(String(v??''),10)||0;}
 
+function redcellUnwrapJson(json) {
+  if (json && json.data !== undefined) return json.data;
+  return json;
+}
 async function redcellFetchJson(path) {
   const cfg = redcellApiConfig();
   const url = cfg.base + path;
-  if (!cfg.proxy) throw new Error('Redcell proxy URL mangler. Fyll inn Cloudflare Worker URL.');
+  let lastErr = null;
+  try {
+    const res = await fetch(url, {headers:{'Accept':'application/json'}});
+    if (!res.ok) throw new Error('HTTP '+res.status+' '+res.statusText);
+    const json = await res.json();
+    return redcellUnwrapJson(json);
+  } catch(e) { lastErr = e; }
+  if (!cfg.proxy) throw lastErr || new Error('Redcell fetch failed. CORS blokkerer direkte henting. Legg inn Cloudflare Worker URL.');
   const res = await fetch(cfg.proxy, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -671,9 +682,9 @@ async function redcellFetchJson(path) {
   });
   const json = await res.json().catch(() => null);
   if (!res.ok || !json) throw new Error((json && json.error) || ('Proxy HTTP ' + res.status));
-  if (json.json !== undefined) return json.json;
-  if (json.data !== undefined) return json.data;
-  return json;
+  if (json.json !== undefined) return redcellUnwrapJson(json.json);
+  if (json.data !== undefined) return redcellUnwrapJson(json.data);
+  return redcellUnwrapJson(json);
 }
 
 function redcellSplitName(name) {
